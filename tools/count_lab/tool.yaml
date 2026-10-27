@@ -1,4 +1,5 @@
 id: LAB-count
+slug: count                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 name: 数え方ラボ
 kind: simulator
 file: count_lab.html

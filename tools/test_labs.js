@@ -20,6 +20,8 @@ const ROOT=path.resolve(__dirname,'..');
   if(await sw()>380)bad(`${tag}: 横にはみ出し`);
   if(v.cfg.mode){const m=await p.evaluate(()=>LK.mode);if(m!==v.cfg.mode)bad(`${tag}: 最初のモードが ${m}`);}
   const pr=v.cfg.predict;
+  const first=(v.cfg.set||{}).items?v.cfg.set.items[0]:(v.cfg.set||{}).item;
+  if(first&&await p.evaluate(()=>document.getElementById('jitem').textContent)!==first)bad(`${tag}: 最初のデータが ${first} にならない`);
   if(pr){
    const vis=await p.evaluate(()=>[...document.querySelectorAll('.mode').values()].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
    if(vis)bad(`${tag}: 予想の前に結果が見えている`);
@@ -52,7 +54,7 @@ const ROOT=path.resolve(__dirname,'..');
   if(await p.evaluate(()=>document.documentElement.scrollWidth)>360)bad(`${tag}: 横にはみ出し`);
   if(v.cfg.predict){
    if(await h()>320)bad(`${tag}: 予想の前に枠（320px）に収まらない（${await h()}px）`);
-   const fixed=Object.keys(v.cfg.set||{});
+   const fixed=Object.keys(v.cfg.set||{}).filter(k=>!(v.cfg.unlock||[]).includes(k));
    for(const k of fixed)if(await p.$eval(`#m-${v.cfg.mode}`,(m,k)=>{const s=m.querySelector(`select[data-key="${k}"]`);return s&&s.offsetParent!==null;},k))bad(`${tag}: 問題で決めた ${k} が選べてしまう`);
    if(v.cfg.predict.type==='number')await p.fill('#lk-in',String(v.expect));else await p.click(`#lk-ch button[data-v="${v.expect}"]`);
    await p.click('#lk-go');
