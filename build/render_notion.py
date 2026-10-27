@@ -178,13 +178,35 @@ class NotionRenderer:
             back.append("- この単元が使われる先 → " + "・".join(self.unit_ref(x) for x in u["used_by"]))
         out += ["---", "\n".join(back)]
         ev = "\n".join(f"| {self.stage_label(s['id'])} | {u['evidence'][s['id']]} |" for s in self.c.stages)
+        personal = f" → {mention(self.t['personal_root'])}" if self.t.get("personal_root") else ""
         out.append(f"<toggle>\n{lab['evidence_title']}\n\n| 段階 | できた証拠 |\n| --- | --- |\n{ev}\n\n"
-                   f'<span color="gray">{self.c.shared["personal_note"]}</span>\n</toggle>')
+                   f'<span color="gray">{self.c.shared["personal_note"]}</span>{personal}\n</toggle>')
         src = "・".join(f"[{s['name']}]({s['url']})" for s in self.c.shared["sources"])
         out.append(f"<toggle>\n{lab['meta_title']}\n\n単元ID：{uid}　版：{u['version']}　原本：stats2-course/content/units/{uid}/"
                    f"（このページは生成物。直すときは原本を直して作り直す）\n\n{self.c.shared['content_note']}\n\n"
                    f"出典：{src} を内容照合の基準とし、説明・例題・問題は独自に構成。\n</toggle>")
         return "\n\n".join(out) + "\n"
+
+    def root_page(self) -> str:
+        lines = [
+            '<callout icon="📌" color="blue_bg">\nこのページと配下の単元は、GitHub の原本（stats2-course）から生成している。'
+            "直すときはページではなく原本を直して作り直す。\n</callout>",
+        ]
+        # このページの子ページは <page> ブロックで並べる（mention にすると子ページが消える）
+        def child(pid, title):
+            return f'<page url="https://app.notion.com/p/{pid}">\n{title}\n</page>'
+        lines += ["", "## 最初に読む", "", child(self.t["guide_page"], "学び方ガイド")]
+        if self.t.get("personal_root"):
+            lines.append(f"\n自分の記録 → {mention(self.t['personal_root'])}")
+        new = self.t.get("units") or {}
+        lines += ["", "## 単元（新しい形）", ""]
+        for uid, meta in self.c.index.items():
+            if uid in new:
+                lines += [child(new[uid], f"{meta['number']}｜{self.c.units[uid]['title']}"), ""]
+        rows = [f"| {m['number']} | {self.unit_ref(uid)} |" for uid, m in self.c.index.items() if uid not in new]
+        lines += ["## まだ旧版の単元", "", "| 番号 | 単元 |", "| --- | --- |", *rows,
+                  "", '<span color="gray">新しい形に移すと、上の一覧に移る。</span>']
+        return "\n".join(lines) + "\n"
 
     def guide_page(self) -> str:
         src = (ROOT / "content" / "guide.md").read_text(encoding="utf-8")
