@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>散らばりラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+</style></head><body>
+<h1>🧪 散らばりラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-dev" class="mode">
+ <p class="mut" style="margin:0">平均からのずれ（偏差）を線で見る。偏差の合計はいつも0なので、2乗して足す（偏差平方和）。全部の値を b 倍して a を足すと、散らばりの数はどう変わるか。</p>
+ <div class="row ctl"><label>データ <select id="ddata" data-key="data"></select></label></div>
+ <input type="range" id="db" min="0.5" max="3" step="0.1" value="1" data-name="b 倍">
+ <input type="range" id="da" min="-20" max="40" step="1" value="0" data-name="a を足す">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+ <div class="card res det"><table id="dtab"></table></div>
+ <div id="dform"></div>
+</div>
+
+<div id="m-cv" class="mode">
+ <p class="mut" style="margin:0">平均の大きさが違う2つの散らばりを比べる。標準偏差は平均が大きいほど大きくなりやすいので、平均で割った変動係数（CV）で比べる。</p>
+ <input type="range" id="cmp" min="1" max="3000" step="1" value="100" data-name="Pの平均">
+ <input type="range" id="csp" min="0" max="1000" step="1" value="10" data-name="Pの標準偏差">
+ <input type="range" id="cmq" min="1" max="3000" step="1" value="20" data-name="Qの平均">
+ <input type="range" id="csq" min="0" max="1000" step="1" value="4" data-name="Qの標準偏差">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<div id="m-unb" class="mode">
+ <p class="mut" style="margin:0">母集団 2, 4, 6, 8, 10（母分散 8）から大きさ n の標本を取る。取り方は全部で 5ⁿ 通り（同じ値を何度でも取れる）。全部の標本で n で割る分散と n−1 で割る分散を計算し、平均を比べる。</p>
+ <input type="range" id="un" min="2" max="6" step="1" value="2" data-name="標本の大きさ n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="uplot"></div>
+ <div class="card res key" id="usum"></div>
+</div>
+
+<div id="m-gini" class="mode">
+ <p class="mut" style="margin:0">4店の売上を小さい順に並べ、累積の店の割合（横）と累積の売上の割合（縦）を結ぶ（ローレンツ曲線）。対角線との間が広いほど偏っている。</p>
+ <input type="range" id="g1" min="0" max="20" step="1" value="1" data-name="1店目">
+ <input type="range" id="g2" min="0" max="20" step="1" value="1" data-name="2店目">
+ <input type="range" id="g3" min="0" max="20" step="1" value="2" data-name="3店目">
+ <input type="range" id="g4" min="0" max="20" step="1" value="6" data-name="4店目">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="gplot"></div>
+ <div class="card res key" id="gsum"></div>
+ <div id="gform"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const W=340;
+const r2=v=>+v.toFixed(2);
+// ---- 計算（本文の値はこの関数で検算する）
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const ssq=a=>{const m=mean(a);return a.reduce((s,x)=>s+(x-m)**2,0);};
+function stats(a){const n=a.length,m=mean(a),ss=ssq(a),v=ss/n,s2=ss/(n-1);return {n,m,ss,v,s2,s:Math.sqrt(s2),sdn:Math.sqrt(v),cv:Math.sqrt(s2)/m,sx2:a.reduce((s,x)=>s+x*x,0),sx:a.reduce((s,x)=>s+x,0)};}
+
+// ---- 偏差と分散
+const DATA={
+ B:{name:"売場B（4〜16個）",v:[4,7,10,13,16],unit:"個"},
+ A:{name:"売場A（8〜12個）",v:[8,9,10,11,12],unit:"個"},
+ t3:{name:"3個（2, 4, 6）",v:[2,4,6],unit:""},
+ t4:{name:"4個（1, 3, 5, 7）",v:[1,3,5,7],unit:""},
+ rx:{name:"X（0, 5, 5, 5, 10）",v:[0,5,5,5,10],unit:""},
+ ry:{name:"Y（0, 0, 5, 10, 10）",v:[0,0,5,10,10],unit:""},
+ temp:{name:"3日の気温（18, 20, 22℃）",v:[18,20,22],unit:""},
+ visit:{name:"5日の来店数（20〜28人）",v:[20,22,24,26,28],unit:"人"},
+ fundB:{name:"投信Bの年リターン（−4, 4, 12%）",v:[-4,4,12],unit:"%"}};
+function dVals(){const D=DATA[$("ddata").value],b=+$("db").value,a=+$("da").value,x=D.v.map(v=>+(b*v+a).toFixed(6));return {D,b,a,x,...stats(x)};}
+function dRender(){const R=dVals(),x=R.x,lo=Math.min(...x,R.m)-1,hi=Math.max(...x,R.m)+1,X=v=>20+(v-lo)/(hi-lo)*(W-40),n=x.length,H=40+n*18;
+ let s=`<svg viewBox="0 0 ${W} ${H+20}" width="${W}" role="img" aria-label="偏差の図">`;
+ s+=`<line x1="${X(R.m)}" y1="6" x2="${X(R.m)}" y2="${H}" stroke="var(--acc2)" stroke-width="2"/><text x="${Math.min(W-30,Math.max(30,X(R.m)))}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--acc2)" font-weight="700">平均 ${f(r2(R.m))}</text>`;
+ x.forEach((v,i)=>{const y=18+i*18;s+=`<line x1="${X(R.m)}" y1="${y}" x2="${X(v)}" y2="${y}" stroke="var(--acc)" stroke-width="2" stroke-dasharray="4 3"/><circle cx="${X(v)}" cy="${y}" r="5" fill="var(--fg)"/><text x="${X(v)+(v>=R.m?9:-9)}" y="${y+4}" font-size="10" text-anchor="${v>=R.m?"start":"end"}" fill="var(--mut)">${f(r2(v))}</text>`;});
+ $("dplot").innerHTML=s+`</svg><div class="mut">点線の長さ＝偏差（値−平均）。左右の点線を足すと0になる。</div>`;
+ const u=R.D.unit,tr=(R.b!==1||R.a!==0)?`<div class="mut">変換 ${f(R.b)}x${R.a>=0?"＋":"−"}${Math.abs(R.a)}：平均は ${f(R.b)}倍して${R.a>=0?"足し":"引き"}、分散は ${f(r2(R.b*R.b))}倍、標準偏差は ${f(R.b)}倍。a は散らばりを変えない。</div>`:"";
+ $("dsum").innerHTML=`<div>偏差平方和 <b>${f(r2(R.ss))}</b>　分散（n）<b>${f(r2(R.v))}</b>　不偏分散（n−1）<b>${f(r2(R.s2))}</b></div><div>標準偏差 s＝√${f(r2(R.s2))}≒<b>${f(r2(R.s))}</b>${u}${R.m>0?`　CV≒<b>${f(r2(R.cv))}</b>`:""}</div>${tr}`;
+ $("dtab").innerHTML="<tr><th>xᵢ</th><th>xᵢ−x̄</th><th>(xᵢ−x̄)²</th></tr>"+x.map(v=>`<tr><td>${f(r2(v))}</td><td>${f(r2(v-R.m))}</td><td>${f(r2((v-R.m)**2))}</td></tr>`).join("")+`<tr><td><b>合計</b></td><td>0</td><td><b>${f(r2(R.ss))}</b></td></tr>`;
+ $("dform").innerHTML=LK.formula([`平均＝${f(r2(R.sx))}÷${n}＝${f(r2(R.m))}`,`分散（n）＝${f(r2(R.ss))}÷${n}＝${f(r2(R.v))}、不偏分散＝${f(r2(R.ss))}÷${n-1}＝${f(r2(R.s2))}`,`近道：Σx²−(Σx)²÷n＝${f(r2(R.sx2))}−${f(r2(R.sx))}²÷${n}＝${f(r2(R.ss))}`]);}
+LK.register("dev",{name:"偏差と分散",
+ init(){$("ddata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("ddata").onchange=dRender;
+  LK.stepper($("db"),dRender);LK.stepper($("da"),dRender);dRender();},
+ apply(s){if(s.data)$("ddata").value=s.data;if(s.b!==undefined)LK.setRange("db",s.b);if(s.a!==undefined)LK.setRange("da",s.a);dRender();},
+ render:dRender,
+ value(key){const R=dVals(),v={ss:R.ss,v:R.v,s2:R.s2,s:R.s,sdn:R.sdn,cv:R.cv,mean:R.m}[key];return {v,text:f(r2(v))};}});
+
+// ---- 変動係数
+function cVals(){const mp=+$("cmp").value,sp=+$("csp").value,mq=+$("cmq").value,sq=+$("csq").value;return {mp,sp,mq,sq,cp:sp/mp,cq:sq/mq};}
+function cRender(){const C=cVals(),H=120,mx=Math.max(C.cp,C.cq,0.01),bars=[["P",C.cp,"var(--acc)"],["Q",C.cq,"var(--acc2)"]];
+ let s=`<svg viewBox="0 0 ${W} ${H+20}" width="${W}" role="img" aria-label="変動係数の比較"><line x1="10" y1="${H}" x2="${W-10}" y2="${H}" stroke="var(--line)"/>`;
+ bars.forEach(([t,v,c],i)=>{const h=v/mx*(H-30),x=60+i*130;s+=`<rect x="${x}" y="${H-h}" width="80" height="${Math.max(1,h)}" rx="3" fill="${c}" fill-opacity=".75"/><text x="${x+40}" y="${H-h-6}" font-size="13" text-anchor="middle" fill="var(--fg)" font-weight="700">${f(r2(v))}</text><text x="${x+40}" y="${H+15}" font-size="12" text-anchor="middle" fill="var(--mut)">${t}のCV</text>`;});
+ $("cplot").innerHTML=s+"</svg>";
+ const big=C.cp>C.cq+1e-12?"P":C.cq>C.cp+1e-12?"Q":"同じ";
+ $("csum").innerHTML=`<div>CV：P＝${C.sp}÷${C.mp}≒<b>${f(r2(C.cp))}</b>、Q＝${C.sq}÷${C.mq}≒<b>${f(r2(C.cq))}</b></div><div class="mut">${C.sp===C.sq?"標準偏差は同じ。":`標準偏差だけなら ${C.sp>C.sq?"P":"Q"} の方が大きい。`}平均に対する相対的なばらつき（CV）が大きいのは <b>${big}</b>。CVは0に意味がある正の量で使う。</div>`;}
+LK.register("cv",{name:"変動係数",
+ init(){["cmp","csp","cmq","csq"].forEach(id=>LK.stepper($(id),cRender));cRender();},
+ apply(s){[["mP","cmp"],["sP","csp"],["mQ","cmq"],["sQ","csq"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});cRender();},
+ render:cRender,
+ value(key){const C=cVals();if(key==="bigger"){const t=C.cp>C.cq+1e-12?"P":C.cq>C.cp+1e-12?"Q":"同じ";return {v:C.cp-C.cq,text:t};}const v=key==="cvQ"?C.cq:C.cp;return {v,text:f(r2(v))};}});
+
+// ---- n で割るか n−1 で割るか（全部の標本を数え上げる）
+const POP=[2,4,6,8,10],SIG2=8;
+function uVals(){const n=+$("un").value;let sv=0,ss2=0,cnt=0,small=0;const idx=Array(n).fill(0);
+ while(true){const x=idx.map(i=>POP[i]),q=ssq(x);sv+=q/n;ss2+=q/(n-1);if(q/n<SIG2)small++;cnt++;
+  let k=n-1;while(k>=0&&idx[k]===POP.length-1){idx[k]=0;k--;}if(k<0)break;idx[k]++;}
+ return {n,cnt,av:sv/cnt,as2:ss2/cnt,small};}
+function uRender(){const U=uVals(),H=130,mx=10,Y=v=>H-v/mx*(H-20),bars=[["nで割る",U.av,"var(--acc2)"],["n−1で割る",U.as2,"var(--acc)"]];
+ let s=`<svg viewBox="0 0 ${W} ${H+22}" width="${W}" role="img" aria-label="分散の平均と母分散"><line x1="10" y1="${H}" x2="${W-10}" y2="${H}" stroke="var(--line)"/>`;
+ bars.forEach(([t,v,c],i)=>{const x=50+i*140;s+=`<rect x="${x}" y="${Y(v)}" width="90" height="${H-Y(v)}" rx="3" fill="${c}" fill-opacity=".7"/><text x="${x+45}" y="${Y(v)-6}" font-size="13" text-anchor="middle" fill="var(--fg)" font-weight="700">${f(r2(v))}</text><text x="${x+45}" y="${H+16}" font-size="12" text-anchor="middle" fill="var(--mut)">${t}</text>`;});
+ s+=`<line x1="20" y1="${Y(SIG2)}" x2="${W-14}" y2="${Y(SIG2)}" stroke="var(--fg)" stroke-width="2" stroke-dasharray="6 4"/><text x="${W-16}" y="${Y(SIG2)-5}" font-size="11" text-anchor="end" fill="var(--fg)">母分散 8</text>`;
+ $("uplot").innerHTML=s+"</svg>";
+ $("usum").innerHTML=`<div>全 ${U.cnt.toLocaleString("ja-JP")} 通りの平均：n で割る分散 <b>${f(r2(U.av))}</b>、n−1 で割る分散 <b>${f(r2(U.as2))}</b>（母分散 8）</div><div class="mut">n で割ると平均して母分散の (n−1)/n＝${f(r2((U.n-1)/U.n))} 倍に小さくなる。n を大きくすると差は縮む。1回の標本では母分散より大きくなることもある（n で割って8未満の標本は ${Math.round(U.small/U.cnt*100)}%）。</div>`;}
+LK.register("unb",{name:"n か n−1 か",
+ init(){LK.stepper($("un"),uRender);uRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("un",s.n);uRender();},
+ render:uRender,
+ value(key){const U=uVals();if(key==="bias"){const t=U.av<SIG2-1e-9?"小さい":U.av>SIG2+1e-9?"大きい":"等しい";return {v:U.av-SIG2,text:t};}
+  if(key==="ratio"){const v=U.av/SIG2;return {v,text:f(r2(v))};}const v=key==="as2"?U.as2:U.av;return {v,text:f(r2(v))};}});
+
+// ---- ローレンツ曲線とジニ係数
+function gVals(){const x=[1,2,3,4].map(i=>+$("g"+i).value).sort((a,b)=>a-b),t=x.reduce((a,b)=>a+b,0),n=x.length;let c=0;const pts=[[0,0]];
+ x.forEach((v,i)=>{c+=v;pts.push([(i+1)/n,t?c/t:(i+1)/n]);});let area=0;for(let i=1;i<pts.length;i++)area+=(pts[i][0]-pts[i-1][0])*(pts[i][1]+pts[i-1][1])/2;
+ return {x,t,pts,area,gini:2*(0.5-area)};}
+function gRender(){const G=gVals(),S=200,O=20,X=v=>O+v*S,Y=v=>O+S-v*S;
+ let s=`<svg viewBox="0 0 ${W} ${S+50}" width="${W}" role="img" aria-label="ローレンツ曲線"><rect x="${O}" y="${O}" width="${S}" height="${S}" fill="none" stroke="var(--line)"/>`;
+ s+=`<polygon points="${[[0,0],[1,1],...G.pts.slice().reverse()].map(p=>X(p[0])+","+Y(p[1])).join(" ")}" fill="var(--acc2)" fill-opacity=".18"/>`;
+ s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--mut)" stroke-dasharray="5 4"/>`;
+ s+=`<polyline points="${G.pts.map(p=>X(p[0])+","+Y(p[1])).join(" ")}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
+ G.pts.forEach(p=>{s+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="var(--acc)"/>`;});
+ G.pts.slice(1).forEach(p=>{s+=`<text x="${X(p[0])-4}" y="${Y(p[1])-6}" font-size="10" text-anchor="end" fill="var(--fg)">${f(r2(p[1]))}</text><text x="${X(p[0])}" y="${O+S+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${f(p[0])}</text>`;});
+ s+=`<text x="${O+S+8}" y="${O+40}" font-size="11" fill="var(--mut)">色の部分×2</text><text x="${O+S+8}" y="${O+56}" font-size="11" fill="var(--mut)">＝ジニ係数</text>`;
+ $("gplot").innerHTML=s+`<text x="${O+S/2}" y="${S+48}" font-size="11" text-anchor="middle" fill="var(--mut)">累積の店の割合</text></svg>`;
+ $("gsum").innerHTML=G.t?`<div>ジニ係数＝2×(0.5−${f(r2(G.area))})＝<b>${f(r2(G.gini))}</b></div><div class="mut">0に近いほど均等、1に近いほど一部の店に偏る。全店同じ売上なら曲線は対角線に重なり0。</div>`:`<div>売上の合計が0なので計算できない。</div>`;
+ $("gform").innerHTML=LK.formula([`小さい順：${G.x.join(", ")}（合計${G.t}）`,`累積の売上の割合：${G.pts.slice(1).map(p=>f(r2(p[1]))).join(", ")}`,`曲線の下の面積（台形）＝${f(+G.area.toFixed(4))}`]);}
+LK.register("gini",{name:"ジニ係数",
+ init(){[1,2,3,4].forEach(i=>LK.stepper($("g"+i),gRender));gRender();},
+ apply(s){if(s.sales!==undefined)String(s.sales).split(",").forEach((v,i)=>LK.setRange("g"+(i+1),+v));gRender();},
+ render:gRender,
+ value(key){const G=gVals();const v=key==="area"?G.area:G.gini;return {v,text:f(r2(v))};}});
+
+LK.start("dev");
+window.__LAB__={LK,stats,ssq,DATA,dVals,cVals,uVals,gVals};
+</script>
+</body></html>

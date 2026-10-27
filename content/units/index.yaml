@@ -7,7 +7,7 @@
 - {id: U05, number: "05", migrated: true}
 - {id: U05T, number: "05-T", migrated: true}
 - {id: U06, number: "06", migrated: true}
-- {id: U07, number: "07", migrated: false}
+- {id: U07, number: "07", migrated: true}
 - {id: U08, number: "08", migrated: false}
 - {id: U09, number: "09", migrated: true}
 - {id: U10, number: "10", migrated: false}
