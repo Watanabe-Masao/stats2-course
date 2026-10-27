@@ -24,7 +24,9 @@ content/
   units/index.yaml   全単元の一覧と移行状況
   units/U09/         unit.yaml（属性・ゴール・検算）＋ S1.md〜S6.md（段階ごとの本文）
   problems/U09.yaml  問題（ID・段階・力・形式・答え・誤答の理由・検算）
-tools/count_lab/     数え方ラボ（HTML）と tool.yaml
+tools/labkit/        ラボの共通部品（課題カード・予想・−／＋・式で計算）
+tools/<lab>/         ラボ（src の HTML と tool.yaml・check.js）
+tests/               build/ の単体テスト
 templates/notion/    Notion表示の見た目（部品の色・アイコン・ラベル）
 build/               検証・検算・生成のプログラム
 publish/notion.yaml  原本ID → NotionページID の対応表（公開先ごとに用意）
@@ -35,7 +37,8 @@ out/                 生成物（git管理外）
 
 ```bash
 python3 build/build.py --check   # 検証と検算だけ
-python3 build/build.py           # 生成（out/notion/*.md）
+python3 build/build.py           # 生成（out/notion/*.md と out/labs/）
+build/check_all.sh               # 公開・コミット前に全部を確かめる（npm install が先に要る）
 ```
 
 本文の書き方は `CLAUDE.md` の「本文の記法」を参照。

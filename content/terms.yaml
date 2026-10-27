@@ -35,3 +35,18 @@
 - id: TERM-bias
   name: バイアス（偏り）
   en: bias
+- id: TERM-qual
+  name: 質的変数
+  en: qualitative variable
+- id: TERM-quant
+  name: 量的変数
+  en: quantitative variable
+- id: TERM-scale
+  name: 尺度
+  en: level of measurement
+- id: TERM-mode
+  name: 最頻値
+  en: mode
+- id: TERM-median
+  name: 中央値
+  en: median
