@@ -5,3 +5,7 @@ figures:
     file: assets/figures/c03.svg
     caption: 母集団（左）から標本（右）を取り、標本から計算した x̄ で、分からない μ を推測する
     used_by: [U03]
+  - id: FIG-U04-scale
+    file: assets/figures/c04_scale.svg
+    caption: 名義→順序→間隔→比例と上がるほど、意味のある計算が増える。何倍と言えるのは0が「無い」を表す比例尺度だけ
+    used_by: [U04]

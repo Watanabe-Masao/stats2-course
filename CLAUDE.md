@@ -35,7 +35,7 @@
 4. 移行した単元は `python3 build/audit.py <ID>` で旧版との欠落がないことを確かめる（落とす項目は migration/waivers に理由を書く）。
 5. 新しいページを作ったら、そのページ ID を `publish/notion.yaml` に書いてコミットする。
 
-入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。
+入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。新しい単元ページを作ると入口の末尾に子ページが付くので、root.md の並びに合わせて動かす。
 
 個人用の学習記録（publish/notion.yaml の personal_root）：解答記録・到達記録・学習ログの3つのDB。問題は「問題ID」の文字列で指す。教材の生成物から個人データを読み書きしない。
 

@@ -5,6 +5,7 @@ guide_page: 406b7cd539a181df985edc50a2b248af  # 学び方ガイド（生成）
 personal_root: 406b7cd539a181719cfdfd53a2501d4a  # 個人用の学習記録（配布しない。配布先の設定では空にする）
 units:                 # 新しく生成した単元ページ
   U03: 406b7cd539a18162b230fddc4cad9937
+  U04: 406b7cd539a181ad89c5ebb1427a5ec5
   U09: 406b7cd539a18111807cf1b85390f332
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
@@ -46,6 +47,7 @@ refs:
   REF-PQ-DB: da3b5947153c4ae59304e308a9b1e9e2
   REF-CONFUSION: 406b7cd539a1813095c5c41c64477e81
   REF-Q-U03: 402b7cd539a181b395afefab24282878
+  REF-Q-U04: 402b7cd539a1819fab4ee8434938ad01
 terms:
   TERM-perm: 405b7cd539a181f2b3b4f04db076d2f0
   TERM-comb: 405b7cd539a181298d8fd17c7d3bd440
@@ -59,3 +61,8 @@ terms:
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143
+  TERM-qual: 405b7cd539a1814eb46ff263f4752929
+  TERM-quant: 405b7cd539a181db899ec9f4f50ffb45
+  TERM-scale: 405b7cd539a1812ba309e50eb09e9dac
+  TERM-mode: 405b7cd539a181dd8705ca1b29acf06b
+  TERM-median: 405b7cd539a1814fa4abc233de2c70df

@@ -1,0 +1,19 @@
+id: LAB-scale
+name: 尺度ラボ
+kind: simulator
+file: scale_lab.html
+version: 1
+replaces_legacy: [scale.html]   # 旧版 教科書04 の「℃とKで何倍が変わる」ラボの機能を含む
+modes:
+  - {key: judge, name: 尺度を判定, purpose: 4つの質問に上から答えて尺度を決め、答えと理由・意味のある計算を見る（14件）}
+  - {key: unit, name: 単位を変える, purpose: 気温（℃・K・℉）・重さ（kg・g・lb）・年で、差と何倍が単位で変わるかを見る}
+  - {key: likert, name: 満足度の平均, purpose: 段階につける点を変えると平均の順位は入れ替わるが、中央値と割合は変わらない}
+  - {key: bin, name: 階級にまとめる, purpose: 年齢を年代にまとめると区別できる値が減り、平均も近似になる}
+data: 満足度 A店[0,0,60,40,0]・B店[20,10,0,10,60]（とても不満→とても満足）。年齢20人（平均41.6歳）
+used_by: [U04]
+tests:
+  - node tools/test_lab.js tools/scale_lab/scale_lab.html   # エラー・380px・ライト／ダーク
+  - node tools/scale_lab/check.js                           # 本文に書いた値（2.000/1.035/1.360、3.40/3.80/3.26、41.6/41.5）
+checked:
+  browser_380px: 2026-10-27
+  notion_iphone: null
