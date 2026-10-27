@@ -23,7 +23,7 @@ from pathlib import Path
 from model import ROOT, TOOLS, Course
 
 OUT = ROOT / "out" / "labs"
-CFG_KEYS = ("mode", "set", "task", "predict", "why")
+CFG_KEYS = ("mode", "modes", "set", "task", "predict", "why")
 
 
 def safe(aid: str) -> str:
@@ -194,7 +194,12 @@ def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
         key = (p.get("predict") or {}).get("key")
         if key and key not in mode.get("values", []):
             err.append(f"{where}: predict.key {key} はモード {mode['key']} の values にない（{mode.get('values')}）")
-    elif p.get("set") or p.get("predict"):
+    for k in p.get("modes") or []:
+        if k not in modes:
+            err.append(f"{where}: modes の {k} はラボにない（{', '.join(modes)}）")
+    if p.get("modes") and p.get("mode") not in p["modes"]:
+        err.append(f"{where}: mode は modes に含める")
+    if not mode and (p.get("set") or p.get("predict")):
         err.append(f"{where}: set や predict を使うときは mode を書く")
     pr = p.get("predict")
     if pr:

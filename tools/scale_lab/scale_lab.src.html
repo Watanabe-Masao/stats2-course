@@ -22,7 +22,7 @@
 
 <div id="m-unit" class="mode">
  <p class="mut" style="margin:0">同じ2つの値を、別の単位で表し直す。「差」と「何倍（B÷A）」は単位を変えると変わるか。</p>
- <div class="row ctl"><label>データ <select id="ukind"><option value="temp">気温</option><option value="wt">重さ</option><option value="money">売上金額</option><option value="year">年</option></select></label></div>
+ <div class="row ctl"><label>データ <select id="ukind" data-key="kind"><option value="temp">気温</option><option value="wt">重さ</option><option value="money">売上金額</option><option value="year">年</option></select></label></div>
  <input type="range" id="ua" data-name="A">
  <input type="range" id="ub" data-name="B">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
@@ -33,7 +33,7 @@
 
 <div id="m-likert" class="mode">
  <p class="mut" style="margin:0">5段階の満足度（各100人）。ふつうは 1〜5 点をつけて平均するが、「段階の間隔は等しい」は仮定にすぎない。両端の段階につける点を変えると、どちらの店が上になるか。</p>
- <div id="lbars"></div>
+ <div id="lbars" class="det"></div>
  <input type="range" id="l5" min="4.1" max="8" step="0.1" value="5" data-name="とても満足" data-unit="点">
  <input type="range" id="l1" min="-3" max="1.9" step="0.1" value="1" data-name="とても不満" data-unit="点">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
@@ -45,8 +45,8 @@
 
 <div id="m-bin" class="mode">
  <p class="mut" style="margin:0">20人の客の年齢。階級（年代）にまとめると、何が見えなくなるか。</p>
- <div class="row ctl"><label>まとめ方 <select id="bw"><option value="1">まとめない（1歳ごと）</option><option value="5">5歳ごと</option><option value="10" selected>10歳ごと（年代）</option></select></label></div>
- <div id="bplot"></div>
+ <div class="row ctl"><label>まとめ方 <select id="bw" data-key="w"><option value="1">まとめない（1歳ごと）</option><option value="5">5歳ごと</option><option value="10" selected>10歳ごと（年代）</option></select></label></div>
+ <div id="bplot" class="det"></div>
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
  <div id="bform"></div>
  <div class="card res" id="bsum"></div>
@@ -54,7 +54,7 @@
 
 <div id="m-code" class="mode">
  <p class="mut" style="margin:0">性別（名義）を数字で記録した100人。どの数字を振るかで平均は変わる。それでも読み取れるものはあるか。</p>
- <div class="row ctl"><label>数字の振り方（男性・女性） <select id="cpair"><option value="1,2">1・2</option><option value="0,1">0・1</option><option value="2,1">2・1</option><option value="10,20">10・20</option></select></label></div>
+ <div class="row ctl"><label>数字の振り方（男性・女性） <select id="cpair" data-key="pair"><option value="1,2">1・2</option><option value="0,1">0・1</option><option value="2,1">2・1</option><option value="10,20">10・20</option></select></label></div>
  <input type="range" id="cn" min="0" max="100" step="1" value="42" data-name="女性" data-unit="人">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
  <div class="card res" id="csum"></div>
