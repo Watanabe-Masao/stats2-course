@@ -1,0 +1,7 @@
+# 図の一覧。id は変えない。本文では {{fig:ID}}（説明を変えるなら {{fig:ID|説明}}）。
+# ラボ（シミュレーター）は tools/*/tool.yaml に登録する。
+figures:
+  - id: FIG-U03-population
+    file: assets/figures/c03.svg
+    caption: 母集団（左）から標本（右）を取り、標本から計算した x̄ で、分からない μ を推測する
+    used_by: [U03]

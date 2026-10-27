@@ -1,0 +1,37 @@
+id: U03
+number: "03"
+title: 母集団と標本・母数と統計量
+domain: D1
+reference_section: ① データの記述
+prev: U02
+next: U04
+prereq: [U01, U02]
+used_by: [U10, U17, U22, U31]
+terms: [TERM-population, TERM-sample, TERM-parameter, TERM-statistic, TERM-frame, TERM-random-sampling, TERM-bias, TERM-sample-space, TERM-event]
+labs: [LAB-sample]
+goal: 問題文の数字が「知りたい全体（母集団）」の値か「調べた一部（標本）」から計算した値かを見分け、**母数と統計量を区別して言える**。さらに、標本の選ばれ方に偏りがないかを確かめられる。
+stage_goals:
+  S1: 「2.4% は全店の平均ではない。なぜなら〜」を自分の言葉で1文にできれば完了。
+  S2: 資料を見ずに答え、答え合わせをして、間違えた所だけ初学に戻る。
+  S3: 問題文に「母数」「統計量」とは書いていない。**数字の出どころ（誰を・どう選んだか）を自分で確かめてから答える**。
+  S4: 品質検査・視聴率・生き物の数など、見た目が違っても「全体を一部から推し量る」同じ形をしている。
+  S5: 2級には直接出ない。1級の有限母集団修正や、他の学問での「一部から全体を知る」方法とのつながり。興味のあるものを1つ選べばよい。
+  S6: 答えが1つに決まらない課題。**問いを立てる→仮定を置く→方法を組む→小さな例で検証する→限界を書く**の順に進める。
+evidence:
+  S1: 「2.4% は全店の平均ではない」理由を1文で書けた
+  S2: 翌日・1週間後・1か月後に見ずに解けた
+  S3: 数字の出どころと偏りの可能性を、自分から確かめて答えられた
+  S4: 別の場面の母集団・標本・偏りを説明できた
+  S5: 1つ選んで理解を確かめた（任意）
+  S6: 課題を1つ作り、検証まで行った（任意）
+status: drafted
+version: 1
+checks:
+  - 'Fraction(sum([Fraction(21,10), Fraction(28,10), Fraction(24,10), Fraction(30,10), Fraction(22,10)]), 5) == Fraction(5,2)'
+  - 'comb(5,2) == 10 and Fraction(comb(4,1), comb(5,2)) == Fraction(2,5)'
+  - 'Fraction(2+3+4, 3) == 3 and Fraction(15, 300) == Fraction(5, 100)'
+  - '50*40//8 == 250'
+  - 'abs(0.7*0.6 + 0.3*0.8 - 0.66) < 1e-12 and abs(0.5*0.6 + 0.5*0.8 - 0.70) < 1e-12'
+  - 'abs((100-10)/(100-1) - 0.909) < 0.001 and abs((1000-100)/(1000-1) - 0.901) < 0.001'
+  - '[round(10*s/100) for s in (30, 50, 20)] == [3, 5, 2]'
+  - 'Fraction(3, 6) == Fraction(1, 2) and Fraction(len({4,5,6}), 6) == Fraction(1, 2)'

@@ -1,0 +1,19 @@
+id: LAB-sample
+name: 標本ラボ
+kind: simulator
+file: sample_lab.html
+version: 1
+replaces_legacy: [frame.html]   # 旧版 教科書03 の「抽出枠」ラボの機能を含む
+modes:
+  - {key: rand, name: 無作為に取る, purpose: x̄ は取り直すと変わり μ のまわりにばらつく。n＝100 は全数調査}
+  - {key: frame, name: 名簿の漏れ, purpose: 抽出枠の偏りは n を増やしても消えない}
+  - {key: resp, name: 自分から回答, purpose: 自発的な回答の偏り。偏りの強さ0と比べる}
+  - {key: space, name: 標本空間, purpose: 試行・標本空間・事象・余事象（確率の言葉）}
+population: 固定の乱数（seed 3）で作る100店の廃棄率。μ＝2.542%、最小1.4%、最大3.8%
+used_by: [U03]
+tests:
+  - node tools/test_lab.js tools/sample_lab/sample_lab.html   # エラー・380px・ライト／ダーク
+  - node tools/sample_lab/check.js                           # 無作為≒μ、全数＝μ、漏れ・自発回答はずれる
+checked:
+  browser_380px: 2026-10-27
+  notion_iphone: null

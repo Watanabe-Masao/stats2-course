@@ -68,6 +68,7 @@ class Course:
     terms: dict
     index: dict          # unit id -> {number, migrated}
     labs: dict           # lab id -> tool.yaml + path
+    figures: dict        # fig id -> content/assets.yaml の項目
     units: dict = field(default_factory=dict)      # id -> unit dict (+ bodies, problems)
     errors: list = field(default_factory=list)
 
@@ -87,7 +88,11 @@ def load_course() -> Course:
         t = load_yaml(ty)
         t["dir"] = ty.parent
         labs[t["id"]] = t
-    c = Course(stages, powers, shared, terms, index, labs)
+    figures = {f["id"]: f for f in (load_yaml(CONTENT / "assets.yaml") or {}).get("figures", [])}
+    for fid, f in figures.items():
+        if not (ROOT / f["file"]).exists():
+            raise FileNotFoundError(f"{fid}: 図のファイル {f['file']} がない")
+    c = Course(stages, powers, shared, terms, index, labs, figures)
     for uid, meta in index.items():
         if not meta.get("migrated"):
             continue
@@ -170,13 +175,17 @@ def _check_token(c: Course, where: str, kind: str, arg):
         return [f"{where}: 用語 {arg} がない"]
     if kind == "lab" and arg not in c.labs:
         return [f"{where}: ラボ {arg} がない"]
+    if kind == "fig" and arg.split("|")[0] not in c.figures:
+        return [f"{where}: 図 {arg} が assets.yaml にない"]
+    if kind == "ref" and arg not in c.shared.get("refs", {}):
+        return [f"{where}: 参照 {arg} が shared.yaml の refs にない"]
     if kind == "power" and arg not in c.powers:
         return [f"{where}: 力 {arg} がない"]
     if kind == "stage" and arg not in c.stage_ids:
         return [f"{where}: 段階 {arg} がない"]
     if kind == "shared" and arg not in c.shared:
         return [f"{where}: 共通文言 {arg} がない"]
-    if kind not in {"unit", "term", "lab", "power", "stage", "shared", "icon", "problem",
+    if kind not in {"unit", "term", "lab", "power", "stage", "shared", "icon", "problem", "fig", "ref",
                     "stages_table", "powers_list"}:
         return [f"{where}: 未知の部品 {{{{{kind}}}}}"]
     return []

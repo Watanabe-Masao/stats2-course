@@ -13,7 +13,7 @@ from model import ROOT, TOKEN, Course, load_yaml
 COMP = load_yaml(ROOT / "templates" / "notion" / "components.yaml")
 CIRC = "①②③④⑤⑥⑦⑧⑨"
 LIST_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s")
-LAB_PLACEHOLDER = "@@LAB:{}@@"
+ASSET_PLACEHOLDER = "@@ASSET:{}@@"
 
 
 def mention(page_id: str) -> str:
@@ -58,7 +58,15 @@ class NotionRenderer:
             if kind == "shared":
                 return self.inline(self.c.shared[arg])
             if kind == "lab":
-                return f'<embed source="{LAB_PLACEHOLDER.format(arg)}" />'
+                return f'<embed source="{ASSET_PLACEHOLDER.format(arg)}" />'
+            if kind == "fig":
+                fid, _, cap = arg.partition("|")
+                cap = cap or self.c.figures[fid].get("caption", "")
+                return f'<image source="{ASSET_PLACEHOLDER.format(fid)}">\n{self.inline(cap)}\n</image>'
+            if kind == "ref":
+                pid = (self.t.get("refs") or {}).get(arg)
+                label = self.c.shared["refs"][arg]
+                return mention(pid) if pid else label
             return m.group(0)
         text = TOKEN.sub(tok, text)
         text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
@@ -126,13 +134,19 @@ class NotionRenderer:
         if rest:
             parts.append("\n".join(rest))
         if q["format"] == "choice":
-            parts.append("\n" + "　".join(f"{CIRC[k]} {v}" for k, v in enumerate(q["choices"])))
+            if max(len(str(v)) for v in q["choices"]) > 12:   # 長い選択肢は1行ずつ
+                parts.append("\n" + "\n".join(f"{CIRC[k]} {v}" for k, v in enumerate(q["choices"])))
+            else:
+                parts.append("\n" + "　".join(f"{CIRC[k]} {v}" for k, v in enumerate(q["choices"])))
             k = q["correct"]
-            ans = f"<b>{CIRC[k-1]} {q['choices'][k-1]}</b>。{self.inline(q['answer'])}"
+            long = max(len(str(v)) for v in q["choices"]) > 12
+            head = f"<b>正解は{CIRC[k-1]}</b>" if long else f"<b>{CIRC[k-1]} {q['choices'][k-1]}</b>"
+            ans = f"{head}。{self.inline(q['answer'])}"
             mis = q.get("misconceptions") or {}
             if mis:
                 ans += "\n\n" + "\n".join(
-                    f"- {CIRC[int(n)-1]} {q['choices'][int(n)-1]}＝{self.inline(t)}" for n, t in sorted(mis.items()))
+                    (f"- {CIRC[int(n)-1]}：{self.inline(t)}" if long else
+                     f"- {CIRC[int(n)-1]} {q['choices'][int(n)-1]}＝{self.inline(t)}") for n, t in sorted(mis.items()))
             title = q.get("answer_title") or COMP["labels"]["answer_choice"]
         else:
             ans = self.inline(q["answer"])
