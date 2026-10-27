@@ -1,0 +1,45 @@
+id: U09
+number: "09"
+title: 場合の数・順列・組合せ
+domain: D0
+reference_section: ② 確率
+prev: U08
+next: U10
+prereq: [U02]
+used_by: [U10, U14, U15]
+terms: [TERM-perm, TERM-comb, TERM-fact]
+labs: [LAB-count]
+goal: 「何通りあるか」を数えるとき、**何を1通りとするか**を決め、順列・組合せ・重複を許す数え方を理由とともに選べる。
+stage_goals:
+  S1: 最後に「÷r! の意味」を自分の言葉で1文にできれば完了。
+  S2: 資料を見ずに答え、答え合わせをして、間違えた所だけ初学に戻る。
+  S3: 問題文に「順列」「組合せ」とは書いていない。**自分で数え方を選び、選んだ理由を1行で書く**。
+  S4: 見た目が違う問題でも「n 個から r 個を、区別あり／なし、再使用あり／なしで選ぶ」という同じ形をしている。
+  S5: 2級には直接出ない。統計検定1級・大学数学・他の学問とのつながり。興味のあるものを1つ選べばよい。
+  S6: 答えが1つに決まらない課題。**問いを立てる→仮定を置く→方法を組む→小さな例で検証する→限界を書く**の順に進める。
+evidence:
+  S1: 「÷r! の意味」を1文で書けた
+  S2: 翌日・1週間後・1か月後に見ずに解けた
+  S3: 問題文に公式名がなくても数え方を選べた
+  S4: 別の場面の共通構造を説明できた
+  S5: 1つ選んで理解を確かめた（任意）
+  S6: 課題を1つ作り、検証まで行った（任意）
+status: drafted      # drafted / generated / verified / published
+version: 1
+# 本文中に出てくる数値の検算（build で自動実行）。満たさないと生成が止まる。
+checks:
+  - 'perm(5,2) == 20 and comb(5,2) == 10'
+  - 'perm(4,3) == 24 and comb(4,3) == 4 and comb(5,3) == 10'
+  - 'perm(7,2) == 42 and comb(7,2) == 21'
+  - 'comb(7,3) == comb(6,2) + comb(6,3) == 35'
+  - 'comb(8,2) == 28 and comb(5,3) == 10 and 26**4 == 456976 and 4**3 == 64 and comb(7,3) == 35 and comb(10,5) == 252'
+  - 'perm(8,3) == 336 and comb(8,3) == 56'
+  - '[comb(4,k) for k in range(5)] == [1,4,6,4,1]'
+  - 'comb(9,6) == 84 and fact(5)//(fact(2)*fact(2)*fact(1)) == 30'
+  - 'Fraction(derange(4), fact(4)) == Fraction(9,24) and abs(1/math.e - 0.368) < 0.001'
+  - 'abs(comb(100,50) - 1.0e29) / 1.0e29 < 0.01'
+  - 'abs(math.log2(28) - 4.8) < 0.01 and math.ceil(math.log2(28)) == 5'
+  - 'abs(comb(4,1)*0.25*0.75**3 - 0.4219) < 0.0001'
+  - 'fact(10) == 3628800 and round(math.sqrt(2*math.pi*10)*(10/math.e)**10) == 3598696'
+  - 'len([c for c in itertools.combinations(range(1,6),2) if c[1]-c[0] > 1]) == comb(4,2) == 6'
+  - 'len([c for c in itertools.combinations(range(1,8),3) if all(b-a > 1 for a,b in zip(c, c[1:]))]) == comb(5,3) == 10'

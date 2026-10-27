@@ -1,0 +1,19 @@
+# 全単元で共通の文言。本文では {{shared:キー}} で呼び出す。
+explain_pattern: "「**〈条件〉**のとき、**〈対象〉**は**〈結論〉**になる。なぜなら**〈根拠〉**。ただし**〈成り立たない場合〉**は別。」"
+exam_scope_note: 統計検定2級の合格に必要なのは初学〜応用。転用は理解を確かにする段階。発展・創造は試験範囲外も含み、得点には入れない。
+lab_protocol: 予想→操作→観察→説明→ラボなしで解く
+content_note: 数値例は全て架空。発展・創造は試験範囲外を含み、得点には算入しない。
+personal_note: 自分の答えや到達の記録は、個人用の学習記録に書く（教材には書き込まない）。
+
+# 単元の領域（ナビの表示に使う）
+domains:
+  D0: {name: 前提補強, icon: "🔧", tone: yellow}
+  D1: {name: ① データの記述, icon: "📊", tone: blue}
+  D2: {name: ② 確率, icon: "🎲", tone: purple}
+  D3: {name: ③ 確率分布, icon: "📈", tone: orange}
+
+total_units: 32
+
+sources:
+  - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}
+  - {name: NIST統計ハンドブック, url: "https://www.itl.nist.gov/div898/handbook/"}
