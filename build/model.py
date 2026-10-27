@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import statistics
 import re
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -65,9 +66,9 @@ def derange(n: int) -> int:
 
 CHECK_ENV = {
     "fact": fact, "perm": perm, "comb": comb, "derange": derange,
-    "Fraction": Fraction, "math": math, "itertools": itertools,
+    "Fraction": Fraction, "math": math, "itertools": itertools, "statistics": statistics,
     "abs": abs, "round": round, "len": len, "sum": sum, "range": range,
-    "all": all, "any": any, "zip": zip,
+    "all": all, "any": any, "zip": zip, "sorted": sorted, "min": min, "max": max,
 }
 
 

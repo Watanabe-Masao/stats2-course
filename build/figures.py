@@ -33,13 +33,16 @@ def _w(ch: str) -> float:
 
 
 def wrap(text: str, width_px: float, size: float) -> list[str]:
+    import re as _re
     lines, cur, cw = [], "", 0.0
-    for ch in str(text):
-        if ch == "\n":
+    # 半角の英数字の並び（47.75、Q₁ など）は途中で折らない
+    for tok in _re.findall(r"[0-9A-Za-z.,%₀-₉]+|\n|.", str(text)):
+        if tok == "\n":
             lines.append(cur); cur, cw = "", 0.0; continue
-        if cw + _w(ch) * size > width_px and cur:
+        tw = sum(_w(ch) for ch in tok) * size
+        if cw + tw > width_px and cur:
             lines.append(cur); cur, cw = "", 0.0
-        cur += ch; cw += _w(ch) * size
+        cur += tok; cw += tw
     if cur:
         lines.append(cur)
     # 行頭に来てはいけない字（句読点・閉じ括弧）は前の行へ、行末の開き括弧は次の行へ
@@ -318,8 +321,138 @@ def fpc(sp: dict) -> str:
     return c.done(y + 4)
 
 
+# ---- 四分位数（ラボ・本文と同じ定義：中央値を除いた下半分・上半分の中央値） ----
+def _median(s):
+    n = len(s)
+    return s[(n - 1) // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
+
+
+def five(values):
+    s = sorted(values)
+    n, h = len(s), len(s) // 2
+    q1, q2, q3 = _median(s[:h]), _median(s), _median(s[n - h:])
+    iqr = q3 - q1
+    lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    inside = [x for x in s if lo <= x <= hi]
+    return {"min": s[0], "max": s[-1], "q1": q1, "q2": q2, "q3": q3, "iqr": iqr, "lo": lo, "hi": hi,
+            "wlo": inside[0], "whi": inside[-1], "out": [x for x in s if x < lo or x > hi], "mean": sum(s) / n}
+
+
+def _box(c, F, y, X, color=BLUE, fence=False, label=None):
+    if label:
+        c.text(8, y - 14, label, 12.5, INK, weight="bold")
+    if fence:
+        for v in (F["lo"], F["hi"]):
+            c.line(X(v), y - 16, X(v), y + 16, RED, 1.2, "3 3")
+    c.line(X(F["wlo"]), y, X(F["q1"]), y, color, 2); c.line(X(F["q3"]), y, X(F["whi"]), y, color, 2)
+    for v in (F["wlo"], F["whi"]):
+        c.line(X(v), y - 7, X(v), y + 7, color, 2)
+    c.rect(X(F["q1"]), y - 11, max(1, X(F["q3"]) - X(F["q1"])), 22, color, rx=3, opacity=0.15)
+    c.add(f'<rect x="{X(F["q1"]):.1f}" y="{y - 11}" width="{max(1, X(F["q3"]) - X(F["q1"])):.1f}" height="22" rx="3" fill="none" stroke="{color}" stroke-width="2"/>')
+    c.line(X(F["q2"]), y - 11, X(F["q2"]), y + 11, color, 3)
+    for v in F["out"]:
+        c.circle(X(v), y, 4.5, "#ffffff", stroke=RED, width=2)
+
+
+def _axis(c, lo, hi, y, step, X):
+    c.line(16, y, W - 16, y, INK2, 1)
+    t = lo
+    while t <= hi + 1e-9:
+        c.text(X(t), y + 15, _num(t), 11, INK2, "middle")
+        t += step
+
+
+# ---- ヒストグラム（階級・度数。幅が違えば度数密度。箱ひげ図を下に付けられる） ----
+def hist(sp: dict) -> str:
+    c = Canvas()
+    if "data" in sp:                        # データと階級の幅から数える
+        a0, w, top = sp["start"], sp["width"], max(sp["data"])
+        cls, a = [], a0
+        while a <= top:
+            cls.append([a, a + w, sum(1 for x in sp["data"] if a <= x < a + w)])
+            a += w
+    else:
+        cls = sp["classes"]                 # [[下限, 上限, 度数], …]
+    dens = sp.get("density", False)
+    lo, hi = cls[0][0], cls[-1][1]
+    X = lambda v: 16 + (v - lo) / (hi - lo) * (W - 32)  # noqa: E731
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    top, base = y + 26, y + 170
+    hts = [(n / (b - a) if dens else n) for a, b, n in cls]
+    mx = max(hts) or 1
+    total = sum(n for _, _, n in cls)
+    mark = sp.get("mark")
+    for i, ((a, b, n), h) in enumerate(zip(cls, hts)):
+        hh = h / mx * (base - top - 18)
+        col = ORANGE if mark is not None and i == mark else BLUE
+        c.rect(X(a), base - hh, X(b) - X(a) - 1.5, hh, col, opacity=0.8)
+        lab = (f"{_num(round(h, 3))}" if dens else f"{n}")
+        c.add(f'<text x="{(X(a) + X(b)) / 2:.1f}" y="{base - hh - 5:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
+              f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(lab)}</text>')
+    ticks = sorted({v for a, b, _ in cls for v in (a, b)})
+    c.line(16, base, W - 16, base, INK2, 1)
+    for t in ticks:
+        c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
+    y = base + 24
+    if sp.get("axis_label"):
+        c.text(W - 16, base + 31, sp["axis_label"], 11, INK2, "end"); y = base + 46
+    if dens:
+        y += 8
+        for a, b, n in cls:
+            y = c.para(8, y + 4, f"{_num(a)}〜{_num(b)}：度数{n}÷幅{_num(b - a)}＝高さ{_num(round(n / (b - a), 3))}（面積＝{n}）", 344, 12.5, INK)
+    elif sp.get("cumulative"):
+        y += 8
+        cum = 0
+        row = []
+        for a, b, n in cls:
+            cum += n
+            row.append(f"{_num(b)}未満 {cum / total:.2f}")
+        y = c.para(8, y + 4, "累積相対度数：" + "、".join(row), 344, 12.5, INK)
+    if sp.get("box"):
+        F = five(sp["box"])
+        y += 40
+        _box(c, F, y, X, ORANGE, fence=True)
+        y += 26
+        y = c.para(8, y + 10, f"箱ひげ図：Q₁ {_num(F['q1'])}・中央値 {_num(F['q2'])}・Q₃ {_num(F['q3'])}。柵 {_num(F['lo'])}〜{_num(F['hi'])} の外（○）が外れ値候補", 344, 12, INK2)
+    if sp.get("note"):
+        y = c.para(8, y + 10, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
+# ---- 箱ひげ図（データから5つの数を計算して描く。複数並べられる） ----
+def boxplot(sp: dict) -> str:
+    c = Canvas()
+    rows = sp["rows"]                       # [{label, data}]
+    Fs = [five(r["data"]) for r in rows]
+    lo = sp.get("lo", min(min(r["data"]) for r in rows))
+    hi = sp.get("hi", max(max(max(r["data"]) for r in rows), max(F["hi"] for F in Fs) if sp.get("fence") else 0))
+    step = sp.get("step", 10)
+    lo, hi = step * (lo // step), step * -(-hi // step)
+    X = lambda v: 16 + (v - lo) / (hi - lo) * (W - 32)  # noqa: E731
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    y += 30
+    for r, F in zip(rows, Fs):
+        _box(c, F, y, X, BLUE, fence=sp.get("fence"), label=r.get("label"))
+        y += 52
+    _axis(c, lo, hi, y - 22, step, X)
+    y += 6
+    for r, F in zip(rows, Fs):
+        head = f"{r['label']}：" if r.get("label") else ""
+        out = "・".join(_num(v) for v in F["out"]) or "なし"
+        y = c.para(8, y + 4, f"{head}Q₁ {_num(F['q1'])}・中央値 {_num(F['q2'])}・Q₃ {_num(F['q3'])}・IQR {_num(F['iqr'])}", 344, 12.5, INK)
+        if sp.get("fence"):
+            y = c.para(8, y, f"柵 {_num(F['lo'])} と {_num(F['hi'])} → 外れ値候補：{out}", 344, 12.5, RED if F["out"] else INK2)
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot}
 
 
 def specs(course: Course) -> dict[str, dict]:
@@ -333,16 +466,20 @@ def specs(course: Course) -> dict[str, dict]:
         for qid, q in u["problems"].items():
             if q.get("figure"):
                 f = q["figure"]
-                src = " ".join([q.get("prompt", ""), q.get("answer", ""), " ".join(map(str, q.get("choices") or []))])
+                # 問題文・答え・選択肢と、同じ単元の本文（「例題Aの表で」のように本文を指す問題があるため）
+                src = " ".join([q.get("prompt", ""), q.get("answer", ""), " ".join(map(str, q.get("choices") or [])), body])
                 out[f"FIG-{qid}"] = {"spec": f, "caption": f.get("caption", ""), "where": qid, "source": src,
                                      "used_by": [uid]}
     return out
 
 
+LAYOUT_KEYS = ("type", "caption", "scale", "mark", "density", "cumulative", "fence", "step", "decimals", "k", "whole", "mean", "mark_extremes")
+
+
 def _strings(v):
     if isinstance(v, dict):
         for k, x in v.items():
-            if k not in ("type", "caption", "scale"):
+            if k not in LAYOUT_KEYS:
                 yield from _strings(x)
     elif isinstance(v, list):
         for x in v:

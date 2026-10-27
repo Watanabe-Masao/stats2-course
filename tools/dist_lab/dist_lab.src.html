@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分布ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{min-height:40px;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:14px;cursor:pointer}
+.seg button.on{border-color:var(--acc);box-shadow:inset 0 0 0 2px var(--acc)}
+.num{font-variant-numeric:tabular-nums}
+.hi td{background:color-mix(in srgb,var(--acc) 14%,transparent)}
+</style></head><body>
+<h1>🧪 分布ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-hist" class="mode">
+ <p class="mut" style="margin:0">データを階級に分けて数える。階級の幅を変えると、表とヒストグラムの見え方が変わる。</p>
+ <div class="row ctl"><label>データ <select id="hdata" data-key="data"></select></label>
+  <label>階級の幅 <select id="hw" data-key="w"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="hplot"></div>
+ <div class="card res det"><table id="htab"></table></div>
+ <div class="card res key" id="hsum"></div>
+</div>
+
+<div id="m-box" class="mode">
+ <p class="mut" style="margin:0">小さい順に並べて4等分する。箱が真ん中50%、柵（Q₁−1.5×IQR、Q₃＋1.5×IQR）の外が外れ値候補。最大の値を動かすと、平均と中央値はどう動くか。</p>
+ <div class="row ctl"><label>データ <select id="bdata" data-key="data"></select></label></div>
+ <input type="range" id="bmax" min="0" max="100" step="1" value="55" data-name="最大値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+ <div id="bform"></div>
+</div>
+
+<div id="m-dens" class="mode">
+ <p class="mut" style="margin:0">階級の幅が違うとき、棒の高さを「度数」にするか「度数密度（度数÷幅）」にするか。面積（高さ×幅）が度数を表すのはどちらか。</p>
+ <div class="row ctl seg" id="dview"><button type="button" data-v="count">高さ＝度数</button><button type="button" data-v="dens" class="on">高さ＝度数密度</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+ <div id="dform"></div>
+</div>
+
+<div id="m-cmp" class="mode">
+ <p class="mut" style="margin:0">5店舗の10日分の日販（万円）を箱ひげ図で並べる。箱の長さ（IQR）が散らばり、ひげの伸び方が裾の向き。</p>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res det"><table id="ctab"></table></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<div id="m-shape" class="mode">
+ <p class="mut" style="margin:0">X店とY店の12日分の売上（万円）。箱ひげ図はまったく同じ。中身（1つ1つの値）を見ると何が違うか。</p>
+ <div class="row ctl"><label><input type="checkbox" id="sdots" checked> 中身（1つ1つの値）を見る</label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const DATA={
+ sales:{name:"20日の売上（万円）",v:[12,15,18,19,21,22,22,24,25,26,27,28,29,30,31,33,35,38,42,55],lo:10},
+ nine:{name:"9個のデータ",v:[3,5,6,7,8,9,10,12,30],lo:0},
+ visits:{name:"8日の来店客数（人）",v:[47,49,51,52,55,58,60,120],lo:40}};
+const STORES={A:[40,42,44,45,46,47,48,49,50,52],B:[38,41,43,45,47,48,50,51,53,55],C:[30,34,38,44,48,55,62,70,78,90],D:[42,44,45,46,47,48,49,50,51,52],E:[36,40,43,46,48,49,51,53,56,58]};
+const SHAPE={X:[10,13,13,14,18,19,21,22,26,27,29,30],Y:[10,12,13,14,15,16,24,25,26,27,28,30]};
+const sum=a=>a.reduce((s,x)=>s+x,0),mean=a=>sum(a)/a.length;
+const med=s=>{const n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;};
+// 四分位数：中央値を除いた下半分・上半分の中央値（本文・図の定義と同じ）
+function five(a){const s=[...a].sort((x,y)=>x-y),n=s.length,h=Math.floor(n/2);
+ const q1=med(s.slice(0,h)),q3=med(s.slice(n-h)),q2=med(s),iqr=q3-q1,lo=q1-1.5*iqr,hi=q3+1.5*iqr;
+ const inside=s.filter(x=>x>=lo&&x<=hi);
+ return {s,n,min:s[0],max:s[n-1],q1,q2,q3,iqr,lo,hi,wlo:inside[0],whi:inside[inside.length-1],out:s.filter(x=>x<lo||x>hi),mean:mean(s)};}
+const W=340;
+function axis(lo,hi,y,step){let h="";for(let t=Math.ceil(lo/step)*step;t<=hi+1e-9;t+=step)h+=`<text x="${X(t,lo,hi)}" y="${y}" font-size="11" text-anchor="middle" fill="var(--mut)">${f(t)}</text>`;return h;}
+function X(v,lo,hi){return 16+(v-lo)/(hi-lo)*(W-32);}
+function boxSvg(rows,lo,hi,step,opt={}){ // rows: [{label, F, color}]
+ const rh=44;let s=`<svg viewBox="0 0 ${W} ${rows.length*rh+30}" width="${W}" role="img" aria-label="箱ひげ図">`;
+ rows.forEach((r,i)=>{const F=r.F,y=i*rh+22,x=v=>X(v,lo,hi),c=r.color||"var(--acc)";
+  if(r.label)s+=`<text x="2" y="${y-10}" font-size="12" fill="var(--fg)" font-weight="700">${esc(r.label)}</text>`;
+  if(opt.fence){s+=`<line x1="${x(Math.max(lo,F.lo))}" y1="${y-14}" x2="${x(Math.max(lo,F.lo))}" y2="${y+14}" stroke="var(--ng)" stroke-dasharray="3 3"/><line x1="${x(Math.min(hi,F.hi))}" y1="${y-14}" x2="${x(Math.min(hi,F.hi))}" y2="${y+14}" stroke="var(--ng)" stroke-dasharray="3 3"/>`;}
+  s+=`<line x1="${x(F.wlo)}" y1="${y}" x2="${x(F.q1)}" y2="${y}" stroke="${c}" stroke-width="2"/><line x1="${x(F.q3)}" y1="${y}" x2="${x(F.whi)}" y2="${y}" stroke="${c}" stroke-width="2"/>`;
+  s+=`<line x1="${x(F.wlo)}" y1="${y-7}" x2="${x(F.wlo)}" y2="${y+7}" stroke="${c}" stroke-width="2"/><line x1="${x(F.whi)}" y1="${y-7}" x2="${x(F.whi)}" y2="${y+7}" stroke="${c}" stroke-width="2"/>`;
+  s+=`<rect x="${x(F.q1)}" y="${y-11}" width="${Math.max(1,x(F.q3)-x(F.q1))}" height="22" rx="3" fill="${c}" fill-opacity=".18" stroke="${c}" stroke-width="2"/>`;
+  s+=`<line x1="${x(F.q2)}" y1="${y-11}" x2="${x(F.q2)}" y2="${y+11}" stroke="${c}" stroke-width="3"/>`;
+  F.out.forEach(v=>{s+=`<circle cx="${x(Math.min(hi,v))}" cy="${y}" r="4.5" fill="var(--bg)" stroke="var(--ng)" stroke-width="2"/>`;});
+  if(opt.mean)s+=`<path d="M${x(F.mean)} ${y+13} l-5 8 h10 z" fill="var(--acc2)"/>`;
+  if(r.dots)r.dots.forEach((v,k)=>{s+=`<circle cx="${x(v)}" cy="${y+22}" r="3.2" fill="${c}" fill-opacity=".8"/>`;});});
+ return s+axis(lo,hi,rows.length*rh+24,step)+"</svg>";}
+
+// ---- 度数分布とヒストグラム
+function classes(v,lo,w){const top=Math.max(...v);const out=[];for(let a=lo;a<=top;a+=w){out.push({a,b:a+w,n:v.filter(x=>x>=a&&x<a+w).length});}return out;}
+function hCur(){const d=DATA[$("hdata").value],w=+$("hw").value;return {d,w,cls:classes(d.v,d.lo,w)};}
+function hRender(){const {d,w,cls}=hCur(),N=d.v.length,mx=Math.max(...cls.map(c=>c.n));
+ const lo=cls[0].a,hi=cls[cls.length-1].b,H=150,x=v=>X(v,lo,hi);
+ let s=`<svg viewBox="0 0 ${W} ${H+30}" width="${W}" role="img" aria-label="ヒストグラム">`;
+ cls.forEach(c=>{const h=c.n/mx*(H-24);s+=`<rect x="${x(c.a)}" y="${H-h}" width="${x(c.b)-x(c.a)-1}" height="${h}" fill="var(--acc)" fill-opacity=".75"/>`;if(c.n)s+=`<text x="${(x(c.a)+x(c.b))/2}" y="${H-h-4}" font-size="11" text-anchor="middle" fill="var(--fg)">${c.n}</text>`;});
+ s+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/>`+axis(lo,hi,H+16,w>=10?w:10)+"</svg>";
+ $("hplot").innerHTML=s;
+ let cum=0;$("htab").innerHTML="<tr><th>階級</th><th>度数</th><th>相対度数（累積）</th></tr>"+cls.map(c=>{cum+=c.n;return `<tr><td>${c.a}〜${c.b}</td><td>${c.n}</td><td>${(c.n/N).toFixed(2)}（${(cum/N).toFixed(2)}）</td></tr>`;}).join("");
+ const m=hMode();$("hsum").innerHTML=`<div>階級 ${cls.length} 個。いちばん度数が多い階級：<b>${m}</b></div><div class="mut">相対度数＝度数÷${N}。累積は小さい階級から足していった値。幅を変えると山の位置や形の見え方が変わる。</div>`;}
+function hMode(){const {cls}=hCur();const mx=Math.max(...cls.map(c=>c.n));return cls.filter(c=>c.n===mx).map(c=>`${c.a}〜${c.b}`).join("・");}
+LK.register("hist",{name:"度数分布",
+ init(){$("hdata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("hdata").onchange=hRender;$("hw").onchange=hRender;hRender();},
+ apply(s){if(s.data)$("hdata").value=s.data;if(s.w)$("hw").value=String(s.w);hRender();},
+ render:hRender,
+ value(key){const {d,cls}=hCur();if(key==="modeClass"){const m=hMode();return {v:m,text:m};}
+  if(key==="nbins")return {v:cls.length,text:cls.length+"個"};
+  const t=+key.split(":")[1],p=d.v.filter(x=>x<t).length/d.v.length;return {v:p,text:p.toFixed(2)};}});
+
+// ---- 箱ひげ図と外れ値（最大の値を動かす）
+function bVals(){const d=DATA[$("bdata").value],v=[...d.v].sort((a,b)=>a-b);v[v.length-1]=+$("bmax").value;return v;}
+function bSetup(){const d=DATA[$("bdata").value],v=[...d.v].sort((a,b)=>a-b),top=v[v.length-1],second=v[v.length-2];
+ const e=$("bmax");e.min=second;e.max=Math.max(top*2,second+10);LK.setRange("bmax",top);bRender();}
+function bRender(){const v=bVals(),F=five(v),lo=Math.floor(Math.min(...v,F.lo)/10)*10,hi=Math.ceil(Math.max(...v,F.hi)/10)*10;   // 柵も軸に入れる
+ $("bplot").innerHTML=boxSvg([{F}],lo,hi,hi-lo>100?20:10,{fence:true,mean:true})+'<div class="mut">箱＝Q₁〜Q₃、太線＝中央値、▲＝平均、赤の点線＝柵、○＝外れ値候補</div>';
+ $("bsum").innerHTML=`<table><tr><th>値</th><th></th></tr><tr><td>Q₁・中央値・Q₃</td><td class="num">${f(F.q1)}・${f(F.q2)}・${f(F.q3)}</td></tr><tr><td>IQR（Q₃−Q₁）</td><td class="num">${f(F.iqr)}</td></tr><tr><td>柵</td><td class="num">${f(F.lo)} と ${f(F.hi)}</td></tr><tr><td>外れ値候補</td><td class="num">${F.out.length?F.out.map(f).join("・"):"なし"}</td></tr><tr><td>平均・中央値</td><td class="num">${F.mean.toFixed(2)}・${f(F.q2)}</td></tr></table>`;
+ $("bform").innerHTML=LK.formula([`IQR＝${f(F.q3)}−${f(F.q1)}＝${f(F.iqr)}`,`柵＝${f(F.q1)}−1.5×${f(F.iqr)}＝${f(F.lo)}、${f(F.q3)}＋1.5×${f(F.iqr)}＝${f(F.hi)}`,`平均＝${f(sum(v))}÷${v.length}＝${F.mean.toFixed(2)}`]);}
+LK.register("box",{name:"箱ひげ図",
+ init(){$("bdata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("bdata").onchange=bSetup;LK.stepper($("bmax"),bRender);bSetup();},
+ apply(s){if(s.data)$("bdata").value=s.data;bSetup();if(s.max!==undefined)LK.setRange("bmax",s.max);bRender();},
+ render:bRender,
+ value(key){const v=bVals(),F=five(v);
+  if(key==="moves"){const w=[...v];w[w.length-1]+=25;const G=five(w),dm=Math.abs(G.mean-F.mean),dq=Math.abs(G.q2-F.q2);const r=dm>dq+1e-9?"平均":dq>dm+1e-9?"中央値":"同じくらい";return {v:r,text:r};}
+  if(key==="outliers"){const t=F.out.length?F.out.map(f).join("・"):"なし";return {v:t,text:t};}
+  const x=F[key==="median"?"q2":key];return {v:x,text:key==="mean"?x.toFixed(2):f(x)};}});
+
+// ---- 幅の違う階級（度数密度）
+let dClasses=[[0,10,4],[10,30,6]],dView="dens";
+function dRender(){const cls=dClasses,lo=cls[0][0],hi=cls[cls.length-1][1],H=150,x=v=>X(v,lo,hi);
+ const ht=c=>dView==="dens"?c[2]/(c[1]-c[0]):c[2],mx=Math.max(...cls.map(ht));
+ let s=`<svg viewBox="0 0 ${W} ${H+30}" width="${W}" role="img" aria-label="幅の違う階級のヒストグラム">`;
+ cls.forEach(c=>{const h=ht(c)/mx*(H-30);s+=`<rect x="${x(c[0])}" y="${H-h}" width="${x(c[1])-x(c[0])-1}" height="${h}" fill="var(--acc)" fill-opacity=".7"/><text x="${(x(c[0])+x(c[1]))/2}" y="${H-h-5}" font-size="12" text-anchor="middle" fill="var(--fg)">高さ ${f(+ht(c).toFixed(3))}</text><text x="${(x(c[0])+x(c[1]))/2}" y="${H-8}" font-size="12" text-anchor="middle" fill="#fff">面積 ${f(+(ht(c)*(c[1]-c[0])).toFixed(3))}</text>`;});
+ const ticks=[...new Set(cls.flatMap(c=>[c[0],c[1]]))];
+ s+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/>`+ticks.map(t=>`<text x="${x(t)}" y="${H+16}" font-size="11" text-anchor="middle" fill="var(--mut)">${t}</text>`).join("")+"</svg>";
+ $("dplot").innerHTML=s;
+ const ok=dView==="dens";
+ $("dsum").innerHTML=cls.map(c=>`<div>${c[0]}〜${c[1]}（幅${c[1]-c[0]}）：度数 ${c[2]} → 度数密度 ${c[2]}÷${c[1]-c[0]}＝<b>${f(+(c[2]/(c[1]-c[0])).toFixed(3))}</b></div>`).join("")+
+  (ok?`<div class="ok">面積（高さ×幅）＝度数。幅の広い階級も正しい大きさに見える。</div>`:`<div class="ng">高さ＝度数だと、幅の広い階級の面積が度数より大きく見える（面積＝度数×幅）。</div>`);
+ $("dform").innerHTML=LK.formula(cls.map(c=>`度数密度＝${c[2]}÷${c[1]-c[0]}＝${f(+(c[2]/(c[1]-c[0])).toFixed(3))}`));
+ document.querySelectorAll("#dview button").forEach(b=>b.classList.toggle("on",b.dataset.v===dView));}
+LK.register("dens",{name:"幅の違う階級",
+ init(){document.querySelectorAll("#dview button").forEach(b=>b.onclick=()=>{dView=b.dataset.v;dRender();});dRender();},
+ apply(s){if(s.classes)dClasses=String(s.classes).split(",").map(t=>{const [r,n]=t.split(":"),[a,b]=r.split("-").map(Number);return [a,b,+n];});if(s.view)dView=s.view;dRender();},
+ render:dRender,
+ value(key){const c=dClasses[+key.split(":")[1]],v=c[2]/(c[1]-c[0]);return {v,text:f(+v.toFixed(3))};}});
+
+// ---- 5店舗を比べる
+function cRender(){const rows=Object.entries(STORES).map(([k,v])=>({label:k+"店",F:five(v),color:k==="C"?"var(--acc2)":"var(--acc)"}));
+ $("cplot").innerHTML=boxSvg(rows,20,100,10);
+ $("ctab").innerHTML="<tr><th>店</th><th>中央値</th><th>IQR</th></tr>"+rows.map(r=>`<tr><td>${r.label}</td><td>${f(r.F.q2)}</td><td>${f(r.F.iqr)}</td></tr>`).join("");
+ const w=cWidest();$("csum").innerHTML=`<div>箱がいちばん長い（散らばりが大きい）のは <b>${w}</b>。上のひげも長く、売上の多い日の側に裾が伸びている。</div><div class="mut">中央値は5店ともほぼ同じ。中央値だけを比べると違いが見えない。</div>`;}
+function cWidest(){let best=null,bi=-1;Object.entries(STORES).forEach(([k,v])=>{const i=five(v).iqr;if(i>bi){bi=i;best=k+"店";}});return best;}
+LK.register("cmp",{name:"店舗を比べる",init(){cRender();},render:cRender,
+ value(key){if(key==="tail"){const F=five(STORES.C),r=(F.whi-F.q3)>(F.q1-F.wlo)?"上（売上の多い側）":"下（売上の少ない側）";return {v:r,text:r};}
+  const w=cWidest();return {v:w,text:w};}});
+
+// ---- 箱ひげ図が同じでも
+function sameBox(){const a=five(SHAPE.X),b=five(SHAPE.Y);return ["min","q1","q2","q3","max"].every(k=>a[k]===b[k]);}
+function sRender(){const d=$("sdots").checked;
+ $("splot").innerHTML=boxSvg([{label:"X店",F:five(SHAPE.X),dots:d?SHAPE.X:null},{label:"Y店",F:five(SHAPE.Y),color:"var(--acc2)",dots:d?SHAPE.Y:null}],5,35,5);
+ const F=five(SHAPE.X);
+ $("ssum").innerHTML=`<div>5つの数（最小・Q₁・中央値・Q₃・最大）は両店とも ${[F.min,F.q1,F.q2,F.q3,F.max].map(f).join("・")}。</div>`+
+  (d?`<div>中身を見ると、Y店は<b>16以下と24以上の2つのかたまり</b>に分かれ、真ん中（17〜23）に1日もない。X店は真ん中にも値がある。</div><div class="mut">箱ひげ図は5つの数しか描かないので、山の数（単峰か二峰か）は分からない。形はヒストグラムやドット図で見る。</div>`:`<div class="mut">「中身を見る」に印を付けると、1つ1つの値が出る。</div>`);}
+LK.register("shape",{name:"同じ箱でも",init(){$("sdots").onchange=sRender;sRender();},render:sRender,
+ apply(s){if(s.dots!==undefined)$("sdots").checked=!!s.dots;sRender();},
+ value(){const r=sameBox()&&SHAPE.X.join()!==SHAPE.Y.join()?"言えない":"言える";return {v:r,text:r};}});
+
+LK.start("hist");
+window.__LAB__={LK,DATA,STORES,SHAPE,five,classes,mean};
+</script>
+</body></html>
