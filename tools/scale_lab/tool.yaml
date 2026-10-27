@@ -4,17 +4,32 @@ kind: simulator
 src: scale_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 2
 replaces_legacy: [scale.html]   # 旧版 教科書04 の「℃とKで何倍が変わる」ラボの機能を含む
-modes:
-  - {key: judge, name: 尺度を判定, purpose: 4つの質問に上から答えて尺度を決める（15件）。間違えたら「どこで取り違えたか」を返す}
-  - {key: unit, name: 単位を変える, purpose: 気温（℃・K・℉）・重さ・売上金額・年で、差と何倍が単位で変わるかを見る}
-  - {key: likert, name: 満足度の平均, purpose: 段階につける点を変えると平均の順位は入れ替わるが、中央値と割合は変わらない}
-  - {key: bin, name: 階級にまとめる, purpose: 年齢を年代にまとめると区別できる値が減り、平均も近似になる}
-  - {key: code, name: 数字のラベル, purpose: 名義に振る数字で平均が変わる。2値なら平均から割合を逆算できるが、3値以上では読めない}
-values:   # 予想と照らし合わせる値（predict.key）
-  unit: ["ratio:0〜2（各単位の B÷A）", "diff:0〜2"]
-  likert: [meanA, meanB, winner（平均点で上の店）]
-  bin: [classMean, rawMean]
-  code: [mean, prop（2つ目の値の割合 %）]
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: judge
+    name: 尺度を判定
+    purpose: 4つの質問に上から答えて尺度を決める（15件）。間違えたら「どこで取り違えたか」を返す
+    set: [item]
+    values: []
+  - key: unit
+    name: 単位を変える
+    purpose: 気温（℃・K・℉）・重さ・売上金額・年で、差と何倍が単位で変わるかを見る
+    set: [kind, a, b]
+    values: ["ratio:0", "ratio:1", "ratio:2", "diff:0", "diff:1", "diff:2"]
+  - key: likert
+    name: 満足度の平均
+    purpose: 段階につける点を変えると平均の順位は入れ替わるが、中央値と割合は変わらない
+    set: [s1, s5]
+    values: [meanA, meanB, winner]
+  - key: bin
+    name: 階級にまとめる
+    purpose: 年齢を年代にまとめると区別できる値が減り、平均も近似になる
+    set: [w]
+    values: [classMean, rawMean]
+  - key: code
+    name: 数字のラベル
+    purpose: 名義に振る数字で平均が変わる。2値なら平均から割合を逆算できるが、3値以上では読めない
+    set: [pair, n2]
+    values: [mean, prop]
 data: 満足度 A店[0,0,60,40,0]・B店[20,10,0,10,60]（とても不満→とても満足）。年齢20人（平均41.6歳）
 # 段階ごとの使い方（本文では {{lab:LAB-scale@名前}}）。問題ごとの使い方は problems/*.yaml の lab に書く。
 presets:

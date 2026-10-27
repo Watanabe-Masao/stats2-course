@@ -101,6 +101,13 @@ class TestValidateCatchesMistakes(unittest.TestCase):
             q.pop("checks")
         self.assertIn("checks がない", self.errs(m))
 
+    def test_lab_contract(self):
+        def bad_key(c):
+            self.q(c, "Q-U04-010")["lab"]["predict"]["key"] = "nope"
+        self.assertIn("values にない", self.errs(bad_key))
+        self.assertIn("使えない", self.errs(lambda c: self.q(c, "Q-U04-010")["lab"]["set"].__setitem__("zzz", 1)))
+        self.assertIn("ラボにない", self.errs(lambda c: self.q(c, "Q-U04-010")["lab"].__setitem__("mode", "nope")))
+
     def test_lab_predict_needs_expect(self):
         self.assertIn("expect", self.errs(lambda c: self.q(c, "Q-U04-010")["lab"].pop("expect")))
 

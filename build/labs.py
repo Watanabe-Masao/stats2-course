@@ -51,6 +51,12 @@ def variants(course: Course) -> dict[str, dict]:
     return out
 
 
+def _drop_head_comment(src: str) -> str:
+    """先頭の説明コメント（/* … */）は版に入れない（説明は原本で読む）。"""
+    src = src.lstrip()
+    return src[src.index("*/") + 2:] if src.startswith("/*") else src
+
+
 def squeeze(html: str) -> str:
     lines = []
     for line in html.splitlines():
@@ -63,8 +69,8 @@ def squeeze(html: str) -> str:
 
 def build_labs(course: Course) -> list[dict]:
     OUT.mkdir(parents=True, exist_ok=True)
-    kit_css = (TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8")
-    kit_js = (TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8")
+    kit_css = _drop_head_comment((TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8"))
+    kit_js = _drop_head_comment((TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8"))
     manifest = []
     for lid, t in course.labs.items():   # 共通部品を使わない古い形のラボ（そのまま使う）
         if not t.get("src"):
@@ -81,7 +87,8 @@ def build_labs(course: Course) -> list[dict]:
             raise ValueError(f"{lid}: 差し込み口が残っている")
         f = OUT / f"{safe(aid)}.html"
         f.write_text(squeeze(html), encoding="utf-8")
-        manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": spec.get("expect")})
+        manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": spec.get("expect"),
+                         "modes": [m["key"] for m in t.get("modes", []) if isinstance(m, dict)]})
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     return manifest
 
@@ -92,7 +99,7 @@ def validate_labs(course: Course) -> list[str]:
         if t.get("src") and not (t["dir"] / t["src"]).exists():
             err.append(f"{lid}: {t['src']} がない")
         for name, p in (t.get("presets") or {}).items():
-            err += _check_spec(f"{lid}@{name}", p)
+            err += _check_spec(f"{lid}@{name}", p, t)
     for u in course.units.values():
         for qid, q in u["problems"].items():
             if not q.get("lab"):
@@ -104,12 +111,26 @@ def validate_labs(course: Course) -> list[str]:
                 err.append(f"{qid}: {lab['id']} は場面ごとの版を作れない（tool.yaml に src がない）")
             if not lab.get("task"):
                 err.append(f"{qid}: lab.task（課題の文）がない")
-            err += _check_spec(qid, lab)
+            err += _check_spec(qid, lab, course.labs.get(lab.get("id")))
     return err
 
 
-def _check_spec(where: str, p: dict) -> list[str]:
+def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
+    """場面の設定が、ラボの約束（tool.yaml の modes の set・values）に合っているか。"""
     err = []
+    modes = {m["key"]: m for m in (tool or {}).get("modes", []) if isinstance(m, dict)}
+    mode = modes.get(p.get("mode")) if p.get("mode") else None
+    if p.get("mode") and not mode:
+        err.append(f"{where}: mode {p.get('mode')} はラボにない（{', '.join(modes)}）")
+    if mode:
+        extra = set(p.get("set") or {}) - set(mode.get("set", []))
+        if extra:
+            err.append(f"{where}: set の {sorted(extra)} はモード {mode['key']} で使えない（{mode.get('set')}）")
+        key = (p.get("predict") or {}).get("key")
+        if key and key not in mode.get("values", []):
+            err.append(f"{where}: predict.key {key} はモード {mode['key']} の values にない（{mode.get('values')}）")
+    elif p.get("set") or p.get("predict"):
+        err.append(f"{where}: set や predict を使うときは mode を書く")
     pr = p.get("predict")
     if pr:
         if pr.get("type") not in ("number", "choice"):

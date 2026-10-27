@@ -3,7 +3,7 @@
 //  - エラーがない、380px で横にはみ出さない（ライト／ダーク）
 //  - 予想がある版：予想する前は結果（.res）が見えない。予想を入れると結果が出る
 //  - expect：ラボが計算した値（LK.last）と一致する
-//  - 全モードを開いて、ボタンを押してもエラーが出ない
+//  - ラボのモードが tool.yaml の modes と一致し、全モードを開いてボタンを押してもエラーが出ない
 const {chromium}=require('playwright');const path=require('path');const fs=require('fs');
 const ROOT=path.resolve(__dirname,'..');
 (async()=>{const man=JSON.parse(fs.readFileSync(path.join(ROOT,'out/labs/manifest.json'),'utf8'));
@@ -35,6 +35,7 @@ const ROOT=path.resolve(__dirname,'..');
   }else if(shots&&scheme==='light')await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}.png`,fullPage:true});
   // 全モードを回して、主なボタンと −／＋ を押す
   const modes=await p.$$eval('#tabs button',bs=>bs.map(x=>x.dataset.m));
+  if(v.modes&&modes.join()!==v.modes.join())bad(`${tag}: ラボのモード ${modes} が tool.yaml の modes ${v.modes} と違う`);
   for(const m of modes){await p.click(`#tabs button[data-m="${m}"]`);
    for(const btn of await p.$$(`#m-${m} button.act, #m-${m} .lk-step button`)){if(await btn.isVisible()&&await btn.isEnabled())await btn.click();}
    if(await sw()>380)bad(`${tag}/${m}: 横にはみ出し`);}
