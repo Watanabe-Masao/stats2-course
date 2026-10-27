@@ -50,3 +50,21 @@
 - id: TERM-median
   name: 中央値
   en: median
+- id: TERM-freqtable
+  name: 度数分布表
+  en: frequency table
+- id: TERM-hist
+  name: ヒストグラム
+  en: histogram
+- id: TERM-boxplot
+  name: 箱ひげ図
+  en: box plot
+- id: TERM-quartile
+  name: 四分位数
+  en: quartile
+- id: TERM-iqr
+  name: 四分位範囲
+  en: interquartile range
+- id: TERM-outlier
+  name: 外れ値
+  en: outlier

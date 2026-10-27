@@ -221,7 +221,7 @@ class TestVisuals(unittest.TestCase):
         import figures
         c = course()
         q = c.units["U03"]["problems"]["Q-U03-030"]
-        q["figure"] = dict(q["figure"], stat=["標本の不良率 1/20＝6%"])
+        q["figure"] = dict(q["figure"], stat=["標本の不良率 1/20＝7.3%"])
         self.assertTrue(any("ない数" in e for e in figures.validate_figures(c)))
 
     def test_no_checkbox_in_pages(self):

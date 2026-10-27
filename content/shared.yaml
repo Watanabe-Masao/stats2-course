@@ -21,6 +21,7 @@ refs:
   REF-CONFUSION: 混同しやすい点を図で比べる
   REF-Q-U03: 確認問題（記述式）
   REF-Q-U04: 確認問題（記述式）
+  REF-Q-U05: 確認問題（記述式）
 
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}

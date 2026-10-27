@@ -1,0 +1,63 @@
+id: LAB-dist
+name: 分布ラボ
+slug: dist                       # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: dist_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_mean.html]   # 旧版 教科書05 の「平均と中央値」シミュレーターの機能（外れ値で平均だけ動く）を box モードに含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: hist
+    name: 度数分布
+    purpose: 階級に分けて数え、表とヒストグラムを作る。幅を変えると見え方が変わる
+    set: [data, w]
+    values: ["below:30", "below:20", modeClass, nbins]
+  - key: box
+    name: 箱ひげ図
+    purpose: 四分位数・IQR・柵・外れ値。最大の値を動かすと平均だけが大きく動く
+    set: [data, max]
+    values: [q1, q2, q3, iqr, lo, hi, mean, median, outliers, moves]
+  - key: dens
+    name: 幅の違う階級
+    purpose: 高さを度数密度にすると、面積が度数を表す
+    set: [classes, view]
+    values: ["dens:0", "dens:1"]
+  - key: cmp
+    name: 店舗を比べる
+    purpose: 5店舗の箱ひげ図。中央値が同じでも散らばり（IQR）と裾が違う
+    set: []
+    values: [widest, tail]          # tail＝C店のひげが長いのは上か下か
+  - key: shape
+    name: 同じ箱でも
+    purpose: 5つの数が同じでも、中身（山の数）は違うことがある
+    set: [dots]
+    values: [sameDist]
+data: 20日の売上 12〜55万円（平均27.6・中央値26.5・Q₁ 21.5・Q₃ 32）。9個 3〜30。8日の来店客数 47〜120。5店舗×10日（C店だけ IQR 32）。X店・Y店の12日（5つの数が同じ）
+presets:
+  s1-box:
+    mode: box
+    set: {data: sales}
+    task: 最大の55万円をもっと大きく（たとえば80万円に）すると、平均と中央値のどちらが大きく動くか。
+    predict: {type: choice, key: moves, label: "大きく動くのは", options: [平均, 中央値, 同じくらい]}
+    expect: 平均
+    why: 平均は全部の値を足すので1つの値に引っ張られる。中央値は真ん中の順位の値なので、端の値が変わっても動かない。
+  s2-box:
+    mode: box
+    set: {data: nine}
+    task: 9個のデータで、最大の30をQ₃（11）の近くまで下げていく。いくつより小さくなると外れ値候補でなくなるか。
+  s4-cmp:
+    mode: cmp
+    modes: [cmp, shape]
+    task: 5店舗の箱ひげ図で、散らばりの大きい店と裾の向きを読む。次に「同じ箱でも」で、箱ひげ図から分からないことを確かめる。
+  s5-hist:
+    mode: hist
+    set: {data: sales}
+    task: 階級の幅を5・10・20と変え、いちばん度数が多い階級と、山の見え方がどう変わるかを見る。
+  s6-free:
+    task: 自分の集めたデータの扱い方を、5つのモードで確かめる（表の作り方、四分位数と外れ値、幅の違う階級、比べ方、箱ひげ図の限界）。
+used_by: [U05]
+tests:
+  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/dist_lab/check.js       # 本文の値（26.5・21.5・32・10.5・47.75、9個の 8・5.5・11、度数密度 0.4・0.3）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
