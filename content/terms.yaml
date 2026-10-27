@@ -74,6 +74,9 @@
 - id: TERM-point
   name: パーセントポイント
   en: percentage point
+- id: TERM-expect
+  name: 期待値
+  en: expected value
 - id: TERM-geomean
   name: 幾何平均
   en: geometric mean

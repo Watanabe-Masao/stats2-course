@@ -1,0 +1,61 @@
+id: LAB-center
+name: 代表値ラボ
+slug: center                     # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: center_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_mean.html]   # 旧版 教科書06 の「平均と中央値」（外れ値で平均だけ動く）を mm モードに含む。成長率のラボ（growth.html）は LAB-ts の growth モードへ
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: mm
+    name: 平均・中央値・最頻値
+    purpose: 3つの代表値と Q₁・Q₃ を同じ図に置く。最大の値を動かすと平均だけが大きく動く
+    set: [data, top]
+    values: [mean, median, mode, q1, q3, trim, sum, bigger]   # trim＝10%トリム平均、bigger＝平均と中央値のどちらが大きいか
+  - key: wmean
+    name: 重み付き平均
+    purpose: 人数の違う2グループの平均をまとめる。単純平均との違い
+    set: [nA, xA, nB, xB]
+    values: [wmean, smean]
+  - key: freq
+    name: 度数表の平均
+    purpose: 階級値×度数の合計÷総数で近似する
+    set: [f1, f2, f3]
+    values: [amean]
+  - key: shape
+    name: 分布の形
+    purpose: 裾の向きで平均・中央値・最頻値の並びが変わる
+    set: [skew]
+    values: [order, gap]           # order＝並び（最頻値＜中央値＜平均 など）、gap＝平均−中央値
+data: 10人の購入額 1〜17千円（平均4・中央値2.5・最頻値2）。5個 3,5,5,7,10／2,2,3,4,9／1,2,2,3,22。6日の来店数 12〜40。9人の年収 300〜1500万円。度数表は階級 0〜10・10〜20・20〜30。分布の形は 0〜20 の目盛りに200人（裾の向き −10〜10）
+presets:
+  s1-mm:
+    mode: mm
+    set: {data: buy10}
+    task: 10人の購入額 1, 1, 2, 2, 2, 3, 3, 4, 5, 17（千円）の平均は何千円か。図で、平均が中央値より右にある理由も見る。
+    predict: {type: number, key: mean, label: "平均", unit: "千円"}
+    expect: 4
+    why: 合計40÷10人＝4千円。17千円の1人が平均を右に引っ張るので、10人のうち7人が平均より少ない。中央値は5番目と6番目の平均で2.5千円。
+  s1-move:
+    mode: mm
+    set: {data: buy10, top: 40}
+    task: いちばん大きい17千円が40千円だったら、平均は何千円になるか。予想したら −／＋ で最大の値を動かし、中央値が動くかを見る。
+    predict: {type: number, key: mean, label: "平均", unit: "千円"}
+    expect: 6.3
+    why: 合計は 40−17＋40＝63 で、平均は6.3千円。中央値は2.5千円のまま。平均は合計を使うので端の値の大きさに引っ張られ、中央値は順番の真ん中なので引っ張られない。
+  s4-shape:
+    mode: shape
+    modes: [shape, mm]
+    task: 裾の向きを −10〜10 に動かし、平均・中央値・最頻値の並びがどう変わるかを見る。次に「平均・中央値・最頻値」で9人の年収を選び、最大の値を動かす。
+  s5-mm:
+    mode: mm
+    set: {data: buy10}
+    task: 最大の値を動かして、平均・中央値・10%トリム平均（くわしくの式）がどれだけ動くかを比べる。
+  s6-free:
+    task: 自分の店の数字で、代表値の選び方を4つのモードで確かめる（3つの代表値、重み付き平均、度数表の平均、分布の形）。
+used_by: [U06]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/center_lab/check.js       # 本文の値（4・2.5・2、2,200円、175円、近似平均16、裾の向きと並び）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
