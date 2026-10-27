@@ -8,3 +8,30 @@
 - id: TERM-fact
   name: 階乗
   en: factorial
+- id: TERM-population
+  name: 母集団
+  en: population
+- id: TERM-sample
+  name: 標本
+  en: sample
+- id: TERM-parameter
+  name: 母数
+  en: parameter
+- id: TERM-statistic
+  name: 統計量
+  en: statistic
+- id: TERM-sample-space
+  name: 標本空間
+  en: sample space
+- id: TERM-event
+  name: 事象
+  en: event
+- id: TERM-frame
+  name: 抽出枠
+  en: sampling frame
+- id: TERM-random-sampling
+  name: 無作為抽出
+  en: random sampling
+- id: TERM-bias
+  name: バイアス（偏り）
+  en: bias

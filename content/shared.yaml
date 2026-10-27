@@ -14,6 +14,13 @@ domains:
 
 total_units: 32
 
+# 原本の外にある参照先（表示名）。リンク先は公開先ごとに publish/*.yaml の refs で決める。
+# 旧版の確認問題・本番形式問題は、問題を原本へ取り込んだら refs から外す。
+refs:
+  REF-PQ-DB: 本番形式問題（5択）
+  REF-CONFUSION: 混同しやすい点を図で比べる
+  REF-Q-U03: 確認問題（記述式）
+
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}
   - {name: NIST統計ハンドブック, url: "https://www.itl.nist.gov/div898/handbook/"}

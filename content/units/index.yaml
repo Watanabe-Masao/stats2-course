@@ -2,7 +2,7 @@
 # migrated: 新しい原本（content/units/ID）に移したか
 - {id: U01, number: "01", migrated: false}
 - {id: U02, number: "02", migrated: false}
-- {id: U03, number: "03", migrated: false}
+- {id: U03, number: "03", migrated: true}
 - {id: U04, number: "04", migrated: false}
 - {id: U05, number: "05", migrated: false}
 - {id: U05T, number: "05-T", migrated: false}

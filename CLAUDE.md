@@ -19,6 +19,8 @@
 | `::: toggle 題名` 〜 `:::` | 開閉する欄（答えなど） |
 | `{{problem:Q-U09-001}}` | 問題を差し込む（番号・難度・答えの開閉は自動） |
 | `{{lab:LAB-count}}` | ラボを埋め込む |
+| `{{fig:FIG-U03-population}}` | 図を入れる（説明文は content/assets.yaml） |
+| `{{ref:REF-PQ-DB}}` | 旧版の問題集などへのリンク（shared.yaml の refs） |
 | `{{unit:U14}}` `{{term:TERM-perm}}` | 単元・用語へのリンク（ID で書く。番号や名前を直接書かない） |
 | `{{power:P3}}` `{{icon:lab}}` `{{stage:S2}}` | 力・補助・段階の印 |
 | `{{shared:explain_pattern}}` | 共通文言 |
@@ -28,9 +30,10 @@
 ## Notion への公開手順
 
 1. `python3 build/build.py`
-2. ラボの HTML を Notion にアップロード（create-attachment、content にファイル全文）。同じアップロード ID は1ページ内で何度でも埋め込める。
-3. `out/notion/<ID>.md` の `@@LAB:LAB-count@@` をアップロードの `file-upload://…` に置き換えて、`publish/notion.yaml` のページへ replace_content。
-4. 新しいページを作ったら、そのページ ID を `publish/notion.yaml` に書いてコミットする。
+2. `python3 build/publish_prep.py <ID>` で必要な素材（図・ラボ）を一覧し、それぞれ Notion にアップロード（create-attachment、content にファイル全文）。同じアップロード ID は1ページ内で何度でも埋め込める。
+3. `{"素材ID": "file-upload://…"}` の JSON を作り、`python3 build/publish_prep.py <ID> <json>` で `out/notion/<ID>.publish.md` を作って、`publish/notion.yaml` のページへ replace_content。
+4. 移行した単元は `python3 build/audit.py <ID>` で旧版との欠落がないことを確かめる（落とす項目は migration/waivers に理由を書く）。
+5. 新しいページを作ったら、そのページ ID を `publish/notion.yaml` に書いてコミットする。
 
 入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。
 

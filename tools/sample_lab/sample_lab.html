@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>標本ラボ</title>
+<style>
+:root{--bg:#ffffff;--fg:#1f2328;--mut:#5d6670;--line:#d0d7de;--card:#f6f8fa;--acc:#0b63c9;--acc2:#b0306f;--ok:#1a7f37;--warn:#9a6700;--off:#c9cfd6}
+@media (prefers-color-scheme:dark){:root{--bg:#191919;--fg:#e6edf3;--mut:#a3adb8;--line:#3d444d;--card:#252525;--acc:#4c9bff;--acc2:#e06aa8;--ok:#3fb950;--warn:#d29922;--off:#4a5058}}
+*{box-sizing:border-box}
+body{margin:0;padding:12px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--fg)}
+h1{font-size:16px;margin:0 0 8px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button{flex:1 1 45%;padding:7px 4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-size:13px;cursor:pointer}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0}
+label{font-size:14px;display:flex;align-items:center;gap:6px}
+input[type=range]{width:120px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.mut{color:var(--mut);font-size:13px}
+.big{font-size:18px;font-weight:700}
+button.act{padding:7px 12px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:14px;cursor:pointer}
+button.sub{padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:14px;cursor:pointer}
+svg{max-width:100%;height:auto;display:block}
+.die{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:18px;cursor:pointer}
+.die.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.legend span{margin-right:10px;font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:3px}
+</style></head><body>
+<h1>🧪 標本ラボ</h1>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-rand" class="mode">
+ <p class="mut" style="margin:0">全100店（母集団）の廃棄率。μ（本当の平均）は普通は分からない。無作為に n 店を選んで x̄ を計算する。</p>
+ <div class="row"><label>選ぶ店の数 n <input type="range" id="rn" min="2" max="100" value="10"><b id="rnv">10</b></label></div>
+ <div class="row"><button class="act" id="rdraw">選んで計算する</button><button class="sub" id="rx10">10回続けて</button><button class="sub" id="rreset">やり直す</button></div>
+ <div id="rgrid"></div>
+ <div class="card" id="rsum"></div>
+ <div id="rstrip"></div>
+ <div class="row"><label><input type="checkbox" id="rmu"> μ（本当の平均）を見る</label></div>
+</div>
+
+<div id="m-frame" class="mode">
+ <p class="mut" style="margin:0">名簿（抽出枠）に載っていない店がある。載っていない店は新しい店で、廃棄率が高めとする。名簿の中から無作為に選ぶ。</p>
+ <div class="row"><label>名簿から漏れた店 <input type="range" id="fm" min="0" max="40" step="5" value="20"><b id="fmv">20</b>%</label>
+  <label>n <input type="range" id="fn" min="2" max="60" value="10"><b id="fnv">10</b></label></div>
+ <div class="row"><button class="act" id="fdraw">20回取り直す</button><button class="sub" id="freset">やり直す</button></div>
+ <div id="fgrid"></div>
+ <div class="card" id="fsum"></div>
+ <div id="fstrip"></div>
+</div>
+
+<div id="m-resp" class="mode">
+ <p class="mut" style="margin:0">全100店にアンケートを送り、返事が来た店だけで平均を出す。廃棄率が低い店ほど返事をしやすいとする。</p>
+ <div class="row"><label>偏りの強さ <input type="range" id="qk" min="0" max="10" value="6"><b id="qkv">6</b></label></div>
+ <div class="row"><button class="act" id="qdraw">アンケートを送る</button><button class="sub" id="qx20">20回続けて</button><button class="sub" id="qreset">やり直す</button></div>
+ <div id="qgrid"></div>
+ <div class="card" id="qsum"></div>
+ <div id="qstrip"></div>
+</div>
+
+<div id="m-space" class="mode">
+ <p class="mut" style="margin:0">サイコロを1回振る試行。起こりうる結果の全部が<b>標本空間</b>、その一部が<b>事象</b>。目をタップして事象を作る。</p>
+ <div class="row" id="dice"></div>
+ <div class="row"><button class="sub" data-ev="even">偶数</button><button class="sub" data-ev="ge4">4以上</button><button class="sub" data-ev="none">空にする</button></div>
+ <div class="card" id="ssum"></div>
+ <p class="mut">注意：統計の「標本」（調べた一部のデータ）と「標本空間」は、名前が似ているだけで別の言葉。</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const MODES=[["rand","無作為に取る"],["frame","名簿の漏れ"],["resp","自分から回答"],["space","標本空間"]];
+const tabs=$("tabs");
+MODES.forEach(([k,n])=>{const b=document.createElement("button");b.textContent=n;b.dataset.m=k;b.onclick=()=>show(k);tabs.appendChild(b);});
+function show(k){document.querySelectorAll(".mode").forEach(d=>d.style.display="none");$("m-"+k).style.display="block";
+ tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.m===k));}
+
+// 母集団（固定の乱数で毎回同じ100店）
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const g=rng(3);
+const POP=[];for(let i=0;i<100;i++){const z=(g()+g()+g()-1.5)*1.6;POP.push(Math.round((2.5+z*0.6)*10)/10);}
+// 新しい店（名簿から漏れやすい）は廃棄率が高め：値の大きい順に並べた番号
+const ORDER=[...POP.keys()].sort((a,b)=>POP[b]-POP[a]);
+const MU=POP.reduce((s,x)=>s+x,0)/100;
+const fmt=x=>x.toFixed(2)+"%";
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+function pick(idx,n,r=Math.random){const a=idx.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+
+function grid(el,state){ // state: i -> "sel"|"off"|""
+ const s=22,W=10*s+4;let h=`<svg viewBox="0 0 ${W} ${W}" width="${W}" role="img" aria-label="100店">`;
+ for(let i=0;i<100;i++){const x=2+(i%10)*s+s/2,y=2+Math.floor(i/10)*s+s/2;const st=state[i]||"";
+  const fill=st==="sel"?"var(--acc)":st==="off"?"var(--off)":"var(--card)";const stroke=st==="off"?"var(--off)":"var(--line)";
+  h+=`<circle cx="${x}" cy="${y}" r="${s/2-2}" fill="${fill}" stroke="${stroke}"/>`;}
+ return h+"</svg>";}
+function strip(vals,mu,showMu,label){ // x̄ の履歴を点で並べる
+ const W=340,H=70,lo=1.5,hi=3.5,X=v=>14+(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*(W-28);
+ let h=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${label}"><line x1="14" y1="48" x2="${W-14}" y2="48" stroke="var(--line)"/>`;
+ for(let t=1.5;t<=3.5001;t+=0.5)h+=`<text x="${X(t)}" y="64" font-size="10" text-anchor="middle" fill="var(--mut)">${t.toFixed(1)}</text>`;
+ const cnt={};vals.forEach(v=>{const k=Math.round(v*20);cnt[k]=(cnt[k]||0)+1;h+=`<circle cx="${X(v)}" cy="${44-(cnt[k]-1)*5}" r="2.6" fill="var(--acc)" opacity="0.8"/>`;});
+ if(showMu)h+=`<line x1="${X(mu)}" y1="4" x2="${X(mu)}" y2="50" stroke="var(--acc2)" stroke-width="2"/><text x="${X(mu)+3}" y="12" font-size="10" fill="var(--acc2)">μ</text>`;
+ if(vals.length){const m=mean(vals);h+=`<line x1="${X(m)}" y1="20" x2="${X(m)}" y2="50" stroke="var(--ok)" stroke-width="2" stroke-dasharray="3 2"/>`;}
+ return h+"</svg>"+`<div class="legend mut"><span><i class="dot" style="background:var(--acc)"></i>1回ごとの x̄</span><span style="color:var(--ok)">┅ x̄ の平均</span>${showMu?'<span style="color:var(--acc2)">｜ μ</span>':''}</div>`;}
+
+// ---- 無作為に取る
+let rHist=[],rLast=[];
+function rDraw(times=1){const n=+$("rn").value;for(let t=0;t<times;t++){rLast=pick([...POP.keys()],n);rHist.push(mean(rLast.map(i=>POP[i])));}rRender();}
+function rRender(){const n=+$("rn").value;$("rnv").textContent=n;const st={};rLast.forEach(i=>st[i]="sel");$("rgrid").innerHTML=grid($("rgrid"),st);
+ const showMu=$("rmu").checked;let t="";
+ if(rHist.length){const last=rHist[rHist.length-1];t+=`<div class="big">x̄ ＝ ${fmt(last)}</div><div class="mut">選んだ ${rLast.length} 店の平均（統計量）。取り直すと変わる。</div>`;
+  if(rHist.length>1){const sd=Math.sqrt(mean(rHist.map(v=>(v-mean(rHist))**2)));t+=`<div>${rHist.length} 回の x̄：平均 ${fmt(mean(rHist))}、ばらつき（標準偏差）${sd.toFixed(2)}</div>`;}}
+ else t='<span class="mut">「選んで計算する」を押す。</span>';
+ if(showMu)t+=`<div style="color:var(--acc2)">μ ＝ ${fmt(MU)}（全100店の平均・母数。実際には分からない）</div>`;
+ if(n===100)t+=`<div class="mut">n＝100 は全数調査。x̄ は毎回 μ と一致する。</div>`;
+ $("rsum").innerHTML=t;$("rstrip").innerHTML=strip(rHist,MU,showMu,"x̄ の履歴");}
+$("rn").addEventListener("input",()=>{rHist=[];rLast=[];rRender();});
+$("rdraw").onclick=()=>rDraw(1);$("rx10").onclick=()=>rDraw(10);$("rreset").onclick=()=>{rHist=[];rLast=[];rRender();};$("rmu").onchange=rRender;
+
+// ---- 名簿の漏れ
+let fHist=[];
+function frameIdx(){const m=+$("fm").value;const out=new Set(ORDER.slice(0,m));return [...POP.keys()].filter(i=>!out.has(i));}
+function fRender(lastSel=[]){const m=+$("fm").value,n=+$("fn").value;$("fmv").textContent=m;$("fnv").textContent=n;
+ const inF=new Set(frameIdx());const st={};POP.forEach((_,i)=>{if(!inF.has(i))st[i]="off";});lastSel.forEach(i=>st[i]="sel");
+ $("fgrid").innerHTML=grid($("fgrid"),st)+'<div class="legend mut"><span><i class="dot" style="background:var(--off)"></i>名簿に載っていない店</span><span><i class="dot" style="background:var(--acc)"></i>選ばれた店</span></div>';
+ const fm=mean([...inF].map(i=>POP[i]));
+ let t=`<div>μ（全100店）＝ <b>${fmt(MU)}</b>　名簿内の平均 ＝ <b>${fmt(fm)}</b></div>`;
+ if(fHist.length)t+=`<div class="big">${fHist.length} 回の x̄ の平均 ＝ ${fmt(mean(fHist))}</div><div class="mut">ずれ（x̄ の平均 − μ）＝ ${(mean(fHist)-MU>=0?"+":"")}${(mean(fHist)-MU).toFixed(2)}。n を増やしても、名簿内の平均の近くに集まるだけで μ には近づかない。</div>`;
+ else t+='<span class="mut">「20回取り直す」を押す。</span>';
+ $("fsum").innerHTML=t;$("fstrip").innerHTML=strip(fHist,MU,true,"x̄ の履歴");}
+$("fdraw").onclick=()=>{const n=+$("fn").value,idx=frameIdx();let last=[];for(let t=0;t<20;t++){last=pick(idx,Math.min(n,idx.length));fHist.push(mean(last.map(i=>POP[i])));}fRender(last);};
+["fm","fn"].forEach(id=>$(id).addEventListener("input",()=>{fHist=[];fRender();}));$("freset").onclick=()=>{fHist=[];fRender();};
+
+// ---- 自分から回答
+let qHist=[],qN=[];
+function respProb(v,k){return 1/(1+Math.exp(k*(v-2.5)))*0.9+0.05;}
+function qRender(last=[]){const k=+$("qk").value;$("qkv").textContent=k;const st={};last.forEach(i=>st[i]="sel");
+ $("qgrid").innerHTML=grid($("qgrid"),st)+'<div class="legend mut"><span><i class="dot" style="background:var(--acc)"></i>返事が来た店</span></div>';
+ let t="";if(qHist.length){t+=`<div class="big">返事の平均 ＝ ${fmt(qHist[qHist.length-1])}</div><div class="mut">今回の回答 ${qN[qN.length-1]} 店。</div><div>${qHist.length} 回の平均 ${fmt(mean(qHist))}、μ ＝ ${fmt(MU)}、ずれ ${(mean(qHist)-MU).toFixed(2)}</div>`;
+  if(k===0)t+='<div class="mut">偏りの強さ 0：返事のしやすさが廃棄率と無関係なので、ずれはほぼ消える。</div>';}
+ else t='<span class="mut">「アンケートを送る」を押す。偏りの強さを0にして比べる。</span>';
+ $("qsum").innerHTML=t;$("qstrip").innerHTML=strip(qHist,MU,true,"回答の平均の履歴");}
+function qDraw(times){const k=+$("qk").value;let last=[];for(let t=0;t<times;t++){last=[...POP.keys()].filter(i=>Math.random()<respProb(POP[i],k));if(!last.length)last=[0];qHist.push(mean(last.map(i=>POP[i])));qN.push(last.length);}qRender(last);}
+$("qdraw").onclick=()=>qDraw(1);$("qx20").onclick=()=>qDraw(20);$("qk").addEventListener("input",()=>{qHist=[];qN=[];qRender();});$("qreset").onclick=()=>{qHist=[];qN=[];qRender();};
+
+// ---- 標本空間
+let ev=new Set([2,4,6]);
+function sRender(){$("dice").innerHTML=[1,2,3,4,5,6].map(d=>`<button class="die${ev.has(d)?" on":""}" data-d="${d}">${d}</button>`).join("");
+ $("dice").querySelectorAll("button").forEach(b=>b.onclick=()=>{const d=+b.dataset.d;ev.has(d)?ev.delete(d):ev.add(d);sRender();});
+ const a=[...ev].sort();$("ssum").innerHTML=`<div>標本空間 Ω ＝ {1, 2, 3, 4, 5, 6}（6通り）</div><div class="big">事象 A ＝ {${a.join(", ")}}</div>`+
+ `<div>どの目も同じくらい出るなら P(A) ＝ ${a.length}/6${a.length?` ≒ ${(a.length/6).toFixed(3)}`:" ＝ 0"}</div><div class="mut">A の余事象（Aでない）＝ {${[1,2,3,4,5,6].filter(d=>!ev.has(d)).join(", ")}}</div>`;}
+document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{ev=new Set(b.dataset.ev==="even"?[2,4,6]:b.dataset.ev==="ge4"?[4,5,6]:[]);sRender();});
+
+rRender();fRender();qRender();sRender();show("rand");
+window.__LAB__={POP,MU,ORDER,frameIdx,respProb,mean};
+</script>
+</body></html>

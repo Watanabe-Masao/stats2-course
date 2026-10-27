@@ -4,6 +4,7 @@ root_page: 406b7cd539a181009c17d5cf82af377c   # 📚 教材 v2
 guide_page: 406b7cd539a181df985edc50a2b248af  # 学び方ガイド（生成）
 personal_root: 406b7cd539a181719cfdfd53a2501d4a  # 個人用の学習記録（配布しない。配布先の設定では空にする）
 units:                 # 新しく生成した単元ページ
+  U03: 406b7cd539a18162b230fddc4cad9937
   U09: 406b7cd539a18111807cf1b85390f332
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
@@ -41,7 +42,20 @@ legacy_units:
   U30: 404b7cd539a1818ca942dd14a6d753a1
   U31: 404b7cd539a181f290b8f54f4baec30b
   U32: 404b7cd539a18104a6d5e51d404464a9
+refs:
+  REF-PQ-DB: da3b5947153c4ae59304e308a9b1e9e2
+  REF-CONFUSION: 406b7cd539a1813095c5c41c64477e81
+  REF-Q-U03: 402b7cd539a181b395afefab24282878
 terms:
   TERM-perm: 405b7cd539a181f2b3b4f04db076d2f0
   TERM-comb: 405b7cd539a181298d8fd17c7d3bd440
   TERM-fact: 405b7cd539a1817ea350f448da86a476
+  TERM-population: 405b7cd539a181a1af22c1469b5048bf
+  TERM-sample: 405b7cd539a181c89c78dd03e0aff365
+  TERM-parameter: 405b7cd539a181dbac4ffc0e5eb81d7c
+  TERM-statistic: 405b7cd539a1816aaefffafd39bb617b
+  TERM-sample-space: 405b7cd539a181f981cace263f9b23e0
+  TERM-event: 405b7cd539a181a0870fe1a8729f5050
+  TERM-frame: 405b7cd539a181c18d95e313c68fa19b
+  TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
+  TERM-bias: 405b7cd539a1810da989ddfb79840143
