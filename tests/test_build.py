@@ -198,3 +198,40 @@ class TestLabs(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVisuals(unittest.TestCase):
+    """例題・問題にはラボか図。教材にチェック欄を残さない。"""
+
+    def test_problem_needs_visual(self):
+        from model import _validate_problem
+        q = {"stage": "S1", "format": "written", "prompt": "問", "answer": "答"}
+        c = course()
+        err = _validate_problem(c, "U03", "Q-U03-901", q, 1)
+        self.assertTrue(any("ラボか図がない" in e for e in err))
+        q["no_visual"] = "理由"
+        self.assertFalse(any("ラボか図がない" in e for e in _validate_problem(c, "U03", "Q-U03-901", q, 1)))
+
+    def test_example_needs_visual(self):
+        from model import _check_examples
+        self.assertTrue(_check_examples("x", "**例題A** 文\n\n説明\n\n### 次"))
+        self.assertFalse(_check_examples("x", "**例題A** 文\n\n{{fig:FIG-U03-exA}}\n\n### 次"))
+
+    def test_figure_numbers_must_come_from_problem(self):
+        import figures
+        c = course()
+        q = c.units["U03"]["problems"]["Q-U03-030"]
+        q["figure"] = dict(q["figure"], stat=["標本の不良率 1/20＝6%"])
+        self.assertTrue(any("ない数" in e for e in figures.validate_figures(c)))
+
+    def test_no_checkbox_in_pages(self):
+        r = NotionRenderer(course(), TARGET)
+        md = r.unit_page("U03")
+        self.assertNotIn("- [ ]", md)
+        self.assertIn("- □ ", md)
+        self.assertEqual(lint_page("x", "- [ ] 自分で", set()) != [], True)
+
+    def test_problem_figure_inside_answer(self):
+        r = NotionRenderer(course(), TARGET)
+        out = r.problem(COURSE.units["U04"]["problems"]["Q-U04-011"], [0])
+        self.assertIn("図で確かめる", out[out.index("<toggle>"):])

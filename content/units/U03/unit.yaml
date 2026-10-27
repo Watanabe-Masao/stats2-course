@@ -35,3 +35,13 @@ checks:
   - 'abs((100-10)/(100-1) - 0.909) < 0.001 and abs((1000-100)/(1000-1) - 0.901) < 0.001'
   - '[round(10*s/100) for s in (30, 50, 20)] == [3, 5, 2]'
   - 'Fraction(3, 6) == Fraction(1, 2) and Fraction(len({4,5,6}), 6) == Fraction(1, 2)'
+# 例題の図（本文で {{fig:ID}}）。図の中の数は本文にある数だけを使う（build/figures.py）
+figures:
+  - id: FIG-U03-exA
+    caption: 協力してくれた10店は全100店の一部。2.4% は10店から計算した統計量で、自分から手を挙げた店なので偏りうる
+    spec:
+      type: popsample
+      pop: {label: 全100店舗, size: N＝100}
+      sample: {label: 協力してくれた10店舗, size: n＝10, bias: 自分から手を挙げた店。廃棄の少ない店ほど協力しやすければ、低めに偏る}
+      param: [全100店の本当の平均廃棄率 μ（分からない）]
+      stat: [10店の平均 x̄＝2.4%]

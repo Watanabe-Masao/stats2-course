@@ -43,3 +43,4 @@ checks:
   - 'fact(10) == 3628800 and round(math.sqrt(2*math.pi*10)*(10/math.e)**10) == 3598696'
   - 'len([c for c in itertools.combinations(range(1,6),2) if c[1]-c[0] > 1]) == comb(4,2) == 6'
   - 'len([c for c in itertools.combinations(range(1,8),3) if all(b-a > 1 for a,b in zip(c, c[1:]))]) == comb(5,3) == 10'
+visuals_pending: true   # 例題・問題ごとのラボか図はまだ。数え方ラボを共通部品に移すときに付け、この行を消す

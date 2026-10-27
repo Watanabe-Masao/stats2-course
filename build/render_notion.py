@@ -16,6 +16,7 @@ CIRC = "①②③④⑤⑥⑦⑧⑨"
 LIST_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s")
 ASSET_PLACEHOLDER = "@@ASSET:{}@@"
 LONG_CHOICE = 12   # これより長い選択肢があれば、選択肢を1行ずつ並べる
+CHECK = re.compile(r"^- \[[ xX]\] ")   # 教材のチェック欄（□ の箇条書きにする）
 
 
 def mention(page_id: str) -> str:
@@ -151,12 +152,33 @@ class NotionRenderer:
         else:
             ans = self.inline(q["answer"])
             title = q.get("answer_title") or COMP["labels"]["answer_default"]
+        if q.get("figure"):
+            fid = f"FIG-{q['id']}"
+            ans += (f"\n\n{COMP['icons']['fig']} <b>{COMP['labels']['fig_check']}</b>\n\n"
+                    + self.inline(f"{{{{fig:{fid}}}}}"))
         if q.get("lab"):
             aid = f"{q['lab']['id']}@{q['id']}"
             ans += (f"\n\n{COMP['icons']['lab']} <b>{COMP['labels']['lab_check']}</b>"
                     f"<span color=\"gray\">{COMP['labels']['lab_check_note']}</span>\n\n"
                     f'<embed source="{self.lab_src(aid)}" />')
         return "\n".join(parts) + f"\n\n<toggle>\n{title}\n\n{ans}\n</toggle>"
+
+    def checklists(self, md: str) -> str:
+        """教材の中に、押して状態が残るチェック欄を作らない（個人の状態は個人用の記録に置く）。
+        「- [ ] 文」は「□ 文」の箇条書きにし、続けて記録先を灰色で添える（配布先の設定では記録先なし）。"""
+        lines, out, i = md.split("\n"), [], 0
+        note = COMP["labels"]["checklist_note"]
+        dest = f" → {mention(self.t['personal_root'])}" if self.t.get("personal_root") else ""
+        while i < len(lines):
+            if CHECK.match(lines[i]):
+                while i < len(lines) and CHECK.match(lines[i]):
+                    out.append("- □ " + CHECK.sub("", lines[i]))
+                    i += 1
+                out.append(f'\n<span color="gray">{note}</span>{dest}')
+                continue
+            out.append(lines[i])
+            i += 1
+        return "\n".join(out)
 
     # ---- ページ ------------------------------------------------------
     def unit_page(self, uid: str) -> str:
@@ -204,7 +226,7 @@ class NotionRenderer:
         out.append(f"<toggle>\n{lab['meta_title']}\n\n単元ID：{uid}　版：{u['version']}　原本：stats2-course/content/units/{uid}/"
                    f"（このページは生成物。直すときは原本を直して作り直す）\n\n{self.c.shared['content_note']}\n\n"
                    f"出典：{src} を内容照合の基準とし、説明・例題・問題は独自に構成。\n</toggle>")
-        return "\n\n".join(out) + "\n"
+        return self.checklists("\n\n".join(out)) + "\n"
 
     def root_page(self) -> str:
         lines = [

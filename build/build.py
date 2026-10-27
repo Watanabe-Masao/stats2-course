@@ -13,6 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from figures import build_figures, validate_figures  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
 from model import ROOT, load_course, load_yaml, run_checks, validate  # noqa: E402
@@ -28,16 +29,20 @@ def fail(title: str, errors: list[str]) -> int:
 
 def main(argv: list[str]) -> int:
     course = load_course()
-    errors = validate(course) + validate_labs(course)
+    errors = validate(course) + validate_labs(course) + validate_figures(course)
     n, check_errors = run_checks(course)
     errors += check_errors
     print(f"単元 {len(course.units)}・問題 {sum(len(u['problems']) for u in course.units.values())}・検算 {n} 件")
     if errors:
         return fail("エラー", errors)
     print("✅ 検証・検算 OK")
+    pending = [uid for uid, u in course.units.items() if u.get("visuals_pending")]
+    if pending:
+        print(f"⚠ 例題・問題のラボか図がまだの単元：{', '.join(pending)}（unit.yaml の visuals_pending）")
     if "--check" in argv:
         return 0
 
+    figs = build_figures(course)
     labs = build_labs(course)
     site = build_site(course)
     assets = set(course.figures) | {v["asset"] for v in labs} | set(course.labs)
@@ -51,7 +56,7 @@ def main(argv: list[str]) -> int:
     outdir.mkdir(parents=True, exist_ok=True)
     for name, md in pages.items():
         (outdir / f"{name}.md").write_text(md, encoding="utf-8")
-    print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版、out/site/ にラボ {sum(1 for e in site if not e['query'])} 本（生成物の検査 OK）")
+    print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版、out/site/ にラボ {sum(1 for e in site if not e['query'])} 本・図 {len(course.figures)}（問題・例題の図 {len(figs)}）（生成物の検査 OK）")
     return 0
 
 

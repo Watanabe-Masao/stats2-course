@@ -31,4 +31,6 @@ labels:
   meta_title: ⚙️ 教材の情報（作成者向け）
   guide_link: タブの選び方・印の意味 →
   lab_check: ラボで確かめる
+  fig_check: 図で確かめる
+  checklist_note: できたら個人用の学習記録に付ける（教材には書き込まない）
   lab_check_note: （この問題の数値が入った状態で開く）
