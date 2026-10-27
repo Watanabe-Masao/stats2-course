@@ -7,10 +7,12 @@ cd "$(dirname "$0")/.."
 dest="${1:?公開用リポジトリの手元のパスを指定する}"
 [ -d "$dest/.git" ] || { echo "❌ $dest は git の作業フォルダではない"; exit 1; }
 [ -f out/site/index.html ] || { echo "❌ out/site がない（python3 build/build.py を先に）"; exit 1; }
-rsync -a --delete --exclude .git out/site/ "$dest/"
+find "$dest" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+cp -a out/site/. "$dest/"
 cd "$dest"
 git add -A
 if git diff --cached --quiet; then echo "変更なし"; exit 0; fi
-git commit -q -m "ラボを更新（stats2-course $(git -C "$OLDPWD" rev-parse --short HEAD)）"
-git push -q
+git commit -q -m "ラボを更新（stats2-course $(git -C "$OLDPWD" rev-parse --short HEAD)）" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Mw2vhLEn7izCfdmNC3tr17"
+git push -q -u origin HEAD
 echo "✅ 公開サイトを更新した"
