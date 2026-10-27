@@ -179,6 +179,18 @@ class TestLabs(unittest.TestCase):
         self.assertIn("LAB-scale@s1-temp", v)
         self.assertIn("LAB-scale@Q-U04-010", v)
 
+    def test_hosted_lab_urls(self):
+        from labs import lab_url
+        self.assertEqual(lab_url("https://x.github.io/labs/", COURSE, "LAB-scale@s1-temp"),
+                         "https://x.github.io/labs/scale/?p=s1-temp")
+        target = dict(TARGET, site_base_url="https://x.github.io/labs")
+        r = NotionRenderer(course(), target)
+        out = r.problem(COURSE.units["U04"]["problems"]["Q-U04-010"], [0])
+        self.assertIn('<embed source="https://x.github.io/labs/scale/?p=Q-U04-010" />', out)
+        page = r.unit_page("U04")
+        self.assertNotIn("@@ASSET", page)   # 公開サイトがあれば、ラボも図もアップロード不要
+        self.assertIn('<image source="https://x.github.io/labs/fig/FIG-U04-scale.svg">', page)
+
     def test_squeeze_keeps_urls_and_code(self):
         src = "  <a href='https://x'>\n  // コメント\n  const a=1; // 行末\n\n"
         self.assertEqual(squeeze(src), "<a href='https://x'>\nconst a=1; // 行末\n")
