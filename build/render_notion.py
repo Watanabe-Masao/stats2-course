@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from labs import fig_url, lab_url
 from model import ROOT, TOKEN, Block, Course, load_yaml, parse_blocks
 
 COMP = load_yaml(ROOT / "templates" / "notion" / "components.yaml")
@@ -38,6 +39,13 @@ class NotionRenderer:
         pid = (self.t.get("terms") or {}).get(tid)
         return mention(pid) if pid else self.c.terms[tid]["name"]
 
+    def lab_src(self, aid: str) -> str:
+        """公開サイトがあれば URL、なければアップロードの差し込み口（publish_prep が置き換える）。"""
+        lid = aid.split("@")[0]
+        if self.t.get("site_base_url") and self.c.labs[lid].get("src"):
+            return lab_url(self.t["site_base_url"], self.c, aid)
+        return ASSET_PLACEHOLDER.format(aid)
+
     def stage_label(self, sid: str) -> str:
         s = next(s for s in self.c.stages if s["id"] == sid)
         return f"{s['icon']} {s['name']}"
@@ -59,11 +67,12 @@ class NotionRenderer:
             if kind == "shared":
                 return self.inline(self.c.shared[arg])
             if kind == "lab":
-                return f'<embed source="{ASSET_PLACEHOLDER.format(arg)}" />'
+                return f'<embed source="{self.lab_src(arg)}" />'
             if kind == "fig":
                 fid, _, cap = arg.partition("|")
                 cap = cap or self.c.figures[fid].get("caption", "")
-                return f'<image source="{ASSET_PLACEHOLDER.format(fid)}">\n{self.inline(cap)}\n</image>'
+                src = fig_url(self.t["site_base_url"], fid) if self.t.get("site_base_url") else ASSET_PLACEHOLDER.format(fid)
+                return f'<image source="{src}">\n{self.inline(cap)}\n</image>'
             if kind == "ref":
                 pid = (self.t.get("refs") or {}).get(arg)
                 label = self.c.shared["refs"][arg]
@@ -146,7 +155,7 @@ class NotionRenderer:
             aid = f"{q['lab']['id']}@{q['id']}"
             ans += (f"\n\n{COMP['icons']['lab']} <b>{COMP['labels']['lab_check']}</b>"
                     f"<span color=\"gray\">{COMP['labels']['lab_check_note']}</span>\n\n"
-                    f'<embed source="{ASSET_PLACEHOLDER.format(aid)}" />')
+                    f'<embed source="{self.lab_src(aid)}" />')
         return "\n".join(parts) + f"\n\n<toggle>\n{title}\n\n{ans}\n</toggle>"
 
     # ---- ページ ------------------------------------------------------

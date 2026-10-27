@@ -49,6 +49,12 @@
 
 `build/check_all.sh`（単体テスト → 検証・検算・生成・生成物の検査 → 旧版との突き合わせ → ラボの全部の版のテスト）。公開とコミットの前に必ず通す。
 
+## 公開サイト（ラボと図）
+
+`publish/notion.yaml` に `site_base_url` があると、ラボと図はアップロードせず URL で埋め込む（`<slug>/?p=場面`、`fig/<図ID>.svg`）。
+`python3 build/build.py` で `out/site/` ができる。`build/check_all.sh` を通してから `build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開する。公開されるのは out/site/ だけ（原本・予想の答え・個人データは出ない）。
+ラボの `slug` と図の ID は URL の一部なので変えない。
+
 ## Notion への公開手順
 
 1. `python3 build/build.py`

@@ -8,12 +8,16 @@ tools/<lab>/tool.yaml に src があるラボは、共通部品（tools/labkit�
   LAB-scale@s1-temp   tool.yaml の presets.s1-temp（本文では {{lab:LAB-scale@s1-temp}}）
   LAB-scale@Q-U04-010 問題 Q-U04-010 の lab（答えの中に「ラボで確かめる」として入る）
 
+公開サイト（publish/notion.yaml に site_base_url があるとき）は out/site/<slug>/index.html を1つ作り、
+全部の場面を中に持つ。Notion には <slug>/?p=名前 の URL で埋め込む（アップロードは要らない）。
+
 out/labs/manifest.json に、各版の設定と expect（予想の答え。テストでラボの値と照合する）を書く。
 expect は HTML には入れない（答えはラボ自身が計算する）。
 """
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from model import ROOT, TOOLS, Course
@@ -67,10 +71,75 @@ def squeeze(html: str) -> str:
     return "\n".join(lines) + "\n"
 
 
-def build_labs(course: Course) -> list[dict]:
-    OUT.mkdir(parents=True, exist_ok=True)
+SITE = ROOT / "out" / "site"
+_PICK = ("window.__LABCFG__=(function(){try{var p=new URLSearchParams(location.search).get(\"p\");"
+         "return (p&&window.__LABPRESETS__[p])||{};}catch(e){return {};}})();")
+
+
+def fig_url(base: str, fid: str) -> str:
+    return f"{base.rstrip('/')}/fig/{fid}.svg"
+
+
+def lab_url(base: str, course: Course, aid: str) -> str:
+    """公開先のラボの URL（場面は ?p=名前 で渡す）。"""
+    lid, _, name = aid.partition("@")
+    url = f"{base.rstrip('/')}/{course.labs[lid]['slug']}/"
+    return url + (f"?p={name}" if name else "")
+
+
+def _assemble(t: dict, cfg_js: str) -> str:
     kit_css = _drop_head_comment((TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8"))
     kit_js = _drop_head_comment((TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8"))
+    src = (t["dir"] / t["src"]).read_text(encoding="utf-8")
+    html = (src.replace("/*@LABKIT_CSS@*/", kit_css)
+               .replace("/*@LABKIT_JS@*/", kit_js)
+               .replace("/*@LABCFG@*/", cfg_js))
+    if "@LAB" in html:
+        raise ValueError(f"{t['id']}: 差し込み口が残っている")
+    return squeeze(html)
+
+
+def build_site(course: Course) -> list[dict]:
+    """公開サイト用：ラボごとに1ファイル。全部の場面を中に持ち、URL の ?p= で選ぶ。"""
+    SITE.mkdir(parents=True, exist_ok=True)
+    (SITE / ".nojekyll").write_text("", encoding="utf-8")
+    entries, links = [], []
+    by_lab: dict[str, dict] = {}
+    for aid, spec in variants(course).items():
+        lid, _, name = aid.partition("@")
+        if name:
+            by_lab.setdefault(lid, {})[name] = {k: spec[k] for k in CFG_KEYS if k in spec}
+    for lid, t in course.labs.items():
+        if not t.get("src"):
+            continue
+        presets = by_lab.get(lid, {})
+        js = "window.__LABPRESETS__=" + json.dumps(presets, ensure_ascii=False) + ";" + _PICK
+        d = SITE / t["slug"]
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(_assemble(t, js), encoding="utf-8")
+        modes = [m["key"] for m in t.get("modes", []) if isinstance(m, dict)]
+        rel = str((d / "index.html").relative_to(ROOT))
+        entries.append({"asset": lid, "file": rel, "query": "", "cfg": {}, "expect": None, "modes": modes})
+        for name, cfg in presets.items():
+            spec = variants(course)[f"{lid}@{name}"]
+            entries.append({"asset": f"{lid}@{name}", "file": rel, "query": f"?p={name}", "cfg": cfg,
+                            "expect": spec.get("expect"), "modes": modes})
+        links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a>（場面 {len(presets)}）</li>')
+    figdir = SITE / "fig"   # 図も公開サイトから出す（アップロード不要）
+    figdir.mkdir(exist_ok=True)
+    for fid, f in course.figures.items():
+        (figdir / f"{fid}.svg").write_bytes((ROOT / f["file"]).read_bytes())
+    (SITE / "index.html").write_text(
+        '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        "<title>統計検定2級 ラボ</title><h1>統計検定2級 ラボ</h1><p>教材の原本（stats2-course）から自動で作るページ。"
+        "教材のページから場面を指定して埋め込む。</p><ul>" + "".join(links) + "</ul>\n", encoding="utf-8")
+    # 試験用の一覧（予想の答えを含むので公開サイトの外に置く）
+    (ROOT / "out" / "site_manifest.json").write_text(json.dumps(entries, ensure_ascii=False, indent=1), encoding="utf-8")
+    return entries
+
+
+def build_labs(course: Course) -> list[dict]:
+    OUT.mkdir(parents=True, exist_ok=True)
     manifest = []
     for lid, t in course.labs.items():   # 共通部品を使わない古い形のラボ（そのまま使う）
         if not t.get("src"):
@@ -78,15 +147,9 @@ def build_labs(course: Course) -> list[dict]:
     for aid, spec in variants(course).items():
         lid = aid.split("@")[0]
         t = course.labs[lid]
-        src = (t["dir"] / t["src"]).read_text(encoding="utf-8")
         cfg = {k: spec[k] for k in CFG_KEYS if k in spec}
-        html = (src.replace("/*@LABKIT_CSS@*/", kit_css)
-                   .replace("/*@LABKIT_JS@*/", kit_js)
-                   .replace("/*@LABCFG@*/", "window.__LABCFG__=" + json.dumps(cfg, ensure_ascii=False) + ";"))
-        if "@LAB" in html:
-            raise ValueError(f"{lid}: 差し込み口が残っている")
         f = OUT / f"{safe(aid)}.html"
-        f.write_text(squeeze(html), encoding="utf-8")
+        f.write_text(_assemble(t, "window.__LABCFG__=" + json.dumps(cfg, ensure_ascii=False) + ";"), encoding="utf-8")
         manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": spec.get("expect"),
                          "modes": [m["key"] for m in t.get("modes", []) if isinstance(m, dict)]})
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -98,6 +161,8 @@ def validate_labs(course: Course) -> list[str]:
     for lid, t in course.labs.items():
         if t.get("src") and not (t["dir"] / t["src"]).exists():
             err.append(f"{lid}: {t['src']} がない")
+        if t.get("src") and not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
+            err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")
         for name, p in (t.get("presets") or {}).items():
             err += _check_spec(f"{lid}@{name}", p, t)
     for u in course.units.values():

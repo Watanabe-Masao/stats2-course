@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from labs import build_labs, validate_labs  # noqa: E402
+from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
 from model import ROOT, load_course, load_yaml, run_checks, validate  # noqa: E402
 from render_notion import NotionRenderer  # noqa: E402
@@ -39,6 +39,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     labs = build_labs(course)
+    site = build_site(course)
     assets = set(course.figures) | {v["asset"] for v in labs} | set(course.labs)
     r = NotionRenderer(course, load_yaml(ROOT / "publish" / "notion.yaml"))
     pages = {"guide": r.guide_page(), "root": r.root_page()}
@@ -50,7 +51,7 @@ def main(argv: list[str]) -> int:
     outdir.mkdir(parents=True, exist_ok=True)
     for name, md in pages.items():
         (outdir / f"{name}.md").write_text(md, encoding="utf-8")
-    print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版（生成物の検査 OK）")
+    print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版、out/site/ にラボ {sum(1 for e in site if not e['query'])} 本（生成物の検査 OK）")
     return 0
 
 

@@ -1,5 +1,6 @@
 id: LAB-scale
 name: 尺度ラボ
+slug: scale                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 kind: simulator
 src: scale_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 2
