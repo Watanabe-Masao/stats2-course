@@ -1,0 +1,35 @@
+# 全単元の一覧。id は変えない。number は表示用（並べ替えてよい）。
+# migrated: 新しい原本（content/units/ID）に移したか
+- {id: U01, number: "01", migrated: false}
+- {id: U02, number: "02", migrated: false}
+- {id: U03, number: "03", migrated: false}
+- {id: U04, number: "04", migrated: false}
+- {id: U05, number: "05", migrated: false}
+- {id: U05T, number: "05-T", migrated: false}
+- {id: U06, number: "06", migrated: false}
+- {id: U07, number: "07", migrated: false}
+- {id: U08, number: "08", migrated: false}
+- {id: U09, number: "09", migrated: true}
+- {id: U10, number: "10", migrated: false}
+- {id: U11, number: "11", migrated: false}
+- {id: U12, number: "12", migrated: false}
+- {id: U13, number: "13", migrated: false}
+- {id: U14, number: "14", migrated: false}
+- {id: U15, number: "15", migrated: false}
+- {id: U16, number: "16", migrated: false}
+- {id: U17, number: "17", migrated: false}
+- {id: U18, number: "18", migrated: false}
+- {id: U19, number: "19", migrated: false}
+- {id: U20, number: "20", migrated: false}
+- {id: U21, number: "21", migrated: false}
+- {id: U22, number: "22", migrated: false}
+- {id: U23, number: "23", migrated: false}
+- {id: U24, number: "24", migrated: false}
+- {id: U25, number: "25", migrated: false}
+- {id: U26, number: "26", migrated: false}
+- {id: U27, number: "27", migrated: false}
+- {id: U28, number: "28", migrated: false}
+- {id: U29, number: "29", migrated: false}
+- {id: U30, number: "30", migrated: false}
+- {id: U31, number: "31", migrated: false}
+- {id: U32, number: "32", migrated: false}

@@ -1,0 +1,10 @@
+# 用語。id は変えない。説明本文は今後ここへ移す（現在はNotionの用語辞典にある）。
+- id: TERM-perm
+  name: 順列
+  en: permutation
+- id: TERM-comb
+  name: 組合せ
+  en: combination
+- id: TERM-fact
+  name: 階乗
+  en: factorial

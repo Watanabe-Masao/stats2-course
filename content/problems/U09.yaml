@@ -1,0 +1,212 @@
+# 単元U09の問題。id は変えない（個人の解答記録がこの id を指す）。
+# format: written（記述）/ fill（穴埋め）/ choice（5択）/ task（課題）
+# powers: P1 式を読む / P2 計算する / P3 言葉にする
+# checks: 答えの数値の検算式（build で自動実行）
+- id: Q-U09-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P2]
+  prompt: |-
+    6人から ① 会長・副会長・書記を選ぶ、② 役割のない委員を3人選ぶ
+
+    ① 6×□×□＝□通り　② □÷3!＝□÷□＝□通り
+  answer_title: 答え（埋めてから開く）
+  answer: ① 6×5×4＝**120**　② 120÷3!＝120÷6＝**20**。3人の並べ方 3!＝6 回ずつ重ねて数えているので6で割る。
+  checks:
+    - 'perm(6,3) == 120'
+    - 'comb(6,3) == 20'
+
+- id: Q-U09-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P2]
+  prompt: 7人から ① 店長代理と副代理を選ぶ、② 2人の研修参加者を選ぶ。
+  answer_title: 答え（解いてから開く）
+  answer: ① ₇P₂＝7×6＝**42通り**　② ₇C₂＝42÷2＝**21通り**
+  checks:
+    - 'perm(7,2) == 42'
+    - 'comb(7,2) == 21'
+
+- id: Q-U09-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P2]
+  prompt: A・B・C・D の4人から、リーダーとサブリーダーを1人ずつ選ぶ（兼任なし）。何通りか。
+  answer: "**12通り**。4×3。役割があるので順列 ₄P₂。"
+  checks:
+    - 'perm(4,2) == 12'
+
+- id: Q-U09-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P3]
+  prompt: 同じ4人から、役割のない委員を2人選ぶ。何通りか。前の問題（リーダーとサブリーダー）と答えが違う理由も書く。
+  answer: "**6通り**。前の問題の12通りでは「リーダーB・サブC」と「リーダーC・サブB」が同じ組 {B, C} になり、どの組も2回ずつ数えているので 12÷2＝6。"
+  checks:
+    - 'comb(4,2) == 6'
+
+- id: Q-U09-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1]
+  prompt: 3種類のパンから、1個目と2個目を順に選ぶ。同じパンを2回選んでもよい。何通りか。
+  answer: "**9通り**。3×3＝3²。同じものを何度も選べる（質問2が「選べる」）ので、P や C ではなく nʳ。"
+  checks:
+    - '3**2 == 9'
+
+- id: Q-U09-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P2]
+  prompt: パン屋の5種類のパンについて、① 3種類を選んで詰め合わせにする、② 3種類を選んで棚の上段・中段・下段に1種類ずつ並べる。それぞれ何通りか。
+  answer: ① ₅C₃＝**10通り**（詰め合わせは並びを区別しない）　② ₅P₃＝5×4×3＝**60通り**（段が役割）。60÷3!＝10 で①とつながる。
+  checks:
+    - 'comb(5,3) == 10'
+    - 'perm(5,3) == 60'
+
+- id: Q-U09-011
+  stage: S2
+  label: 計算練習
+  format: written
+  powers: [P2]
+  prompt: |-
+    工夫して計算する。
+
+    1. ₁₀C₈
+    2. ₇C₃
+    3. ₁₂C₁₀
+  answer: |-
+    1. ₁₀C₈＝₁₀C₂＝10×9÷2＝**45**（選ばない2つを選ぶ）
+    2. 7×6×5÷(3×2×1)＝210÷6＝**35**（先に約分すると楽）
+    3. ₁₂C₂＝12×11÷2＝**66**
+  checks:
+    - 'comb(10,8) == 45'
+    - 'comb(7,3) == 35'
+    - 'comb(12,10) == 66'
+
+- id: Q-U09-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: (a) 0〜9 を使った4桁の暗証番号（同じ数字を何度使ってもよい）　(b) 8人から委員4人　(c) 8人の中の1位・2位・3位
+  answer: (a) 10⁴＝**10,000通り**（重複可・順番あり）　(b) ₈C₄＝**70通り**　(c) ₈P₃＝8×7×6＝**336通り**
+  checks:
+    - '10**4 == 10000'
+    - 'comb(8,4) == 70'
+    - 'perm(8,3) == 336'
+
+- id: Q-U09-020
+  stage: S3
+  format: written
+  powers: [P2]
+  prompt: 6人から3人の当番を選ぶ。Aさんを必ず含む選び方は何通りか。
+  answer: Aさんは決まっているので、残り5人から2人：₅C₂＝**10通り**。
+  checks:
+    - 'comb(5,2) == 10'
+
+- id: Q-U09-021
+  stage: S3
+  format: written
+  powers: [P1]
+  prompt: 男性3人・女性4人から3人を選ぶ。女性を少なくとも1人含む選び方は何通りか。
+  answer: 反対（女性0人＝男性3人）を引く：₇C₃−₃C₃＝35−1＝**34通り**。「女性1人＋男性2人」などに分けて足しても同じ（12＋18＋4＝34）。
+  checks:
+    - 'comb(7,3) - comb(3,3) == 34'
+    - 'comb(4,1)*comb(3,2) + comb(4,2)*comb(3,1) + comb(4,3) == 34'
+
+- id: Q-U09-022
+  stage: S3
+  format: written
+  powers: [P2]
+  prompt: A〜E の5人を一列に並べる。AとBが隣り合う並び方は何通りか。
+  answer: AとBを1つのかたまりとみて4つを並べる 4!＝24、かたまりの中の並び AB・BA の2通り → 24×2＝**48通り**。全部の並び方120通りのうち48通り（確率0.4）。
+  checks:
+    - "len([p for p in itertools.permutations('ABCDE') if abs(p.index('A')-p.index('B')) == 1]) == 48"
+
+- id: Q-U09-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P1]
+  prompt: 10人の中から委員長1人と、役割のない委員2人を選ぶ方法は何通りか。
+  choices: ["45", "120", "360", "720", "1,000"]
+  correct: 3
+  answer: 委員長10通り×残り9人から委員2人 ₉C₂＝36 → 360。
+  misconceptions:
+    1: ₁₀C₂：委員長を選び忘れている
+    2: ₁₀C₃：3人全員を役割なしとして数えた
+    4: ₁₀P₃：委員2人にも役割があるとして数えた
+    5: 10³：同じ人を何度も選べるとして数えた
+  checks:
+    - '10*comb(9,2) == 360'
+    - 'comb(10,2) == 45'
+    - 'comb(10,3) == 120'
+    - 'perm(10,3) == 720'
+    - '10**3 == 1000'
+
+- id: Q-U09-024
+  stage: S3
+  tag: 確率へ
+  format: written
+  powers: [P1]
+  prompt: 5人から無作為に2人を選ぶ。AとBが両方選ばれる確率は？ 組合せと順列の両方で求め、一致を確かめよ。
+  answer: 組合せ：1÷₅C₂＝**1/10**。順列：「A→B」「B→A」の2通り÷20＝**1/10**。分子と分母で**同じ「1通り」**を使えば、どちらで数えてもよい。
+  checks:
+    - 'Fraction(1, comb(5,2)) == Fraction(2, perm(5,2)) == Fraction(1,10)'
+
+- id: Q-U09-025
+  stage: S3
+  tag: 分布へ
+  format: written
+  powers: [P2]
+  prompt: 10個のうち2個が不良。3個を戻さずに取り出すとき、不良がちょうど1個の確率は？
+  answer: ₂C₁×₈C₂÷₁₀C₃＝2×28÷120＝**7/15**。超幾何分布（{{unit:U15}}）の形。
+  checks:
+    - 'Fraction(comb(2,1)*comb(8,2), comb(10,3)) == Fraction(7,15)'
+
+- id: Q-U09-030
+  stage: S4
+  format: written
+  powers: [P1]
+  prompt: 10人が全員と1回ずつ握手する。握手は全部で何回か。
+  answer: 握手1回＝2人の組（区別なし）。₁₀C₂＝**45回**。総当たり戦と同じ構造。
+  checks:
+    - 'comb(10,2) == 45'
+
+- id: Q-U09-031
+  stage: S4
+  format: written
+  powers: [P1]
+  prompt: 右へ4歩・上へ3歩の最短経路は何通りか。
+  answer: 7歩のうち右の4歩を選ぶ：₇C₄＝₇C₃＝**35通り**。
+  checks:
+    - 'comb(7,4) == comb(7,3) == 35'
+
+- id: Q-U09-032
+  stage: S4
+  tag: 仕事へ
+  format: written
+  powers: [P3]
+  prompt: 10店舗のうち5店舗で新しい売場を試し、残り5店舗と比べたい。「どの5店にするか」の選び方は何通りあり、それを無作為に決めると何がよいか。
+  answer: ₁₀C₅＝**252通り**。252通りのどれも同じ確率で選ぶ（無作為化）と、「良い店ばかり選んだ」という偏りが入りにくい。実験計画（{{unit:U32}}）の基礎になる。
+  checks:
+    - 'comb(10,5) == 252'
+
+- id: Q-U09-040
+  stage: S5
+  label: 確かめ問題
+  format: written
+  powers: [P2]
+  prompt: B(4, 0.25) の確率 0.3164, 0.4219, 0.2109, 0.0469, 0.0039 を足すと？
+  answer_title: 答え
+  answer: 1（端数の丸めで0.9999〜1.0001になることがある）。
+  checks:
+    - "abs(sum(comb(4,k)*0.25**k*0.75**(4-k) for k in range(5)) - 1) < 1e-12"
+    - "[round(comb(4,k)*0.25**k*0.75**(4-k),4) for k in range(5)] == [0.3164, 0.4219, 0.2109, 0.0469, 0.0039]"

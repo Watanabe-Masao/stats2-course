@@ -1,0 +1,15 @@
+id: LAB-count
+name: 数え方ラボ
+kind: simulator
+file: count_lab.html
+version: 1
+modes:
+  - {key: list, name: 並べて数える}
+  - {key: pascal, name: パスカル}
+  - {key: multi, name: 重複を許す}
+  - {key: path, name: 道順}
+  - {key: der, name: 完全順列}
+used_by: [U09]
+checked:
+  browser_380px: 2026-10-27
+  notion_iphone: null   # 未確認

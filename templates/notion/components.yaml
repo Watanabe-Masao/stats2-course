@@ -1,0 +1,32 @@
+# Notion表示での部品の見た目。UIを変えるときはここ（とrender_notion.py）だけを直す。
+# 本文では ::: 名前 … ::: で囲んで使う。
+callouts:
+  task:    {icon: "✏️", color: gray_bg}          # 問題文の枠
+  ask:     {icon: "❓", color: yellow_bg}        # 判断の質問
+  key:     {icon: "💡", color: green_bg, title: ここが一番大事}
+  summary: {icon: "📌", color: blue_bg, title: まとめ（3行）}
+  pattern: {icon: "🧩", color: blue_bg, title: 説明の型}
+  warn:    {icon: "⚠️", color: red_bg}
+  info:    {icon: "💡", color: blue_bg}
+
+tones:   # 段階や領域の tone → Notion の色
+  green: green_bg
+  purple: purple_bg
+  blue: blue_bg
+  yellow: yellow_bg
+  orange: orange_bg
+
+icons:   # 本文中の {{icon:名前}}
+  fig: "🖼️"
+  lab: "🧪"
+  check: "✅"
+
+labels:
+  answer_default: 答え（考えてから開く）
+  answer_choice: 答えと、各選択肢の誤解
+  difficulty: {1: 易, 2: 中, 3: やや難}
+  goal_title: この段階のゴール
+  back_title: つまずいたら戻る
+  evidence_title: 🎯 段階ごとの到達の目安
+  meta_title: ⚙️ 教材の情報（作成者向け）
+  guide_link: タブの選び方・印の意味 →
