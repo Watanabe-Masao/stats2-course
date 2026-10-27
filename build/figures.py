@@ -338,9 +338,9 @@ def five(values):
             "wlo": inside[0], "whi": inside[-1], "out": [x for x in s if x < lo or x > hi], "mean": sum(s) / n}
 
 
-def _box(c, F, y, X, color=BLUE, fence=False, label=None):
+def _box(c, F, y, X, color=BLUE, fence=False, label=None, mean=None):
     if label:
-        c.text(8, y - 14, label, 12.5, INK, weight="bold")
+        c.text(8, y - 22, label, 12.5, INK, weight="bold")   # 柵の点線（y−16から）と箱に重ならない高さ
     if fence:
         for v in (F["lo"], F["hi"]):
             c.line(X(v), y - 16, X(v), y + 16, RED, 1.2, "3 3")
@@ -352,6 +352,10 @@ def _box(c, F, y, X, color=BLUE, fence=False, label=None):
     c.line(X(F["q2"]), y - 11, X(F["q2"]), y + 11, color, 3)
     for v in F["out"]:
         c.circle(X(v), y, 4.5, "#ffffff", stroke=RED, width=2)
+    if mean is not None:                                       # 平均の位置（▲）。中央値（箱の中の線）との違いを見せる
+        m = X(mean)
+        c.add(f'<path d="M{m:.1f} {y + 13} l-5 8 h10 z" fill="{INK}"/>')
+        c.text(m, y + 32, f"平均 {_num(round(mean, 2))}", 11, INK, "middle")
 
 
 def _axis(c, lo, hi, y, step, X):
@@ -434,10 +438,11 @@ def boxplot(sp: dict) -> str:
     y = 8
     if sp.get("title"):
         y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
-    y += 30
+    y += 38
     for r, F in zip(rows, Fs):
-        _box(c, F, y, X, BLUE, fence=sp.get("fence"), label=r.get("label"))
-        y += 52
+        mean = sum(r["data"]) / len(r["data"]) if sp.get("mean") else None
+        _box(c, F, y, X, BLUE, fence=sp.get("fence"), label=r.get("label"), mean=mean)
+        y += 64 if mean is not None else 52
     _axis(c, lo, hi, y - 22, step, X)
     y += 6
     for r, F in zip(rows, Fs):

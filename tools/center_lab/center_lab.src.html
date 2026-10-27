@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>代表値ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+</style></head><body>
+<h1>🧪 代表値ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-mm" class="mode">
+ <p class="mut" style="margin:0">平均・中央値・最頻値を同じ図に置く。いちばん大きい値を動かすと、どれが大きく動くか。</p>
+ <div class="row ctl"><label>データ <select id="mdata" data-key="data"></select></label></div>
+ <input type="range" id="mtop" min="0" max="60" step="1" value="17" data-name="最大の値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="mplot"></div>
+ <div class="card res key" id="msum"></div>
+ <div id="mform"></div>
+</div>
+
+<div id="m-wmean" class="mode">
+ <p class="mut" style="margin:0">人数（個数）の違う2つのグループの平均をまとめる。単純に2つの平均を足して2で割ると、人数の違い（重み）を無視することになる。</p>
+ <input type="range" id="wna" min="1" max="200" step="1" value="20" data-name="Aの人数">
+ <input type="range" id="wxa" min="50" max="5000" step="50" value="3000" data-name="Aの平均">
+ <input type="range" id="wnb" min="1" max="200" step="1" value="80" data-name="Bの人数">
+ <input type="range" id="wxb" min="50" max="5000" step="50" value="2000" data-name="Bの平均">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="wplot"></div>
+ <div class="card res key" id="wsum"></div>
+ <div id="wform"></div>
+</div>
+
+<div id="m-freq" class="mode">
+ <p class="mut" style="margin:0">度数分布表だけが分かるときは、各階級の値が階級値（真ん中の値）に集まっていると見なして平均を近似する。</p>
+ <input type="range" id="f1" min="0" max="20" step="1" value="2" data-name="0〜10">
+ <input type="range" id="f2" min="0" max="20" step="1" value="5" data-name="10〜20">
+ <input type="range" id="f3" min="0" max="20" step="1" value="3" data-name="20〜30">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="fplot"></div>
+ <div class="card res key" id="fsum"></div>
+ <div class="card res det"><table id="ftab"></table></div>
+</div>
+
+<div id="m-shape" class="mode">
+ <p class="mut" style="margin:0">分布の裾の向きを変えると、平均・中央値・最頻値の並び方がどう変わるか（200人分の分布）。</p>
+ <input type="range" id="ssk" min="-10" max="10" step="1" value="6" data-name="裾の向き">
+ <div class="mut" style="margin-top:-4px">−：左に裾が長い　0：左右対称　＋：右に裾が長い</div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const W=340;
+const yen=v=>Math.round(v).toLocaleString("ja-JP");
+// ---- 計算（本文の値はこの関数で検算する）
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+function median(a){const s=[...a].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function modes(a){const c={};a.forEach(x=>c[x]=(c[x]||0)+1);const mx=Math.max(...Object.values(c));return mx<2?[]:Object.keys(c).filter(k=>c[k]===mx).map(Number).sort((x,y)=>x-y);}
+function quart(a){const s=[...a].sort((x,y)=>x-y),n=s.length,h=Math.floor(n/2);return {q1:median(s.slice(0,h)),q3:median(s.slice(n-h))};}  // 中央値を除いた下半分・上半分の中央値（05と同じ）
+function trim(a,p){const s=[...a].sort((x,y)=>x-y),k=Math.floor(s.length*p);return mean(s.slice(k,s.length-k));}
+
+// ---- 平均・中央値・最頻値
+const DATA={
+ buy10:{name:"10人の購入額（千円）",v:[1,1,2,2,2,3,3,4,5,17],unit:"千円"},
+ five:{name:"5個（3〜10）",v:[3,5,5,7,10],unit:""},
+ q06:{name:"5個（2〜9）",v:[2,2,3,4,9],unit:""},
+ skew5:{name:"5個（1〜22）",v:[1,2,2,3,22],unit:""},
+ six:{name:"6日の来店数（人）",v:[12,15,15,18,20,40],unit:"人"},
+ income:{name:"9人の年収（万円）",v:[300,350,400,400,450,500,550,700,1500],unit:"万円"}};
+function mVals(){const D=DATA[$("mdata").value],v=[...D.v].sort((x,y)=>x-y);v[v.length-1]=+$("mtop").value;
+ const s=[...v].sort((x,y)=>x-y);return {D,v:s,mean:mean(s),median:median(s),modes:modes(s),...quart(s),trim:trim(s,0.1),sum:s.reduce((a,b)=>a+b,0)};}
+function mRange(){const D=DATA[$("mdata").value],s=[...D.v].sort((x,y)=>x-y),top=s[s.length-1],sec=s[s.length-2],st=top>=100?50:1;
+ const el=$("mtop");el.step=st;el.min=Math.ceil(sec/st)*st;el.max=Math.max(top*3,sec*2,top+20);}
+let mBase=null;
+function mRender(){const M=mVals(),s=M.v,lo=Math.min(0,s[0]),hi=Math.max(...s)*1.04+1e-9,X=x=>18+(x-lo)/(hi-lo)*(W-36),H=150,base=H-30;
+ if(!mBase||mBase.data!==$("mdata").value){const D=DATA[$("mdata").value];mBase={data:$("mdata").value,mean:mean(D.v),median:median(D.v)};}
+ let svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="データと代表値">`;
+ svg+=`<rect x="${X(M.q1)}" y="${base-70}" width="${Math.max(1,X(M.q3)-X(M.q1))}" height="70" fill="var(--acc)" fill-opacity=".08"/>`;
+ svg+=`<line x1="14" y1="${base}" x2="${W-10}" y2="${base}" stroke="var(--line)"/>`;
+ const cnt={};s.forEach(x=>{const k=cnt[x]=(cnt[x]||0)+1;svg+=`<circle cx="${X(x)}" cy="${base-8-(k-1)*13}" r="5.5" fill="var(--fg)" fill-opacity=".75"/>`;});
+ const mk=(x,c,t,y,dash)=>`<line x1="${X(x)}" y1="${base-72}" x2="${X(x)}" y2="${base+4}" stroke="${c}" stroke-width="2.5" ${dash?`stroke-dasharray="${dash}"`:""}/><text x="${Math.min(W-24,Math.max(24,X(x)))}" y="${y}" font-size="11" text-anchor="middle" fill="${c}" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke">${t}</text>`;
+ svg+=mk(M.median,"var(--acc2)","中央値 "+f(M.median),base-76,"5 3")+mk(M.mean,"var(--acc)","平均 "+f(+M.mean.toFixed(2)),base+18);
+ const ticks=[s[0],s[s.length-1]];ticks.forEach(t=>{svg+=`<text x="${X(t)}" y="${H-2}" font-size="10" text-anchor="middle" fill="var(--mut)">${f(t)}</text>`;});
+ $("mplot").innerHTML=svg+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>平均</span><span><i class="sw" style="background:var(--acc2)"></i>中央値</span><span>薄い帯＝Q₁〜Q₃（真ん中の半分）</span></div>`;
+ const u=M.D.unit,md=M.modes.length?M.modes.map(f).join("・"):"なし（どの値も1回ずつ）";
+ const dm=M.mean-mBase.mean,dd=M.median-mBase.median;
+ $("msum").innerHTML=`<div>平均 <b>${f(+M.mean.toFixed(2))}</b>${u}　中央値 <b>${f(M.median)}</b>${u}　最頻値 <b>${md}</b></div><div class="mut">最初のデータから：平均は ${dm>=0?"＋":"−"}${f(Math.abs(+dm.toFixed(2)))}、中央値は ${dd>=0?"＋":"−"}${f(Math.abs(+dd.toFixed(2)))}。Q₁＝${f(M.q1)}、Q₃＝${f(M.q3)}（中央値を除いた下半分・上半分の中央値）。</div>`;
+ const n=s.length;$("mform").innerHTML=LK.formula([`並べる：${s.map(f).join(", ")}`,`平均＝合計${f(M.sum)}÷${n}＝${f(+M.mean.toFixed(3))}`,n%2?`中央値＝${(n+1)/2}番目＝${f(M.median)}`:`中央値＝${n/2}番目と${n/2+1}番目の平均＝(${f(s[n/2-1])}＋${f(s[n/2])})÷2＝${f(M.median)}`,`10%トリム平均（両端の${Math.floor(n*0.1)}個ずつ除く）＝${f(+M.trim.toFixed(3))}`]);}
+LK.register("mm",{name:"平均・中央値・最頻値",
+ init(){$("mdata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");
+  $("mdata").onchange=()=>{mRange();const s=[...DATA[$("mdata").value].v].sort((x,y)=>x-y);LK.setRange("mtop",s[s.length-1]);mRender();};
+  mRange();LK.stepper($("mtop"),mRender);mRender();},
+ apply(s){if(s.data){$("mdata").value=s.data;mRange();const v=[...DATA[s.data].v].sort((x,y)=>x-y);LK.setRange("mtop",v[v.length-1]);mBase=null;}if(s.top!==undefined)LK.setRange("mtop",s.top);mRender();},
+ render:mRender,
+ value(key){const M=mVals();
+  if(key==="mode"){const t=M.modes.length?M.modes.map(f).join("・"):"なし";return {v:M.modes.length?M.modes[0]:NaN,text:t};}
+  if(key==="bigger"){const t=Math.abs(M.mean-M.median)<1e-9?"同じ":M.mean>M.median?"平均":"中央値";return {v:M.mean-M.median,text:t};}
+  const v={mean:M.mean,median:M.median,q1:M.q1,q3:M.q3,trim:M.trim,sum:M.sum}[key];return {v,text:f(+v.toFixed(3))};}});
+
+// ---- 重み付き平均
+function wVals(){const na=+$("wna").value,xa=+$("wxa").value,nb=+$("wnb").value,xb=+$("wxb").value;return {na,xa,nb,xb,w:(na*xa+nb*xb)/(na+nb),s:(xa+xb)/2,tot:na*xa+nb*xb};}
+function wRender(){const R=wVals(),H=150,mx=Math.max(R.xa,R.xb)*1.15,Y=v=>H-24-v/mx*(H-40),tw=W-40,wa=Math.max(8,tw*R.na/(R.na+R.nb)),wb=Math.max(8,tw-wa);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="人数を幅にした平均">`;
+ s+=`<rect x="20" y="${Y(R.xa)}" width="${wa-2}" height="${H-24-Y(R.xa)}" fill="var(--acc)" fill-opacity=".55" rx="3"/><rect x="${20+wa}" y="${Y(R.xb)}" width="${wb-2}" height="${H-24-Y(R.xb)}" fill="var(--acc2)" fill-opacity=".55" rx="3"/>`;
+ s+=`<line x1="14" y1="${Y(R.w)}" x2="${W-10}" y2="${Y(R.w)}" stroke="var(--fg)" stroke-width="2.5"/><line x1="14" y1="${Y(R.s)}" x2="${W-10}" y2="${Y(R.s)}" stroke="var(--mut)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+ s+=`<line x1="14" y1="${H-24}" x2="${W-10}" y2="${H-24}" stroke="var(--line)"/>`;
+ s+=`<text x="${20+wa/2}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--mut)">A ${R.na}人</text><text x="${20+wa+wb/2}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--mut)">B ${R.nb}人</text>`;
+ $("wplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--fg)"></i>重み付き平均 ${yen(R.w)}</span><span><i class="sw" style="background:var(--mut)"></i>2つの平均の単純平均 ${yen(R.s)}</span></div><div class="mut">棒の幅＝人数、高さ＝平均。面積の合計が全員の合計になる。</div>`;
+ $("wsum").innerHTML=`<div>全員の平均（重み付き平均）＝<b>${yen(R.w)}</b>　単純平均＝${yen(R.s)}</div><div class="mut">人数の多いグループの平均に近づく。人数が同じときだけ両者が一致する。</div>`;
+ $("wform").innerHTML=LK.formula([`合計＝${R.na}×${yen(R.xa)}＋${R.nb}×${yen(R.xb)}＝${yen(R.tot)}`,`重み付き平均＝${yen(R.tot)}÷${R.na+R.nb}＝${f(+R.w.toFixed(3))}`,`単純平均＝(${yen(R.xa)}＋${yen(R.xb)})÷2＝${f(R.s)}`]);}
+LK.register("wmean",{name:"重み付き平均",
+ init(){["wna","wxa","wnb","wxb"].forEach(id=>LK.stepper($(id),wRender));wRender();},
+ apply(s){[["nA","wna"],["xA","wxa"],["nB","wnb"],["xB","wxb"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});wRender();},
+ render:wRender,
+ value(key){const R=wVals(),v=key==="smean"?R.s:R.w;return {v,text:f(+v.toFixed(3))};}});
+
+// ---- 度数表の平均
+function fVals(){const fr=[1,2,3].map(i=>+$("f"+i).value),mid=[5,15,25],n=fr.reduce((a,b)=>a+b,0),s=fr.reduce((a,x,i)=>a+x*mid[i],0);return {fr,mid,n,s,m:n?s/n:NaN};}
+function fRender(){const F=fVals(),H=140,mx=Math.max(...F.fr,1),bw=(W-40)/3,X=v=>20+v/30*(W-40);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="ヒストグラムと近似平均"><line x1="16" y1="${H-24}" x2="${W-12}" y2="${H-24}" stroke="var(--line)"/>`;
+ F.fr.forEach((c,i)=>{const h=c/mx*(H-50);s+=`<rect x="${20+i*bw+1}" y="${H-24-h}" width="${bw-2}" height="${h}" fill="var(--acc)" fill-opacity=".45"/><text x="${20+i*bw+bw/2}" y="${H-28-h}" font-size="12" text-anchor="middle" fill="var(--fg)">${c}</text>`;});
+ [0,10,20,30].forEach(t=>{s+=`<text x="${X(t)}" y="${H-8}" font-size="10" text-anchor="middle" fill="var(--mut)">${t}</text>`;});
+ if(F.n)s+=`<line x1="${X(F.m)}" y1="10" x2="${X(F.m)}" y2="${H-24}" stroke="var(--acc2)" stroke-width="2.5"/><text x="${Math.min(W-30,Math.max(30,X(F.m)))}" y="12" font-size="11" text-anchor="middle" fill="var(--acc2)" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke">近似平均 ${f(+F.m.toFixed(2))}</text>`;
+ $("fplot").innerHTML=s+"</svg>";
+ $("fsum").innerHTML=F.n?`<div>近似平均＝(${F.fr.map((c,i)=>F.mid[i]+"×"+c).join("＋")})÷${F.n}＝<b>${f(+F.m.toFixed(3))}</b></div><div class="mut">各階級の値を階級値（5・15・25）に置いた近似。元のデータの平均とは少しずれることがある。</div>`:`<div>度数が全部0なので平均を出せない。</div>`;
+ $("ftab").innerHTML="<tr><th>階級</th><th>階級値</th><th>度数</th><th>階級値×度数</th></tr>"+F.fr.map((c,i)=>`<tr><td>${i*10}〜${i*10+10}</td><td>${F.mid[i]}</td><td>${c}</td><td>${F.mid[i]*c}</td></tr>`).join("")+`<tr><td>合計</td><td></td><td>${F.n}</td><td>${F.s}</td></tr>`;}
+LK.register("freq",{name:"度数表の平均",
+ init(){[1,2,3].forEach(i=>LK.stepper($("f"+i),fRender));fRender();},
+ apply(s){[1,2,3].forEach(i=>{if(s["f"+i]!==undefined)LK.setRange("f"+i,s["f"+i]);});fRender();},
+ render:fRender,
+ value(){const F=fVals();return {v:F.m,text:f(+F.m.toFixed(3))};}});
+
+// ---- 分布の形
+function sCounts(k){const a=4*Math.exp(-0.13*k),b=4*Math.exp(0.13*k),p=Array.from({length:21},(_,i)=>Math.pow((i+0.5)/21,a-1)*Math.pow(1-(i+0.5)/21,b-1)),t=p.reduce((x,y)=>x+y,0);
+ const c=p.map(x=>Math.round(200*x/t));return c;}
+function sVals(){const k=+$("ssk").value,a=4*Math.exp(-0.13*k),b=4*Math.exp(0.13*k),c=sCounts(k),N=4000;   // ベータ分布の形（0〜20に広げる）
+ let cdf=0,tot=0,med=null;const d=t=>Math.pow(t,a-1)*Math.pow(1-t,b-1);for(let i=0;i<N;i++)tot+=d((i+0.5)/N);
+ for(let i=0;i<N;i++){cdf+=d((i+0.5)/N)/tot;if(cdf>=0.5){med=20*(i+0.5)/N;break;}}
+ return {k,c,n:c.reduce((x,y)=>x+y,0),mean:20*a/(a+b),median:med,mode:20*(a-1)/(a+b-2)};}
+function order(S){const e=(a,b)=>Math.abs(a-b)<0.05;if(e(S.mean,S.median)&&e(S.median,S.mode))return "ほぼ等しい";
+ if(S.mean>S.median&&S.median>S.mode)return "最頻値＜中央値＜平均";if(S.mean<S.median&&S.median<S.mode)return "平均＜中央値＜最頻値";return "その他";}
+function sRender(){const S=sVals(),H=150,mx=Math.max(...S.c),bw=(W-30)/21,X=v=>15+v/20*(W-30-bw)+bw/2;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="分布と代表値"><line x1="12" y1="${H-20}" x2="${W-12}" y2="${H-20}" stroke="var(--line)"/>`;
+ S.c.forEach((c,i)=>{const h=c/mx*(H-60);s+=`<rect x="${15+i*bw+1}" y="${H-20-h}" width="${bw-2}" height="${h}" fill="var(--fg)" fill-opacity=".22"/>`;});
+ const mk=(x,col,t,y,d)=>`<line x1="${X(x)}" y1="${y+4}" x2="${X(x)}" y2="${H-20}" stroke="${col}" stroke-width="2.5" ${d?`stroke-dasharray="${d}"`:""}/><text x="${Math.min(W-28,Math.max(28,X(x)))}" y="${y}" font-size="11" text-anchor="middle" fill="${col}" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke">${t}</text>`;
+ s+=mk(S.mode,"var(--fg)","最頻値",14)+mk(S.median,"var(--acc2)","中央値",28,"5 3")+mk(S.mean,"var(--acc)","平均",42);
+ $("splot").innerHTML=s+"</svg>";
+ $("ssum").innerHTML=`<div>並び：<b>${order(S)}</b></div><div class="mut">平均 ${S.mean.toFixed(1)}、中央値 ${S.median.toFixed(1)}、最頻値 ${S.mode.toFixed(1)}（0〜20 の目盛り）。平均は長い裾の側に引っ張られる。</div>`;}
+LK.register("shape",{name:"分布の形",
+ init(){LK.stepper($("ssk"),sRender);sRender();},
+ apply(s){if(s.skew!==undefined)LK.setRange("ssk",s.skew);sRender();},
+ render:sRender,
+ value(key){const S=sVals();if(key==="gap"){const v=S.mean-S.median;return {v,text:f(+v.toFixed(2))};}const t=order(S);return {v:S.mean-S.median,text:t};}});
+
+LK.start("mm");
+window.__LAB__={LK,mean,median,modes,quart,trim,DATA,wVals,fVals,sVals,order};
+</script>
+</body></html>
