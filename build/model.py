@@ -126,6 +126,8 @@ def load_course() -> Course:
                 c.errors.append(f"{uid}: 問題 id が重複：{q['id']}")
             unit["problems"][q["id"]] = q
         c.units[uid] = unit
+    from figures import register   # 問題・例題ごとの図（原本の figure: から作る）
+    register(c)
     return c
 
 
@@ -272,16 +274,43 @@ def _validate_unit(c: Course, uid: str, u: dict, texts: list) -> list[str]:
                 for m in _PROBLEM.finditer(b.text):
                     err.append(f"{where}:{b.line}: {{{{problem:...}}}} は1行に単独で書く")
 
+    pending = u.get("visuals_pending")   # まだ図解を付け終えていない単元（付け終えたら消す）
+    for sid, body in u["bodies"].items():
+        if not pending:
+            err += _check_examples(f"{uid}/{sid}", body or "")
+
     for qid, q in probs.items():
-        err += _validate_problem(c, uid, qid, q, used.get(qid, 0))
+        err += _validate_problem(c, uid, qid, q, used.get(qid, 0), pending)
         texts += [(qid, q.get("prompt", "")), (qid, q.get("answer", ""))]
         texts += [(qid, t) for t in (q.get("choices") or [])]
         texts += [(qid, t) for t in (q.get("misconceptions") or {}).values()]
     return err
 
 
-def _validate_problem(c: Course, uid: str, qid: str, q: dict, used: int) -> list[str]:
+_EX_START = re.compile(r"^\*\*例題")
+_EX_END = re.compile(r"^(\*\*例題|#{2,4} |\{\{problem:)")
+
+
+def _check_examples(where: str, body: str) -> list[str]:
+    """本文に書いた例題（**例題…）には、次の例題・見出し・問題までの間にラボか図を置く。"""
+    err, start, has = [], None, False
+    lines = body.splitlines() + ["### (終わり)"]
+    for i, line in enumerate(lines, 1):
+        if start is not None and _EX_END.match(line):
+            if not has:
+                err.append(f"{where}:{start}: 例題にラボか図がない（{{{{lab:…}}}} か {{{{fig:…}}}} を置く）")
+            start = None
+        if _EX_START.match(line):
+            start, has = i, False
+        if start is not None and ("{{lab:" in line or "{{fig:" in line):
+            has = True
+    return err
+
+
+def _validate_problem(c: Course, uid: str, qid: str, q: dict, used: int, pending=False) -> list[str]:
     err = []
+    if not pending and not q.get("retired") and not (q.get("lab") or q.get("figure") or q.get("no_visual")):
+        err.append(f"{qid}: ラボか図がない（lab: か figure: を書く。どうしても要らないなら no_visual: 理由）")
     if not re.fullmatch(rf"Q-{uid}-\d{{3}}", qid):
         err.append(f"{qid}: id は Q-{uid}-NNN の形にする")
     if q.get("stage") not in c.stage_ids:
