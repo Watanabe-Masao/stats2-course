@@ -22,6 +22,10 @@ refs:
   REF-Q-U03: 確認問題（記述式）
   REF-Q-U04: 確認問題（記述式）
   REF-Q-U05: 確認問題（記述式）
+  REF-Q-U05T-1: 確認問題（T1 増減率）
+  REF-Q-U05T-2: 確認問題（T2 平均成長率）
+  REF-Q-U05T-3: 確認問題（T3 移動平均）
+  REF-Q-U05T-4: 確認問題（T4 自己相関）
 
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}

@@ -1,0 +1,69 @@
+id: LAB-ts
+name: 時系列ラボ
+slug: ts                         # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: ts_lab.src.html             # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [ratio.html, growth.html, ma.html]   # 旧版 補講05-T の3つのラボ（増減率・平均成長率・移動平均と自己相関）をまとめた
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: ratio
+    name: 増減を重ねる
+    purpose: 2回の増減率は足さず倍率を掛ける。指数（最初＝100）も出す
+    set: [x0, r1, r2]
+    values: [total, x2, naive]     # total＝全体の増減率（%）
+  - key: growth
+    name: 平均成長率
+    purpose: 倍率の幾何平均だけが実際の最後の値を再現する。算術平均の線と比べる
+    set: [m, rates]
+    values: [gmean, amean, final]  # gmean＝幾何平均による平均成長率（%）
+  - key: ma
+    name: 移動平均
+    purpose: 中央・後方の移動平均、窓の幅、計算できる時点
+    set: [series, k, type]
+    values: ["ma:1", "ma:2", "ma:3", "ma:4", count]
+  - key: acf
+    name: 自己相関
+    purpose: k 日ずらした自分自身との相関。曜日の波はラグ7、トレンドは全ラグを正に寄せる
+    set: [wave, trend]
+    values: ["r:1", "r:7", peak]
+  - key: contrib
+    name: 寄与度
+    purpose: 部門の増減額÷全体の前期。足すと全体の増減率
+    set: [a0, a1, b0, b1]
+    values: [total, cA, cB, rateA]
+data: 増減は最初の値と2回の率（%）。平均成長率は最初＝100。移動平均は月別数量 10,14,12,18,16・月別売上 20,26,23,29,32・日販4週間（固定の乱数 seed 11）。自己相関は日販56日（曜日の波×2＋トレンド×0.25×日＋小さなゆらぎ）
+presets:
+  s1-ratio:
+    mode: ratio
+    set: {x0: 80, r1: 25, r2: -10}
+    task: 80パックが25%増えて、その後10%減った。全体では何%増えたか。
+    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    expect: 12.5
+    why: 1.25×0.90＝1.125。2回目の基準は増えた後の100なので、25−10＝15%にはならない。1回目を＋20%、2回目を−20%にして元に戻らないことも確かめる。
+  s1-growth:
+    mode: growth
+    set: {m: 4, rates: "25,-10,20,-20"}
+    task: 4期の増減率が ＋25%、−10%、＋20%、−20% だった。平均して毎期何%ずつ増えたか（幾何平均）。
+    predict: {type: number, key: gmean, label: "平均成長率", unit: "%"}
+    expect: 1.943
+    why: 累計倍率は 1.25×0.9×1.2×0.8＝1.08。その4乗根から1を引いて約1.94%。算術平均の3.75%で4回増やすと、実際の108より大きくなる。
+  s2-ma:
+    mode: ma
+    set: {series: day, k: 3, type: center}
+    task: 日販4週間で、窓を3点から7点に広げると曜日の上下がどう変わるかを見る。次に「後方」にして、最新の日まで計算できるかを確かめる。
+  s4-acf:
+    mode: acf
+    modes: [acf, ma]
+    task: 曜日の波を0〜10、トレンドを0〜10に動かし、自己相関のどのラグが高くなるかを見る。次に「移動平均」で日販を7点でならす。
+  s5-acf:
+    mode: acf
+    task: 曜日の波だけを大きくしたとき、ラグ7とラグ14の自己相関がどうなるかを見る。トレンドだけを大きくしたときと比べる。
+  s6-free:
+    task: 自分の店の数字の扱い方を、5つのモードで確かめる（増減の重ね方、平均成長率、移動平均、自己相関、寄与度）。
+used_by: [U05T]
+tests:
+  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/ts_lab/check.js         # 本文の値（12.5%・6.07%・14.67・寄与度 6/−2、自己相関はラグ7が最大）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
