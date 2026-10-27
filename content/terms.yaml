@@ -68,3 +68,21 @@
 - id: TERM-outlier
   name: 外れ値
   en: outlier
+- id: TERM-ratio
+  name: 割合
+  en: ratio
+- id: TERM-point
+  name: パーセントポイント
+  en: percentage point
+- id: TERM-geomean
+  name: 幾何平均
+  en: geometric mean
+- id: TERM-ma
+  name: 移動平均
+  en: moving average
+- id: TERM-acf
+  name: 自己相関
+  en: autocorrelation
+- id: TERM-corr
+  name: 相関係数
+  en: correlation coefficient

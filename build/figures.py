@@ -451,8 +451,60 @@ def boxplot(sp: dict) -> str:
     return c.done(y + 6)
 
 
+# ---- 折れ線（時系列。幾何平均の率で結んだ線・指数平滑の線を計算して重ねられる） ----
+def line(sp: dict) -> str:
+    c = Canvas()
+    series = [dict(s) for s in sp["series"]]           # [{label, values}]
+    labels = sp.get("labels") or [str(i + 1) for i in range(len(series[0]["values"]))]
+    first = series[0]["values"]
+    extra = []
+    if sp.get("geom"):                                    # 最初と最後を同じ倍率で結ぶ（平均成長率の線）
+        m = len(first) - 1
+        g = (first[-1] / first[0]) ** (1 / m)
+        extra.append({"label": f"毎期 {_num(round((g - 1) * 100, 2))}%（幾何平均）", "values": [first[0] * g ** i for i in range(m + 1)], "dash": "6 4"})
+    if sp.get("smooth") is not None:                      # 指数平滑 S_t＝αx_t＋(1−α)S_{t−1}
+        a, sm = sp["smooth"], [first[0]]
+        for x in first[1:]:
+            sm.append(a * x + (1 - a) * sm[-1])
+        extra.append({"label": f"指数平滑（α＝{_num(a)}）", "values": sm, "dash": "6 4"})
+    allv = [v for s in series + extra for v in s["values"]]
+    lo, hi = min(allv), max(allv)
+    if sp.get("zero"):
+        lo = 0
+    pad = (hi - lo) * 0.15 or 1
+    lo, hi = lo - (0 if sp.get("zero") else pad), hi + pad
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    top, base = y + 22, y + 170
+    n = len(labels)
+    X = lambda i: 30 + i * (W - 60) / max(1, n - 1)            # noqa: E731
+    Y = lambda v: base - (v - lo) / (hi - lo) * (base - top)  # noqa: E731
+    c.line(16, base, W - 16, base, INK2, 1)
+    colors = [BLUE, ORANGE, "#6250d6"]
+    for k, s in enumerate(series + extra):
+        col = colors[k % len(colors)]
+        pts = [(X(i), Y(v)) for i, v in enumerate(s["values"])]
+        c.poly(pts, col, 2.5, dash=s.get("dash"))
+        for i, (px, py) in enumerate(pts):
+            c.circle(px, py, 4, col)
+            if k == 0 or s.get("show_values", True):
+                c.add(f'<text x="{px:.1f}" y="{py - 9:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
+                      f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(_num(round(s["values"][i], 2)))}</text>')
+    for i, t in enumerate(labels):
+        c.text(X(i), base + 16, t, 11.5, INK2, "middle")
+    y = base + 32
+    for k, s in enumerate(series + extra):
+        col = colors[k % len(colors)]
+        c.line(10, y - 4, 30, y - 4, col, 2.5, s.get("dash"))
+        y = c.para(36, y, s.get("label", ""), 316, 12, INK2)
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line}
 
 
 def specs(course: Course) -> dict[str, dict]:
@@ -473,7 +525,7 @@ def specs(course: Course) -> dict[str, dict]:
     return out
 
 
-LAYOUT_KEYS = ("type", "caption", "scale", "mark", "density", "cumulative", "fence", "step", "decimals", "k", "whole", "mean", "mark_extremes")
+LAYOUT_KEYS = ("type", "caption", "scale", "mark", "density", "cumulative", "fence", "step", "decimals", "k", "whole", "mean", "mark_extremes", "geom", "zero", "dash", "show_values")
 
 
 def _strings(v):
