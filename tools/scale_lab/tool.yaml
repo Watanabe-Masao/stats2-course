@@ -9,7 +9,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
   - key: judge
     name: 尺度を判定
     purpose: 4つの質問に上から答えて尺度を決める（15件）。間違えたら「どこで取り違えたか」を返す
-    set: [item]
+    set: [item, items]           # item＝最初に出すデータ、items＝この順に出すデータ（ITEMS の名前）
     values: []
   - key: unit
     name: 単位を変える
@@ -37,10 +37,15 @@ presets:
   s1-temp:
     mode: unit
     set: {kind: temp, a: 10, b: 20}
+    unlock: [kind]               # 本文の手順2で「重さ」「売上金額」に切り替えるので、予想のあとは選べるようにする
     task: 10℃と20℃を、絶対温度（K）で表すと B÷A は何倍になるか。
     predict: {type: number, key: "ratio:1", label: "K で B÷A", unit: "倍"}
     expect: 1.035
     why: 単位を変えると0の位置が動くので、何倍の値が変わる（℃では2倍、Kでは約1.035倍）。
+  s1-exA:
+    mode: judge
+    set: {items: [店番, 満足度（不満・普通・満足）, 気温（℃）, 販売個数]}
+    task: 例題Aの4つを、4つの質問に上から答えて判定し直す。表を見ずに、どの質問で止まるかを確かめる。
   s2-judge:
     mode: judge
     task: 10問続けて判定する。間違えたら「どこで取り違えたか」を読み、どの質問で「はい／いいえ」を取り違えたかを書く。
@@ -60,4 +65,4 @@ tests:
   - node tools/scale_lab/check.js      # 本文に書いた値（2.000/1.035/1.360、3.40/3.80/3.26、41.6/41.5、1.80）
 checked:
   browser_380px: 2026-10-27
-  notion_iphone: null   # 2026-10-28 表示・動作は確認。操作感の指摘を受けて埋め込み用の小さい表示を追加（再確認待ち）
+  notion_iphone: 2026-10-28   # 表示・動作を確認。埋め込み用の小さい表示は試験ページで確認

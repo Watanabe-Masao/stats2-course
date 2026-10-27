@@ -93,9 +93,11 @@ const ITEMS=[
  ["待ち時間（分）",3,"0分は「待っていない」。10分は5分の2倍と言える（連続型）"],
  ["来店客数",3,"0人は「来ていない」。数え上げる量（離散型）"]];
 const QS=["区別するためのラベルだけ？","順番に意味はあるが、間隔はそろっていない？","差に同じ意味があるが、0が「無い」ではない？","0が「無い」を表し、何倍と言える？"];
-let jOrder=[],jPos=-1,jStep=0,jDone=false,jRight=0,jTotal=0,jFirst=null;
+let jOrder=[],jPos=-1,jStep=0,jDone=false,jRight=0,jTotal=0,jQueue=[],jSet=0;
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function jNext(){if(jPos<0||jPos>=jOrder.length-1){jOrder=shuffle([...ITEMS.keys()]);if(jFirst!==null){jOrder.splice(jOrder.indexOf(jFirst),1);jOrder.unshift(jFirst);jFirst=null;}jPos=0;}else jPos++;jStep=0;jDone=false;jRender();}
+// 場面で決めたデータ（set.item／set.items）を先に順番どおり出し、そのあとは全部をまぜて出す
+function jNext(){if(jQueue.length){jOrder=[jQueue.shift()];jPos=0;}
+ else if(jPos<0||jPos>=jOrder.length-1){jOrder=shuffle([...ITEMS.keys()]);jPos=0;}else jPos++;jStep=0;jDone=false;jRender();}
 function jRender(){const it=ITEMS[jOrder[jPos]];$("jitem").textContent=it[0];
  let h="";for(let k=0;k<jStep;k++)h+=`<div class="mut">質問${k+1}：${QS[k]} → いいえ</div>`;
  if(!jDone){h+=`<div><b>質問${jStep+1}：${QS[jStep]}</b></div><div class="qbtns"><button class="act" id="jy">はい</button><button class="sub" id="jn"${jStep===3?" disabled":""}>いいえ</button></div>`;}
@@ -103,12 +105,14 @@ function jRender(){const it=ITEMS[jOrder[jPos]];$("jitem").textContent=it[0];
   h+=`<div>質問${pick+1}：${QS[pick]} → はい</div><div class="big">あなたの判定：${SCALES[pick]}尺度</div>`+
    (ok?`<div class="ok">◯ 正しい</div>`:`<div class="ng">✕ 正しくは ${SCALES[ans]}尺度</div><div><b>どこで取り違えたか：</b>${FEED[ans][pick]}</div>`)+
    `<div style="margin-top:4px">${it[2]}</div><div class="mut">${SCALES[ans]}尺度で意味のある計算：${CALC[ans]}</div>`;}
- $("jq").innerHTML=h;$("jscore").textContent=jTotal?`${jTotal}問中 ${jRight}問 正解`:"";
+ $("jq").innerHTML=h;$("jscore").textContent=(jTotal?`${jTotal}問中 ${jRight}問 正解`:"")+(jSet&&jTotal<jSet?`（指定の${jSet}件のうち ${Math.min(jTotal+1,jSet)}件目）`:"");
  if(!jDone){$("jy").onclick=()=>{jDone=true;jTotal++;if(jStep===ITEMS[jOrder[jPos]][1])jRight++;jRender();};
   $("jn").onclick=()=>{if(jStep<3){jStep++;jRender();}};}}
 LK.register("judge",{name:"尺度を判定",
  init(){$("jnext").onclick=jNext;jNext();},
- apply(s){if(s.item){const i=ITEMS.findIndex(x=>x[0]===s.item);if(i>=0){jFirst=i;jPos=-1;jNext();}}},
+ apply(s){const list=s.items||(s.item?[s.item]:[]);jQueue=list.map(n=>ITEMS.findIndex(x=>x[0]===n));
+  if(jQueue.some(i=>i<0))console.error("尺度ラボ：ITEMS にないデータ "+list.filter((n,k)=>jQueue[k]<0).join("・"));
+  jQueue=jQueue.filter(i=>i>=0);jSet=jQueue.length;jPos=-1;jNext();},
  value(){return {v:jRight,text:`${jTotal}問中 ${jRight}問`};}});
 
 // ---- 単位を変える

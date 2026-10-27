@@ -144,7 +144,7 @@ class TestRender(unittest.TestCase):
     def test_lab_check_inside_answer(self):
         out = self.r.problem(self.probs["Q-U04-010"], [0])
         toggle = out[out.index("<toggle>"):]
-        self.assertIn("@@ASSET:LAB-scale@Q-U04-010@@", toggle)
+        self.assertIn(f'<embed source="{self.r.lab_src("LAB-scale@Q-U04-010")}" />', toggle)
 
     def test_numbering_and_difficulty(self):
         counter = [0]

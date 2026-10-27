@@ -3,6 +3,7 @@
      mode   最初に開くモード
      modes  タブに出すモード（省略時：mode があればそれだけ、なければ全部）
      set    そのモードに渡す値（モードごとの apply が受け取る）
+     unlock 予想のある版でも選べるままにする set の選択欄（本文の手順で切り替えるとき）
      task   課題の文
      predict {type:"number"|"choice", key, label, unit, options, tol}  予想してから結果を見せる
      why    結果のあとに出す一言
@@ -43,7 +44,7 @@ const LK=(()=>{
  function formula(lines,title){return `<div class="lk-formula res"><div class="lk-ft">${esc(title||"式で計算")}</div>${lines.map(l=>`<div class="l">${esc(l)}</div>`).join("")}</div>`;}
  // 予想のある版：set で決めた選択欄は文字にする（問題と関係のない選択をさせない）
  function fixPicks(){if(!cfg.predict||!cfg.set)return;
-  Object.keys(cfg.set).forEach(k=>{const el=document.querySelector(`#m-${cur} select[data-key="${k}"]`);if(!el)return;
+  Object.keys(cfg.set).filter(k=>!(cfg.unlock||[]).includes(k)).forEach(k=>{const el=document.querySelector(`#m-${cur} select[data-key="${k}"]`);if(!el)return;
    const lab=el.closest("label"),name=lab?lab.firstChild.textContent.trim():"";
    const t=document.createElement("span");t.className="lk-fixed";t.innerHTML=`${esc(name)}：<b>${esc(el.options[el.selectedIndex].text)}</b>`;
    el.style.display="none";(lab||el).after(t);if(lab)lab.style.display="none";});}

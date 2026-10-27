@@ -23,7 +23,7 @@ from pathlib import Path
 from model import ROOT, TOOLS, Course
 
 OUT = ROOT / "out" / "labs"
-CFG_KEYS = ("mode", "modes", "set", "task", "predict", "why")
+CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why")
 
 
 def safe(aid: str) -> str:
@@ -110,7 +110,12 @@ def build_site(course: Course) -> list[dict]:
         if name:
             by_lab.setdefault(lid, {})[name] = {k: spec[k] for k in CFG_KEYS if k in spec}
     for lid, t in course.labs.items():
-        if not t.get("src"):
+        if not t.get("src"):   # 共通部品を使わない古い形のラボはそのまま置く（場面の版はない）
+            d = SITE / t["slug"]
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "index.html").write_bytes((t["dir"] / t["file"]).read_bytes())
+            entries.append({"asset": lid, "file": str((d / "index.html").relative_to(ROOT)), "query": "", "cfg": {}, "expect": None})
+            links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a></li>')
             continue
         presets = by_lab.get(lid, {})
         js = "window.__LABPRESETS__=" + json.dumps(presets, ensure_ascii=False) + ";" + _PICK
@@ -161,7 +166,12 @@ def validate_labs(course: Course) -> list[str]:
     for lid, t in course.labs.items():
         if t.get("src") and not (t["dir"] / t["src"]).exists():
             err.append(f"{lid}: {t['src']} がない")
-        if t.get("src") and not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
+        if not t.get("src") and not (t["dir"] / str(t.get("file", ""))).is_file():
+            err.append(f"{lid}: file（古い形のラボ）がない")
+        slugs = [x.get("slug") for x in course.labs.values()]
+        if slugs.count(t.get("slug")) > 1:
+            err.append(f"{lid}: slug {t.get('slug')} がほかのラボと重なる")
+        if not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
             err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")
         for name, p in (t.get("presets") or {}).items():
             err += _check_spec(f"{lid}@{name}", p, t)
@@ -197,6 +207,9 @@ def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
     for k in p.get("modes") or []:
         if k not in modes:
             err.append(f"{where}: modes の {k} はラボにない（{', '.join(modes)}）")
+    for k in p.get("unlock") or []:
+        if k not in (p.get("set") or {}):
+            err.append(f"{where}: unlock の {k} は set にない（予想のあとも選べるようにする選択欄は set で値を決める）")
     if p.get("modes") and p.get("mode") not in p["modes"]:
         err.append(f"{where}: mode は modes に含める")
     if not mode and (p.get("set") or p.get("predict")):
