@@ -32,4 +32,8 @@
 3. `out/notion/<ID>.md` の `@@LAB:LAB-count@@` をアップロードの `file-upload://…` に置き換えて、`publish/notion.yaml` のページへ replace_content。
 4. 新しいページを作ったら、そのページ ID を `publish/notion.yaml` に書いてコミットする。
 
+入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。
+
+個人用の学習記録（publish/notion.yaml の personal_root）：解答記録・到達記録・学習ログの3つのDB。問題は「問題ID」の文字列で指す。教材の生成物から個人データを読み書きしない。
+
 Notion の記法の注意：`<sup>` は消える（ʳ や ² を使う）。メンションは `<mention url="https://app.notion.com/p/ID" />`。

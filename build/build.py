@@ -35,6 +35,7 @@ def main(argv: list[str]) -> int:
     outdir = ROOT / "out" / "notion"
     outdir.mkdir(parents=True, exist_ok=True)
     (outdir / "guide.md").write_text(r.guide_page(), encoding="utf-8")
+    (outdir / "root.md").write_text(r.root_page(), encoding="utf-8")
     for uid in course.units:
         (outdir / f"{uid}.md").write_text(r.unit_page(uid), encoding="utf-8")
     print(f"生成：{outdir.relative_to(ROOT)}/ に {len(course.units) + 1} ページ")
