@@ -9,6 +9,7 @@ units:                 # 新しく生成した単元ページ
   U05: 406b7cd539a181c6b10ceb390917d414
   U05T: 406b7cd539a181f38500f08086ad379a
   U06: 406b7cd539a181c39098d12d714d6480
+  U07: 406b7cd539a181d5aa31ef447de733e6
   U09: 406b7cd539a18111807cf1b85390f332
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
@@ -56,6 +57,7 @@ refs:
   REF-Q-U04: 402b7cd539a1819fab4ee8434938ad01
   REF-Q-U05: 402b7cd539a1812fab0eed024a3c1108
   REF-Q-U06: 402b7cd539a18168aa9fd86135ccc0cd
+  REF-Q-U07: 402b7cd539a181eda58df84bc3ba1ca2
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -65,6 +67,12 @@ terms:
   TERM-point: 405b7cd539a181d6ad3eea8fba23d204
   TERM-geomean: 405b7cd539a181c697efe9e4ce0df3b6
   TERM-expect: 405b7cd539a181c196aff93bdfe95015
+  TERM-dev: 405b7cd539a18170af0dcdc812d807ab
+  TERM-var: 405b7cd539a181b0bff3c1731ecc1fcf
+  TERM-unbvar: 405b7cd539a181378a50ead5555fe7ed
+  TERM-sd: 405b7cd539a181cfba81d5c7ed6d8bda
+  TERM-cv: 405b7cd539a18108b0dbdef839a11d0f
+  TERM-unbiased: 405b7cd539a181a09ab4c49d336deaae
   TERM-ma: 405b7cd539a181b9bcfdef282dbf06d5
   TERM-acf: 405b7cd539a1819589e5f68661c99a59
   TERM-corr: 405b7cd539a1818ba87dcbb970bf2c60

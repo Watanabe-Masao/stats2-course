@@ -74,6 +74,24 @@
 - id: TERM-point
   name: パーセントポイント
   en: percentage point
+- id: TERM-dev
+  name: 偏差
+  en: deviation
+- id: TERM-var
+  name: 分散
+  en: variance
+- id: TERM-unbvar
+  name: 不偏分散
+  en: unbiased variance
+- id: TERM-sd
+  name: 標準偏差
+  en: standard deviation
+- id: TERM-cv
+  name: 変動係数
+  en: coefficient of variation
+- id: TERM-unbiased
+  name: 不偏性
+  en: unbiasedness
 - id: TERM-expect
   name: 期待値
   en: expected value

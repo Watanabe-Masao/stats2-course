@@ -508,8 +508,41 @@ def line(sp: dict) -> str:
     return c.done(y + 6)
 
 
+# ---- 偏差（平均からのずれ）を行ごとに線で見せる。偏差平方和・分散は図を作るときに計算する ----
+def dev(sp: dict) -> str:
+    c = Canvas()
+    rows = sp["rows"]                       # [{label, data}]
+    allv = [v for r in rows for v in r["data"]]
+    step = sp.get("step", 2)
+    lo, hi = step * (min(allv) // step), step * -(-max(allv) // step)
+    X = lambda v: 16 + (v - lo) / (hi - lo) * (W - 32)  # noqa: E731
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    y += 14
+    colors = [BLUE, ORANGE, RED]
+    for k, r in enumerate(rows):
+        d = r["data"]; n = len(d); m = Fraction(sum(Fraction(str(v)) for v in d), n)
+        ss = sum((Fraction(str(v)) - m) ** 2 for v in d)
+        col = colors[k % len(colors)]
+        c.text(8, y + 4, r["label"], 12.5, INK, weight="bold")
+        y0 = y + 14
+        c.line(X(float(m)), y0 - 4, X(float(m)), y0 + 12 * n, INK2, 1.5)
+        for i, v in enumerate(d):
+            yy = y0 + 4 + i * 12
+            c.add(f'<line x1="{X(float(m)):.1f}" y1="{yy}" x2="{X(v):.1f}" y2="{yy}" stroke="{col}" stroke-width="2" stroke-dasharray="4 3"/>')
+            c.circle(X(v), yy, 4, col)
+        y = y0 + 12 * n + 6
+        y = c.para(8, y + 8, f"平均 {_num(float(m))}・偏差平方和 {_num(float(ss))}・分散（n）{_num(float(ss / n))}・不偏分散 {_num(float(ss / (n - 1)))}", 344, 12.5, INK) + 4
+    _axis(c, lo, hi, y + 2, step, X)
+    y += 26
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev}
 
 
 def specs(course: Course) -> dict[str, dict]:
