@@ -8,12 +8,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from model import ROOT, TOKEN, Course, load_yaml
+from model import ROOT, TOKEN, Block, Course, load_yaml, parse_blocks
 
 COMP = load_yaml(ROOT / "templates" / "notion" / "components.yaml")
 CIRC = "①②③④⑤⑥⑦⑧⑨"
 LIST_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s")
 ASSET_PLACEHOLDER = "@@ASSET:{}@@"
+LONG_CHOICE = 12   # これより長い選択肢があれば、選択肢を1行ずつ並べる
 
 
 def mention(page_id: str) -> str:
@@ -74,38 +75,31 @@ class NotionRenderer:
 
     # ---- ブロック ------------------------------------------------------
     def body(self, src: str, problems: dict | None = None, counter: list | None = None) -> str:
-        out, lines, i = [], src.splitlines(), 0
-        while i < len(lines):
-            line = lines[i]
-            m = re.match(r"^:::\s*(\w+)\s*(.*)$", line)
-            if m:
-                name, title = m.group(1), m.group(2).strip()
-                j = i + 1
-                inner = []
-                while j < len(lines) and lines[j].strip() != ":::":
-                    inner.append(lines[j])
-                    j += 1
-                out.append(self.container(name, title, "\n".join(inner), problems, counter))
-                i = j + 1
-                continue
-            pm = re.fullmatch(r"\{\{problem:([^}]+)\}\}", line.strip())
-            if pm:
-                out.append(self.problem(problems[pm.group(1)], counter))
-            elif line.startswith("^ "):
-                out.append(f'<span color="gray">{self.inline(line[2:])}</span>')
+        blocks, err = parse_blocks(src)
+        if err:  # validate() で先に止まるはず。ここに来たら生成をやめる
+            raise ValueError("本文の書き方の誤り: " + " / ".join(err))
+        return self.blocks(blocks, problems, counter)
+
+    def blocks(self, blocks: list[Block], problems: dict | None, counter: list | None) -> str:
+        out = []
+        for b in blocks:
+            if b.kind == "container":
+                out.append(self.container(b, problems, counter))
+            elif b.kind == "problem":
+                out.append(self.problem(problems[b.text], counter))
+            elif b.kind == "gray":
+                out.append(f'<span color="gray">{self.inline(b.text)}</span>')
             else:
-                out.append(self.inline(line))
-            i += 1
+                out.append(self.inline(b.text))
         return "\n".join(out)
 
-    def container(self, name, title, inner, problems, counter) -> str:
-        if name == "toggle":
-            return f"<toggle>\n{self.inline(title)}\n\n{self.body(inner, problems, counter)}\n</toggle>"
-        spec = COMP["callouts"][name]
-        content = self.join_soft_breaks(self.body(inner, problems, counter))
-        head = f"<b>{spec['title']}</b>\n\n" if spec.get("title") else ""
-        if title:
-            head = f"<b>{self.inline(title)}</b>\n\n"
+    def container(self, b: Block, problems, counter) -> str:
+        inner = self.blocks(b.inner, problems, counter)
+        if b.name == "toggle":
+            return f"<toggle>\n{self.inline(b.title)}\n\n{inner}\n</toggle>"
+        spec = COMP["callouts"][b.name]
+        content = self.join_soft_breaks(inner)
+        head = f"<b>{self.inline(b.title or spec.get('title', ''))}</b>\n\n" if (b.title or spec.get("title")) else ""
         return f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n{head}{content}\n</callout>'
 
     @staticmethod
@@ -128,29 +122,31 @@ class NotionRenderer:
             counter[0] += 1
             tag = q.get("tag") or COMP["labels"]["difficulty"].get(q.get("difficulty"))
             label = f"問{counter[0]}" + (f"（{tag}）" if tag else "")
-        prompt = self.inline(q["prompt"]).split("\n")
-        first, rest = prompt[0], prompt[1:]
+        first, *rest = self.inline(q["prompt"]).split("\n")
         parts = [f"<b>{label}</b> {icons}　{first}".replace(" 　", "　")]
         if rest:
             parts.append("\n".join(rest))
         if q["format"] == "choice":
-            if max(len(str(v)) for v in q["choices"]) > 12:   # 長い選択肢は1行ずつ
-                parts.append("\n" + "\n".join(f"{CIRC[k]} {v}" for k, v in enumerate(q["choices"])))
-            else:
-                parts.append("\n" + "　".join(f"{CIRC[k]} {v}" for k, v in enumerate(q["choices"])))
-            k = q["correct"]
-            long = max(len(str(v)) for v in q["choices"]) > 12
-            head = f"<b>正解は{CIRC[k-1]}</b>" if long else f"<b>{CIRC[k-1]} {q['choices'][k-1]}</b>"
+            ch, k = q["choices"], q["correct"]
+            long = max(len(str(v)) for v in ch) > LONG_CHOICE   # 長い選択肢は1行ずつ
+            sep = "\n" if long else "　"
+            parts.append("\n" + sep.join(f"{CIRC[i]} {self.inline(str(v))}" for i, v in enumerate(ch)))
+            head = f"<b>正解は{CIRC[k - 1]}</b>" if long else f"<b>{CIRC[k - 1]} {self.inline(str(ch[k - 1]))}</b>"
             ans = f"{head}。{self.inline(q['answer'])}"
-            mis = q.get("misconceptions") or {}
+            mis = sorted((int(n), t) for n, t in (q.get("misconceptions") or {}).items())
             if mis:
                 ans += "\n\n" + "\n".join(
-                    (f"- {CIRC[int(n)-1]}：{self.inline(t)}" if long else
-                     f"- {CIRC[int(n)-1]} {q['choices'][int(n)-1]}＝{self.inline(t)}") for n, t in sorted(mis.items()))
+                    f"- {CIRC[n - 1]}：{self.inline(t)}" if long else f"- {CIRC[n - 1]} {self.inline(str(ch[n - 1]))}＝{self.inline(t)}"
+                    for n, t in mis)
             title = q.get("answer_title") or COMP["labels"]["answer_choice"]
         else:
             ans = self.inline(q["answer"])
             title = q.get("answer_title") or COMP["labels"]["answer_default"]
+        if q.get("lab"):
+            aid = f"{q['lab']['id']}@{q['id']}"
+            ans += (f"\n\n{COMP['icons']['lab']} <b>{COMP['labels']['lab_check']}</b>"
+                    f"<span color=\"gray\">{COMP['labels']['lab_check_note']}</span>\n\n"
+                    f'<embed source="{ASSET_PLACEHOLDER.format(aid)}" />')
         return "\n".join(parts) + f"\n\n<toggle>\n{title}\n\n{ans}\n</toggle>"
 
     # ---- ページ ------------------------------------------------------

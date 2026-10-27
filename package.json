@@ -1,0 +1,11 @@
+{
+  "name": "stats2-course",
+  "private": true,
+  "description": "ラボのテスト用（playwright）。教材の生成は python3 build/build.py",
+  "scripts": {
+    "check": "build/check_all.sh"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
