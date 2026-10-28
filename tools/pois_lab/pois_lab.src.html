@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>離散分布ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+#m-pois .lk-step .lk-name,#m-hyper .lk-step .lk-name,#m-geom .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 離散分布ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-pois" class="mode">
+ <p class="mut" style="margin:0">一定の時間（範囲）に独立に起きる件数はポアソン分布。λ（平均件数）は区間の長さに比例する。平均も分散も λ。</p>
+ <input type="range" id="pr" min="0.1" max="20" step="0.1" value="2" data-name="1時間の平均" data-unit="件">
+ <input type="range" id="pt" min="0.25" max="8" step="0.25" value="1" data-name="時間" data-unit="時間">
+ <input type="range" id="pk" min="0" max="40" step="1" value="0" data-name="k 件">
+ <div class="row ctl"><label>求める <select id="pkind" data-key="kind"><option value="eq">ちょうど k 件</option><option value="le">k 件以下</option><option value="ge">k 件以上</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+ <div class="res det" id="ptab"></div>
+</div>
+
+<div id="m-approx" class="mode">
+ <p class="mut" style="margin:0">回数 n が大きく、確率 p が小さい二項分布 B(n, p) は、λ＝np のポアソン分布でよく近似できる。</p>
+ <input type="range" id="an" min="5" max="2000" step="5" value="1000" data-name="回数 n">
+ <input type="range" id="ap" min="0.001" max="0.3" step="0.001" value="0.002" data-name="確率 p">
+ <input type="range" id="ak" min="0" max="30" step="1" value="2" data-name="k 回">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="aplot"></div>
+ <div class="card res key" id="asum"></div>
+</div>
+
+<div id="m-geom" class="mode">
+ <p class="mut" style="margin:0">成功確率 p の試行を、r 回目の成功が出るまで続ける。r＝1 なら幾何分布（初めて成功するまで）、r が2以上なら負の二項分布。成功した回も数える。</p>
+ <input type="range" id="gp" min="0.05" max="0.95" step="0.05" value="0.25" data-name="確率 p">
+ <input type="range" id="gr" min="1" max="5" step="1" value="1" data-name="成功 r 回">
+ <input type="range" id="gk" min="1" max="40" step="1" value="4" data-name="k 回目">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="gplot"></div>
+ <div class="card res key" id="gsum"></div>
+</div>
+
+<div id="m-hyper" class="mode">
+ <p class="mut" style="margin:0">N 個のうち当たり（不良）K 個の箱から、戻さずに n 個取り出す。当たりの数は超幾何分布。同じ割合の二項分布と比べる。</p>
+ <input type="range" id="hN" min="2" max="200" step="1" value="10" data-name="全体 N 個">
+ <input type="range" id="hK" min="0" max="200" step="1" value="2" data-name="当たり K 個">
+ <input type="range" id="hn" min="1" max="200" step="1" value="3" data-name="取り出す n">
+ <input type="range" id="hk" min="0" max="200" step="1" value="1" data-name="当たり k 個">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="hplot"></div>
+ <div class="card res key" id="hsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const SUP={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+const f=(v,d=4)=>{if(!isFinite(v))return "—";if(v!==0&&Math.abs(v)<Math.pow(10,-d)){const [m,e]=v.toExponential(2).split("e");return `${+m}×10${String(+e).split("").map(c=>SUP[c]).join("")}`;}const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lnC(n,k){if(k<0||k>n)return -Infinity;let s=0;for(let i=1;i<=k;i++)s+=Math.log(n-k+i)-Math.log(i);return s;}
+function C(n,k){return k<0||k>n?0:Math.round(Math.exp(lnC(n,k)));}
+function fact(k){let r=1;for(let i=2;i<=k;i++)r*=i;return r;}
+function pois(l,k){if(k<0)return 0;let lp=-l+k*Math.log(l);for(let i=2;i<=k;i++)lp-=Math.log(i);return Math.exp(lp);}
+function binom(n,p,k){if(k<0||k>n)return 0;return Math.exp(lnC(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function bars(ps,opt){const H=opt.H||170,L=30,R=W-10,base=H-28,top=22,n=ps.length,mx=Math.max(...ps,...(opt.ps2||[0]),0.01);
+ const X=i=>L+(i+0.5)/n*(R-L),Y=q=>base-q/mx*(base-top),bw=Math.max(2,Math.min(26,(R-L)/n*(opt.ps2?0.4:0.75)));
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(opt.label||"分布")}"><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--line)"/>`;
+ ps.forEach((q,i)=>{const on=opt.on(i+(opt.off||0)),dx=opt.ps2?-bw/2:0;s+=`<rect x="${X(i)-bw/2+dx}" y="${Y(q)}" width="${bw}" height="${base-Y(q)}" rx="2" fill="${on?"var(--acc2)":"var(--acc)"}" fill-opacity="${on?.85:.45}"/>`;
+  if(opt.ps2){const q2=opt.ps2[i];s+=`<rect x="${X(i)+bw/2-bw/2+0.5}" y="${Y(q2)}" width="${bw}" height="${base-Y(q2)}" rx="2" fill="none" stroke="var(--fg)" stroke-width="1.2" stroke-dasharray="3 2"/>`;}
+  const step=Math.ceil(n/12),lab=i+(opt.off||0);if(i%step===0||on&&opt.kmark===lab)s+=`<text x="${X(i)}" y="${base+13}" font-size="10" text-anchor="middle" fill="var(--fg)">${lab}</text>`;
+  if(n<=9&&q>0.0005)s+=`<text x="${X(i)}" y="${Y(Math.max(q,opt.ps2?opt.ps2[i]:0))-3}" font-size="10" text-anchor="middle" fill="var(--mut)">${f(q,3)}</text>`;});
+ if(opt.mean!==undefined){const mx2=L+(opt.mean-(opt.off||0)+0.5)/n*(R-L);s+=`<path d="M${mx2-6} ${base+26} L${mx2+6} ${base+26} L${mx2} ${base+17} Z" fill="var(--acc2)"/><text x="${Math.min(R,Math.max(L,mx2))}" y="14" font-size="11" text-anchor="${mx2>W*0.7?"end":mx2<W*0.3?"start":"middle"}" fill="var(--acc2)">平均 ${f(opt.mean)}</text>`;}
+ return s+`</svg>`;}
+
+// ---- ポアソン
+let PU="時間";
+function pVals(){const r=+$("pr").value,t=+$("pt").value,l=r*t,k=+$("pk").value,kind=$("pkind").value;
+ let le=0;for(let i=0;i<=k;i++)le+=pois(l,i);const pk=pois(l,k),ge=1-le+pk;return {r,t,lambda:l,k,kind,pk,le,ge:Math.max(0,ge),p0:Math.exp(-l),mean:l,var:l,sel:kind==="eq"?pk:kind==="le"?le:Math.max(0,ge)};}
+function pRender(){const P=pVals(),top=Math.max(P.k+2,Math.ceil(P.lambda+4*Math.sqrt(P.lambda))+1,8),ps=[];for(let i=0;i<=top;i++)ps.push(pois(P.lambda,i));
+ const on=i=>P.kind==="eq"?i===P.k:P.kind==="le"?i<=P.k:i>=P.k;
+ $("pplot").innerHTML=bars(ps,{on,mean:P.lambda,kmark:P.k,label:"ポアソン分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>求める範囲</span><span>▲ 平均 λ</span></div>`;
+ const lab=P.kind==="eq"?`P(X＝${P.k})`:P.kind==="le"?`P(X≦${P.k})`:`P(X≧${P.k})`;
+ $("psum").innerHTML=`<div>λ＝1${PU} ${f(P.r)}件 × ${f(P.t)}${PU}＝<b>${f(P.lambda)}</b>（平均＝分散＝λ）</div><div>P(X＝${P.k})＝e^(−${f(P.lambda)})×${f(P.lambda)}^${P.k}÷${P.k}!＝${f(P.p0)}×${f(Math.pow(P.lambda,P.k)/fact(P.k))}＝<b>${f(P.pk)}</b></div><div>${lab}＝<b>${f(P.sel)}</b>　0件＝e^(−λ)＝${f(P.p0)}</div><div class="mut">件数に上限はない。区間（${PU}）を2倍にすると λ も2倍。</div>`;
+ $("ptab").innerHTML=`<table><tr><th>k</th><th>P(X＝k)</th><th>k 以下の合計</th></tr>${ps.slice(0,Math.min(ps.length,16)).map((q,i)=>`<tr><td>${i}</td><td>${f(q)}</td><td>${f(ps.slice(0,i+1).reduce((a,b)=>a+b,0))}</td></tr>`).join("")}</table>`;}
+LK.register("pois",{name:"ポアソン分布",
+ init(){["pr","pt","pk"].forEach(id=>LK.stepper($(id),pRender));$("pkind").onchange=pRender;pRender();},
+ apply(s){if(s.unit){PU=s.unit;const nm=id=>$(id).parentNode.querySelector(".lk-name");nm("pr").textContent=`1${PU}の平均`;nm("pt").textContent=`${PU}数`;$("pt").dataset.unit=PU;$("pt")._lkUpd&&$("pt")._lkUpd();}if(s.rate!==undefined)LK.setRange("pr",s.rate);if(s.t!==undefined)LK.setRange("pt",s.t);if(s.k!==undefined)LK.setRange("pk",s.k);if(s.kind)$("pkind").value=s.kind;pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:f(v)};}});
+
+// ---- 二項とポアソン
+function aVals(){const n=+$("an").value,p=+$("ap").value,k=+$("ak").value,l=n*p,b=binom(n,p,k),q=pois(l,k);return {n,p,k,lambda:l,bin:b,poi:q,diff:q-b,bmean:l,bvar:l*(1-p)};}
+function aRender(){const A=aVals(),top=Math.max(A.k+2,Math.ceil(A.lambda+4*Math.sqrt(A.lambda))+1,8),b=[],q=[];for(let i=0;i<=top;i++){b.push(binom(A.n,A.p,i));q.push(pois(A.lambda,i));}
+ $("aplot").innerHTML=bars(b,{on:i=>i===A.k,ps2:q,mean:A.lambda,kmark:A.k,label:"二項分布とポアソン分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>二項 B(n, p)</span><span><i class="sw" style="border:2px dashed var(--fg)"></i>ポアソン λ＝np</span></div>`;
+ $("asum").innerHTML=`<div>λ＝np＝${A.n}×${f(A.p)}＝<b>${f(A.lambda)}</b></div><div>P(X＝${A.k})：二項 <b>${f(A.bin)}</b>　ポアソン <b>${f(A.poi)}</b>（差 ${f(A.diff)}）</div><div class="mut">二項の分散 np(1−p)＝${f(A.bvar)} と、ポアソンの分散 λ＝${f(A.lambda)} は、p が小さいほど近い。p を大きくすると近似がずれる。</div>`;}
+LK.register("approx",{name:"二項とポアソン",
+ init(){["an","ap","ak"].forEach(id=>LK.stepper($(id),aRender));aRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("an",s.n);if(s.p!==undefined)LK.setRange("ap",s.p);if(s.k!==undefined)LK.setRange("ak",s.k);aRender();},
+ render:aRender,
+ value(key){const A=aVals(),v=A[key];return {v,text:f(v)};}});
+
+// ---- 幾何・負の二項
+function gVals(){const p=+$("gp").value,r=+$("gr").value;let k=+$("gk").value;if(k<r){k=r;LK.setRange("gk",k);}
+ const pk=C(k-1,r-1)*Math.pow(p,r)*Math.pow(1-p,k-r);let le=0;for(let i=r;i<=k;i++)le+=C(i-1,r-1)*Math.pow(p,r)*Math.pow(1-p,i-r);
+ return {p,r,k,pk,le,gt:1-le,mean:r/p,var:r*(1-p)/(p*p),sd:Math.sqrt(r*(1-p))/p};}
+function gRender(){const G=gVals(),top=Math.max(G.k+2,Math.ceil(G.mean+3*G.sd)),ps=[];for(let i=1;i<=top;i++)ps.push(i<G.r?0:C(i-1,G.r-1)*Math.pow(G.p,G.r)*Math.pow(1-G.p,i-G.r));
+ $("gplot").innerHTML=bars(ps,{on:i=>i===G.k,off:1,mean:G.mean,kmark:G.k,label:"成功までの回数"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>ちょうど k 回目</span><span>▲ 平均 r/p</span></div>`;
+ $("gsum").innerHTML=`<div>P(${G.r}回目の成功が ${G.k} 回目)＝${G.k-1}C${G.r-1}×${f(G.p)}^${G.r}×${f(1-G.p)}^${G.k-G.r}＝<b>${f(G.pk)}</b></div><div>平均 r/p＝<b>${f(G.mean)}</b> 回　分散 r(1−p)/p²＝<b>${f(G.var)}</b></div><div>${G.k} 回までに成功している＝${f(G.le)}　${G.k} 回を超える＝${f(G.gt)}</div><div class="mut">${G.r===1?`幾何分布：最初の ${G.k-1} 回が失敗、${G.k} 回目に成功。`:`最後（${G.k} 回目）は必ず成功。その前の ${G.k-1} 回のどこで ${G.r-1} 回成功するかを数える。`}「失敗の回数」で数える流儀だと平均は (1−p)/p ずれる。</div>`;}
+LK.register("geom",{name:"成功するまで",
+ init(){["gp","gr","gk"].forEach(id=>LK.stepper($(id),gRender));gRender();},
+ apply(s){if(s.p!==undefined)LK.setRange("gp",s.p);if(s.r!==undefined)LK.setRange("gr",s.r);if(s.k!==undefined)LK.setRange("gk",s.k);gRender();},
+ render:gRender,
+ value(key){const G=gVals(),v=G[key];return {v,text:f(v)};}});
+
+// ---- 超幾何
+function hFix(){const N=+$("hN").value;["hK","hn"].forEach(id=>{const e=$(id);e.max=N;if(+e.value>N)LK.setRange(id,N);else e._lkUpd&&e._lkUpd();});const n=+$("hn").value,K=+$("hK").value,e=$("hk");e.max=Math.min(n,K);if(+e.value>+e.max)LK.setRange("hk",+e.max);else e._lkUpd&&e._lkUpd();}
+function hVals(){const N=+$("hN").value,K=Math.min(+$("hK").value,N),n=Math.min(+$("hn").value,N),k=Math.min(+$("hk").value,n,K),p=K/N;
+ const P=i=>(i<Math.max(0,n-(N-K))||i>Math.min(n,K))?0:Math.exp(lnC(K,i)+lnC(N-K,n-i)-lnC(N,n));
+ const fpc=N>1?(N-n)/(N-1):0;return {N,K,n,k,p,P,pk:P(k),mean:n*p,var:n*p*(1-p)*fpc,bvar:n*p*(1-p),fpc,binom:binom(n,p,k),num:C(K,k)*C(N-K,n-k),den:C(N,n)};}
+function hRender(){hFix();const H=hVals(),top=Math.min(H.n,H.K),ps=[],bs=[];for(let i=0;i<=top;i++){ps.push(H.P(i));bs.push(binom(H.n,H.p,i));}
+ $("hplot").innerHTML=bars(ps,{on:i=>i===H.k,ps2:bs,mean:H.mean,kmark:H.k,label:"超幾何分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>超幾何（戻さない）</span><span><i class="sw" style="border:2px dashed var(--fg)"></i>二項（戻す、p＝K/N）</span></div>`;
+ $("hsum").innerHTML=`<div>P(X＝${H.k})＝${H.K}C${H.k}×${H.N-H.K}C${H.n-H.k}÷${H.N}C${H.n}＝${H.num}÷${H.den}＝<b>${f(H.pk)}</b>　（二項なら ${f(H.binom)}）</div><div>平均 nK/N＝<b>${f(H.mean)}</b>　分散＝np(1−p)×(N−n)/(N−1)＝${f(H.bvar)}×${f(H.fpc)}＝<b>${f(H.var)}</b></div><div class="mut">(N−n)/(N−1) は戻さないことによる補正。N が n に比べて大きいほど1に近く、二項分布とほぼ同じになる。</div>`;}
+LK.register("hyper",{name:"戻さず取り出す",
+ init(){["hN","hK","hn","hk"].forEach(id=>LK.stepper($(id),hRender));hRender();},
+ apply(s){if(s.N!==undefined)LK.setRange("hN",s.N);$("hK").max=+$("hN").value;$("hn").max=+$("hN").value;if(s.K!==undefined)LK.setRange("hK",s.K);if(s.n!==undefined)LK.setRange("hn",s.n);$("hk").max=Math.min(+$("hn").value,+$("hK").value);if(s.k!==undefined)LK.setRange("hk",s.k);hRender();},
+ render:hRender,
+ value(key){const H=hVals(),v=H[key];return {v,text:f(v)};}});
+
+LK.start("pois");
+window.__LAB__={LK,pVals,aVals,gVals,hVals,pois,binom};
+</script>
+</body></html>

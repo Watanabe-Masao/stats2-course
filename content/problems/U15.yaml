@@ -1,0 +1,305 @@
+# 単元U15の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U15-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    1日に平均3件の返品がある（ポアソン分布）。ある日に返品が1件以下の確率は？（e⁻³≒0.0498）
+
+    P(0)＝e⁻³×3⁰÷0!＝□、P(1)＝e⁻³×3¹÷1!＝□。1件以下＝□＋□＝□
+  answer_title: 答え（埋めてから開く）
+  answer: P(0)＝**0.0498**、P(1)＝0.0498×3＝**0.1494**。合計 **0.199**（約20%）。
+  checks:
+    - 'abs(math.exp(-3) - 0.0498) < 0.00005 and abs(0.0498*3 - 0.1494) < 1e-9 and abs(0.0498+0.1494 - 0.199) < 0.0005 and abs(4*math.exp(-3) - 0.199) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {unit: 日, rate: 3, t: 1, k: 1, kind: le}
+    task: 1日に平均3件の返品。ある日に返品が1件以下の確率は（小数で）？
+    predict: {type: number, key: le, label: "P(X≦1)"}
+    expect: 0.1991
+    why: 0件0.0498＋1件0.1494≒0.199。平均3件なので、1件以下で済む日は5日に1日くらい。
+
+- id: Q-U15-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 不良率0.2%の商品を1000個検品する。不良がちょうど2個の確率を、ポアソン近似で求めよ（e⁻²≒0.135）。
+  answer_title: 答え（解いてから開く）
+  answer: 二項分布 B(1000, 0.002) は n が大きく p が小さいので、λ＝np＝**2** のポアソン分布で近似できる。P(2)＝e⁻²×2²÷2!＝0.135×2＝**0.271**。
+  checks:
+    - 'math.isclose(1000*0.002, 2) and abs(math.exp(-2)*4/2 - 0.271) < 0.0005 and math.isclose(0.135*2, 0.27) and abs(comb(1000,2)*0.002**2*0.998**998 - 0.271) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: approx
+    set: {n: 1000, p: 0.002, k: 2}
+    task: B(1000, 0.002) をポアソン分布で近似する。ちょうど2個の確率（ポアソン）は（小数で）？
+    predict: {type: number, key: poi, label: "ポアソンの P(X＝2)"}
+    expect: 0.2707
+    why: λ＝np＝2、e⁻²×4÷2≒0.2707。二項分布の正確な値0.2709とほとんど同じ。p を0.2のように大きくすると差が開く。
+
+- id: Q-U15-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 1時間平均2件で、1時間にちょうど1件の確率は？
+  answer: e⁻²×2÷1!＝0.135×2＝**0.271**。
+  checks:
+    - 'abs(2*math.exp(-2) - 0.271) < 0.0005 and math.isclose(0.135*2, 0.27)'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 2, t: 1, k: 1, kind: eq}
+    task: 1時間に平均2件。ちょうど1件の確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝1)"}
+    expect: 0.2707
+    why: e⁻²×2¹÷1!≒0.271。λ＝2 では1件と2件がちょうど同じ確率になる。
+
+- id: Q-U15-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 1時間に平均2件の問い合わせがある。30分間に2件以上来る確率は？
+  answer: 30分なので λ＝1。P(0)＝e⁻¹≒0.368、P(1)＝e⁻¹×1≒0.368。2件以上＝1−0.368−0.368≒**0.264**。
+  checks:
+    - 'abs(math.exp(-1) - 0.368) < 0.0005 and abs(1-2*math.exp(-1) - 0.264) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 2, t: 0.5, k: 2, kind: ge}
+    task: 1時間に平均2件。30分間に2件以上来る確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧2)"}
+    expect: 0.2642
+    why: λ＝2×0.5＝1。1−e⁻¹−e⁻¹≒0.264。λ を2のまま計算すると0.594になり、2倍以上に見積もってしまう。
+
+- id: Q-U15-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 1日に平均3件の返品がある（ポアソン分布、日ごとに独立）。「2日間の返品が0件」の確率と、「1日0件の日が2日続く」確率をそれぞれ求めて比べよ。
+  answer: 2日間は λ＝6 なので e⁻⁶≒**0.0025**。1日0件は e⁻³≒0.0498、2日続くのは 0.0498²≒**0.0025**。同じになる。区間を足すと λ も足せる（ポアソン分布の和）。
+  checks:
+    - 'abs(math.exp(-6) - 0.0025) < 0.00005 and math.isclose(math.exp(-3)**2, math.exp(-6)) and abs(0.0498**2 - 0.0025) < 0.00005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {unit: 日, rate: 3, t: 2, k: 0, kind: eq}
+    task: 1日に平均3件の返品。2日間で返品が0件の確率は（小数で）？
+    predict: {type: number, key: p0, label: "P(X＝0)"}
+    expect: 0.0025
+    why: λ＝3×2＝6、e⁻⁶≒0.0025。1日0件（e⁻³）を2回掛けても同じ。区間を延ばすと0件はどんどん起きにくくなる。
+
+- id: Q-U15-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 1時間に平均4人がレジに並ぶ。15分間に1人も並ばない確率は？
+  answer: 15分は1時間の1/4なので λ＝4×0.25＝1。P(0)＝e⁻¹≒**0.368**。
+  checks:
+    - 'math.isclose(4*0.25, 1) and abs(math.exp(-1) - 0.368) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 4, t: 0.25, k: 0, kind: eq}
+    task: 1時間に平均4人。15分間に0人の確率は（小数で）？
+    predict: {type: number, key: p0, label: "P(X＝0)"}
+    expect: 0.3679
+    why: λ＝4×0.25＝1、e⁻¹≒0.368。15分の3回に1回くらいは誰も並ばない。
+
+- id: Q-U15-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 当たりの確率が0.2のくじを、当たるまで引く。3回目で初めて当たる確率と、当たるまでの平均回数は？
+  answer: 1回目・2回目がはずれ、3回目が当たり：0.8²×0.2＝**0.128**。平均は 1/p＝**5回**。
+  checks:
+    - 'math.isclose(0.8**2*0.2, 0.128) and math.isclose(1/0.2, 5)'
+  lab:
+    id: LAB-pois
+    mode: geom
+    set: {p: 0.2, r: 1, k: 3}
+    task: 当たり確率0.2。3回目で初めて当たる確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝3)"}
+    expect: 0.128
+    why: はずれ0.8を2回、当たり0.2を1回で 0.128。平均は5回だが、1回目で当たる（0.2）のがいちばん起きやすい。
+
+- id: Q-U15-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P3]
+  prompt: 1日200人の来店客のうち、各客が1%の確率で特定の商品を返品する。返品が0件になる確率を、二項分布（{{unit:U14}}）とポアソン近似でそれぞれ求めて比べよ。
+  answer: 二項：0.99²⁰⁰≒**0.134**。ポアソン：λ＝200×0.01＝2、e⁻²≒**0.135**。ほぼ同じ。n が大きく p が小さいので近似がよく合う。
+  checks:
+    - 'abs(0.99**200 - 0.134) < 0.0005 and math.isclose(200*0.01, 2) and abs(math.exp(-2) - 0.135) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: approx
+    set: {n: 200, p: 0.01, k: 0}
+    task: B(200, 0.01)。返品が0件になる確率（二項の正確な値）は（小数で）？
+    predict: {type: number, key: bin, label: "二項の P(X＝0)"}
+    expect: 0.134
+    why: 0.99²⁰⁰≒0.134。ポアソン近似 e⁻²≒0.135 との差は0.001ほど。
+
+- id: Q-U15-020
+  stage: S3
+  tag: 分布を選ぶ
+  format: written
+  powers: [P3]
+  prompt: 次の数え方に合う分布は？　(a) 1日に届く苦情の件数　(b) 10人中の購入者数　(c) 初めて当たりが出るまでのくじの回数。(c) で当たりの確率が0.1なら、平均何回か。
+  answer: (a) **ポアソン分布**、(b) **二項分布**、(c) **幾何分布**。(c) の平均は 1/0.1＝**10回**。
+  checks:
+    - 'math.isclose(1/0.1, 10)'
+  lab:
+    id: LAB-pois
+    mode: geom
+    set: {p: 0.1, r: 1, k: 10}
+    task: (c) 当たり確率0.1のくじを当たるまで引く。平均何回か。
+    predict: {type: number, key: mean, label: "平均回数", unit: "回"}
+    expect: 10
+    why: 幾何分布の平均は 1/p＝10回。ただし10回までに当たる確率は約65%で、10回を超えることも3回に1回以上ある。
+
+- id: Q-U15-021
+  stage: S3
+  tag: 負の二項分布
+  format: written
+  powers: [P1, P3]
+  prompt: 成功率0.5で、2回目の成功がちょうど3回目の試行で起きる確率は？
+  answer: 最初の2回で成功1回（どちらか ₂C₁＝2通り）、3回目に成功。2×0.5²×0.5＝**0.25**。
+  checks:
+    - 'comb(2,1) == 2 and math.isclose(2*0.5**2*0.5, 0.25)'
+  lab:
+    id: LAB-pois
+    mode: geom
+    set: {p: 0.5, r: 2, k: 3}
+    task: 成功率0.5。2回目の成功がちょうど3回目に起きる確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝3)"}
+    expect: 0.25
+    why: 3回目は必ず成功。前の2回のどちらで1回成功するかが2通りで、2×0.5³＝0.25。
+
+- id: Q-U15-022
+  stage: S3
+  tag: 戻さずに取り出す
+  format: written
+  powers: [P1, P2]
+  prompt: 10個中2個が不良。戻さずに3個取り出すとき、不良がちょうど1個の確率は？
+  answer: ₂C₁×₈C₂÷₁₀C₃＝2×28÷120＝56÷120＝**7/15**（約0.467）。母集団 N が大きければ二項分布とほぼ同じになる。
+  checks:
+    - 'comb(2,1)*comb(8,2) == 56 and comb(10,3) == 120 and Fraction(56,120) == Fraction(7,15) and abs(7/15 - 0.467) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: hyper
+    set: {N: 10, K: 2, n: 3, k: 1}
+    task: 10個中2個が不良、戻さず3個。不良がちょうど1個の確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝1)"}
+    expect: 0.4667
+    why: 56÷120＝7/15。戻す（二項）と0.384で、箱が小さいと差が大きい。N を100倍にすると二項に近づく。
+
+- id: Q-U15-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: 1時間あたりの問い合わせ件数が平均2件のポアソン分布に従うとき、正しいものはどれか。
+  choices:
+    - 分散は4である。
+    - 30分間の件数も平均2件である。
+    - 30分間の件数の平均と分散はどちらも1である。
+    - 1時間の件数は多くても2件までである。
+    - 実際の件数の平均と分散が等しければ、ポアソン分布に従うと証明できる。
+  correct: 3
+  answer: 30分なら λ＝1。ポアソン分布では平均＝分散＝λ なので、どちらも1。
+  misconceptions:
+    1: ポアソン分布の分散は λ そのもの（2）。2乗しない
+    2: λ は区間の長さに比例するので30分は1
+    4: ポアソン分布の件数に上限はない
+    5: 平均＝分散は手がかりの1つで、証明にはならない
+  checks:
+    - 'math.isclose(2*0.5, 1)'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 2, t: 0.5, k: 1, kind: eq}
+    task: 1時間に平均2件。30分間の件数の分散はいくつか。
+    predict: {type: number, key: var, label: "分散"}
+    expect: 1
+    why: λ＝2×0.5＝1。ポアソン分布は平均＝分散＝λ。
+
+- id: Q-U15-030
+  stage: S4
+  tag: レジの応援基準
+  format: written
+  powers: [P1, P3]
+  prompt: 夕方のレジには15分間に平均3人が来る（ポアソン分布）。5人以上来たら応援を呼ぶ基準にすると、応援が要る15分は全体のどれくらいか。
+  answer: λ＝3。P(0〜4人)＝e⁻³×(1＋3＋4.5＋4.5＋3.375)≒0.815。5人以上＝1−0.815≒**0.185**（約18%）。15分の5回に1回くらいは応援が要る。
+  checks:
+    - 'abs(math.exp(-3)*(1+3+4.5+4.5+3.375) - 0.815) < 0.0005 and abs(1-math.exp(-3)*(1+3+4.5+4.5+3.375) - 0.185) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 12, t: 0.25, k: 5, kind: ge}
+    task: 15分間に平均3人（1時間に12人）。5人以上来る確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧5)"}
+    expect: 0.1847
+    why: λ＝3、1−(0〜4人)≒0.185。基準を6人以上にすると約0.084まで下がる。
+
+- id: Q-U15-031
+  stage: S4
+  tag: 箱からの抜き取り
+  format: written
+  powers: [P1, P3]
+  prompt: 20個入りの箱に不良が2個ある。4個を戻さずに抜き取って調べるとき、不良が1個も見つからない確率は？ 戻すと考えた二項分布の値とも比べよ。
+  answer: 超幾何：₁₈C₄÷₂₀C₄＝3060÷4845≒**0.632**。二項（p＝0.1）：0.9⁴≒0.656。戻さない方が見逃しはやや少ない。1個以上見つかる確率は 1−0.632≒0.368。
+  checks:
+    - 'comb(18,4) == 3060 and comb(20,4) == 4845 and abs(3060/4845 - 0.632) < 0.0005 and abs(0.9**4 - 0.656) < 0.0005 and abs(1-3060/4845 - 0.368) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: hyper
+    set: {N: 20, K: 2, n: 4, k: 0}
+    task: 20個中2個が不良、戻さず4個。不良が0個（見逃し）の確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝0)"}
+    expect: 0.6316
+    why: 3060÷4845≒0.632。抜く数 n を8にすると約0.37まで下がる。
+
+- id: Q-U15-032
+  stage: S4
+  tag: クレームの件数
+  format: written
+  powers: [P1, P3]
+  prompt: 1日に平均0.5件のクレームがある。1週間（7日）でクレームが0件になる確率は？ 「先週は0件だったので改善した」と言えるか。
+  answer: λ＝0.5×7＝3.5、e⁻³·⁵≒**0.030**（約3%）。改善がなくても0件は約3%で起きる。めったに起きないので改善の手がかりにはなるが、1週間だけで断定せず、続く週も見る。
+  checks:
+    - 'math.isclose(0.5*7, 3.5) and abs(math.exp(-3.5) - 0.030) < 0.0005'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {unit: 日, rate: 0.5, t: 7, k: 0, kind: eq}
+    task: 1日に平均0.5件、7日間で0件の確率は（小数で）？
+    predict: {type: number, key: p0, label: "P(X＝0)"}
+    expect: 0.0302
+    why: λ＝3.5、e⁻³·⁵≒0.030。偶然かどうかの判断は検定の単元で正式に扱う。
+
+- id: Q-U15-040
+  stage: S5
+  tag: 待ち時間
+  format: written
+  powers: [P1, P3]
+  prompt: 問い合わせは1時間に平均2件（ポアソン分布）。今から次の問い合わせまで30分以上待つ確率は？ 待ち時間の平均は？
+  answer: 30分以上待つ＝30分間に0件。λ＝1 なので e⁻¹≒**0.368**。待ち時間の平均は 1/2時間＝**30分**。
+  checks:
+    - 'abs(math.exp(-1) - 0.368) < 0.0005 and math.isclose(60/2, 30)'
+  lab:
+    id: LAB-pois
+    mode: pois
+    set: {rate: 2, t: 0.5, k: 0, kind: eq}
+    task: 1時間に平均2件。30分間に0件（＝30分以上待つ）確率は（小数で）？
+    predict: {type: number, key: p0, label: "P(X＝0)"}
+    expect: 0.3679
+    why: 待ち時間が t を超える＝t の間に0件。e^(−λt) で、時間を延ばすと指数的に小さくなる（指数分布）。

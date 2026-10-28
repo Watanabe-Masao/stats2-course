@@ -155,3 +155,15 @@
 - id: TERM-binom
   name: 二項分布
   en: binomial distribution
+- id: TERM-poisson
+  name: ポアソン分布
+  en: Poisson distribution
+- id: TERM-geom
+  name: 幾何分布
+  en: geometric distribution
+- id: TERM-hyper
+  name: 超幾何分布
+  en: hypergeometric distribution
+- id: TERM-expo
+  name: 指数分布
+  en: exponential distribution

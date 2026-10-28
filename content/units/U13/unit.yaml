@@ -6,7 +6,7 @@ reference_section: ② 確率
 prev: U12
 next: U14
 prereq: [U06, U07, U02]
-used_by: [U14, U15, U16, U28]
+used_by: [U14, U15, U18, U19, U28]
 terms: [TERM-rv, TERM-dist, TERM-expect, TERM-var, TERM-sd, TERM-cov, TERM-indep]
 labs: [LAB-expect]
 goal: 「値」と「その確率」の一覧（確率分布）から、**1回あたりの平均（期待値）とばらつき（分散・標準偏差）を計算でき**、aX＋b や X＋Y にしたときの変化も求められる。

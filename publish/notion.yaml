@@ -19,6 +19,7 @@ units:                 # 新しく生成した単元ページ
   U12: 407b7cd539a1813998ebdc86e6e71f03
   U13: 407b7cd539a181f8bc27f67163370eb9
   U14: 407b7cd539a1818f921ffa133256cbeb
+  U15: 407b7cd539a181788528f3ea6d48e0ac
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
@@ -74,6 +75,7 @@ refs:
   REF-Q-U12: 402b7cd539a181ed9d2accc6a79a6488
   REF-Q-U13: 402b7cd539a1811bbabff1d6af67eee5
   REF-Q-U14: 402b7cd539a181c19bbdc55fc3960968
+  REF-Q-U15: 402b7cd539a1811792e2d31ec101609f
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -123,6 +125,10 @@ terms:
   TERM-dist: 405b7cd539a181778418e09f63cd73f3
   TERM-cov: 405b7cd539a1816c8b7edc6c7d33d35f
   TERM-binom: 405b7cd539a1811082e7c81fcb0a652d
+  TERM-poisson: 405b7cd539a1810e8e1acc60ea5f43c6
+  TERM-geom: 405b7cd539a1817dbff6c2aa3e386cb8
+  TERM-hyper: 405b7cd539a181418f71c018e2ea2b2c
+  TERM-expo: 405b7cd539a181b2b988fc0038633e47
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143
