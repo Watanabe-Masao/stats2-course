@@ -227,3 +227,33 @@
 - id: TERM-welch
   name: ウェルチの t 検定
   en: Welch's t-test
+- id: TERM-h0
+  name: 帰無仮説
+  en: null hypothesis
+- id: TERM-h1
+  name: 対立仮説
+  en: alternative hypothesis
+- id: TERM-test-stat
+  name: 検定統計量
+  en: test statistic
+- id: TERM-pvalue
+  name: p値
+  en: p-value
+- id: TERM-alpha
+  name: 有意水準
+  en: significance level
+- id: TERM-reject
+  name: 棄却域
+  en: rejection region
+- id: TERM-sides
+  name: 片側検定・両側検定
+  en: one-sided and two-sided tests
+- id: TERM-type1
+  name: 第1種の過誤
+  en: type I error
+- id: TERM-type2
+  name: 第2種の過誤
+  en: type II error
+- id: TERM-power
+  name: 検出力
+  en: power

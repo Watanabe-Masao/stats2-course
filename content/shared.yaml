@@ -13,6 +13,7 @@ domains:
   D3: {name: ③ 確率分布, icon: "📈", tone: orange}
   D4: {name: ④ 標本分布, icon: "🔬", tone: green}
   D5: {name: ⑤ 推定, icon: "📏", tone: pink}
+  D6: {name: ⑥ 検定, icon: "⚖️", tone: red}
 
 total_units: 32
 
@@ -43,6 +44,7 @@ refs:
   REF-Q-U21: 確認問題（記述式）
   REF-Q-U22: 確認問題（記述式）
   REF-Q-U23: 確認問題（記述式）
+  REF-Q-U24: 確認問題（記述式）
   REF-Q-U05T-1: 確認問題（T1 増減率）
   REF-Q-U05T-2: 確認問題（T2 平均成長率）
   REF-Q-U05T-3: 確認問題（T3 移動平均）
