@@ -10,6 +10,7 @@
 .die .ab{border-color:var(--fg);background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--acc) 35%,var(--card)) 0 6px,color-mix(in srgb,var(--acc2) 35%,var(--card)) 6px 12px)}
 .legend span{margin-right:10px;font-size:12px;white-space:nowrap}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+#m-bayes .lk-step .lk-name{max-width:6.4em}
 </style></head><body>
 <h1>🧪 確率ラボ</h1>
 <div id="lk-task"></div>
@@ -186,9 +187,9 @@ function bRender(){const B=bVals();$("bn1").textContent=BN.c;$("bnE").textConten
  for(let i=0;i<1000;i++){const x=ox+(i%cols)*cw,y=4+Math.floor(i/cols)*ch;let f="var(--card)",o=1;
   if(i<nTP){f="var(--acc2)";}else if(i<nC){f="var(--acc2)";o=.3;}else if(i<nC+nFP){f="var(--acc)";}
   s+=`<rect x="${x}" y="${y}" width="${cw-1.4}" height="${ch-1.4}" rx="1" fill="${f}" fill-opacity="${o}"${f==="var(--card)"?' stroke="var(--line)" stroke-width=".4"':""}/>`;}
- $("bplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>${BN.c}で${BN.e}あり</span><span><i class="sw" style="background:var(--acc2);opacity:.3"></i>${BN.c}で${BN.e}なし</span><span><i class="sw" style="background:var(--acc)"></i>${BN.nc}なのに${BN.e}あり</span></div>`;
+ $("bplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>${BN.c}・${BN.e}あり</span><span><i class="sw" style="background:var(--acc2);opacity:.3"></i>${BN.c}・${BN.e}なし</span><span><i class="sw" style="background:var(--acc)"></i>${BN.nc}・${BN.e}あり</span></div>`;
  const t2=B.t===2?"（2回とも）":"";
- $("bsum").innerHTML=`<div>1000個のうち ${BN.c} ${n1(1000*B.p)}個 → ${BN.e}${t2} ${n1(B.tpn)}個。${BN.nc} ${n1(1000*(1-B.p))}個 → 誤って${BN.e}${t2} ${n1(B.fpn)}個。</div><div>${BN.e}${t2}された ${n1(B.tpn+B.fpn)}個のうち${BN.c}＝${n1(B.tpn)}÷${n1(B.tpn+B.fpn)}＝<b>${isNaN(B.post)?"—":n1(B.post)+"%"}</b>（事後確率）</div><div class="mut">${BN.e}される割合（全確率）＝${n1(B.p*100)}%×${n1(B.se*100)}%＋${n1((1-B.p)*100)}%×${n1(B.fp*100)}%＝${n1(B.total)}%。${BN.e}されなかったもののうち${BN.c}は ${n1(B.postNeg)}%。</div>`;}
+ $("bsum").innerHTML=`<div>1000個のうち ${BN.c} ${n1(1000*B.p)}個 → ${BN.e}あり${t2} ${n1(B.tpn)}個。${BN.nc} ${n1(1000*(1-B.p))}個 → ${BN.e}あり${t2} ${n1(B.fpn)}個。</div><div>${BN.e}あり${t2}の ${n1(B.tpn+B.fpn)}個のうち${BN.c}＝${n1(B.tpn)}÷${n1(B.tpn+B.fpn)}＝<b>${isNaN(B.post)?"—":n1(B.post)+"%"}</b>（事後確率）</div><div class="mut">${BN.e}ありの割合（全確率）＝${n1(B.p*100)}%×${n1(B.se*100)}%＋${n1((1-B.p)*100)}%×${n1(B.fp*100)}%＝${n1(B.total)}%。${BN.e}なしのもののうち${BN.c}は ${n1(B.postNeg)}%。</div>`;}
 LK.register("bayes",{name:"ベイズ",
  init(){["bp","bs","bf"].forEach(id=>LK.stepper($(id),bRender));$("bt").onchange=bRender;bRender();},
  apply(s){if(s.name)BN.c=s.name;if(s.other)BN.nc=s.other;if(s.event)BN.e=s.event;if(s.prior!==undefined)LK.setRange("bp",s.prior);if(s.sens!==undefined)LK.setRange("bs",s.sens);if(s.fpr!==undefined)LK.setRange("bf",s.fpr);if(s.times!==undefined)$("bt").value=String(s.times);bRender();},
