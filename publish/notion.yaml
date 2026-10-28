@@ -31,6 +31,7 @@ units:                 # 新しく生成した単元ページ
   U24: 407b7cd539a18160b785dc5ab8ea7f96
   U25: 407b7cd539a181318485e2b4be5fa996
   U26: 407b7cd539a18167a276d90fd6725857
+  U27: 407b7cd539a1814892fbc1cc03b5d535
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
@@ -98,6 +99,7 @@ refs:
   REF-Q-U24: 402b7cd539a1812faa71e62fb418d9b9
   REF-Q-U25: 402b7cd539a18126b4a4f1ec096dec58
   REF-Q-U26: 402b7cd539a181c2ac5cce67b1fbfdf3
+  REF-Q-U27: 402b7cd539a1818faa06d550d637e3a1
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -182,6 +184,10 @@ terms:
   TERM-type2: 405b7cd539a181d5bf72e16b649bfff6
   TERM-power: 405b7cd539a1815c9866f9cc2b898583
   TERM-pool: 405b7cd539a181c390d2f483cea34a58
+  TERM-expected: 405b7cd539a18125a8abf0a968487a3d
+  TERM-indep-test: 405b7cd539a181898e6fcf7a36061852
+  TERM-gof: 405b7cd539a181c7b764fa34a7fa9a9f
+  TERM-crosstab: 405b7cd539a181feb25df3c6f83fe015
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143

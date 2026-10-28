@@ -23,7 +23,23 @@ from pathlib import Path
 from model import ROOT, TOOLS, Course
 
 OUT = ROOT / "out" / "labs"
-CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why")
+CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why", "steps", "law")
+STEP_KEYS = ("label", "task", "set", "predict", "why")
+
+
+def page_cfg(spec: dict) -> dict:
+    """HTML に入れる設定。expect（予想の答え）は入れない。steps（法則を見つける）も各段の expect を除く。"""
+    cfg = {k: spec[k] for k in CFG_KEYS if k in spec}
+    if "steps" in cfg:
+        cfg["steps"] = [{k: s[k] for k in STEP_KEYS if k in s} for s in cfg["steps"]]
+    return cfg
+
+
+def expect_of(spec: dict):
+    """テストで照合する答え。steps なら各段の expect の並び。"""
+    if spec.get("steps"):
+        return [s.get("expect") for s in spec["steps"]]
+    return spec.get("expect")
 
 
 def safe(aid: str) -> str:
@@ -108,7 +124,7 @@ def build_site(course: Course) -> list[dict]:
     for aid, spec in variants(course).items():
         lid, _, name = aid.partition("@")
         if name:
-            by_lab.setdefault(lid, {})[name] = {k: spec[k] for k in CFG_KEYS if k in spec}
+            by_lab.setdefault(lid, {})[name] = page_cfg(spec)
     for lid, t in course.labs.items():
         if not t.get("src"):   # 共通部品を使わない古い形のラボはそのまま置く（場面の版はない）
             d = SITE / t["slug"]
@@ -128,7 +144,7 @@ def build_site(course: Course) -> list[dict]:
         for name, cfg in presets.items():
             spec = variants(course)[f"{lid}@{name}"]
             entries.append({"asset": f"{lid}@{name}", "file": rel, "query": f"?p={name}", "cfg": cfg,
-                            "expect": spec.get("expect"), "modes": modes})
+                            "expect": expect_of(spec), "modes": modes})
         links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a>（場面 {len(presets)}）</li>')
     figdir = SITE / "fig"   # 図も公開サイトから出す（アップロード不要）
     figdir.mkdir(exist_ok=True)
@@ -152,10 +168,10 @@ def build_labs(course: Course) -> list[dict]:
     for aid, spec in variants(course).items():
         lid = aid.split("@")[0]
         t = course.labs[lid]
-        cfg = {k: spec[k] for k in CFG_KEYS if k in spec}
+        cfg = page_cfg(spec)
         f = OUT / f"{safe(aid)}.html"
         f.write_text(_assemble(t, "window.__LABCFG__=" + json.dumps(cfg, ensure_ascii=False) + ";"), encoding="utf-8")
-        manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": spec.get("expect"),
+        manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": expect_of(spec),
                          "modes": [m["key"] for m in t.get("modes", []) if isinstance(m, dict)]})
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     return manifest
@@ -214,6 +230,28 @@ def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
         err.append(f"{where}: mode は modes に含める")
     if not mode and (p.get("set") or p.get("predict")):
         err.append(f"{where}: set や predict を使うときは mode を書く")
+    steps = p.get("steps")
+    if steps is not None:
+        if not isinstance(steps, list) or len(steps) < 2:
+            err.append(f"{where}: steps（法則を見つける）は2段以上のリスト")
+            steps = []
+        if not mode:
+            err.append(f"{where}: steps を使うときは mode を書く")
+        if p.get("predict") or p.get("task"):
+            err.append(f"{where}: steps を使うときは、task・predict は各段に書く")
+        for i, s in enumerate(steps, 1):
+            w = f"{where} の段{i}"
+            if not s.get("label"):
+                err.append(f"{w}: label（条件の短い名前。記録の表に出る）がない")
+            extra = set(s) - set(STEP_KEYS) - {"expect"}
+            if extra:
+                err.append(f"{w}: 使えない項目 {sorted(extra)}")
+            err += _check_spec(w, {"mode": p.get("mode"), **{k: s[k] for k in ("set", "predict", "expect", "task") if k in s}}, tool)
+            if not s.get("predict"):
+                err.append(f"{w}: predict がない（探究は毎段で予想する）")
+        law = p.get("law")
+        if not law or not law.get("lines"):
+            err.append(f"{where}: steps の最後に見せる law.lines（式）がない")
     pr = p.get("predict")
     if pr:
         if pr.get("type") not in ("number", "choice"):

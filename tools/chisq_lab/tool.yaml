@@ -1,0 +1,62 @@
+id: LAB-chisq
+name: カイ二乗検定ラボ
+slug: chisq                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: chisq_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_chisq.html]   # 旧版 教科書27 の「4つのセルの件数を動かすと E・(O−E)²/E・χ²・p 値が変わる」を indep に含む。適合度（50対50 に60と40）を gof にした
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: gof
+    name: 適合度
+    purpose: 区分2〜6個の観測度数 O と比率から、期待度数 E＝総数×比率、χ²＝Σ(O−E)²÷E、自由度＝区分の数−1−推定した母数の数、上側の点（3桁）と p 値。観測と期待の棒グラフを並べ、χ² 分布に棄却域を塗る。期待度数5未満の区分を知らせる
+    set: [alpha, k, m, o, w]                # o：観測度数の並び、w：比率の並び（合計1でなくてよい）、m：推定した母数の数
+    values: [chi2, df, crit, p, decision, emin, e1, e2, e3]
+  - key: indep
+    name: 独立性
+    purpose: 2×2〜3×3 のクロス集計表から、期待度数 E＝行計×列計÷総計、χ²、自由度 (r−1)(c−1)、上側の点（3桁）と p 値。行ごとの割合を100%の横帯（帯グラフ）で並べ、全体の区切りを点線で重ねる（独立ならどの行もそろう）。期待度数5未満のセルを知らせる
+    set: [alpha, r, c, t]                   # t：表の行の並び（例 [[30, 20], [20, 30]]）
+    values: [chi2, df, crit, p, decision, emin, nsmall, e11, e12, e21, e22]
+data: 表の数を入力して決める（データの読み込みなし）。χ² の点は数値計算を3桁に丸めた値（数表と同じ）
+presets:
+  s1-indep:
+    mode: indep
+    set: {alpha: 0.05, r: 2, c: 2, t: [[30, 20], [20, 30]]}
+    task: チラシA（購入30・なし20）とB（購入20・なし30）。χ² は（小数で）？
+    predict: {type: number, key: chi2, label: "χ²"}
+    expect: 4
+    why: 期待度数はどのセルも50×50÷100＝25。(5²÷25)×4＝4 が自由度1の点3.841 を超えるので、独立を棄却する。帯の区切りが行ごとにずれている。
+  s1-gof:
+    mode: gof
+    set: {alpha: 0.05, k: 2, m: 0, o: [60, 40], w: [1, 1]}
+    task: 2つの区分を50対50 と決めた。観測は60と40。p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0455
+    why: 期待度数50・50、χ²＝100÷50＋100÷50＝4、自由度1。比率の検定の z＝2 の2乗と同じ。
+  s1-half:
+    mode: indep
+    set: {alpha: 0.05, r: 2, c: 2, t: [[15, 10], [10, 15]]}
+    task: 例題Aと同じ割合（60%と40%）で、人数を半分（各25人）にした。χ² は（小数で）？
+    predict: {type: number, key: chi2, label: "χ²"}
+    expect: 2
+    why: 割合が同じでも、件数が半分なら χ² も半分の2。境目3.841 に届かない。各500人なら χ²＝40。
+  s3-free:
+    mode: indep
+    modes: [indep, gof]
+    task: 解いてから、何の検定か（2つの分類の関係か、決めた比率どおりか）に合うモードで確かめる。
+  s4-free:
+    mode: indep
+    modes: [indep, gof]
+    task: 自分の売場の集計（店×支払い方法、曜日ごとの客数など）を入れ、帯グラフと χ² を読む。
+  s5-free:
+    mode: gof
+    modes: [gof, indep]
+    task: 「適合度」で推定した母数の数を0→1にして自由度と境目の変化を見る（発展1）。「独立性」で2×2 の表の χ² を2つの比率の z² と比べる（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（適合度、独立性）。
+used_by: [U27]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/chisq_lab/check.js        # 本文の値（χ²＝4・E＝25・3.841、適合度の χ²＝4、半分の人数で χ²＝2）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

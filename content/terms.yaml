@@ -260,3 +260,15 @@
 - id: TERM-pool
   name: プールした比率
   en: pooled proportion
+- id: TERM-expected
+  name: 期待度数
+  en: expected frequency
+- id: TERM-indep-test
+  name: 独立性検定
+  en: test of independence
+- id: TERM-gof
+  name: 適合度検定
+  en: goodness-of-fit test
+- id: TERM-crosstab
+  name: クロス集計表
+  en: cross tabulation

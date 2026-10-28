@@ -7,6 +7,8 @@
      task   課題の文
      predict {type:"number"|"choice", key, label, unit, options, tol}  予想してから結果を見せる
      why    結果のあとに出す一言
+     steps  法則を見つける：[{label, task, set, predict, why}, …]。条件を変えて予想→観察を何段か重ね、最後に law（決まり）を式で見せる
+     law    {title, lines:[式…], text, limit}  最後に「式で説明する」で開く。limit は式の外にあること（前提が崩れる条件など）
    予想のある版では、set で決めた選択欄（data-key の select）を文字に置き換え、問題と関係のない選択をさせない。
    Notion の埋め込み（iframe。高さ約320pxで変えられない）では「小さい表示」にする：
      見出し・説明文を省き、予想の前は課題カードだけ、結果のあとは要点と操作だけを出す。
@@ -15,6 +17,8 @@
 */
 const LK=(()=>{
  const cfg=window.__LABCFG__||{};
+ const STEPS=Array.isArray(cfg.steps)&&cfg.steps.length?cfg.steps:null;let si=0;const hist=[];
+ if(STEPS){const s0=STEPS[0];cfg.task=s0.task;cfg.predict=s0.predict;cfg.why=s0.why;}
  const $=id=>document.getElementById(id);
  const modes={},order=[];let cur=null,locked=false,last=null,revealed=false,moved=false;
  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -58,7 +62,7 @@ const LK=(()=>{
   if(m)m.onclick=()=>{const on=!document.body.classList.contains("lk-more");document.body.classList.toggle("lk-more",on);m.setAttribute("aria-expanded",on);m.textContent=on?"たたむ ▴":"くわしく（表・式）▾";};}
  // 課題カードと予想
  function taskCard(){const box=$("lk-task");if(!cfg.task){box.remove();return;}
-  const p=cfg.predict;let h=`<div class="lk-task"><div class="lk-tt">🎯 課題</div><div class="lk-q">${esc(cfg.task)}</div>`;
+  const p=cfg.predict;const head=STEPS?`🔍 法則を見つける ${si+1}／${STEPS.length}`:"🎯 課題";let h=`<div class="lk-task"><div class="lk-tt">${head}</div>${STEPS&&hist.length?histTable():""}<div class="lk-q">${esc(cfg.task)}</div>`;
   if(p){h+=`<div id="lk-ask"><div class="mut lk-note">先に予想を決める。決めるまで結果は隠れている。</div>`;
    if(p.type==="number")h+=`<div class="row"><label>${esc(p.label||"予想")} <input type="number" id="lk-in" inputmode="decimal" step="any">${esc(p.unit||"")}</label></div>`;
    else h+=`<div class="mut">${esc(p.label||"予想")}</div><div class="lk-choices" id="lk-ch">${p.options.map(o=>`<button type="button" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
@@ -76,6 +80,7 @@ const LK=(()=>{
   el.innerHTML=`動かすと変わる → ${esc(p.label||"結果")}：<b>${esc(r.text)}</b>`;}
  function reveal(guess){const p=cfg.predict;lock(false);revealed=true;if(modes[cur].render)modes[cur].render();
   const r=modes[cur].value(p.key);last=r;let h="";
+  if(STEPS)hist.push({label:STEPS[si].label||`${si+1}`,guess:guess===null?"—":(p.type==="number"?fmtNum(guess)+(p.unit||""):String(guess)),result:r.text+(p.type==="number"?(p.unit||""):"")});
   const both=`予想 <b>${esc(p.type==="number"?fmtNum(guess)+(p.unit||""):guess)}</b> ／ ラボ <b>${esc(r.text)}</b>`;
   if(guess===null)h=`<div>ラボの結果：<b>${esc(r.text)}</b></div>`;
   else if(p.type==="number"){const tol=p.tol??Math.max(Math.abs(r.v)*0.01,0.005);const d=guess-r.v,hit=Math.abs(d)<=tol;
@@ -85,9 +90,20 @@ const LK=(()=>{
     `<div><span class="ng">✕ 予想と違った</span>　${both}</div><div class="mut">なぜかを1文で書く。</div>`;}
   if(cfg.why)h+=`<div class="lk-why">${esc(cfg.why)}</div>`;
   h+=`<div class="lk-live" id="lk-live" hidden></div>`;
+  if(STEPS){if(si<STEPS.length-1)h+=`<div class="row"><button type="button" class="act" id="lk-next">次の条件で予想する ▶</button></div>`;
+   else if(cfg.law)h+=`<div class="lk-lawask"><div class="mut">ここまでの結果から、決まりを1文で書いてみる。書けたら式で確かめる。</div><div class="row"><button type="button" class="act" id="lk-law">式で説明する ▼</button></div></div><div id="lk-lawbox"></div>`;}
   $("lk-verdict").innerHTML=`<div class="lk-verdict">${h}</div>`;
+  const nx=$("lk-next");if(nx)nx.onclick=nextStep;const lw=$("lk-law");if(lw)lw.onclick=showLaw;
   const ask=$("lk-ask");if(ask)ask.remove();document.querySelector(".lk-task").classList.add("lk-done");
   live();bar();if(EMBED)window.scrollTo(0,0);}
+ // 探究：次の条件へ
+ function histTable(){const p=cfg.predict||{};return `<table class="lk-hist"><tr><th>条件</th><th>予想</th><th>結果</th></tr>${hist.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.guess)}</td><td><b>${esc(r.result)}</b></td></tr>`).join("")}</table>`;}
+ function nextStep(){si++;const s=STEPS[si];cfg.task=s.task;cfg.predict=s.predict;cfg.why=s.why;revealed=false;moved=false;
+  if(s.set&&modes[cur].apply)modes[cur].apply(s.set);if(modes[cur].render)modes[cur].render();
+  taskCard();lock(true);bar();$("lk-bar").hidden=true;if(EMBED)window.scrollTo(0,0);}
+ function showLaw(){const L=cfg.law,box=$("lk-lawbox");if(!L||!box)return;
+  box.innerHTML=`<div class="lk-law">${histTable()}<div class="lk-tt">📐 ${esc(L.title||"式で説明する")}</div>${(L.lines||[]).map(l=>`<div class="l">${esc(l)}</div>`).join("")}${L.text?`<div class="lk-why">${esc(L.text)}</div>`:""}${L.limit?`<div class="lk-limit"><b>この式で言えないこと</b>　${esc(L.limit)}</div>`:""}</div>`;
+  const b=$("lk-law");if(b)b.closest(".lk-lawask").remove();const top=document.querySelector(".lk-task > .lk-hist");if(top)top.remove();}
  function start(def){const tabs=$("tabs");
   const m=cfg.mode&&modes[cfg.mode]?cfg.mode:def;
   const shown=(cfg.modes||(cfg.mode?[cfg.mode]:order)).filter(k=>modes[k]);
@@ -97,8 +113,9 @@ const LK=(()=>{
   if(!$("lk-bar")){const b=document.createElement("div");b.id="lk-bar";b.className="lk-bar";document.body.appendChild(b);}
   order.forEach(k=>modes[k].init&&modes[k].init());
   if(cfg.set&&modes[m].apply)modes[m].apply(cfg.set);
+  if(STEPS&&STEPS[0].set&&modes[m].apply)modes[m].apply(STEPS[0].set);
   show(m);fixPicks();taskCard();if(cfg.predict)lock(true);
   if(!cfg.predict){const t=$("lk-task");if(t&&EMBED)t.after($("lk-bar"));bar();}else $("lk-bar").hidden=true;
   ["input","change","click"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest(".mode"))moved=true;setTimeout(live,0);}));}
- return {cfg,$,esc,register,show,start,stepper,setRange,formula,fmtNum,embed:EMBED,focus:FOCUS,get last(){return last;},get locked(){return locked;},value:k=>modes[cur].value(k),get mode(){return cur;}};
+ return {cfg,$,esc,get step(){return si;},register,show,start,stepper,setRange,formula,fmtNum,embed:EMBED,focus:FOCUS,get last(){return last;},get locked(){return locked;},value:k=>modes[cur].value(k),get mode(){return cur;}};
 })();

@@ -1,0 +1,59 @@
+id: LAB-graph
+name: 統計図ラボ
+slug: graph                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: graph_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: []              # 新しく作ったラボ（数字と図のつながりを触って覚える）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: link
+    name: 図をつなげる
+    purpose: 同じデータを点・ヒストグラム・箱ひげ図で縦に並べる。点を指で動かす（または選んだ点の値を変える）と、図・平均・中央値・四分位数・外れ値がいっしょに変わる
+    set: [data, w, pick, value]          # pick＝何番目に小さい値を動かすか（0から。max で最大）、value＝その値
+    values: [mean, median, q1, q3, iqr, outliers, modeClass, max]
+  - key: stem
+    name: 幹葉図
+    purpose: 十の位を幹・一の位を葉にした幹葉図と、それを倒した幅10のヒストグラムを並べる。真ん中の葉に色を付ける
+    set: [data, max]
+    values: [median, topStem, maxStemCount, nStems]
+  - key: cum
+    name: 累積の折れ線
+    purpose: 累積相対度数の折れ線。割合 p のところの値を読む（0.5 で中央値のおよその値）。表と本当の中央値も並べる
+    set: [data, w, p]
+    values: [xq, median, "below:30", "below:20"]
+  - key: qual
+    name: 質的データの図
+    purpose: カテゴリの度数を棒グラフ・円グラフ・帯グラフ・パレート図で表す。度数を変えると割合・中心角・上位の累積がいっしょに変わる
+    set: [kind, n]                       # kind：bar／pie／band／pareto。n＝5つのカテゴリ（食品・日用品・衣料・家電・その他）の度数
+    values: [topName, topShare, "share:0", "angle:0", top2]
+data: 20日の売上 12〜55万円（分布ラボと同じ）。9個 3〜30。8日の来店客数 47〜120。売れた商品の部門（食品45・日用品25・衣料15・家電10・その他5）
+presets:
+  s1-link:
+    mode: link
+    set: {data: sales, w: 10, pick: 9, value: 40}
+    task: 20日の売上で、10番目に小さい値（26万円）を40万円に動かした。中央値は（万円）？
+    predict: {type: number, key: median, label: "中央値", unit: "万円"}
+    expect: 27.5
+    why: 並べ直すと10番目と11番目が27と28になり、中央値は27.5。真ん中の値を動かすと中央値と箱が動き、端の値（55）を動かしても中央値は動かない。
+  s2-cum:
+    mode: cum
+    set: {data: sales, w: 10, p: 0.5}
+    task: 20日の売上の累積相対度数の折れ線で、累積0.5 に当たる値を読むと（万円、小数1けた）？
+    predict: {type: number, key: xq, label: "読んだ値", unit: "万円"}
+    expect: 26.7
+    why: 20〜30 の階級の中を一様とみて、20＋(0.5−0.2)÷0.45×10≒26.7。本当の中央値26.5 に近いが、ぴったりではない。
+  s4-link:
+    mode: link
+    modes: [link, stem, cum]
+    task: 9個のデータや来店客数に切り替え、点を1つずつ動かして、ヒストグラム・箱ひげ図・累積の折れ線がどう変わるかを見る。
+  s5-free:
+    mode: link
+    modes: [link, stem, cum, qual]
+    task: 4つの図を切り替え、同じデータでも図によって見えること・見えないことを比べる。
+used_by: [U04, U05]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/graph_lab/check.js        # 本文の値（中央値27.5、累積0.5 で26.7、幹2 の葉9個、食品の中心角162°）と、点のドラッグ
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null
