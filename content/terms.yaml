@@ -272,3 +272,12 @@
 - id: TERM-crosstab
   name: クロス集計表
   en: cross tabulation
+- id: TERM-scatter
+  name: 散布図
+  en: scatter plot
+- id: TERM-partial-corr
+  name: 偏相関係数
+  en: partial correlation coefficient
+- id: TERM-spurious
+  name: 擬相関
+  en: spurious correlation

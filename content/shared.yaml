@@ -15,6 +15,7 @@ domains:
   D4: {name: ④ 標本分布, icon: "🔬", tone: green}
   D5: {name: ⑤ 推定, icon: "📏", tone: pink}
   D6: {name: ⑥ 検定, icon: "⚖️", tone: red}
+  D7: {name: ⑦ 相関・回帰, icon: "🔗", tone: brown}
 
 total_units: 32
 
@@ -49,6 +50,7 @@ refs:
   REF-Q-U25: 確認問題（記述式）
   REF-Q-U26: 確認問題（記述式）
   REF-Q-U27: 確認問題（記述式）
+  REF-Q-U28: 確認問題（記述式）
   REF-Q-U05T-1: 確認問題（T1 増減率）
   REF-Q-U05T-2: 確認問題（T2 平均成長率）
   REF-Q-U05T-3: 確認問題（T3 移動平均）

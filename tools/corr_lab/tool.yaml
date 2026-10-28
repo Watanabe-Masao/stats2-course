@@ -1,0 +1,75 @@
+id: LAB-corr
+name: 相関ラボ
+slug: corr                       # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: corr_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_reg.html]  # 旧版 教科書28 の「散布図と r、外れ値1つの影響」を scatter に、「偏相関 0.8・0.8・0.8 → 0.444」を partial に含む。回帰直線は U29 で扱う
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: scatter
+    name: 散布図
+    purpose: 点をドラッグで動かすと、平均の十字・偏差の長方形（積の正負で色分け）・偏差の積の和・共分散・相関係数・表が同時に動く。点を足す・消す・元に戻す
+    set: [data]                          # data は "x,y x,y …"（空白区切り）
+    values: [n, xbar, ybar, sxy, cov, covn, sxx, syy, sx, sy, r, vsum, sign]   # sign は「正」（r≧0.2）／「ほぼ0」／「負」（r≦−0.2）
+  - key: unit
+    name: 単位を変える
+    purpose: x を a 倍して b を足す、y を c 倍する。散布図の形は変わらず、共分散は a×c 倍、r は変わらない（a×c が負なら符号だけ逆）
+    set: [data, a, b, c]
+    values: [cov0, r0, cov, r, ratio]
+  - key: strata
+    name: 層別と擬相関
+    purpose: 冬と夏の2群（群の中は r＝0）。群の中心の差 d を広げると、合わせた r だけが大きくなる。季節（0・1）で取り除いた偏相関は0
+    set: [d]
+    values: [r, rA, rB, rxz, ryz, rp]
+  - key: partial
+    name: 偏相関
+    purpose: r_xy・r_xz・r_yz から偏相関 r_xy・z を出し、3つの変数の相関を線の太さで描く
+    set: [rxy, rxz, ryz]
+    values: [rp]
+  - key: range
+    name: 範囲を絞る
+    purpose: 12店の広告費と売上。x がある値以上の店だけに絞ると r がどう変わるか。除いた店は灰色
+    set: [xmin]
+    values: [r, n, rAll]
+  - key: rtest
+    name: 無相関の検定
+    purpose: t＝r√(n−2)÷√(1−r²)（自由度 n−2）と両側の p 値、両側5%の境目（3桁）
+    set: [r, n]
+    values: [t, df, p, crit, decision]
+data: 点は場面ごとに data で渡す（なければ旧版の例題 (1,3)(2,5)(3,4)(4,6)(5,7)）。範囲を絞るの12店と層別の2群はラボに固定。t の点は数値計算を3桁に丸めた値（数表と同じ）
+presets:
+  s1-scatter:
+    mode: scatter
+    set: {data: "1,3 2,5 3,4 4,6 5,7"}
+    task: 5週の広告回数 x と来店者数 y は (1,3)(2,5)(3,4)(4,6)(5,7)。相関係数 r を（小数で）予想する。
+    predict: {type: number, key: r, label: "r"}
+    expect: 0.9
+    why: 偏差の積の和9、x と y の偏差平方和はどちらも10 で、r＝9÷√(10×10)＝0.9。積が0の点（灰色）は r に効かない。
+  s1-outlier:
+    mode: scatter
+    set: {data: "1,3 2,5 3,4 4,6 5,1"}
+    task: 例題Aの5週目だけ来店者数が1になった。相関は正・ほぼ0・負のどれか。
+    predict: {type: choice, key: sign, label: "相関は", options: [正, ほぼ0, 負]}
+    expect: 負
+    why: r≒−0.25。右下の長方形（積が−）が1つ大きくなり、全体が負に傾く。点を7まで戻すと r＝0.9 に戻る。
+  s3-free:
+    mode: scatter
+    modes: [scatter, unit, strata, partial, range, rtest]
+    task: 解いてから、問題が聞いていること（r の計算、単位、層別、偏相関、範囲、検定）に合うモードで確かめる。
+  s4-free:
+    mode: scatter
+    modes: [scatter, strata, range]
+    task: 自分の売場の2つの数字（たとえば気温と売上）を点で入れ、散布図と r を読む。層別や範囲を絞ったときの変化も見る。
+  s5-free:
+    mode: rtest
+    modes: [rtest, partial]
+    task: 「無相関の検定」で r を0.3 に固定し、n を変えて有意になる n を探す（発展1）。「偏相関」で r_xz と r_yz を0に近づけると、偏相関が r_xy に戻ることを見る（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（散布図、単位、層別、偏相関、範囲、検定）。
+used_by: [U28]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/corr_lab/check.js         # 本文の値（Σ積9・共分散2.25・r＝0.9、単位変換、層別、偏相関0.444、範囲、t）とドラッグ
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

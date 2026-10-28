@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>相関ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+:root{--pos:#c2410c;--neg:#0b63c9}
+@media (prefers-color-scheme:dark){:root{--pos:#ff9a5c;--neg:#4c9bff}}
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.pic svg{touch-action:none;user-select:none;-webkit-user-select:none}
+.lk-locked .pic{opacity:1}
+.pt{cursor:grab}
+.hint{font-size:12px;color:var(--mut);margin:2px 0 0}
+</style></head><body>
+<h1>🧪 相関ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-scatter" class="mode">
+ <p class="mut" style="margin:0">点を指で動かすと、平均の十字・偏差の長方形・共分散・相関係数 r が同時に動く。右上と左下（偏差の積が＋）の長方形が多いほど r は＋、左上と右下（積が−）が多いほど −。</p>
+ <div class="ctl pic" id="sbox"></div>
+ <p class="hint ctl">点はドラッグで動く（0.5 刻み）。</p>
+ <div class="row ctl"><button type="button" class="sub" id="sadd">点を足す</button><button type="button" class="sub" id="sdel">点を消す</button><button type="button" class="sub" id="sreset">元に戻す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="ssum"></div>
+ <div class="res det" id="stab"></div>
+</div>
+
+<div id="m-unit" class="mode">
+ <p class="mut" style="margin:0">単位を変える（x を a 倍して b を足す、y を c 倍する）。散布図の形は変わらないので r は変わらない。共分散は a×c 倍になる。</p>
+ <div class="ctl pic" id="ubox"></div>
+ <input type="range" id="ua" min="-3" max="3" step="0.01" value="1.8" data-name="x の倍率 a">
+ <input type="range" id="ub" min="-100" max="100" step="1" value="32" data-name="x に足す b">
+ <input type="range" id="uc" min="0.1" max="10" step="0.1" value="1" data-name="y の倍率 c">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="usum"></div>
+</div>
+
+<div id="m-strata" class="mode">
+ <p class="mut" style="margin:0">冬（●）と夏（▲）の2つの群。群の中では x と y に関係がないのに、2群を合わせると r が出る（擬相関）。群の中心を離すと、合わせた r だけが大きくなる。</p>
+ <div class="ctl pic" id="tbox"></div>
+ <input type="range" id="td" min="0" max="8" step="0.5" value="4" data-name="群の中心の差 d">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<div id="m-partial" class="mode">
+ <p class="mut" style="margin:0">第3の変数 z の影響を直線的に取り除いた x と y の相関（偏相関係数）。r_xy・z＝(r_xy−r_xz r_yz)÷√((1−r_xz²)(1−r_yz²))。</p>
+ <input type="range" id="pxy" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_xy">
+ <input type="range" id="pxz" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_xz">
+ <input type="range" id="pyz" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_yz">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+</div>
+
+<div id="m-range" class="mode">
+ <p class="mut" style="margin:0">12店の広告費 x と売上 y。x が大きい店だけに絞ると（観測範囲を狭めると）、散らばりのうち関係で説明できる部分が減り、r は小さくなりやすい。</p>
+ <div class="ctl pic" id="rbox"></div>
+ <input type="range" id="rmin" min="1" max="10" step="1" value="1" data-name="x がこれ以上">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="rsum"></div>
+</div>
+
+<div id="m-rtest" class="mode">
+ <p class="mut" style="margin:0">H₀：母相関 ρ＝0（無相関）の検定。t＝r√(n−2)÷√(1−r²) が自由度 n−2 の t 分布に従う。同じ r でも n が大きいと有意になる。</p>
+ <input type="range" id="qr" min="-0.99" max="0.99" step="0.01" value="0.5" data-name="相関係数 r">
+ <input type="range" id="qn" min="4" max="200" step="1" value="20" data-name="個数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="qplot"></div>
+ <div class="card res key" id="qsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const tden=(x,k)=>Math.exp(lgam((k+1)/2)-lgam(k/2)-0.5*Math.log(k*Math.PI)-(k+1)/2*Math.log(1+x*x/k));
+
+// 統計量
+function stats(P){const n=P.length;if(n<2)return {n,xbar:NaN,ybar:NaN,sxy:NaN,cov:NaN,covn:NaN,sxx:NaN,syy:NaN,sx:NaN,sy:NaN,r:NaN,vsum:NaN};
+ const xb=P.reduce((s,p)=>s+p[0],0)/n,yb=P.reduce((s,p)=>s+p[1],0)/n;let sxy=0,sxx=0,syy=0;P.forEach(([x,y])=>{sxy+=(x-xb)*(y-yb);sxx+=(x-xb)**2;syy+=(y-yb)**2;});
+ const r=sxx>0&&syy>0?sxy/Math.sqrt(sxx*syy):NaN;
+ return {n,xbar:xb,ybar:yb,sxy,cov:sxy/(n-1),covn:sxy/n,sxx,syy,sx:Math.sqrt(sxx/(n-1)),sy:Math.sqrt(syy/(n-1)),r,vsum:(sxx+syy+2*sxy)/(n-1)};}
+const parse=s=>String(s).trim().split(/\s+/).map(t=>t.split(",").map(Number)).filter(p=>p.length===2&&p.every(isFinite));
+function niceStep(span){const raw=span/5,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+function domain(P){const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ const px=Math.max((x1-x0)*0.15,1),py=Math.max((y1-y0)*0.15,1);x0-=px;x1+=px;y0-=py;y1+=py;const sx=niceStep(x1-x0),sy=niceStep(y1-y0);
+ return {x0:Math.floor(x0/sx)*sx,x1:Math.ceil(x1/sx)*sx,y0:Math.floor(y0/sy)*sy,y1:Math.ceil(y1/sy)*sy,sx,sy};}
+// 散布図：偏差の長方形と平均の十字。opts.drag で点を動かせる
+function scatter(box,P,D,opts){opts=opts||{};const H=opts.h||250,L=34,R=W-10,T=10,B=H-24,X=x=>L+(x-D.x0)/(D.x1-D.x0)*(R-L),Y=y=>B-(y-D.y0)/(D.y1-D.y0)*(B-T);
+ const S=stats(P.filter((p,i)=>!(opts.off&&opts.off[i])));let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(opts.label||"散布図")}">`;
+ for(let x=D.x0;x<=D.x1+1e-9;x+=D.sx)s+=`<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${B}" stroke="var(--line)" stroke-width=".6"/><text x="${X(x)}" y="${B+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${+x.toFixed(6)}</text>`;
+ for(let y=D.y0;y<=D.y1+1e-9;y+=D.sy)s+=`<line x1="${L}" y1="${Y(y)}" x2="${R}" y2="${Y(y)}" stroke="var(--line)" stroke-width=".6"/><text x="${L-4}" y="${Y(y)+3}" font-size="10" text-anchor="end" fill="var(--mut)">${+y.toFixed(6)}</text>`;
+ if(opts.xlab)s+=`<text x="${R}" y="${B-4}" font-size="10" text-anchor="end" fill="var(--mut)">${esc(opts.xlab)}</text>`;
+ if(opts.ylab)s+=`<text x="${L+4}" y="${T+10}" font-size="10" fill="var(--mut)">${esc(opts.ylab)}</text>`;
+ if(isFinite(S.xbar)&&!opts.noRect){P.forEach((p,i)=>{if(opts.off&&opts.off[i])return;const pr=(p[0]-S.xbar)*(p[1]-S.ybar),c=pr>0?"var(--pos)":pr<0?"var(--neg)":"var(--mut)";
+   const x1=X(Math.min(p[0],S.xbar)),x2=X(Math.max(p[0],S.xbar)),y1=Y(Math.max(p[1],S.ybar)),y2=Y(Math.min(p[1],S.ybar));
+   s+=`<rect x="${x1}" y="${y1}" width="${Math.max(0,x2-x1)}" height="${Math.max(0,y2-y1)}" fill="${c}" fill-opacity=".14" stroke="${c}" stroke-opacity=".5" stroke-width=".8"/>`;});
+  s+=`<line x1="${X(S.xbar)}" y1="${T}" x2="${X(S.xbar)}" y2="${B}" stroke="var(--fg)" stroke-dasharray="4 3" stroke-width="1.2"/><line x1="${L}" y1="${Y(S.ybar)}" x2="${R}" y2="${Y(S.ybar)}" stroke="var(--fg)" stroke-dasharray="4 3" stroke-width="1.2"/>`;}
+ P.forEach((p,i)=>{const off=opts.off&&opts.off[i],sh=opts.shape?opts.shape[i]:"c";const pr=isFinite(S.xbar)?(p[0]-S.xbar)*(p[1]-S.ybar):0,c=off?"var(--mut)":opts.colors?opts.colors[i]:pr>0?"var(--pos)":pr<0?"var(--neg)":"var(--mut)";
+  const cx=X(p[0]),cy=Y(p[1]),st=`fill="${c}" fill-opacity="${off?.35:.9}" stroke="var(--bg)" stroke-width="2"`;
+  s+=sh==="t"?`<path class="pt" data-i="${i}" d="M${cx} ${cy-7}L${cx+7} ${cy+5}L${cx-7} ${cy+5}Z" ${st}/>`:`<circle class="pt" data-i="${i}" cx="${cx}" cy="${cy}" r="7" ${st}/>`;});
+ box.innerHTML=s+`</svg>`+(opts.legend===false?"":`<div class="legend mut"><span><i class="sw" style="background:var(--pos);opacity:.6"></i>偏差の積＋</span><span><i class="sw" style="background:var(--neg);opacity:.6"></i>偏差の積−</span><span>灰色＝積が0</span><span>点線＝平均の十字</span></div>`);
+ box._st={P,D,L,R,T,B,snap:opts.snap||0.5,drag:opts.drag};
+ if(opts.drag&&!box._on){box._on=true;let di=-1;
+  const at=e=>{const st=box._st,svg=box.querySelector("svg"),m=svg.getScreenCTM().inverse(),pt=new DOMPoint(e.clientX,e.clientY).matrixTransform(m),q=st.snap,D=st.D;
+   return [Math.min(D.x1,Math.max(D.x0,Math.round(((pt.x-st.L)/(st.R-st.L)*(D.x1-D.x0)+D.x0)/q)*q)),Math.min(D.y1,Math.max(D.y0,Math.round(((st.B-pt.y)/(st.B-st.T)*(D.y1-D.y0)+D.y0)/q)*q))];};
+  box.addEventListener("pointerdown",e=>{const t=e.target.closest&&e.target.closest(".pt");if(!t)return;di=+t.dataset.i;box.setPointerCapture(e.pointerId);e.preventDefault();});
+  box.addEventListener("pointermove",e=>{if(di<0)return;const st=box._st,v=at(e),o=st.P[di];if(o[0]===v[0]&&o[1]===v[1])return;st.P[di]=v;st.drag();});
+  const up=()=>{if(di<0)return;di=-1;box.dispatchEvent(new Event("change",{bubbles:true}));};
+  box.addEventListener("pointerup",up);box.addEventListener("pointercancel",up);}}
+const rText=r=>!isFinite(r)?"—":Math.abs(r)>=0.7?(r>0?"強い正の相関":"強い負の相関"):Math.abs(r)>=0.4?(r>0?"中程度の正の相関":"中程度の負の相関"):Math.abs(r)>=0.2?(r>0?"弱い正の相関":"弱い負の相関"):"直線的な関係はほとんどない";
+
+// ---- 散布図
+const DEF="1,3 2,5 3,4 4,6 5,7";
+let sOrig=parse(DEF),sP=sOrig.map(p=>p.slice()),sD=domain(sP);
+function sVals(){const S=stats(sP);return {...S,sign:!isFinite(S.r)?"—":S.r>=0.2?"正":S.r<=-0.2?"負":"ほぼ0",data:sP.map(p=>p.join(",")).join(" ")};}
+function sRender(){scatter($("sbox"),sP,sD,{drag:sRender,label:"散布図と偏差の長方形"});const S=sVals();
+ $("ssum").innerHTML=`<div>x̄＝${f(S.xbar,3)}、ȳ＝${f(S.ybar,3)}（n＝${S.n}）</div><div>偏差の積の和 Σ(x−x̄)(y−ȳ)＝<b>${f(S.sxy,3)}</b>　共分散 s_xy＝${f(S.sxy,3)}÷${S.n-1}＝<b>${f(S.cov,4)}</b></div><div>相関係数 r＝${f(S.sxy,3)}÷√(${f(S.sxx,3)}×${f(S.syy,3)})＝<b>${f(S.r,4)}</b>（${rText(S.r)}）</div><div class="mut">r は偏差の長方形の「＋の面積−−の面積」を、x と y の散らばりで割って −1〜1 にそろえたもの。</div>`;
+ $("stab").innerHTML=`<table><tr><th>x</th><th>y</th><th>x−x̄</th><th>y−ȳ</th><th>積</th></tr>${sP.map(([x,y])=>`<tr><td>${f(x,2)}</td><td>${f(y,2)}</td><td>${f(x-S.xbar,3)}</td><td>${f(y-S.ybar,3)}</td><td>${f((x-S.xbar)*(y-S.ybar),3)}</td></tr>`).join("")}<tr><th>計</th><td></td><td></td><td></td><th>${f(S.sxy,3)}</th></tr></table><div class="mut">Σ(x−x̄)²＝${f(S.sxx,3)}、Σ(y−ȳ)²＝${f(S.syy,3)}、s_x＝${f(S.sx,4)}、s_y＝${f(S.sy,4)}、x＋y の分散＝${f(S.vsum,4)}（＝s_x²＋s_y²＋2s_xy）、n で割る共分散＝${f(S.covn,4)}</div>`;}
+LK.register("scatter",{name:"散布図",
+ init(){$("sadd").onclick=()=>{const S=stats(sP);sP.push([Math.round(((sD.x0+sD.x1)/2)*2)/2,Math.round(((sD.y0+sD.y1)/2)*2)/2]);sRender();};
+  $("sdel").onclick=()=>{if(sP.length>2){sP.pop();sRender();}};$("sreset").onclick=()=>{sP=sOrig.map(p=>p.slice());sD=domain(sP);sRender();};sRender();},
+ apply(s){if(s.data){sOrig=parse(s.data);sP=sOrig.map(p=>p.slice());sD=domain(sP);}sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 単位を変える
+let uP=parse(DEF);
+function uVals(){const a=+$("ua").value,b=+$("ub").value,c=+$("uc").value,S0=stats(uP),Q=uP.map(([x,y])=>[a*x+b,c*y]),S=stats(Q);
+ return {a,b,c,cov0:S0.cov,r0:S0.r,cov:S.cov,r:S.r,ratio:S.cov/S0.cov,Q};}
+function uRender(){const U=uVals();scatter($("ubox"),U.Q,domain(U.Q),{h:200,label:"単位を変えた散布図",xlab:"a x＋b",ylab:"c y"});
+ $("usum").innerHTML=`<table><tr><th></th><th>元の単位</th><th>変えた単位</th></tr><tr><td>共分散</td><td>${f(U.cov0,4)}</td><td><b>${f(U.cov,4)}</b></td></tr><tr><td>相関係数 r</td><td>${f(U.r0,4)}</td><td><b>${f(U.r,4)}</b></td></tr></table><div>共分散は a×c＝${f(U.a*U.c,3)} 倍（b は効かない）。r は a×c が正なら同じ、負なら符号だけ逆。</div>`;}
+LK.register("unit",{name:"単位を変える",
+ init(){["ua","ub","uc"].forEach(id=>LK.stepper($(id),uRender));uRender();},
+ apply(s){if(s.data)uP=parse(s.data);if(s.a!==undefined)LK.setRange("ua",s.a);if(s.b!==undefined)LK.setRange("ub",s.b);if(s.c!==undefined)LK.setRange("uc",s.c);uRender();},
+ render:uRender,
+ value(key){const U=uVals(),v=U[key];return {v,text:f(v)};}});
+
+// ---- 層別（擬相関）
+const BASE=[[-2,-1],[-2,1],[0,-1],[0,1],[2,-1],[2,1]];
+function tVals(){const d=+$("td").value,A=BASE.map(([x,y])=>[4+x,4+y]),B=BASE.map(([x,y])=>[4+d+x,4+d+y]),all=A.concat(B),z=A.map(()=>0).concat(B.map(()=>1));
+ const r=stats(all).r,rA=stats(A).r,rB=stats(B).r,rxz=stats(all.map((p,i)=>[p[0],z[i]])).r,ryz=stats(all.map((p,i)=>[p[1],z[i]])).r;
+ const den=Math.sqrt((1-rxz*rxz)*(1-ryz*ryz)),rp=den>1e-12?(r-rxz*ryz)/den:r;
+ return {d,r,rA,rB,rxz,ryz,rp,all,A,B};}
+function tRender(){const T=tVals(),D={x0:0,x1:16,y0:0,y1:16,sx:4,sy:4};
+ scatter($("tbox"),T.all,D,{h:230,label:"2群の散布図",shape:T.all.map((p,i)=>i<6?"c":"t"),colors:T.all.map((p,i)=>i<6?"var(--neg)":"var(--pos)"),xlab:"x",ylab:"y",legend:false});
+ $("tbox").insertAdjacentHTML("beforeend",`<div class="legend mut"><span>● 冬（青）</span><span>▲ 夏（橙）</span><span>点線＝全体の平均</span></div>`);
+ $("tsum").innerHTML=`<div>2群を合わせた r＝<b>${f(T.r,4)}</b></div><div>冬だけ r＝${f(T.rA,4)}、夏だけ r＝${f(T.rB,4)}</div><div>季節 z（冬0・夏1）の影響を取り除いた偏相関 r_xy・z＝<b>${f(T.rp,4)}</b></div><div class="mut">合わせた r は「季節」という共通の原因から生まれた見かけの相関。群ごと（層別）に見るか、偏相関で季節を取り除く。</div>`;}
+LK.register("strata",{name:"層別と擬相関",
+ init(){LK.stepper($("td"),tRender);tRender();},
+ apply(s){if(s.d!==undefined)LK.setRange("td",s.d);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key];return {v,text:f(v)};}});
+
+// ---- 偏相関係数
+function pVals(){const a=+$("pxy").value,b=+$("pxz").value,c=+$("pyz").value,den=Math.sqrt((1-b*b)*(1-c*c)),rp=(a-b*c)/den,ok=1-a*a-b*b-c*c+2*a*b*c>=-1e-12;return {rxy:a,rxz:b,ryz:c,rp,ok};}
+function pRender(){const P=pVals(),H=150,cx={x:[60,120],y:[280,120],z:[170,30]};
+ const edge=(u,v,r,lab)=>{const w=1+Math.abs(r)*7,c=r>=0?"var(--pos)":"var(--neg)",mx=(cx[u][0]+cx[v][0])/2,my=(cx[u][1]+cx[v][1])/2;return `<line x1="${cx[u][0]}" y1="${cx[u][1]}" x2="${cx[v][0]}" y2="${cx[v][1]}" stroke="${c}" stroke-width="${w}" stroke-opacity=".7"/><text x="${mx}" y="${my-6}" font-size="11" text-anchor="middle" fill="var(--fg)">${lab}</text>`;};
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="3つの変数の相関">`+edge("x","y",P.rxy,"r_xy "+f(P.rxy,2))+edge("x","z",P.rxz,"r_xz "+f(P.rxz,2))+edge("y","z",P.ryz,"r_yz "+f(P.ryz,2));
+ ["x","y","z"].forEach(k=>s+=`<circle cx="${cx[k][0]}" cy="${cx[k][1]}" r="16" fill="var(--card)" stroke="var(--fg)"/><text x="${cx[k][0]}" y="${cx[k][1]+5}" font-size="14" text-anchor="middle" fill="var(--fg)">${k}</text>`);
+ $("pplot").innerHTML=s+`</svg><div class="legend mut"><span>線の太さ＝相関の強さ</span><span><i class="sw" style="background:var(--pos)"></i>正</span><span><i class="sw" style="background:var(--neg)"></i>負</span></div>`;
+ $("psum").innerHTML=`<div>r_xy・z＝(${f(P.rxy,2)}−${f(P.rxz,2)}×${f(P.ryz,2)})÷√((1−${f(P.rxz,2)}²)(1−${f(P.ryz,2)}²))＝<b>${f(P.rp,4)}</b></div><div>z を取り除く前の r_xy＝${f(P.rxy,2)}</div>${P.ok?"":`<div class="ng">この3つの組み合わせは同時には起こりえない（相関行列が成り立たない）</div>`}<div class="mut">z と x・y の両方に強い相関があると、r_xy の多くは z を通した見かけの関係。偏相関が残っても、ほかの交絡がないとは言えない。</div>`;}
+LK.register("partial",{name:"偏相関",
+ init(){["pxy","pxz","pyz"].forEach(id=>LK.stepper($(id),pRender));pRender();},
+ apply(s){if(s.rxy!==undefined)LK.setRange("pxy",s.rxy);if(s.rxz!==undefined)LK.setRange("pxz",s.rxz);if(s.ryz!==undefined)LK.setRange("pyz",s.ryz);pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:typeof v==="boolean"?String(v):f(v)};}});
+
+// ---- 範囲を絞る
+const RX=[1,2,3,4,5,6,7,8,9,10,11,12],RY=[15,8,16,24,17,25,18,26,34,27,35,31];
+function rVals(){const m=+$("rmin").value,all=RX.map((x,i)=>[x,RY[i]]),sel=all.filter(p=>p[0]>=m),S=stats(sel);return {xmin:m,n:sel.length,r:S.r,rAll:stats(all).r,all};}
+function rRender(){const Rr=rVals(),D={x0:0,x1:14,y0:0,y1:40,sx:2,sy:10};
+ const off=Rr.all.map(p=>p[0]<Rr.xmin);scatter($("rbox"),Rr.all,D,{h:220,off,label:"範囲を絞った散布図",xlab:"広告費 x",ylab:"売上 y"});
+ $("rsum").innerHTML=`<div>全12店の r＝${f(Rr.rAll,4)}</div><div>x が ${Rr.xmin} 以上の ${Rr.n} 店だけの r＝<b>${f(Rr.r,4)}</b></div><div class="mut">灰色の点は除いた店。範囲を狭めると、関係が同じでも r は小さく見えやすい。調べた範囲の外に結論を広げない。</div>`;}
+LK.register("range",{name:"範囲を絞る",
+ init(){LK.stepper($("rmin"),rRender);rRender();},
+ apply(s){if(s.xmin!==undefined)LK.setRange("rmin",s.xmin);rRender();},
+ render:rRender,
+ value(key){const Rr=rVals(),v=Rr[key];return {v,text:f(v)};}});
+
+// ---- 無相関の検定
+function qVals(){const r=+$("qr").value,n=+$("qn").value,k=n-2,t=r*Math.sqrt(k)/Math.sqrt(1-r*r),p=2*(1-tcdf(Math.abs(t),k)),crit=Math.round(inv(x=>tcdf(x,k),0.975,0,60)*1000)/1000;
+ return {r,n,df:k,t,p,crit,decision:Math.abs(t)>crit?"棄却する":"棄却しない"};}
+function qRender(){const Q=qVals(),H=140,L=12,R=W-12,base=H-24,top=28,x0=-5,x1=5,X=x=>L+(x-x0)/(x1-x0)*(R-L),mx=tden(0,Q.df)*1.1,Y=y=>base-y/mx*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="t 分布">`;const a=Math.abs(Q.t);
+ [[-9,-a],[a,9]].forEach(([u,v])=>{const lo=Math.max(u,x0),hi=Math.min(v,x1);if(hi<=lo)return;let p=`M${X(lo)} ${base}`;for(let i=0;i<=60;i++){const x=lo+(hi-lo)*i/60;p+=` L${X(x).toFixed(1)} ${Y(tden(x,Q.df)).toFixed(1)}`;}s+=`<path d="${p} L${X(hi)} ${base} Z" fill="var(--acc2)" fill-opacity=".45"/>`;});
+ let d="";for(let i=0;i<=200;i++){const x=x0+(x1-x0)*i/200;d+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(tden(x,Q.df)).toFixed(1);}s+=`<path d="${d}" fill="none" stroke="var(--acc)" stroke-width="2"/><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [-4,-2,0,2,4].forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x}</text>`);
+ const placed=[];[{x:Q.t,l:`t＝${f(Q.t,2)}`,c:"var(--fg)",dash:"2 2"},{x:Q.crit,l:Q.crit.toFixed(3),c:"var(--acc)"},{x:-Q.crit,l:(-Q.crit).toFixed(3),c:"var(--acc)"}].forEach(o=>{const lx=X(Math.max(x0,Math.min(x1,o.x))),near=placed.some(p=>Math.abs(p-lx)<36),ly=near?top-16:top-4;if(!near)placed.push(lx);
+  s+=`<line x1="${lx}" y1="${top}" x2="${lx}" y2="${base}" stroke="${o.c}" stroke-dasharray="${o.dash||"4 3"}" stroke-width="1.5"/><text x="${lx}" y="${ly}" font-size="10.5" text-anchor="${lx>W*0.75?"end":lx<W*0.25?"start":"middle"}" fill="${o.c}">${esc(o.l)}</text>`;});
+ $("qplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${Q.df})</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>p 値（両側）</span></div>`;
+ $("qsum").innerHTML=`<div>t＝${f(Q.r,2)}×√${Q.df}÷√(1−${f(Q.r,2)}²)＝<b>${f(Q.t,3)}</b>（自由度 ${Q.df}）</div><div>両側5%の境目 ±${Q.crit.toFixed(3)}　p 値＝<b>${f(Q.p)}</b> → H₀ を <b>${Q.decision}</b></div><div class="mut">有意でも「相関が強い」とは限らない。n が大きいと、弱い相関でも有意になる。</div>`;}
+LK.register("rtest",{name:"無相関の検定",
+ init(){["qr","qn"].forEach(id=>LK.stepper($(id),qRender));qRender();},
+ apply(s){if(s.r!==undefined)LK.setRange("qr",s.r);if(s.n!==undefined)LK.setRange("qn",s.n);qRender();},
+ render:qRender,
+ value(key){const Q=qVals(),v=Q[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+LK.start("scatter");
+window.__LAB__={LK,sVals,uVals,tVals,pVals,rVals,qVals,stats};
+</script>
+</body></html>

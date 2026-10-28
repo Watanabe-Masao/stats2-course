@@ -1,0 +1,294 @@
+# 単元U28の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U28-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    3日間のチラシの枚数 x（百枚）と売上 y（万円）は、(1,2)(2,4)(3,5)。共分散と相関係数を求めよ。
+
+    x̄＝□、ȳ＝□。偏差の積の和＝(−1)×(□)＋0×(□)＋1×(□)＝□。共分散＝□÷2＝□。Σ(x−x̄)²＝□、Σ(y−ȳ)²＝□。r＝□÷√(□×□)≒□。
+  answer_title: 答え（埋めてから開く）
+  answer: x̄＝**2**、ȳ＝11÷3≒**3.667**。y の偏差は −5/3, 1/3, 4/3。偏差の積の和＝5/3＋0＋4/3＝**3**。共分散＝3÷2＝**1.5**。Σ(x−x̄)²＝**2**、Σ(y−ȳ)²＝25/9＋1/9＋16/9＝**14/3**。r＝3÷√(2×14/3)≒**0.982**。強い正の直線関係だが、3点だけでは偶然の可能性も大きい。
+  checks:
+    - '(1+2+3)/3 == 2 and abs((2+4+5)/3 - 11/3) < 1e-12 and abs((-1)*(2-11/3)+0+1*(5-11/3) - 3) < 1e-12 and 3/2 == 1.5 and abs((2-11/3)**2+(4-11/3)**2+(5-11/3)**2 - 14/3) < 1e-12 and abs(3/math.sqrt(2*14/3) - 0.982) < 0.0005 and abs(11/3 - 3.667) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "1,2 2,4 3,5"}
+    task: 3点 (1,2)(2,4)(3,5)。相関係数 r は（小数で）？
+    predict: {type: number, key: r, label: "r"}
+    expect: 0.982
+    why: r＝3÷√(2×14/3)≒0.982。真ん中の点を上下に動かすと、3点しかないので r が大きく動く。
+
+- id: Q-U28-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 5日間の気温 x（℃）と売上 y（万円）は (20,30)(22,34)(24,33)(26,38)(28,40)。共分散は12、相関係数は約0.949。気温を華氏（°F＝1.8×℃＋32）に直すと、共分散と相関係数はそれぞれいくつになるか。理由も述べよ。
+  answer: 共分散は**1.8倍の21.6**（＋32 は偏差に効かない）。相関係数は**0.949 のまま**。r は共分散を x と y の標準偏差で割るので、x の標準偏差も1.8倍になって打ち消し合う。単位を変えても散布図の形は変わらない。
+  checks:
+    - 'abs(sum((x-24)*(y-35) for x,y in [(20,30),(22,34),(24,33),(26,38),(28,40)])/4 - 12) < 1e-12 and abs(48/math.sqrt(40*64) - 0.949) < 0.0005 and abs(1.8*12 - 21.6) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: unit
+    set: {data: "20,30 22,34 24,33 26,38 28,40", a: 1.8, b: 32, c: 1}
+    task: 気温を ℃ から °F（1.8倍して32を足す）に直す。共分散は（小数で）？
+    predict: {type: number, key: cov, label: "°F での共分散"}
+    expect: 21.6
+    why: 12×1.8＝21.6。r は0.9487 のまま。a をマイナスにすると r の符号だけが変わる。
+
+- id: Q-U28-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: x＝1, 2, 3, 4, 5 に対して y＝3x＋2（5, 8, 11, 14, 17）のとき、相関係数はいくつか。y＝−3x＋20 ならどうか。
+  answer: すべての点が右上がりの直線に乗るので **r＝1**。y＝−3x＋20 なら右下がりの直線で **r＝−1**。傾きが3でも0.5でも、直線に乗っていれば r＝1（r は傾きの大きさではない）。
+  checks:
+    - 'abs(sum((x-3)*(3*x+2-11) for x in range(1,6))/math.sqrt(sum((x-3)**2 for x in range(1,6))*sum((3*x+2-11)**2 for x in range(1,6))) - 1) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "1,5 2,8 3,11 4,14 5,17"}
+    task: x＝1〜5、y＝3x＋2 の5点。相関係数 r は？
+    predict: {type: number, key: r, label: "r"}
+    expect: 1
+    why: 全部の点が直線上にあり、長方形はすべて＋。1点を直線から外すと1より小さくなる。
+
+- id: Q-U28-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P3]
+  prompt: x＝−2, −1, 0, 1, 2 に対して y＝x²（4, 1, 0, 1, 4）。相関係数を求めよ。「x と y には関係がない」と言ってよいか。
+  answer: x̄＝0、ȳ＝2。偏差の積は (−2)(2)＋(−1)(−1)＋0＋(1)(−1)＋(2)(2)＝−4＋1＋0−1＋4＝0 なので **r＝0**。ただし y は x で完全に決まる（曲線の関係）。r＝0 は「**直線的な**関係がない」だけで、関係がないとは言えない。散布図を必ず見る。
+  checks:
+    - 'sum(x*(x*x-2) for x in range(-2,3)) == 0 and sum(x*x for x in range(-2,3))/5 == 2'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "-2,4 -1,1 0,0 1,1 2,4"}
+    task: y＝x² の5点（x＝−2〜2）。相関係数 r は？
+    predict: {type: number, key: r, label: "r"}
+    expect: 0
+    why: 左上と右上の長方形が打ち消し合う。右側だけ（x≧0）なら強い正の相関になる。
+
+- id: Q-U28-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 5店の (1,2)(2,1)(3,3)(4,2)(5,3) では r≒0.57。ここに大型店 (12,12) を1つ加えると r はどうなるか。この r で「x と y には強い関係がある」と言ってよいか。
+  answer: 6店で r≒**0.95**。大型店1つが平均の十字から遠く、右上に巨大な＋の長方形を作るため、r の大半がこの1点で決まる。強い関係とは言えない。外れ値を除いた r と並べて報告し、散布図を見せる。
+  checks:
+    - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,2),(2,1),(3,3),(4,2),(5,3)]) - 0.567) < 0.0005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,2),(2,1),(3,3),(4,2),(5,3),(12,12)]) - 0.955) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "1,2 2,1 3,3 4,2 5,3 12,12"}
+    task: 5店に大型店 (12,12) を加えた6店。相関係数 r は（小数で）？
+    predict: {type: number, key: r, label: "r"}
+    expect: 0.9548
+    why: 右上の大きな長方形1つで r が0.57 から0.95 に上がる。「点を消す」で最後の点を外すと元に戻る。
+
+- id: Q-U28-010
+  stage: S2
+  format: written
+  powers: [P1, P2]
+  prompt: 4店の売場面積 x（十m²）と売上 y（百万円）は (2,1)(4,3)(6,2)(8,6)。偏差の積の和・共分散・相関係数を求めよ。
+  answer: x̄＝5、ȳ＝3。x の偏差 −3, −1, 1, 3、y の偏差 −2, 0, −1, 3。偏差の積の和＝6＋0−1＋9＝**14**。共分散＝14÷3≒**4.67**。Σ(x−x̄)²＝20、Σ(y−ȳ)²＝14 で、r＝14÷√(20×14)≒**0.837**。
+  checks:
+    - 'sum((x-5)*(y-3) for x,y in [(2,1),(4,3),(6,2),(8,6)]) == 14 and abs(14/3 - 4.67) < 0.005 and sum((x-5)**2 for x in [2,4,6,8]) == 20 and sum((y-3)**2 for y in [1,3,2,6]) == 14 and abs(14/math.sqrt(280) - 0.837) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "2,1 4,3 6,2 8,6"}
+    task: 4店 (2,1)(4,3)(6,2)(8,6)。共分散（n−1 で割る）は（小数で）？
+    predict: {type: number, key: cov, label: "共分散"}
+    expect: 4.6667
+    why: 14÷3≒4.67。3店目 (6,2) は右下で積が−1。この点を上げると共分散も r も上がる。
+
+- id: Q-U28-011
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 例題Aの来店者数 y の単位を「百人」から「十人」に変える（y を10倍）。共分散と相関係数はそれぞれいくつになるか。
+  answer: 共分散は10倍の **22.5**、相関係数は **0.9 のまま**。共分散は単位をかけ合わせた量（回×十人）なので単位で変わる。関係の強さを比べるときは r を使う。
+  checks:
+    - 'abs(2.25*10 - 22.5) < 1e-12 and abs(90/math.sqrt(10*1000) - 0.9) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: unit
+    set: {data: "1,3 2,5 3,4 4,6 5,7", a: 1, b: 0, c: 10}
+    task: 例題Aの y を10倍（百人→十人）。共分散は（小数で）？
+    predict: {type: number, key: cov, label: "共分散"}
+    expect: 22.5
+    why: 2.25×10＝22.5。r は0.9 のまま。散布図は目盛りが変わるだけで形は同じ。
+
+- id: Q-U28-012
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 例題Aで、x の不偏分散は2.5、y の不偏分散は2.5、共分散は2.25。広告回数と来店者数の和 x＋y の分散を、{{unit:U13}} の式で求めよ。x と y が無相関だったらいくつか。
+  answer: V(x＋y)＝2.5＋2.5＋2×2.25＝**9.5**。無相関（共分散0）なら 2.5＋2.5＝**5**。正の相関があると、和のばらつきは大きくなる。
+  checks:
+    - '10/4 == 2.5 and 2.5+2.5+2*2.25 == 9.5 and 2.5+2.5 == 5'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "1,3 2,5 3,4 4,6 5,7"}
+    task: 例題Aの x＋y の分散（n−1 で割る）は（小数で）？（「くわしく」の表の下に出る）
+    predict: {type: number, key: vsum, label: "x＋y の分散"}
+    expect: 9.5
+    why: 2.5＋2.5＋2×2.25＝9.5。点を動かして共分散を0に近づけると5に近づく。
+
+- id: Q-U28-020
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 冬の6日と夏の6日について、ある2つの売上 x・y を点に打つと、冬だけ・夏だけではどちらも r＝0 だが、12日を合わせると r≒0.69 になった。この r をどう読むか。どう分析し直すか。
+  answer: 合わせた r≒**0.69** は、季節という共通の原因で、冬は x も y も小さく夏は両方大きいことから生まれた**擬相関**。同じ季節の中では関係がない。季節で分けて（**層別**して）散布図と r を見るか、季節の影響を取り除いた偏相関（この例では0）を求める。
+  checks:
+    - 'abs(48/math.sqrt(80*60) - 0.69) < 0.005'
+  lab:
+    id: LAB-corr
+    mode: strata
+    set: {d: 4}
+    task: 冬と夏の2群（群の中は r＝0）、中心の差 d＝4。2群を合わせた r は（小数で）？
+    predict: {type: number, key: r, label: "合わせた r"}
+    expect: 0.6928
+    why: 群の中心がずれているだけで r≒0.69。d を0にすると0、d を8 にすると約0.90。季節で取り除いた偏相関は0。
+
+- id: Q-U28-021
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 気温 z、アイスの売上 x、飲料の売上 y について、r_xy＝0.8、r_xz＝0.8、r_yz＝0.8 だった。気温の影響を取り除いた x と y の偏相関係数を求めよ。
+  answer: r_xy・z＝(0.8−0.8×0.8)÷√((1−0.64)(1−0.64))＝0.16÷0.36≒**0.444**。0.8 の相関の多くは気温を通した関係で、気温をそろえると関係は弱まる。ただし偏相関が残っても、ほかの共通原因がないとは言えない。
+  checks:
+    - 'abs((0.8-0.64)/0.36 - 0.444) < 0.0005 and abs(0.8*0.8 - 0.64) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: partial
+    set: {rxy: 0.8, rxz: 0.8, ryz: 0.8}
+    task: r_xy＝r_xz＝r_yz＝0.8。偏相関 r_xy・z は（小数で）？
+    predict: {type: number, key: rp, label: "r_xy・z"}
+    expect: 0.4444
+    why: 0.16÷0.36≒0.444。r_xz・r_yz を0 にすると偏相関は0.8 に戻る。
+
+- id: Q-U28-022
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 12店の広告費 x と売上 y の相関は r≒0.86。広告費が8以上の大型の5店だけで見ると r≒0.43 だった。「大型店では広告の効果が小さい」と言ってよいか。
+  answer: 言えない。x の範囲を狭めると、y の散らばりのうち x で説明できる部分が小さくなり、関係が同じでも r は小さく出やすい（**範囲の制限**）。5店しかないので偶然の影響も大きい。傾き（{{unit:U29}}）や範囲を広げたデータで確かめる。
+  checks:
+    - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,15),(2,8),(3,16),(4,24),(5,17),(6,25),(7,18),(8,26),(9,34),(10,27),(11,35),(12,31)]) - 0.86) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(8,26),(9,34),(10,27),(11,35),(12,31)]) - 0.43) < 0.005'
+  lab:
+    id: LAB-corr
+    mode: range
+    set: {xmin: 8}
+    task: 12店のうち、広告費 x が8以上の5店だけ。r は（小数で）？
+    predict: {type: number, key: r, label: "5店の r"}
+    expect: 0.4308
+    why: 全12店では0.86。範囲を狭めるほど r は下がりやすい。x を1以上に戻すと0.86 に戻る。
+
+- id: Q-U28-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: 相関係数について、正しいものはどれか。
+  choices:
+    - 相関係数が0なら、2つの変数の間には何の関係もない。
+    - 相関係数が大きいほど、散布図の直線の傾きは大きい。
+    - x の単位を cm から m に変えると、x と y の相関係数は100分の1になる。
+    - 相関係数は、共分散を x と y の標準偏差の積で割ったもので、−1 以上1 以下の値をとる。
+    - 相関係数が0.9 なら、x が y の原因である。
+  correct: 4
+  answer: r＝s_xy÷(s_x s_y) で、単位も散らばりの大きさも消える。例題Aでは 2.25÷(√2.5×√2.5)＝0.9。
+  misconceptions:
+    1: r＝0 は直線的な関係がないだけ。y＝x² のような曲線の関係では r＝0 になりうる
+    2: r は直線へのそろい方。傾きが小さくても点が直線に乗れば r＝1
+    3: 単位を変えると共分散は変わるが、r は変わらない
+    5: 相関は因果ではない。共通の原因による擬相関もある
+  checks:
+    - 'abs(2.25/(math.sqrt(2.5)*math.sqrt(2.5)) - 0.9) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: unit
+    set: {data: "1,3 2,5 3,4 4,6 5,7", a: 0.01, b: 0, c: 1}
+    task: 例題Aの x を100分の1（cm→m）にする。相関係数 r は（小数で）？
+    predict: {type: number, key: r, label: "r"}
+    expect: 0.9
+    why: r は0.9 のまま。共分散は2.25 から0.0225 に変わる。
+
+- id: Q-U28-030
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 20店のデータで、広告費 x と売上 y の相関は0.6、売場面積 z と広告費の相関は0.5、売場面積と売上の相関は0.7。売場面積の影響を取り除いた広告費と売上の偏相関を求め、報告の文を書け。
+  answer: r_xy・z＝(0.6−0.5×0.7)÷√((1−0.25)(1−0.49))＝0.25÷√0.3825≒**0.404**。「広告費と売上の相関0.6 の一部は、大きい店ほど広告費も売上も多いことによる。売場面積をそろえても0.40 ほどの相関が残る（因果は別に確かめる）」。
+  checks:
+    - 'abs(0.6-0.5*0.7 - 0.25) < 1e-12 and abs(0.75*0.51 - 0.3825) < 1e-12 and abs(0.25/math.sqrt(0.3825) - 0.404) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: partial
+    set: {rxy: 0.6, rxz: 0.5, ryz: 0.7}
+    task: r_xy＝0.6、r_xz＝0.5、r_yz＝0.7。偏相関 r_xy・z は（小数で）？
+    predict: {type: number, key: rp, label: "r_xy・z"}
+    expect: 0.4042
+    why: 0.25÷√0.3825≒0.40。r_yz を0.9 にすると偏相関はさらに下がる。
+
+- id: Q-U28-031
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 5店の1日の客数 x（人）と客単価 y（円）は (100,1200)(120,1150)(150,1000)(180,1050)(200,900)。相関係数を求め、店長に伝える文を書け。
+  answer: x̄＝150、ȳ＝1060。偏差の積の和＝−18000、Σ(x−x̄)²＝6800、Σ(y−ȳ)²＝57000。r＝−18000÷√(6800×57000)≒**−0.914**。「客数の多い店ほど客単価が低い、強い負の相関がある。ただし5店だけで、立地や品ぞろえの違いが両方に効いている可能性もある」。
+  checks:
+    - 'sum((x-150)*(y-1060) for x,y in [(100,1200),(120,1150),(150,1000),(180,1050),(200,900)]) == -18000 and sum((x-150)**2 for x in [100,120,150,180,200]) == 6800 and sum((y-1060)**2 for y in [1200,1150,1000,1050,900]) == 57000 and abs(-18000/math.sqrt(6800*57000) + 0.914) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "100,1200 120,1150 150,1000 180,1050 200,900"}
+    task: 5店の客数と客単価。相関係数 r は（小数で）？
+    predict: {type: number, key: r, label: "r"}
+    expect: -0.9143
+    why: 左上と右下（積が−）の長方形ばかりで r≒−0.91。4店目 (180,1050) を下げるとさらに −1 に近づく。
+
+- id: Q-U28-032
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 店A の (1,3)(2,5)(3,4)(4,6)(5,7) と、店B の (1,1)(2,5)(3,3)(4,7)(5,9)。どちらも r＝0.9 になることを確かめ、「2店は広告回数の効き方が同じ」と言えるか答えよ。
+  answer: 店B は x̄＝3、ȳ＝5、偏差の積の和18、Σ(y−ȳ)²＝40 で r＝18÷√(10×40)＝**0.9**。店A と同じ r でも、店B は y の散らばりが2倍で、x が1増えると y は約2倍増える（傾きが違う）。r は直線へのそろい方で、効き方（傾き）は回帰（{{unit:U29}}）で比べる。
+  checks:
+    - 'sum((x-3)*(y-5) for x,y in [(1,1),(2,5),(3,3),(4,7),(5,9)]) == 18 and sum((y-5)**2 for y in [1,5,3,7,9]) == 40 and abs(18/math.sqrt(10*40) - 0.9) < 1e-12'
+  lab:
+    id: LAB-corr
+    mode: scatter
+    set: {data: "1,1 2,5 3,3 4,7 5,9"}
+    task: 店B の5点。相関係数 r は（小数で）？
+    predict: {type: number, key: r, label: "r"}
+    expect: 0.9
+    why: r は店A と同じ0.9。共分散は店A の2倍の4.5。散布図の縦の目盛りを見比べる。
+
+- id: Q-U28-040
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 20店で相関係数 r＝0.5 だった。母相関が0（無相関）という仮説を両側5%で検定せよ。t＝r√(n−2)÷√(1−r²)、t(18) の上側2.5%点は2.101。
+  answer: t＝0.5×√18÷√0.75≒**2.449**。2.449＞2.101 なので H₀ を**棄却**（p≒0.025）。「母相関は0 ではないと言える」。ただし有意でも、r＝0.5 は中程度の相関で、n が大きければ r＝0.1 でも有意になる。
+  checks:
+    - 'abs(0.5*math.sqrt(18)/math.sqrt(0.75) - 2.449) < 0.0005 and 2.449 > 2.101 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.101,18) - 0.975) < 0.0005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.4495,18)) - 0.025) < 0.0005'
+  lab:
+    id: LAB-corr
+    mode: rtest
+    set: {r: 0.5, n: 20}
+    task: r＝0.5、n＝20。検定統計量 t は（小数で）？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2.4495
+    why: t≒2.45 が境目2.101 を超える。n を10 にすると t≒1.63 で棄却しない。
