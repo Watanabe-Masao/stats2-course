@@ -1,0 +1,296 @@
+# 単元U20の問題。id は変えない（個人の解答記録がこの id を指す）。
+# 確率点は問題文に数表の値として書く。答えにだけ出る点は、密度の数値積分（中点則4000分割）で左側累積を出して照合する
+# 式の中の (lambda x,k: …) は t(k) の P(T≦x)、(lambda q,k: …) は χ²(k) の P(Q≦q)、(lambda x,a,b: …) は F(a,b) の P(F≦x)
+- id: Q-U20-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    25日分の1日の売上の平均は12万円、データの標準偏差 s は5万円。基準の平均10万円と違うかを、両側5%で調べる。（t(24) の0.975点は2.064）
+
+    SE＝□÷√□＝□。t＝(□−10)÷□＝□、自由度□。|t| と2.064を比べると □
+  answer_title: 答え（埋めてから開く）
+  answer: SE＝5÷√25＝**1**。t＝(12−10)÷1＝**2**、自由度 **24**。2＜2.064 なので、**基準以内**（偶然の範囲）。σ が分かっていて1.96と比べるなら超えていた。s を使う分だけ基準が厳しくなる。
+  checks:
+    - '5/math.sqrt(25) == 1 and (12-10)/1 == 2 and 25-1 == 24 and 2 < 2.064 and 2 > 1.96'
+  lab:
+    id: LAB-tcf
+    mode: tstat
+    set: {xbar: 12, mu0: 10, s: 5, n: 25}
+    task: 25日の平均12万円、s＝5万円、基準10万円。t の値は？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2
+    why: SE＝5÷5＝1、t＝2。t(24) の点2.064にわずかに届かない。1.96なら超えていたので、z と t の違いで判断が変わる例。
+
+- id: Q-U20-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 商品の内容量の分散は、製造の基準では σ²＝8（g²）。10個を測ると不偏分散 s²＝12 だった。Q＝(n−1)s²÷σ² と自由度を求め、χ² の上側5%点と比べよ。（χ²(9) の上側5%点は16.919）
+  answer: Q＝9×12÷8＝**13.5**、自由度 **9**。13.5＜16.919 なので、ばらつきが基準より大きいとは**言えない**。χ²(9) の平均は自由度と同じ9なので、13.5 はやや大きいが珍しくはない。
+  checks:
+    - '(10-1)*12/8 == 13.5 and 13.5 < 16.919 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(16.919,9)-0.95) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: chi
+    set: {n: 10, s2: 12, sigma2: 8}
+    task: 10個、s²＝12、基準の σ²＝8。Q＝(n−1)s²÷σ² は？
+    predict: {type: number, key: q, label: "Q"}
+    expect: 13.5
+    why: 9×12÷8＝13.5。上側5%点16.919より小さい。Q 以上になる確率は約0.14で、10回に1回以上は起こる大きさ。
+
+- id: Q-U20-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 36日分の1日の売上の平均は104万円、s は12万円。基準100万円との差について、標準誤差・t の値・自由度を求め、両側5%で判断せよ。（t(35) の0.975点は2.030）
+  answer: SE＝12÷√36＝**2**、t＝(104−100)÷2＝**2**、自由度 **35**。2＜2.030 なので**基準以内**。わずかに届かない。
+  checks:
+    - '12/math.sqrt(36) == 2 and (104-100)/2 == 2 and 36-1 == 35 and 2 < 2.030'
+  lab:
+    id: LAB-tcf
+    mode: tstat
+    set: {xbar: 104, mu0: 100, s: 12, n: 36}
+    task: 36日の平均104万円、s＝12万円。平均の標準誤差 SE は何万円か。
+    predict: {type: number, key: se, label: "SE", unit: "万円"}
+    expect: 2
+    why: 12÷√36＝2万円。t＝2 で、t(35) の点2.030にわずかに届かない。n を49にすると SE は約1.71、t は約2.33 で超える。
+
+- id: Q-U20-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 店Aの11日分の売上の不偏分散は18、店Bの13日分は9（単位は万円²）。2店のばらつきが違うかを F＝s₁²÷s₂² で調べる。F の値と自由度を求め、上側5%点と比べよ。（F(10, 12) の上側5%点は2.753）
+  answer: F＝18÷9＝**2**、自由度（分子 **10**、分母 **12**）。2＜2.753 なので、ばらつきが違うとは**言えない**。分散が2倍でも、10日ほどのデータでは偶然の範囲。
+  checks:
+    - '18/9 == 2 and 11-1 == 10 and 13-1 == 12 and 2 < 2.753 and abs((lambda x,a,b: sum(math.exp(0.5*(a*math.log(a*x*(i+0.5)/4000)+b*math.log(b)-(a+b)*math.log(a*x*(i+0.5)/4000+b))-math.log(x*(i+0.5)/4000)-math.lgamma(a/2)-math.lgamma(b/2)+math.lgamma((a+b)/2)) for i in range(4000))*x/4000)(2.753,10,12)-0.95) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: f
+    set: {s1: 18, n1: 11, s2: 9, n2: 13}
+    task: 店A 11日 s₁²＝18、店B 13日 s₂²＝9。F の値は？
+    predict: {type: number, key: F, label: "F"}
+    expect: 2
+    why: 18÷9＝2。F(10, 12) の上側5%点2.753より小さい。自由度を逆にした F(12, 10) の点は2.913で別の値。
+
+- id: Q-U20-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 10店のデータで、σ が分からないので s を使って t＝2.1 を出した。担当者は「1.96を超えたので差がある」と判断した。正しい基準の点（t(9) の0.975点）は2.262。判断はどう変わるか。正規の点との差はいくつか。
+  answer: s を使ったので基準は t(9) の **2.262**。2.1＜2.262 なので、差があるとは**言えない**（偶然の範囲）。正規の点との差は 2.262−1.96＝**0.302**。n が小さいほどこの差は大きく、1.96と比べると差を見つけすぎる。
+  checks:
+    - 'abs(2.262-1.96 - 0.302) < 1e-9 and 1.96 < 2.1 < 2.262'
+  lab:
+    id: LAB-tcf
+    mode: t
+    set: {df: 9, side: two, alpha: 0.05, t: 2.1}
+    task: 自由度9、両側5%の t の点は？
+    predict: {type: number, key: tcrit, label: "t(9) の0.975点"}
+    expect: 2.2622
+    why: 約2.262で、1.96より0.3ほど大きい。t＝2.1 はその内側。自由度を30にすると点は2.042で、2.1 は外側になる。
+
+- id: Q-U20-010
+  stage: S2
+  format: written
+  powers: [P1, P2]
+  prompt: 9店で調べた客数の増加の平均は23人、s は3人。基準20人と違うかを両側5%で判断せよ。t の値と自由度も書け。（t(8) の0.975点は2.306）
+  answer: SE＝3÷√9＝1、t＝(23−20)÷1＝**3**、自由度 **8**。3＞2.306 なので**基準を超える**（差がある）。
+  checks:
+    - '3/math.sqrt(9) == 1 and (23-20)/1 == 3 and 9-1 == 8 and 3 > 2.306'
+  lab:
+    id: LAB-tcf
+    mode: tstat
+    set: {xbar: 23, mu0: 20, s: 3, n: 9}
+    task: 9店の平均23人、s＝3人、基準20人。t の値は？
+    predict: {type: number, key: t, label: "t"}
+    expect: 3
+    why: SE＝1、t＝3。t(8) の点2.306を超える。分母に s をそのまま入れると1になり、判断を誤る。
+
+- id: Q-U20-011
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 自由度9のカイ二乗分布の、下側2.5%点（0.025点）と上側2.5%点（0.975点）を表から引き、平均9からの距離を比べよ。表は χ²(9) で 0.025点2.700、0.975点19.023。
+  answer: 下側 **2.700**（平均から6.3）、上側 **19.023**（平均から約10）。右に長い形なので、上側の点の方が遠い。z や t のように「平均±同じ幅」にはならない。
+  checks:
+    - 'abs(9-2.700 - 6.3) < 1e-9 and abs(19.023-9 - 10) < 0.05 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(2.700,9)-0.025) < 5e-4 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(19.023,9)-0.975) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: chi
+    set: {n: 10, s2: 8, sigma2: 8}
+    task: 自由度9のカイ二乗分布。下側2.5%点は（小数で）？
+    predict: {type: number, key: lo, label: "χ²(9) の0.025点"}
+    expect: 2.7004
+    why: 約2.700。上側2.5%点は19.023。平均9から見ると、下は6.3、上は約10離れている。
+
+- id: Q-U20-012
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 25日分の平均は104、基準は100。① 過去の記録から σ＝10 が分かっている場合（{{unit:U16}} の z）と、② σ が分からずデータの s＝10 を使う場合で、両側5%の判断を比べよ。（t(24) の0.975点は2.064）
+  answer: どちらも分母は 10÷√25＝2、値は (104−100)÷2＝**2**。① z＝2＞1.96 で**基準を超える**。② t＝2＜2.064 で**基準以内**。同じ数でも、σ を知っているかで判断が分かれる。
+  checks:
+    - '10/math.sqrt(25) == 2 and (104-100)/2 == 2 and 2 > 1.96 and 2 < 2.064'
+  lab:
+    id: LAB-tcf
+    mode: tstat
+    set: {xbar: 104, mu0: 100, s: 10, n: 25}
+    task: 25日の平均104、s＝10、基準100。両側5%の t の点（自由度24）は？
+    predict: {type: number, key: tcrit, label: "t(24) の0.975点"}
+    expect: 2.0639
+    why: 約2.064で、t＝2 はわずかに内側。σ＝10 が分かっていれば点は1.96で、2 は外側になる。
+
+- id: Q-U20-020
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 新しいレジの10日分の処理時間の不偏分散は16、古いレジの8日分は4（単位は分²）。新しいレジの方がばらつきが大きいかを調べる。F の値と自由度を求め、上側5%点と比べよ。（F(9, 7) の上側5%点は3.677）
+  answer: F＝16÷4＝**4**、自由度（分子 **9**、分母 **7**）。4＞3.677 なので、新しいレジのばらつきは**大きい**と判断する。分子は「大きいと疑う方」、自由度は分子・分母の順に書く。
+  checks:
+    - '16/4 == 4 and 10-1 == 9 and 8-1 == 7 and 4 > 3.677 and abs((lambda x,a,b: sum(math.exp(0.5*(a*math.log(a*x*(i+0.5)/4000)+b*math.log(b)-(a+b)*math.log(a*x*(i+0.5)/4000+b))-math.log(x*(i+0.5)/4000)-math.lgamma(a/2)-math.lgamma(b/2)+math.lgamma((a+b)/2)) for i in range(4000))*x/4000)(3.677,9,7)-0.95) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: f
+    set: {s1: 16, n1: 10, s2: 4, n2: 8}
+    task: 新レジ10日 s₁²＝16、旧レジ8日 s₂²＝4。F の値は？
+    predict: {type: number, key: F, label: "F"}
+    expect: 4
+    why: 16÷4＝4。F(9, 7) の上側5%点3.677を超える。F 以上になる確率は約0.04。
+
+- id: Q-U20-021
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 自由度20の t 分布で、表には1.725と2.086がある。片側5%と両側5%の点はそれぞれどちらで、左側累積のいくつの点か。t＝1.9 のとき、片側と両側で判断はどう変わるか。
+  answer: 片側5%は0.95点の **1.725**、両側5%は0.975点の **2.086**。t＝1.9 は片側なら**超える**、両側なら**基準以内**。どちらで調べるかは、データを見る前に決めておく。
+  checks:
+    - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.725,20)-0.95) < 5e-4 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.086,20)-0.975) < 5e-4 and 1.725 < 1.9 < 2.086'
+  lab:
+    id: LAB-tcf
+    mode: t
+    set: {df: 20, side: one, alpha: 0.05, t: 1.9}
+    task: 自由度20、片側（上側）5%の t の点は？
+    predict: {type: number, key: tcrit, label: "t(20) の0.95点"}
+    expect: 1.7247
+    why: 約1.725。両側に切り替えると2.086。t＝1.9 は片側なら外側、両側なら内側。
+
+- id: Q-U20-022
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 21日分の売上の不偏分散は150、去年の分散は100（単位は万円²）。ばらつきが去年より大きくなったかを、上側5%で調べよ。（χ²(20) の上側5%点は31.410）
+  answer: Q＝20×150÷100＝**30**、自由度 **20**。30＜31.410 なので、ばらつきが大きくなったとは**言えない**。Q 以上になる確率は約0.07で、5%にわずかに届かない。
+  checks:
+    - '20*150/100 == 30 and 30 < 31.410 and abs(1-(lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(30,20) - 0.0699) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: chi
+    set: {n: 21, s2: 150, sigma2: 100}
+    task: 21日、s²＝150、去年の σ²＝100。Q＝(n−1)s²÷σ² は？
+    predict: {type: number, key: q, label: "Q"}
+    expect: 30
+    why: 20×1.5＝30。上側5%点31.410に届かない。分散が1.5倍でも、20日ほどでは偶然の範囲。
+
+- id: Q-U20-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: t 分布・カイ二乗分布・F 分布について、正しいものはどれか。
+  choices:
+    - t 分布は自由度が小さいほど裾が薄く、両側5%の点は1.96より小さい。
+    - σ が分からないとき、t＝(x̄−μ₀)÷(s÷√n) は自由度 n の t 分布に従う。
+    - 自由度が大きくなると、t 分布は標準正規分布に近づく。
+    - カイ二乗分布は左右対称なので、下側2.5%点と上側2.5%点は平均から同じ距離にある。
+    - F＝s₁²÷s₂² の点は、分子と分母の自由度を入れ替えても同じ値を使える。
+  correct: 3
+  answer: 自由度が大きいと s が σ にほぼ一致するので、t は z と同じ分布に近づく。自由度100の0.975点は約1.984で1.96に近い。
+  misconceptions:
+    1: 逆。自由度が小さいほど裾が厚く、点は1.96より大きい
+    2: 自由度は n−1。平均を使って偏差を作るので1つ減る
+    4: χ² は0以上で右に長い。上側の点の方が平均から遠い
+    5: F(a, b) と F(b, a) は別の分布で、点も違う
+  checks:
+    - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.984,100)-0.975) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: t
+    set: {df: 100, side: two, alpha: 0.05, t: 1}
+    task: 自由度100、両側5%の t の点は？
+    predict: {type: number, key: tcrit, label: "t(100) の0.975点"}
+    expect: 1.984
+    why: 約1.984で、1.96とほとんど同じ。自由度を4にすると2.776で、差は大きい。
+
+- id: Q-U20-030
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 陳列替えの前後で、9店それぞれの1日の売上の差（後−前）を出すと、差の平均は3万円、差の標準偏差 s は4.5万円だった。効果があったかを両側5%で判断せよ。（t(8) の0.975点は2.306）
+  answer: 差を1つのデータとみて、SE＝4.5÷√9＝1.5、t＝(3−0)÷1.5＝**2**、自由度 **8**。2＜2.306 なので、効果があったとは**言えない**。9店では、差3万円は偶然でも起こる。
+  checks:
+    - '4.5/math.sqrt(9) == 1.5 and (3-0)/1.5 == 2 and 9-1 == 8 and 2 < 2.306'
+  lab:
+    id: LAB-tcf
+    mode: tstat
+    set: {xbar: 3, mu0: 0, s: 4.5, n: 9}
+    task: 9店の前後差の平均3万円、差の s＝4.5万円、基準0。t の値は？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2
+    why: SE＝1.5、t＝2。t(8) の点2.306に届かない。店数を16にすると SE は約1.13、t は約2.67 で超える。
+
+- id: Q-U20-031
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 内容量の標準偏差は規格で σ＝2g。16個を測ると s＝3g だった。ばらつきが規格より大きいかを、上側5%で調べよ。（χ²(15) の上側5%点は24.996）
+  answer: Q＝15×3²÷2²＝15×9÷4＝**33.75**、自由度 **15**。33.75＞24.996 なので、ばらつきは規格より**大きい**と判断する。標準偏差で与えられたら、2乗して分散にしてから入れる。
+  checks:
+    - '15*3**2/2**2 == 33.75 and 33.75 > 24.996 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(24.996,15)-0.95) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: chi
+    set: {n: 16, s2: 9, sigma2: 4}
+    task: 16個、s²＝9、規格の σ²＝4。Q＝(n−1)s²÷σ² は？
+    predict: {type: number, key: q, label: "Q"}
+    expect: 33.75
+    why: 15×9÷4＝33.75。上側5%点24.996を大きく超える。s と σ を2乗せずに入れると 15×3÷2＝22.5 になり、判断が変わってしまう。
+
+- id: Q-U20-032
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 店Aの13日分の売上の不偏分散は900、店Bの11日分は400（単位は千円²）。2店の日々のばらつきが違うかを、大きい方を分子にして上側5%点と比べよ。（F(12, 10) の上側5%点は2.913）
+  answer: F＝900÷400＝**2.25**、自由度（分子 **12**、分母 **10**）。2.25＜2.913 なので、ばらつきが違うとは**言えない**。標準偏差では30と20で1.5倍の差に見えるが、10日ほどのデータでは偶然の範囲。
+  checks:
+    - '900/400 == 2.25 and 13-1 == 12 and 11-1 == 10 and 2.25 < 2.913 and math.sqrt(900) == 30 and math.sqrt(400) == 20 and 30/20 == 1.5 and abs((lambda x,a,b: sum(math.exp(0.5*(a*math.log(a*x*(i+0.5)/4000)+b*math.log(b)-(a+b)*math.log(a*x*(i+0.5)/4000+b))-math.log(x*(i+0.5)/4000)-math.lgamma(a/2)-math.lgamma(b/2)+math.lgamma((a+b)/2)) for i in range(4000))*x/4000)(2.913,12,10)-0.95) < 5e-4'
+  lab:
+    id: LAB-tcf
+    mode: f
+    set: {s1: 900, n1: 13, s2: 400, n2: 11}
+    task: 店A 13日 s₁²＝900、店B 11日 s₂²＝400。F の値は？
+    predict: {type: number, key: F, label: "F"}
+    expect: 2.25
+    why: 900÷400＝2.25。F(12, 10) の上側5%点2.913に届かない。F 以上になる確率は約0.10。
+
+- id: Q-U20-040
+  stage: S5
+  format: written
+  powers: [P1, P3]
+  prompt: t(15) の0.975点は2.131、F(1, 15) の上側5%点は4.543。2.131² を計算して比べよ。なぜ近い値になるか。
+  answer: 2.131²≒**4.541**で、4.543 とほぼ同じ（表の丸めの差）。t(15) の2乗は F(1, 15) に従い、「|t| が2.131を超える（両側5%）」と「t² が4.543を超える（上側5%）」は同じ出来事だから。
+  checks:
+    - 'abs(2.131**2 - 4.541) < 0.0005 and abs(2.131**2 - 4.543) < 0.003'
+  lab:
+    id: LAB-tcf
+    mode: f
+    set: {s1: 20, n1: 2, s2: 4, n2: 16}
+    task: 分子の自由度1・分母の自由度15の F 分布。上側5%点は（小数で）？
+    predict: {type: number, key: fcrit, label: "F(1, 15) の上側5%点"}
+    expect: 4.543
+    why: 約4.543。「t 分布の点」で自由度15・両側5%の点2.131を2乗した値と一致する。自由度を変えても t² と F(1, k) の点は一致し続ける。

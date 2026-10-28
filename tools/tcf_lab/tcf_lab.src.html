@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>t・χ²・F ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 t・χ²・F ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-tstat" class="mode">
+ <p class="mut" style="margin:0">σ が分からないとき、データの標準偏差 s で標準誤差 s÷√n を作り、t＝(x̄−μ₀)÷(s÷√n) を自由度 n−1 の t 分布の点と比べる。</p>
+ <input type="range" id="sx" min="0" max="1000" step="0.5" value="52" data-name="平均 x̄">
+ <input type="range" id="sm" min="0" max="1000" step="0.5" value="50" data-name="基準 μ₀">
+ <input type="range" id="ss" min="0.5" max="200" step="0.5" value="8" data-name="標準偏差 s">
+ <input type="range" id="sn" min="2" max="200" step="1" value="16" data-name="個数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<div id="m-t" class="mode">
+ <p class="mut" style="margin:0">t 分布は自由度が小さいほど裾が厚く、基準の点（確率点）が正規分布の1.96より大きい。自由度が大きいと標準正規分布に近づく。</p>
+ <input type="range" id="tdf" min="1" max="200" step="1" value="15" data-name="自由度">
+ <div class="row ctl"><label>基準 <select id="tside" data-key="side"><option value="two">両側</option><option value="one">片側（上側）</option></select></label><label><select id="talpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="tobs" min="0" max="6" step="0.01" value="1" data-name="t の値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+ <div class="res det" id="ttab"></div>
+</div>
+
+<div id="m-chi" class="mode">
+ <p class="mut" style="margin:0">正規母集団から n 個取ると、Q＝(n−1)s²÷σ² は自由度 n−1 のカイ二乗分布 χ² に従う。0以上で右に長い形、平均は自由度。</p>
+ <input type="range" id="cn" min="2" max="100" step="1" value="10" data-name="個数 n">
+ <input type="range" id="cs" min="0.5" max="500" step="0.5" value="12" data-name="不偏分散 s²">
+ <input type="range" id="cv" min="0.5" max="500" step="0.5" value="8" data-name="基準の σ²">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<div id="m-f" class="mode">
+ <p class="mut" style="margin:0">2つの独立な正規母集団の不偏分散の比 F＝s₁²÷s₂² は、分散が等しいとき自由度 (n₁−1, n₂−1) の F 分布に従う。分子・分母の自由度の順を逆にしない。</p>
+ <input type="range" id="fs1" min="0.5" max="2000" step="0.5" value="18" data-name="s₁²">
+ <input type="range" id="fn1" min="2" max="100" step="1" value="11" data-name="n₁">
+ <input type="range" id="fs2" min="0.5" max="2000" step="0.5" value="9" data-name="s₂²">
+ <input type="range" id="fn2" min="2" max="100" step="1" value="13" data-name="n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="fplot"></div>
+ <div class="card res key" id="fsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+// ---- 特殊関数（Numerical Recipes の方法）
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const MAXIT=300,EPS=3e-14,FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=MAXIT;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,s=1/a,d=s;for(let n=0;n<500;n++){ap++;d*=x/ap;s+=d;if(Math.abs(d)<Math.abs(s)*3e-15)break;}return s*Math.exp(-x+a*Math.log(x)-lgam(a));}
+ let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return 1-Math.exp(-x+a*Math.log(x)-lgam(a))*h;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+const chicdf=(q,df)=>gammp(df/2,q/2);
+const fcdf=(F,d1,d2)=>F<=0?0:ibeta(d1/2,d2/2,d1*F/(d1*F+d2));
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const tq=(p,df)=>p===0.5?0:p>0.5?inv(t=>tcdf(t,df),p,0,1e3):-inv(t=>tcdf(t,df),1-p,0,1e3);
+const zq=p=>inv(Phi,p,-10,10);
+const chiq=(p,df)=>inv(q=>chicdf(q,df),p,0,df+200*Math.sqrt(2*df)+100);
+const fq=(p,d1,d2)=>inv(F=>fcdf(F,d1,d2),p,0,1e4);
+const tpdf=(t,df)=>Math.exp(lgam((df+1)/2)-lgam(df/2)-0.5*Math.log(df*Math.PI)-(df+1)/2*Math.log(1+t*t/df));
+const npdf=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+const chipdf=(x,k)=>x<=0?0:Math.exp((k/2-1)*Math.log(x)-x/2-k/2*Math.log(2)-lgam(k/2));
+const fpdf=(x,a,b)=>x<=0?0:Math.exp(0.5*(a*Math.log(a*x)+b*Math.log(b)-(a+b)*Math.log(a*x+b))-Math.log(x)-(lgam(a/2)+lgam(b/2)-lgam((a+b)/2)));
+// 曲線を描く
+function plot(pdfs,x0,x1,opt){const H=opt.H||160,L=12,R=W-12,base=H-28,top=14,N=220,X=x=>L+(x-x0)/(x1-x0)*(R-L);
+ let mx=0;pdfs.forEach(p=>{for(let i=0;i<=N;i++){const v=p.fn(x0+(x1-x0)*i/N);if(isFinite(v)&&v>mx)mx=v;}});mx=Math.min(mx,opt.cap||mx)*1.08;const Y=y=>base-Math.min(1,y/mx)*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(opt.label||"分布")}">`;
+ (opt.shade||[]).forEach(([a,b])=>{const lo=Math.max(a,x0),hi=Math.min(b,x1);if(hi<=lo)return;let p=`M${X(lo).toFixed(1)} ${base}`;for(let i=0;i<=80;i++){const x=lo+(hi-lo)*i/80;p+=` L${X(x).toFixed(1)} ${Y(pdfs[0].fn(x)).toFixed(1)}`;}s+=`<path d="${p} L${X(hi).toFixed(1)} ${base} Z" fill="var(--acc2)" fill-opacity=".45"/>`;});
+ pdfs.forEach(p=>{let d="";for(let i=0;i<=N;i++){const x=x0+(x1-x0)*i/N;d+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(p.fn(x)).toFixed(1);}s+=`<path d="${d}" fill="none" stroke="${p.col}" stroke-width="${p.w||2}" ${p.dash?`stroke-dasharray="${p.dash}"`:""}/>`;});
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ (opt.ticks||[]).forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${f(x,2)}</text>`);
+ (opt.lines||[]).forEach(t=>{if(t.x<x0||t.x>x1)return;const lx=X(t.x);s+=`<line x1="${lx}" y1="${top}" x2="${lx}" y2="${base}" stroke="${t.col||"var(--acc2)"}" stroke-dasharray="${t.dash||"4 3"}" stroke-width="1.5"/><text x="${Math.min(R,Math.max(L,lx))}" y="${top-2}" font-size="10.5" text-anchor="${lx>W*0.75?"end":lx<W*0.25?"start":"middle"}" fill="${t.col||"var(--acc2)"}">${esc(t.label)}</text>`;});
+ return s+`</svg>`;}
+
+// ---- t 値を計算
+function sVals(){const xb=+$("sx").value,mu=+$("sm").value,s=+$("ss").value,n=+$("sn").value,se=s/Math.sqrt(n),t=(xb-mu)/se,df=n-1,tc=tq(0.975,df);
+ return {xbar:xb,mu0:mu,s,n,se,t,df,tcrit:tc,zcrit:1.959964,p:2*(1-tcdf(Math.abs(t),df)),judge:Math.abs(t)>tc?"基準を超える":"基準以内",wrong:(xb-mu)/s};}
+function sRender(){const S=sVals(),lim=Math.max(4.5,Math.abs(S.t)+1);
+ $("splot").innerHTML=plot([{fn:x=>tpdf(x,S.df),col:"var(--acc)"},{fn:npdf,col:"var(--mut)",w:1.2,dash:"4 3"}],-lim,lim,{shade:[[-99,-S.tcrit],[S.tcrit,99]],ticks:[-4,-2,0,2,4].filter(x=>Math.abs(x)<=lim),lines:[{x:S.t,label:`t＝${f(S.t,3)}`,col:"var(--fg)",dash:"2 2"},{x:S.tcrit,label:`${f(S.tcrit,3)}`}],label:"t 分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${S.df})</span><span><i class="sw" style="background:var(--mut)"></i>標準正規</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>両側5%の外側</span></div>`;
+ $("ssum").innerHTML=`<div>SE＝s÷√n＝${f(S.s,2)}÷√${S.n}＝<b>${f(S.se)}</b></div><div>t＝(${f(S.xbar,2)}−${f(S.mu0,2)})÷${f(S.se)}＝<b>${f(S.t,3)}</b>　自由度 ${S.df}</div><div>両側5%の点 t(${S.df}) の上側2.5%点＝<b>${f(S.tcrit,3)}</b>（正規なら1.96）→ |t| は <b>${S.judge}</b>（両側の p≒${f(S.p,3)}）</div><div class="mut">分母に s をそのまま入れると ${f(S.wrong,3)} になってしまう。分母は平均のぶれ s÷√n。</div>`;}
+LK.register("tstat",{name:"t 値を計算",
+ init(){["sx","sm","ss","sn"].forEach(id=>LK.stepper($(id),sRender));sRender();},
+ apply(s){if(s.xbar!==undefined)LK.setRange("sx",s.xbar);if(s.mu0!==undefined)LK.setRange("sm",s.mu0);if(s.s!==undefined)LK.setRange("ss",s.s);if(s.n!==undefined)LK.setRange("sn",s.n);sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:typeof v==="string"?v:f(v,key==="df"?0:4)};}});
+
+// ---- t 分布
+function tVals(){const df=+$("tdf").value,side=$("tside").value,a=+$("talpha").value,obs=+$("tobs").value,p=side==="two"?1-a/2:1-a;
+ const tc=tq(p,df),zc=zq(p),pv=side==="two"?2*(1-tcdf(obs,df)):1-tcdf(obs,df);return {df,side,alpha:a,obs,tcrit:tc,zcrit:zc,pval:pv,diff:tc-zc,q:p};}
+function tRender(){const T=tVals(),sh=T.side==="two"?[[-99,-T.tcrit],[T.tcrit,99]]:[[T.tcrit,99]];
+ $("tplot").innerHTML=plot([{fn:x=>tpdf(x,T.df),col:"var(--acc)"},{fn:npdf,col:"var(--mut)",w:1.2,dash:"4 3"}],-5,5,{shade:sh,ticks:[-4,-2,0,2,4],lines:[{x:T.tcrit,label:`t点 ${f(T.tcrit,3)}`},{x:T.obs,label:`t＝${f(T.obs,2)}`,col:"var(--fg)",dash:"2 2"}],label:"t 分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${T.df})</span><span><i class="sw" style="background:var(--mut)"></i>標準正規</span></div>`;
+ $("tsum").innerHTML=`<div>${T.side==="two"?"両側":"片側"}${T.alpha*100}%の点（左側累積 ${f(T.q,3)}）：t(${T.df})＝<b>${f(T.tcrit,3)}</b>　標準正規＝${f(T.zcrit,3)}（差 ${f(T.diff,3)}）</div><div>t＝${f(T.obs,2)} の${T.side==="two"?"両側":"上側"}確率（p 値）＝<b>${f(T.pval)}</b></div><div class="mut">自由度を大きくすると t 点は正規の点に近づく。両側5%は左側累積0.975の点、片側5%は0.95の点。</div>`;
+ $("ttab").innerHTML=`<table><tr><th>自由度</th><th>両側5%</th><th>片側5%</th></tr>${[1,2,4,9,15,24,30,60,120].map(d=>`<tr><td>${d}</td><td>${f(tq(0.975,d),3)}</td><td>${f(tq(0.95,d),3)}</td></tr>`).join("")}<tr><td>正規</td><td>1.96</td><td>1.645</td></tr></table>`;}
+LK.register("t",{name:"t 分布の点",
+ init(){["tdf","tobs"].forEach(id=>LK.stepper($(id),tRender));["tside","talpha"].forEach(id=>$(id).onchange=tRender);tRender();},
+ apply(s){if(s.df!==undefined)LK.setRange("tdf",s.df);if(s.side)$("tside").value=s.side;if(s.alpha!==undefined)$("talpha").value=String(s.alpha);if(s.t!==undefined)LK.setRange("tobs",s.t);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key];return {v,text:f(v,key==="pval"?4:3)};}});
+
+// ---- カイ二乗
+function cVals(){const n=+$("cn").value,s2=+$("cs").value,v=+$("cv").value,df=n-1,q=df*s2/v;
+ return {n,s2,sigma2:v,df,q,lo:chiq(0.025,df),hi:chiq(0.975,df),up5:chiq(0.95,df),pUp:1-chicdf(q,df),mean:df,var:2*df};}
+function cRender(){const C=cVals(),x1=Math.max(C.hi*1.3,C.q*1.15,5);
+ $("cplot").innerHTML=plot([{fn:x=>chipdf(x,C.df),col:"var(--acc)"}],0,x1,{cap:C.df<=2?1:undefined,shade:[[0,C.lo],[C.hi,1e6]],ticks:[0,C.df,Math.round(x1*0.9)],lines:[{x:C.q,label:`Q＝${f(C.q,2)}`,col:"var(--fg)",dash:"2 2"},{x:C.hi,label:f(C.hi,2)}],label:"カイ二乗分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>χ²(${C.df})</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>下側・上側2.5%</span></div>`;
+ $("csum").innerHTML=`<div>Q＝(n−1)s²÷σ²＝${C.df}×${f(C.s2,2)}÷${f(C.sigma2,2)}＝<b>${f(C.q,3)}</b>　自由度 ${C.df}（平均 ${C.df}・分散 ${C.var}）</div><div>χ²(${C.df}) の下側2.5%点 <b>${f(C.lo,3)}</b>・上側2.5%点 <b>${f(C.hi,3)}</b>・上側5%点 ${f(C.up5,3)}</div><div>Q 以上になる確率（上側）＝<b>${f(C.pUp)}</b></div><div class="mut">左右対称ではないので、下側と上側の点は別々に引く。</div>`;}
+LK.register("chi",{name:"カイ二乗分布",
+ init(){["cn","cs","cv"].forEach(id=>LK.stepper($(id),cRender));cRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("cn",s.n);if(s.s2!==undefined)LK.setRange("cs",s.s2);if(s.sigma2!==undefined)LK.setRange("cv",s.sigma2);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:f(v,3)};}});
+
+// ---- F
+function fVals(){const s1=+$("fs1").value,n1=+$("fn1").value,s2=+$("fs2").value,n2=+$("fn2").value,d1=n1-1,d2=n2-1,F=s1/s2;
+ return {s1,s2,n1,n2,d1,d2,F,fcrit:fq(0.95,d1,d2),fcrit975:fq(0.975,d1,d2),pUp:1-fcdf(F,d1,d2),rev:fq(0.95,d2,d1)};}
+function fRender(){const Fv=fVals(),x1=Math.max(Fv.fcrit975*1.4,Fv.F*1.2,3);
+ $("fplot").innerHTML=plot([{fn:x=>fpdf(x,Fv.d1,Fv.d2),col:"var(--acc)"}],0,x1,{cap:2.5,shade:[[Fv.fcrit,1e6]],ticks:[0,1,2,Math.round(x1*0.9*10)/10],lines:[{x:Fv.F,label:`F＝${f(Fv.F,3)}`,col:"var(--fg)",dash:"2 2"},{x:Fv.fcrit,label:f(Fv.fcrit,3)}],label:"F 分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>F(${Fv.d1}, ${Fv.d2})</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>上側5%</span></div>`;
+ $("fsum").innerHTML=`<div>F＝s₁²÷s₂²＝${f(Fv.s1,2)}÷${f(Fv.s2,2)}＝<b>${f(Fv.F,3)}</b>　自由度（分子 ${Fv.d1}、分母 ${Fv.d2}）</div><div>F(${Fv.d1}, ${Fv.d2}) の上側5%点＝<b>${f(Fv.fcrit,3)}</b>・上側2.5%点＝${f(Fv.fcrit975,3)}　F 以上の確率＝<b>${f(Fv.pUp)}</b></div><div class="mut">自由度を逆にした F(${Fv.d2}, ${Fv.d1}) の上側5%点は ${f(Fv.rev,3)} で別の値。大きい方の分散を分子にすると、上側の点だけで判断できる。</div>`;}
+LK.register("f",{name:"F 分布",
+ init(){["fs1","fn1","fs2","fn2"].forEach(id=>LK.stepper($(id),fRender));fRender();},
+ apply(s){if(s.s1!==undefined)LK.setRange("fs1",s.s1);if(s.n1!==undefined)LK.setRange("fn1",s.n1);if(s.s2!==undefined)LK.setRange("fs2",s.s2);if(s.n2!==undefined)LK.setRange("fn2",s.n2);fRender();},
+ render:fRender,
+ value(key){const Fv=fVals(),v=Fv[key];return {v,text:f(v,3)};}});
+
+LK.start("tstat");
+window.__LAB__={LK,sVals,tVals,cVals,fVals,tq,chiq,fq,tcdf,chicdf,fcdf};
+</script>
+</body></html>

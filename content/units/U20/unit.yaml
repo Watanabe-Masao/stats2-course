@@ -1,0 +1,48 @@
+id: U20
+number: "20"
+title: 標準誤差・t分布・カイ二乗分布・F分布
+domain: D4
+reference_section: ④ 標本分布
+prev: U19
+next: U21
+prereq: [U16, U18, U19]
+used_by: [U22, U24, U25, U27]
+terms: [TERM-se, TERM-t, TERM-chi2, TERM-f, TERM-df]
+labs: [LAB-tcf]
+goal: σ が分からず s を使う平均は **t**、分散は **χ²**、2つの分散の比は **F** というように、調べたいものと統計量から分布と自由度を決め、確率点（左側累積）を引いて基準と比べられる。
+stage_goals:
+  S1: 「t＝1、自由度15。基準2.131より小さいので偶然の範囲。なぜなら〜」「σ を知らないので1.96ではなく t の点を使う。なぜなら〜」を自分の言葉で言えれば完了。
+  S2: 資料を見ずに、z・t・χ²・F の統計量と自由度を書き、t 値を計算して表の点と比べられる。間違えた所だけ初学に戻る。
+  S3: 問題文に「t 分布を使え」とは書いていない。**平均か・分散か・分散の比かを決め、σ が分かっているかを確かめ、自由度と両側／片側を決めて、左側累積のどの点かを書いてから比べる**。
+  S4: 施策前後の差・新店の客単価・内容量のばらつき・2店のばらつきのように、場面が違っても「何で割って、どの分布の点と比べるか」の形は同じ。
+  S5: 2級には直接出ない。3つの分布の作り方（正規の2乗和と比）、t² と F の関係、正規でない母集団での頑健さ、自由度の意味。興味のあるものを1つ選べばよい。
+  S6: 答えが1つに決まらない課題。**問いを立てる→仮定を置く→方法を組む→小さな例で検証する→限界を書く**の順に進める。
+evidence:
+  S1: t 値を計算して t の点と比べ、z と t の違いを1文で言えた
+  S2: 翌日・1週間後・1か月後に見ずに解けた
+  S3: 平均・分散・分散の比で分布を選び、自由度と両側／片側を決められた
+  S4: 売場の差やばらつきを、t・χ²・F の点で説明できた
+  S5: 1つ選んで理解を確かめた（任意）
+  S6: 課題を1つ作り、検証まで行った（任意）
+status: drafted
+version: 1
+checks:
+  # 確率点は数表の値。検算は密度の数値積分（中点則4000分割）で左側累積を出して照合する
+  # 式の中の (lambda x,k: …) は t(k) の P(T≦x)、(lambda q,k: …) は χ²(k) の P(Q≦q)、(lambda x,a,b: …) は F(a,b) の P(F≦x)
+  # 前提チェック
+  - '12/math.sqrt(36) == 2 and (54-50)/2 == 2 and ((2-4)**2+0+(6-4)**2)/(3-1) == 4'
+  # 例題A
+  - '8/math.sqrt(16) == 2 and (52-50)/2 == 1 and 16-1 == 15 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.131,15)-0.975) < 5e-4 and 8/math.sqrt(64) == 1 and (52-50)/8 == 0.25'
+  # 実験
+  - 'abs(0.5+math.atan(12.706)/math.pi-0.975) < 5e-4 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.776,4)-0.975) < 5e-4 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.042,30)-0.975) < 5e-4 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.980,120)-0.975) < 5e-4'
+  - 'abs(2.042-1.96-0.082) < 1e-9 and abs(1.980-1.96-0.020) < 1e-9 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.725,20)-0.95) < 5e-4'
+  # 復習の図・早見
+  - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.646,1000)-0.95) < 5e-4 and abs(0.5*(1+math.erf(1.645/math.sqrt(2)))-0.95) < 5e-4 and abs(0.5*(1+math.erf(1.96/math.sqrt(2)))-0.975) < 5e-4'
+  - 'abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(2.700,9)-0.025) < 5e-4 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(19.023,9)-0.975) < 5e-4'
+  # 転用の読み取り
+  - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.201,11)-0.975) < 5e-4 and abs(6/math.sqrt(12) - 1.73) < 0.005 and abs(2.5/(6/math.sqrt(12)) - 1.44) < 0.005 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(19.675,11)-0.95) < 5e-4 and abs(11*30/20 - 16.5) < 1e-9'
+  # 発展
+  # χ²(1) の左側累積は erf(√(q/2))
+  - 'abs(1.96**2 - 3.84) < 0.005 and abs(math.erf(math.sqrt(3.841/2))-0.95) < 5e-4'
+  # 創造
+  - '(2*4)**2 == 64 and 2/(8/math.sqrt(64)) == 2 and abs(2.131*8/math.sqrt(16) - 4.26) < 0.005'
