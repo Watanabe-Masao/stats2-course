@@ -1,0 +1,65 @@
+id: LAB-est
+name: 推定量ラボ
+slug: estimator                  # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: est_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [unb.html, hyper.html]   # 旧版 教科書21 の「v と s² の平均を比べる（不偏・一致）」を var と comp に含む。有限母集団修正（hyper.html）は U17 の発展と LAB-srs に移した
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: calc
+    name: 推定値を計算
+    purpose: データ（カンマ区切り）から x̄・偏差の2乗和・n で割る v・n−1 で割る s²・s・標準誤差・中央値を出す。偏差を図に描く
+    set: [vals]
+    values: [n, mean, ss, v, s2, sd, se, median]
+  - key: comp
+    name: 推定量を比べる
+    purpose: 正規母集団（μ＝50）から n 個を2000回取り直し（固定の乱数）、標本平均・中央値・最初の1個・標本平均＋b の分布と偏り・SE・MSE を並べる。くわしくに不偏・一致の表
+    set: [sigma, n, b]
+    values: [seMean, seMed, seFirst, seShift, biasShift, mseMean, mseMed, mseFirst, mseShift, effMed, best]   # best：MSE が最も小さい推定量の名前（標本平均／中央値／最初の1個／標本平均＋b）。中央値の値は2000回から
+  - key: var
+    name: 分散の推定量
+    purpose: 正規母集団（σ²）から n 個を2000回取り直し（固定の乱数）、s²（n−1 で割る）と v（n で割る）の分布を並べ、理論の平均・偏り・分散・MSE と E[s]＝c₄σ を出す
+    set: [sigma2, n]
+    values: [meanS2, meanV, biasV, ratio, varS2, varV, mseS2, mseV, better, meanS, c4]   # better：MSE が小さい方（「n で割る v」／「n−1 で割る s²」）
+  - key: self
+    name: 集め方の偏り
+    purpose: 満足の人と不満の人で回答率が違うとき、回答者の満足率が落ち着く先 p·r₁÷(p·r₁＋(1−p)·r₀)、偏り、SE、MSE と、回答数を増やしたときの推移（固定の乱数）
+    set: [p, r1, r0, n]
+    values: [target, bias, se, mse, respRate]
+data: スライダーと入力欄で決める（データの読み込みなし）。比べる・分散は固定の乱数（seed 29・31）で2000回、集め方は固定の乱数（seed 37。「別の乱数で集め直す」で変わる）
+presets:
+  s1-calc:
+    mode: calc
+    set: {vals: "2,4,4,6,9"}
+    task: 5店の返品数 2, 4, 4, 6, 9。n−1 で割る不偏分散 s² は？
+    predict: {type: number, key: s2, label: "s²"}
+    expect: 7
+    why: 平均5、偏差の2乗和28。28÷4＝7。n で割ると5.6で、母分散を平均して小さめに見積もってしまう。
+  s1-comp:
+    mode: comp
+    set: {sigma: 10, n: 10, b: 2}
+    task: 10個の標本から μ を推定する。標本平均・中央値・最初の1個・標本平均＋2 のうち、MSE（偏り²＋分散）が最も小さいのはどれか。
+    predict: {type: choice, key: best, label: "MSE が最も小さい", options: [標本平均, 中央値, 最初の1個, 標本平均＋b]}
+    expect: 標本平均
+    why: 標本平均は偏り0で SE＝10÷√10≒3.16、MSE＝10。中央値は偏り0だが広がりが大きく MSE≒14。最初の1個は MSE＝100、標本平均＋2 は 10＋4＝14。
+  s3-free:
+    mode: comp
+    modes: [comp, var, self, calc]
+    task: 解いてから、問題が聞いていること（推定量の偏りとばらつきか、分散の推定量か、集め方の偏りか、推定値の計算か）に合うモードで確かめる。
+  s4-free:
+    mode: calc
+    modes: [calc, self, comp]
+    task: 自分の売場の数字（日別の売上、アンケートの回答率）を入れ、推定値と、その推定がどれくらい外れうるかを読む。
+  s5-free:
+    mode: var
+    modes: [var, comp]
+    task: 「分散の推定量」で n を2〜50で動かし、s² と v の MSE がどちらが小さいか、E[s] が σ より小さいかを見る（発展1・2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（推定値、推定量の比較、分散の推定量、集め方の偏り）。
+used_by: [U21]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/est_lab/check.js          # 本文の値（s²＝7・v＝5.6、E[v]＝(n−1)σ²/n、MSE 50 と 36、c₄、自己選択の0.75）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
