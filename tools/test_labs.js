@@ -19,17 +19,17 @@ const ROOT=path.resolve(__dirname,'..');
   const sw=()=>p.evaluate(()=>document.documentElement.scrollWidth);
   if(await sw()>380)bad(`${tag}: 横にはみ出し`);
   if(v.cfg.mode){const m=await p.evaluate(()=>LK.mode);if(m!==v.cfg.mode)bad(`${tag}: 最初のモードが ${m}`);}
-  const pr=v.cfg.predict;
+  const ST=v.cfg.steps||null,EX=ST?v.expect:[v.expect],pr=ST?ST[0].predict:v.cfg.predict;const v0={...v,expect:EX[0],cfg:{...v.cfg,task:ST?ST[0].task:v.cfg.task,set:{...(v.cfg.set||{}),...(ST?ST[0].set||{}:{})}}};
   const first=(v.cfg.set||{}).items?v.cfg.set.items[0]:(v.cfg.set||{}).item;
   if(first&&await p.evaluate(()=>document.getElementById('jitem').textContent)!==first)bad(`${tag}: 最初のデータが ${first} にならない`);
   if(pr){
    const vis=await p.evaluate(()=>[...document.querySelectorAll('.mode').values()].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
    if(vis)bad(`${tag}: 予想の前に結果が見えている`);
    // .res の付け忘れも見逃さない：予想の前に、課題・操作・説明文の外に答えの数が出ていないか
-   if(typeof v.expect==='number'&&v.expect!==0){
-    const given=[String(v.cfg.task||''),JSON.stringify(v.cfg.set||{})].join(' ');
+   if(typeof v0.expect==='number'&&v0.expect!==0){
+    const given=[String(v0.cfg.task||''),JSON.stringify(v0.cfg.set||{})].join(' ');
     const nums=t=>(t.replace(/[,，]/g,'').replace(/[−–]/g,'-').match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);
-    const near=x=>Math.abs(Math.abs(x)-Math.abs(v.expect))<=Math.max(1e-9,Math.abs(v.expect)*1e-3);
+    const near=x=>Math.abs(Math.abs(x)-Math.abs(v0.expect))<=Math.max(1e-9,Math.abs(v0.expect)*1e-3);
     if(!nums(given).some(near)){
      const txt=await p.evaluate(()=>{const m=[...document.querySelectorAll('.mode')].find(d=>d.style.display!=='none');if(!m)return '';
       return [...m.querySelectorAll(':scope *')].filter(e=>e.children.length===0&&e.offsetParent!==null&&!e.closest('.lk-step,select,.res,.lk-wait')&&!(e.closest('p.mut')&&e.closest('p.mut').parentElement===m)).map(e=>e.textContent).join(' ');});
@@ -37,14 +37,19 @@ const ROOT=path.resolve(__dirname,'..');
      if(hit!==undefined)bad(`${tag}: 予想の前に答えの数（${hit}）が見えている（.res の付け忘れ？）`);}
    }
    if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}_before.png`,fullPage:true});
-   if(pr.type==='number')await p.fill('#lk-in',String(v.expect));
-   else await p.click(`#lk-ch button[data-v="${v.expect}"]`);
+   for(let i=0;i<EX.length;i++){const P=ST?ST[i].predict:pr,E=EX[i],st=ST?`（段${i+1}）`:'';
+   if(i>0){await p.click('#lk-next');
+    const vis2=await p.evaluate(()=>[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
+    if(vis2)bad(`${tag}${st}: 予想の前に結果が見えている`);}
+   if(P.type==='number')await p.fill('#lk-in',String(E));
+   else await p.click(`#lk-ch button[data-v="${E}"]`);
    await p.click('#lk-go');
    const r=await p.evaluate(()=>({last:LK.last,locked:LK.locked,vis:[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).every(e=>e.offsetParent!==null),verdict:document.getElementById('lk-verdict').innerText}));
-   if(r.locked||!r.vis)bad(`${tag}: 予想のあとも結果が出ない`);
-   const ok=typeof v.expect==='number'?Math.abs(r.last.v-v.expect)<=Math.max(5e-4,Math.abs(v.expect)*5e-4):r.last.text===v.expect;
-   if(!ok)bad(`${tag}: expect ${v.expect} とラボの値 ${r.last.text} が違う`);
-   if(!/予想どおり/.test(r.verdict))bad(`${tag}: 正しい予想なのに「予想どおり」にならない`);
+   if(r.locked||!r.vis)bad(`${tag}${st}: 予想のあとも結果が出ない`);
+   const ok=typeof E==='number'?Math.abs(r.last.v-E)<=Math.max(5e-4,Math.abs(E)*5e-4):r.last.text===E;
+   if(!ok)bad(`${tag}${st}: expect ${E} とラボの値 ${r.last.text} が違う`);
+   if(!/予想どおり/.test(r.verdict))bad(`${tag}${st}: 正しい予想なのに「予想どおり」にならない`);}
+   if(ST){await p.click('#lk-law');if(!(await p.$('.lk-law .l')))bad(`${tag}: 最後に式（law）が出ない`);}
    if(await sw()>380)bad(`${tag}: 結果を出したあと横にはみ出し`);
    if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}_after.png`,fullPage:true});
   }else if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}.png`,fullPage:true});
@@ -63,11 +68,12 @@ const ROOT=path.resolve(__dirname,'..');
   const tag=`埋め込み ${v.site?'公開サイト ':''}${v.asset}`;
   const h=()=>p.evaluate(()=>document.documentElement.scrollHeight);
   if(await p.evaluate(()=>document.documentElement.scrollWidth)>360)bad(`${tag}: 横にはみ出し`);
-  if(v.cfg.predict){
+  const ST=v.cfg.steps||null,EX=ST?v.expect:[v.expect],pr=ST?ST[0].predict:v.cfg.predict;
+  if(pr){
    if(await h()>320)bad(`${tag}: 予想の前に枠（320px）に収まらない（${await h()}px）`);
    const fixed=Object.keys(v.cfg.set||{}).filter(k=>!(v.cfg.unlock||[]).includes(k));
    for(const k of fixed)if(await p.$eval(`#m-${v.cfg.mode}`,(m,k)=>{const s=m.querySelector(`select[data-key="${k}"]`);return s&&s.offsetParent!==null;},k))bad(`${tag}: 問題で決めた ${k} が選べてしまう`);
-   if(v.cfg.predict.type==='number')await p.fill('#lk-in',String(v.expect));else await p.click(`#lk-ch button[data-v="${v.expect}"]`);
+   if(pr.type==='number')await p.fill('#lk-in',String(EX[0]));else await p.click(`#lk-ch button[data-v="${EX[0]}"]`);
    await p.click('#lk-go');
    embedH.push(`${v.asset}:${await h()}`);
    await p.click('#lk-more');

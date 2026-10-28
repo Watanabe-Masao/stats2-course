@@ -45,6 +45,41 @@ presets:
     mode: z
     modes: [z, power, multi]
     task: 自分の売場の数字（基準の平均、施策後の平均、σ、人数）を入れ、p 値と、その人数で差を見つけられる確率を読む。
+  s3-rule:
+    mode: power
+    steps:
+      - label: n＝25・差4・α5%
+        set: {side: two, alpha: 0.05, mu0: 100, mu1: 104, sigma: 10, n: 25}
+        task: 本当の平均104、σ＝10、25人、両側5%。検出力は（小数で）？
+        predict: {type: number, key: power, label: "検出力"}
+        expect: 0.516
+        why: 本当の z の中心は 4÷2＝2。境目1.96 をやっと超える位置なので、約半分。
+      - label: n＝100（4倍）
+        set: {n: 100}
+        task: 人数だけを4倍の100人にする。検出力は（小数で）？
+        predict: {type: number, key: power, label: "検出力"}
+        expect: 0.9793
+        why: SE が半分の1になり、中心が2から4へ。人数を4倍にすると中心が2倍になる。
+      - label: n＝100・差2（半分）
+        set: {mu1: 102}
+        task: 100人のまま、本当の差を半分の2（μ₁＝102）にする。検出力は（小数で）？
+        predict: {type: number, key: power, label: "検出力"}
+        expect: 0.516
+        why: 1つ目と同じ値に戻った。差を半分にしても、人数を4倍にすれば中心は同じ2。
+      - label: n＝25・差4・α1%
+        set: {alpha: 0.01, mu1: 104, n: 25}
+        task: 1つ目の条件に戻し、有意水準だけを1%にする。検出力は（小数で）？
+        predict: {type: number, key: power, label: "検出力"}
+        expect: 0.2823
+        why: 境目が2.576 に外へ動き、中心2 の山の大半が内側に入る。
+    law:
+      title: 式で説明する
+      lines:
+        - 本当の z の中心 ＝ (μ₁−μ₀)÷(σ÷√n) ＝ Δ×√n÷σ
+        - 検出力 ≒ P(Z ＞ 境目 − Δ×√n÷σ)
+        - Δ を半分にしても、√n が2倍（n が4倍）なら中心は同じ
+      text: 検出力は「差 Δ」「人数 n」「ばらつき σ」が Δ×√n÷σ の形でまとめて効き、境目（α）で決まる。だから必要な人数は n≒((境目＋0.84)×σ÷Δ)² と見積もれる（発展2）。
+      limit: σ を知らずに s で代わりにする（t 検定）と、少ない n では境目が外へ動き、検出力はこの見積もりより低くなる。店ごとの効果がばらばら（平均だけでは語れない）なときも、この式の外。
   s5-free:
     mode: power
     modes: [power, multi]

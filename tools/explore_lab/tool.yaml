@@ -1,0 +1,29 @@
+id: LAB-explore
+name: 探究ラボ
+slug: explore                    # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: explore_lab.src.html        # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: []              # 新しく作ったラボ（発展・創造の探究用。答えの照合はしない）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: sandbox
+    name: データを動かす
+    purpose: 2店×120日の架空データ（曜日・天気・キャンペーン・店の改装・台風と大口注文の日を含む）を、見る値・分け方・絞り方・図を選んで動かす。群ごとの日数・平均・中央値・標準偏差と、試したことの記録を出す。予想と照合しない
+    set: [value, group, filter, chart]
+    values: [diff]
+data: 固定の乱数（seed 20261029）で作る架空の2店×120日。客数は店・週末・天気・キャンペーン・B店の61日目からの改装で変わり、キャンペーンは週末に多い（群が混ざる）。A店42日目は台風、B店89日目は大口注文
+presets:
+  s6-camp:
+    mode: sandbox
+    set: {value: sales, group: camp, filter: all, chart: box}
+    task: 「キャンペーンの日は売上が高い。だからキャンペーンは効いている」と言えるか。分け方・絞り方・図を変えて、差が何によって生まれているかを探る。
+  s6-free:
+    mode: sandbox
+    task: 自分で問いを立て、見る値・分け方・絞り方・図を選んで動かす。統計で言えることと、自分の解釈を分けて書く。
+used_by: [U05]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・埋め込み
+  - node tools/explore_lab/check.js      # データの仕組み（キャンペーンの差が、平日だけに絞ると小さくなる）
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null

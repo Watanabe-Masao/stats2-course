@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>統計図ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.gfig{touch-action:none;user-select:none;-webkit-user-select:none}
+.gfig .dot{cursor:grab}
+.gfig .dot.sel{stroke:var(--fg);stroke-width:2}
+.glab{font-size:12px;font-weight:700;color:var(--mut);margin:6px 0 0}
+.stem{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.55;margin:4px 0}
+.stem .s{display:inline-block;width:2.2em;text-align:right;padding-right:.4em;border-right:2px solid var(--fg);margin-right:.4em}
+.stem .hl{color:var(--acc2);font-weight:700}
+.mode .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 統計図ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-link" class="mode">
+ <p class="mut" style="margin:0">同じデータを、点・ヒストグラム・箱ひげ図で並べる。点を指で左右に動かすと、図と数がいっしょに変わる。</p>
+ <div class="row ctl"><label>データ <select id="ldata" data-key="data"></select></label><label>階級の幅 <select id="lw" data-key="w"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label></div>
+ <div class="row ctl"><label>動かす点 <select id="lpick" data-key="pick"></select></label></div>
+ <input type="range" id="lval" min="0" max="150" step="1" value="55" data-name="その点の値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="lplot"></div>
+ <div class="card res key" id="lsum"></div>
+ <div class="res det" id="ltab"></div>
+</div>
+
+<div id="m-stem" class="mode">
+ <p class="mut" style="margin:0">十の位を幹、一の位を葉にして並べる。横に倒すと、幅10のヒストグラムと同じ形になる。1つ1つの値も残る。</p>
+ <div class="row ctl"><label>データ <select id="sdata" data-key="data"></select></label></div>
+ <input type="range" id="sval" min="0" max="99" step="1" value="55" data-name="最大の値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<div id="m-cum" class="mode">
+ <p class="mut" style="margin:0">累積相対度数を折れ線にする。縦が0.5 の所の横の値が、中央値のおよその値。階級の幅を変えると折れ線の角が変わる。</p>
+ <div class="row ctl"><label>データ <select id="cdata" data-key="data"></select></label><label>階級の幅 <select id="cw" data-key="w"><option value="5">5</option><option value="10" selected>10</option></select></label></div>
+ <input type="range" id="cp" min="0.05" max="0.95" step="0.05" value="0.5" data-name="累積の割合">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+ <div class="res det" id="ctab"></div>
+</div>
+
+<div id="m-qual" class="mode">
+ <p class="mut" style="margin:0">質的データ（カテゴリ）の度数は、棒グラフ・円グラフ・帯グラフ・パレート図で表す。同じ数でも、図によって見えやすいことが違う。</p>
+ <div class="row ctl"><label>図 <select id="qkind" data-key="kind"><option value="bar">棒グラフ</option><option value="pie">円グラフ</option><option value="band">帯グラフ</option><option value="pareto">パレート図</option></select></label></div>
+ <input type="range" id="q0" min="0" max="100" step="1" value="45" data-name="食品">
+ <input type="range" id="q1" min="0" max="100" step="1" value="25" data-name="日用品">
+ <input type="range" id="q2" min="0" max="100" step="1" value="15" data-name="衣料">
+ <input type="range" id="q3" min="0" max="100" step="1" value="10" data-name="家電">
+ <input type="range" id="q4" min="0" max="100" step="1" value="5" data-name="その他">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="qplot"></div>
+ <div class="card res key" id="qsum"></div>
+ <div class="res det" id="qtab"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const f=(v,d=2)=>{if(typeof v!=="number"||!isFinite(v))return String(v);const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+const W=340;
+const DATA={
+ sales:{name:"20日の売上（万円）",v:[12,15,18,19,21,22,22,24,25,26,27,28,29,30,31,33,35,38,42,55],lo:10},
+ nine:{name:"9個のデータ",v:[3,5,6,7,8,9,10,12,30],lo:0},
+ visits:{name:"8日の来店客数（人）",v:[47,49,51,52,55,58,60,120],lo:40}};
+const CAT=["食品","日用品","衣料","家電","その他"];
+const CCOL=["var(--acc)","var(--acc2)","#2a9d8f","#e9a23b","var(--mut)"];
+const sum=a=>a.reduce((s,x)=>s+x,0),mean=a=>sum(a)/a.length;
+const med=s=>{const n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;};
+// 四分位数：中央値を除いた下半分・上半分の中央値（分布ラボ・本文と同じ定義）
+function five(a){const s=[...a].sort((x,y)=>x-y),n=s.length,h=Math.floor(n/2);
+ const q1=med(s.slice(0,h)),q3=med(s.slice(n-h)),q2=med(s),iqr=q3-q1,lo=q1-1.5*iqr,hi=q3+1.5*iqr;
+ const inside=s.filter(x=>x>=lo&&x<=hi);
+ return {s,n,min:s[0],max:s[n-1],q1,q2,q3,iqr,lo,hi,wlo:inside[0],whi:inside[inside.length-1],out:s.filter(x=>x<lo||x>hi),mean:mean(s)};}
+function classes(v,lo,w,top){const t=top??Math.max(...v);const out=[];for(let a=lo;a<=t;a+=w)out.push({a,b:a+w,n:v.filter(x=>x>=a&&x<a+w).length});return out;}
+const X=(v,lo,hi)=>16+(v-lo)/(hi-lo)*(W-32);
+function ticks(lo,hi,y,step){let h="";for(let t=Math.ceil(lo/step)*step;t<=hi+1e-9;t+=step)h+=`<text x="${X(t,lo,hi)}" y="${y}" font-size="11" text-anchor="middle" fill="var(--mut)">${t}</text>`;return h;}
+const niceStep=r=>r>120?40:r>60?20:r>30?10:5;
+// 画面の x 座標 → データの値（ドラッグ用）
+function svgX(svg,ev){const r=svg.getBoundingClientRect();return (ev.clientX-r.left)/r.width*W;}
+
+// ---- 点・ヒストグラム・箱ひげ図をつなげる
+let L={key:null,v:[],sel:0};
+function lLoad(){const d=DATA[$("ldata").value];L.key=$("ldata").value;L.v=[...d.v].sort((a,b)=>a-b);L.sel=L.v.length-1;lPicks();lSync();}
+function lPicks(){$("lpick").innerHTML=L.v.map((x,i)=>`<option value="${i}">${i+1}番目に小さい値</option>`).join("");$("lpick").value=String(L.sel);}
+function lSync(){const d=DATA[L.key],e=$("lval");e.min=d.lo;e.max=Math.max(...DATA[L.key].v)*2;LK.setRange("lval",L.v[L.sel]);}
+function lRange(){const d=DATA[L.key],F=five(L.v),w=+$("lw").value;const lo=Math.min(d.lo,Math.floor(Math.min(...L.v)/w)*w),hi=Math.ceil((Math.max(...L.v)+1e-9)/w)*w;return {lo,hi:hi===lo?lo+w:hi,w,F};}
+function lVals(){const {lo,hi,w,F}=lRange(),cls=classes(L.v,lo,w,hi-1e-9),mx=Math.max(...cls.map(c=>c.n)),N=L.v.length;
+ const modeCls=cls.filter(c=>c.n===mx).map(c=>`${c.a}〜${c.b}`).join("・");
+ return {data:L.key,n:N,mean:F.mean,median:F.q2,q1:F.q1,q3:F.q3,iqr:F.iqr,fenceHi:F.hi,outliers:F.out.length,modeClass:modeCls,cls,lo,hi,w,F,max:F.max,min:F.min};}
+function lRender(){const R=lVals(),{lo,hi,w,F,cls}=R,x=v=>X(v,lo,hi),step=niceStep(hi-lo),mx=Math.max(...cls.map(c=>c.n));
+ // 点（同じ値は縦に積む）
+ const cnt={};let s=`<div class="glab">点（1つ＝1つの値）</div><svg class="gfig" id="ldots" viewBox="0 0 ${W} 74" width="${W}" role="img" aria-label="点の図">`;
+ L.v.forEach((v,i)=>{const k=v;cnt[k]=(cnt[k]||0)+1;const y=60-(cnt[k]-1)*11;s+=`<circle class="dot${i===L.sel?" sel":""}" data-i="${i}" cx="${x(v)}" cy="${y}" r="${i===L.sel?7:5.5}" fill="${i===L.sel?"var(--acc2)":"var(--acc)"}" fill-opacity=".85"/>`;});
+ s+=`<line x1="${x(R.mean)}" y1="8" x2="${x(R.mean)}" y2="70" stroke="var(--acc2)" stroke-dasharray="3 3"/><text x="${x(R.mean)}" y="8" font-size="10.5" text-anchor="${x(R.mean)>W*.75?"end":"middle"}" fill="var(--acc2)">平均 ${f(R.mean)}</text>`;
+ s+=`<line x1="16" y1="68" x2="${W-16}" y2="68" stroke="var(--line)"/></svg>`;
+ // ヒストグラム
+ const H=96;s+=`<div class="glab">ヒストグラム（幅${w}）</div><svg viewBox="0 0 ${W} ${H+8}" width="${W}" role="img" aria-label="ヒストグラム">`;
+ cls.forEach(c=>{const h=mx?c.n/mx*(H-20):0;s+=`<rect x="${x(c.a)}" y="${H-h}" width="${Math.max(1,x(c.b)-x(c.a)-1)}" height="${h}" fill="var(--acc)" fill-opacity=".7"/>`;if(c.n)s+=`<text x="${(x(c.a)+x(c.b))/2}" y="${H-h-4}" font-size="11" text-anchor="middle" fill="var(--fg)">${c.n}</text>`;});
+ s+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/></svg>`;
+ // 箱ひげ図
+ const y=26;s+=`<div class="glab">箱ひげ図</div><svg viewBox="0 0 ${W} 66" width="${W}" role="img" aria-label="箱ひげ図">`;
+ s+=`<line x1="${x(F.wlo)}" y1="${y}" x2="${x(F.q1)}" y2="${y}" stroke="var(--acc)" stroke-width="2"/><line x1="${x(F.q3)}" y1="${y}" x2="${x(F.whi)}" y2="${y}" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${x(F.wlo)}" y1="${y-7}" x2="${x(F.wlo)}" y2="${y+7}" stroke="var(--acc)" stroke-width="2"/><line x1="${x(F.whi)}" y1="${y-7}" x2="${x(F.whi)}" y2="${y+7}" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<rect x="${x(F.q1)}" y="${y-11}" width="${Math.max(1,x(F.q3)-x(F.q1))}" height="22" rx="3" fill="var(--acc)" fill-opacity=".18" stroke="var(--acc)" stroke-width="2"/><line x1="${x(F.q2)}" y1="${y-11}" x2="${x(F.q2)}" y2="${y+11}" stroke="var(--acc)" stroke-width="3"/>`;
+ F.out.forEach(v=>{s+=`<circle cx="${x(v)}" cy="${y}" r="4.5" fill="var(--bg)" stroke="var(--ng)" stroke-width="2"/>`;});
+ s+=ticks(lo,hi,60,step)+`</svg><div class="legend mut"><span>太線＝中央値</span><span>点線＝平均</span><span>○＝外れ値候補</span></div>`;
+ $("lplot").innerHTML=s;
+ $("lsum").innerHTML=`<div>動かした点：<b>${f(L.v[L.sel])}</b>（${L.sel+1}番目に小さい値）</div><div>平均 <b>${f(R.mean)}</b>　中央値 <b>${f(R.median)}</b>　Q₁ ${f(R.q1)}・Q₃ ${f(R.q3)}（IQR ${f(R.iqr)}）</div><div>いちばん度数が多い階級：${R.modeClass}　外れ値候補：${R.outliers} 個</div><div class="mut">端の点を動かすと、平均・ヒストグラムの端・ひげは動くが、中央値と箱はほとんど動かない。真ん中の点を動かすと箱が動く。</div>`;
+ $("ltab").innerHTML=`<table><tr><th>階級</th><th>度数</th></tr>${cls.map(c=>`<tr><td>${c.a}〜${c.b}</td><td>${c.n}</td></tr>`).join("")}</table>`;
+}
+let LD=null;
+function lDragInit(){const box=$("lplot");
+ box.addEventListener("pointerdown",ev=>{const t=ev.target.closest&&ev.target.closest("#ldots .dot");if(!t)return;LD=+t.dataset.i;L.sel=LD;$("lpick").value=String(LD);box.setPointerCapture(ev.pointerId);ev.preventDefault();lRender();});
+ box.addEventListener("pointermove",ev=>{if(LD===null)return;const svg=$("ldots");if(!svg)return;const {lo,hi}=lRange(),e=$("lval");let v=Math.round(lo+(svgX(svg,ev)-16)/(W-32)*(hi-lo));v=Math.max(+e.min,Math.min(+e.max,v));if(v!==L.v[L.sel])lSet(v,true);});
+ const end=()=>{if(LD===null)return;LD=null;lResort();};box.addEventListener("pointerup",end);box.addEventListener("pointercancel",end);}
+function lSet(v,dragging){L.v[L.sel]=v;LK.setRange("lval",v);if(!dragging)lResort();else{lRender();}}
+function lResort(){const v=L.v[L.sel];L.v.sort((a,b)=>a-b);L.sel=Math.max(0,L.v.lastIndexOf(v));lPicks();lRender();}
+LK.register("link",{name:"図をつなげる",
+ init(){$("ldata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("ldata").onchange=()=>{lLoad();lRender();};$("lw").onchange=lRender;
+  $("lpick").onchange=()=>{L.sel=+$("lpick").value;lSync();lRender();};LK.stepper($("lval"),()=>lSet(+$("lval").value,false));lDragInit();lLoad();lRender();},
+ apply(s){if(s.data){$("ldata").value=s.data;lLoad();}if(s.w)$("lw").value=String(s.w);if(s.pick!==undefined){L.sel=Math.max(0,Math.min(L.v.length-1,s.pick==="max"?L.v.length-1:+s.pick));lPicks();lSync();}if(s.value!==undefined){L.v[L.sel]=+s.value;lResort();lSync();}lRender();},
+ render:lRender,
+ value(key){const R=lVals(),v=R[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 幹葉図
+let Sv=[];
+function sLoad(){const d=DATA[$("sdata").value];Sv=[...d.v].sort((a,b)=>a-b);const e=$("sval");e.min=Sv[Sv.length-2];e.max=99;LK.setRange("sval",Sv[Sv.length-1]);}
+function sVals(){const v=[...Sv];v[v.length-1]=+$("sval").value;v.sort((a,b)=>a-b);const stems={};const lo=Math.floor(v[0]/10),hi=Math.floor(v[v.length-1]/10);for(let t=lo;t<=hi;t++)stems[t]=[];v.forEach(x=>stems[Math.floor(x/10)].push(x%10));
+ const counts=Object.values(stems).map(a=>a.length),mx=Math.max(...counts),topStem=+Object.keys(stems).find(k=>stems[k].length===mx);
+ return {v,stems,lo,hi,median:med(v),maxStemCount:mx,topStem,nStems:hi-lo+1,max:v[v.length-1],"leaves:2":(stems[2]||[]).length};}
+function sRender(){const S=sVals(),N=S.v.length,mi=N%2?[(N-1)/2]:[N/2-1,N/2];let k=0,h=`<div class="glab">幹葉図（幹＝十の位、葉＝一の位）</div><div class="stem">`;
+ for(let t=S.lo;t<=S.hi;t++){h+=`<div><span class="s">${t}</span>${S.stems[t].map(l=>{const hl=mi.includes(k);k++;return `<span class="${hl?"hl":""}">${l}</span>`;}).join(" ")||"&nbsp;"}</div>`;}
+ h+=`</div><div class="mut">色の付いた葉が真ん中の値（中央値に使う値）</div>`;
+ // 横に倒すと幅10のヒストグラム
+ const x0=S.lo*10,x1=(S.hi+1)*10,x=v=>X(v,x0,x1),H=86,mx=S.maxStemCount;h+=`<div class="glab">倒すと：幅10のヒストグラム</div><svg viewBox="0 0 ${W} ${H+22}" width="${W}" role="img" aria-label="ヒストグラム">`;
+ for(let t=S.lo;t<=S.hi;t++){const n=S.stems[t].length,hh=n/mx*(H-18);h+=`<rect x="${x(t*10)}" y="${H-hh}" width="${x(t*10+10)-x(t*10)-1}" height="${hh}" fill="var(--acc)" fill-opacity=".7"/>`;if(n)h+=`<text x="${x(t*10+5)}" y="${H-hh-4}" font-size="11" text-anchor="middle" fill="var(--fg)">${n}</text>`;}
+ h+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/>`+ticks(x0,x1,H+16,niceStep(x1-x0))+`</svg>`;
+ $("splot").innerHTML=h;
+ $("ssum").innerHTML=`<div>葉がいちばん多い幹：<b>${S.topStem}</b>（${S.maxStemCount}個）　中央値 <b>${f(S.median)}</b></div><div class="mut">幹葉図は、ヒストグラムと同じ形を見せながら、1つ1つの値も残る。データが多いと葉が長くなりすぎるので、少ないデータ向き。</div>`;}
+LK.register("stem",{name:"幹葉図",
+ init(){$("sdata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("sdata").onchange=()=>{sLoad();sRender();};LK.stepper($("sval"),sRender);sLoad();sRender();},
+ apply(s){if(s.data){$("sdata").value=s.data;sLoad();}if(s.max!==undefined)LK.setRange("sval",s.max);sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:f(v)};}});
+
+// ---- 累積相対度数の折れ線
+function cVals(){const d=DATA[$("cdata").value],w=+$("cw").value,v=[...d.v].sort((a,b)=>a-b),N=v.length,cls=classes(v,d.lo,w);let c=0;const pts=[[cls[0].a,0]];cls.forEach(k=>{c+=k.n;pts.push([k.b,c/N]);});
+ const p=+$("cp").value;let xq=pts[pts.length-1][0];for(let i=1;i<pts.length;i++){if(pts[i][1]>=p-1e-12){const [xa,ya]=pts[i-1],[xb,yb]=pts[i];xq=yb===ya?xa:xa+(p-ya)/(yb-ya)*(xb-xa);break;}}
+ const below=t=>v.filter(x=>x<t).length/N;
+ return {d,w,v,N,cls,pts,p,xq,median:med(v),"below:30":below(30),"below:20":below(20)};}
+function cRender(){const C=cVals(),lo=C.pts[0][0],hi=C.pts[C.pts.length-1][0],x=v=>36+(v-lo)/(hi-lo)*(W-52),H=150,top=12,Y=p=>H-p*(H-top);
+ let s=`<svg viewBox="0 0 ${W} ${H+22}" width="${W}" role="img" aria-label="累積相対度数の折れ線">`;
+ [0,0.25,0.5,0.75,1].forEach(p=>{s+=`<line x1="36" y1="${Y(p)}" x2="${W-16}" y2="${Y(p)}" stroke="var(--line)" stroke-opacity=".6"/><text x="30" y="${Y(p)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${p}</text>`;});
+ s+=`<path d="${C.pts.map((q,i)=>(i?"L":"M")+x(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1)).join("")}" fill="none" stroke="var(--acc)" stroke-width="2.2"/>`;
+ C.pts.forEach(q=>{s+=`<circle cx="${x(q[0])}" cy="${Y(q[1])}" r="3.5" fill="var(--acc)"/>`;});
+ s+=`<line x1="36" y1="${Y(C.p)}" x2="${x(C.xq)}" y2="${Y(C.p)}" stroke="var(--acc2)" stroke-dasharray="4 3" stroke-width="1.5"/><line x1="${x(C.xq)}" y1="${Y(C.p)}" x2="${x(C.xq)}" y2="${H}" stroke="var(--acc2)" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+ s+=`<text x="${Math.min(W-40,x(C.xq)+4)}" y="${H-4}" font-size="11" fill="var(--acc2)">${f(C.xq,1)}</text>`;
+ s+=`<line x1="36" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--fg)" stroke-opacity=".5"/>`;for(let tk=Math.ceil(lo/niceStep(hi-lo))*niceStep(hi-lo);tk<=hi+1e-9;tk+=niceStep(hi-lo))s+=`<text x="${x(tk)}" y="${H+16}" font-size="11" text-anchor="middle" fill="var(--mut)">${tk}</text>`;s+=`</svg>`;
+ $("cplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>累積相対度数（階級の右端で区切る）</span><span><i class="sw" style="background:var(--acc2)"></i>割合 ${C.p} の位置</span></div>`;
+ $("csum").innerHTML=`<div>累積の割合 ${C.p} に当たる値：<b>${f(C.xq,1)}</b>（折れ線から読む）</div><div>本当の中央値：${f(C.median)}　30未満の割合：${f(C.v.filter(x=>x<30).length/C.N)}</div><div class="mut">折れ線は階級の中で一様に並んでいると考えて結ぶので、読んだ値はおよその値。0.25・0.75 を読むと Q₁・Q₃ のおよその値。</div>`;
+ let c=0;$("ctab").innerHTML=`<table><tr><th>階級</th><th>累積相対度数</th></tr>${C.cls.map(k=>{c+=k.n;return `<tr><td>${k.a}〜${k.b}</td><td>${f(c/C.N)}</td></tr>`;}).join("")}</table>`;}
+LK.register("cum",{name:"累積の折れ線",
+ init(){$("cdata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("cdata").onchange=cRender;$("cw").onchange=cRender;LK.stepper($("cp"),cRender);cRender();},
+ apply(s){if(s.data)$("cdata").value=s.data;if(s.w)$("cw").value=String(s.w);if(s.p!==undefined)LK.setRange("cp",s.p);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=key==="xq"?+C.xq.toFixed(1):C[key];return {v,text:f(v,key==="xq"?1:2)};}});
+
+// ---- 質的データの図
+function qVals(){const n=CAT.map((c,i)=>+$("q"+i).value),N=sum(n)||1,kind=$("qkind").value;const order=CAT.map((c,i)=>i).sort((a,b)=>n[b]-n[a]);
+ const share=n.map(x=>x/N),top=order[0];return {kind,n,N,share,order,topName:CAT[top],topShare:share[top],"angle:0":share[0]*360,"share:0":share[0],top2:share[order[0]]+share[order[1]]};}
+function qRender(){const Q=qVals();let s="";
+ if(Q.kind==="bar"){const H=150,mx=Math.max(...Q.n,1),bw=(W-40)/CAT.length;s=`<svg viewBox="0 0 ${W} ${H+24}" width="${W}" role="img" aria-label="棒グラフ">`;
+  CAT.forEach((c,i)=>{const h=Q.n[i]/mx*(H-22),xx=24+i*bw+bw*.15;s+=`<rect x="${xx}" y="${H-h}" width="${bw*.7}" height="${h}" rx="3" fill="${CCOL[i]}" fill-opacity=".85"/><text x="${xx+bw*.35}" y="${H-h-4}" font-size="11" text-anchor="middle" fill="var(--fg)">${Q.n[i]}</text><text x="${xx+bw*.35}" y="${H+15}" font-size="11" text-anchor="middle" fill="var(--fg)">${c}</text>`;});
+  s+=`<line x1="20" y1="${H}" x2="${W-12}" y2="${H}" stroke="var(--line)"/></svg><div class="mut">棒は離して並べ、高さで度数を比べる（ヒストグラムとの違い：横軸はカテゴリで、順番を入れ替えてもよい）。</div>`;}
+ else if(Q.kind==="pie"){const cx=W/2,cy=96,r=82;let a0=-Math.PI/2;s=`<svg viewBox="0 0 ${W} 196" width="${W}" role="img" aria-label="円グラフ">`;
+  CAT.forEach((c,i)=>{const a1=a0+Q.share[i]*2*Math.PI;if(Q.share[i]>0){const big=a1-a0>Math.PI?1:0;s+=Q.share[i]>=0.9999?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${CCOL[i]}" fill-opacity=".85"/>`:`<path d="M${cx} ${cy} L${cx+r*Math.cos(a0)} ${cy+r*Math.sin(a0)} A${r} ${r} 0 ${big} 1 ${cx+r*Math.cos(a1)} ${cy+r*Math.sin(a1)} Z" fill="${CCOL[i]}" fill-opacity=".85" stroke="var(--bg)" stroke-width="1.5"/>`;
+   const am=(a0+a1)/2;if(Q.share[i]>=0.06)s+=`<text x="${cx+r*.62*Math.cos(am)}" y="${cy+r*.62*Math.sin(am)+4}" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">${c}</text>`;}a0=a1;});
+  s+=`</svg><div class="mut">円全体が100%。中心角＝割合×360°。全体の中の割合を見るのに向くが、近い割合どうしの比較は棒グラフの方が読みやすい。</div>`;}
+ else if(Q.kind==="band"){const y=40,h=40;let x0=16;s=`<svg viewBox="0 0 ${W} 120" width="${W}" role="img" aria-label="帯グラフ">`;
+  CAT.forEach((c,i)=>{const w=Q.share[i]*(W-32);if(w>0){s+=`<rect x="${x0}" y="${y}" width="${w}" height="${h}" fill="${CCOL[i]}" fill-opacity=".85" stroke="var(--bg)" stroke-width="1.5"/>`;if(w>34)s+=`<text x="${x0+w/2}" y="${y+h/2+4}" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">${Math.round(Q.share[i]*100)}%</text>`;}x0+=w;});
+  s+=`<g font-size="11" fill="var(--fg)">${CAT.map((c,i)=>`<rect x="${16+i*64}" y="96" width="10" height="10" fill="${CCOL[i]}"/><text x="${30+i*64}" y="105">${c}</text>`).join("")}</g></svg><div class="mut">帯の全体が100%。いくつかの帯を並べると、グループごとの割合の違い（構成比）を比べやすい。</div>`;}
+ else{const H=150,mx=Q.N,bw=(W-48)/CAT.length,Y=v=>H-v/mx*(H-16);s=`<svg viewBox="0 0 ${W} ${H+24}" width="${W}" role="img" aria-label="パレート図">`;let c=0;const pts=[];
+  Q.order.forEach((i,k)=>{const xx=24+k*bw+bw*.1,h=H-Y(Q.n[i]);s+=`<rect x="${xx}" y="${H-h}" width="${bw*.8}" height="${h}" fill="${CCOL[i]}" fill-opacity=".8"/><text x="${xx+bw*.4}" y="${H+15}" font-size="11" text-anchor="middle" fill="var(--fg)">${CAT[i]}</text>`;c+=Q.n[i];pts.push([xx+bw*.8,Y(c),c/Q.N]);});
+  s+=`<path d="M24 ${H} ${pts.map(p=>"L"+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ")}" fill="none" stroke="var(--fg)" stroke-width="2"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="var(--fg)"/><text x="${p[0]}" y="${p[1]-6}" font-size="10" text-anchor="end" fill="var(--fg)">${Math.round(p[2]*100)}%</text>`).join("");
+  s+=`<line x1="20" y1="${H}" x2="${W-12}" y2="${H}" stroke="var(--line)"/></svg><div class="mut">多い順に棒を並べ、累積の割合を折れ線で重ねる。上位いくつで全体の何%かが読める。</div>`;}
+ $("qplot").innerHTML=s;
+ $("qsum").innerHTML=`<div>合計 ${Q.N}　いちばん多い：<b>${Q.topName}</b>（${f(Q.topShare*100,1)}%）</div><div>食品の割合 ${f(Q["share:0"]*100,1)}% → 円グラフの中心角 <b>${f(Q["angle:0"],1)}°</b>　上位2つで <b>${f(Q.top2*100,1)}%</b></div>`;
+ $("qtab").innerHTML=`<table><tr><th>カテゴリ</th><th>度数（割合）</th></tr>${CAT.map((c,i)=>`<tr><td>${c}</td><td>${Q.n[i]}（${f(Q.share[i]*100,1)}%）</td></tr>`).join("")}</table>`;}
+LK.register("qual",{name:"質的データの図",
+ init(){CAT.forEach((c,i)=>LK.stepper($("q"+i),qRender));$("qkind").onchange=qRender;qRender();},
+ apply(s){if(s.kind)$("qkind").value=s.kind;if(s.n)s.n.forEach((v,i)=>LK.setRange("q"+i,v));qRender();},
+ render:qRender,
+ value(key){const Q=qVals(),v=Q[key];if(key==="topName")return {v,text:v};return {v,text:key.startsWith("angle")?f(v,1):f(v,3)};}});
+
+LK.start("link");
+window.__LAB__={LK,lVals,sVals,cVals,qVals,L};
+</script>
+</body></html>
