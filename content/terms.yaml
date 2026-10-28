@@ -167,3 +167,9 @@
 - id: TERM-expo
   name: 指数分布
   en: exponential distribution
+- id: TERM-pdf
+  name: 確率密度関数
+  en: probability density function
+- id: TERM-uniform
+  name: 一様分布
+  en: uniform distribution

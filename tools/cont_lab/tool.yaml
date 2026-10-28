@@ -1,0 +1,77 @@
+id: LAB-cont
+name: 連続分布ラボ
+slug: continuous                 # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: cont_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_normal.html, expo.html]   # 旧版 教科書16 の「正規分布（μ・σ・区間）」を norm、「指数分布と無記憶性」を expo に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: norm
+    name: 正規分布の確率
+    purpose: N(μ, σ²) で区間に入る確率を、標準化 z＝(値−μ)÷σ と Φ(z) の差で求める。面積として塗って見せる
+    set: [mu, sd, a, b, kind]     # kind：between（a 以上 b 以下）／le（b 以下）／ge（a 以上）／out（外側）
+    values: [p, pct, za, zb, phiA, phiB]
+  - key: q
+    name: 上位 p% の値
+    purpose: 上側・下側・両側の割合 p% から z を逆に決め、値＝μ＋z×σ に戻す
+    set: [mu, sd, p, side]        # p は %。side：upper／lower／both
+    values: [z, x, xlo, xhi]
+  - key: unif
+    name: 一様分布
+    purpose: U(a, b) の高さ 1÷(b−a)、区間の確率＝幅÷全体の幅、平均 (a＋b)÷2・分散 (b−a)²÷12
+    set: [a, b, c, d, unit]
+    values: [p, h, mean, var, sd]
+  - key: expo
+    name: 指数分布
+    purpose: 平均の待ち時間（＝1÷λ）から、t より長く待つ確率 e^(−λt)。すでに s 待っても先の確率は同じ（無記憶性）
+    set: [mean, t, s, unit]
+    values: [pgt, ple, lambda, mean, var, sd, cond, med]
+  - key: dens
+    name: 高さと面積
+    purpose: 確率密度の高さ f(x) は確率ではない。幅 w の面積≒f(x)×w が確率で、幅0なら0。σ が小さいと高さは1を超える
+    set: [sd, x, w]
+    values: [fx, p, approx, over1]   # over1：f(x) が1を「超える」か「超えない」
+data: スライダーと選択欄で値を決める（データの読み込みなし）。Φ は誤差関数の近似（誤差 1.5×10⁻⁷ 以下）、逆関数は Acklam の近似
+presets:
+  s1-norm:
+    mode: norm
+    set: {mu: 100, sd: 10, a: 120, b: 130, kind: ge}
+    task: 1日の来店客数は平均100人・標準偏差10人の正規分布。120人以上になる確率は（小数で）？
+    predict: {type: number, key: p, label: "P(X≧120)"}
+    expect: 0.0228
+    why: z＝(120−100)÷10＝2。1−Φ(2)＝1−0.9772≒0.023。50日に1日くらい。a を90、求めるを「a 以上 b 以下」、b を110にすると約68%になる。
+  s1-dens:
+    mode: dens
+    set: {sd: 0.2, x: 0, w: 0.1}
+    task: 標準偏差0.2の正規分布（真ん中は0）。真ん中の高さ f(0) は1を超えるか。
+    predict: {type: choice, key: over1, label: "f(0) は1を", options: [超える, 超えない]}
+    expect: 超える
+    why: f(0)≒1.99。高さは確率ではないので1を超えてよい。確率は面積で、幅0.1なら約0.2。幅を0にすると確率は0になる。
+  s1-band:
+    mode: norm
+    set: {mu: 100, sd: 10, a: 80, b: 120, kind: between}
+    task: 平均100・標準偏差10の正規分布で、80以上120以下（μ±2σ）に入る確率は（小数で）？
+    predict: {type: number, key: p, label: "P(80≦X≦120)"}
+    expect: 0.9545
+    why: z は −2 と 2。Φ(2)−Φ(−2)≒0.954。σ を変えても、a・b を μ±2σ に合わせ直せば同じ約95%になる。確率は z だけで決まる。
+  s3-free:
+    mode: norm
+    modes: [norm, q, unif, expo]
+    task: 解いてから、問題の分布（正規・一様・指数）と、求めるもの（区間の確率か、上位 p% の値か）に合うモードで確かめる。
+  s4-free:
+    mode: norm
+    modes: [norm, q, expo]
+    task: 自分の売場の数字（販売数・重さ・待ち時間の平均と標準偏差）を入れ、「〇〇以上」の確率や、上位 p% の値を読む。
+  s5-free:
+    mode: expo
+    modes: [expo, unif, dens]
+    task: 「指数分布」で s（すでに待った時間）を動かし、その先の確率が変わらないことを見る（発展1）。「高さと面積」で σ を小さくし、高さが1を超えても面積は1のままなのを見る（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（正規分布の確率、上位 p% の値、一様分布、指数分布、高さと面積）。
+used_by: [U16]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/cont_lab/check.js         # 本文の値（0.6827・0.0228・0.9104、1/3、2/3、e⁻²、上位5%の z＝1.645）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
