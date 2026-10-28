@@ -1,0 +1,65 @@
+id: LAB-reg
+name: 回帰ラボ
+slug: reg                        # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: reg_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_reg.html]  # 旧版 教科書29 の「残差を表示して、2乗和が最小になる直線」を fit と line に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: fit
+    name: 回帰直線
+    purpose: 点をドラッグで動かすと、最小二乗の直線・残差の縦線と2乗の正方形・傾き・切片・SSE・R²・表・平方和の表が同時に動く。予測する x を動かすと予測値（◇）が動き、観測した範囲の外なら外挿と出す
+    set: [data, px]                      # data は "x,y x,y …"（空白区切り）、px は予測する x
+    values: [n, xbar, ybar, sxx, sxy, syy, b, a, sse, sst, ssr, r2, r, se, f, yhat, inrange, emax, emin, esum]   # inrange は「範囲内」／「外挿」
+  - key: line
+    name: 自分で引く
+    purpose: 傾きと切片を動かして自分の直線を引き、その残差平方和（正方形の面積の合計）を最小二乗の直線と比べる
+    set: [data, m, c]
+    values: [sseUser, sumUser, sseLS, b, a, diff]
+  - key: resid
+    name: 残差プロット
+    purpose: 散布図と回帰直線の下に、横に x・縦に残差の図を描く。点をドラッグで動かせる。残差と (x−x̄)² の相関で形（山形・谷形・ばらばら）を判定する
+    set: [data]
+    values: [b, a, r2, curve, shape]     # shape は「山形」／「谷形」／「ばらばら」
+  - key: dir
+    name: 回帰の向き
+    purpose: y を x で回帰した直線と x を y で回帰した直線を重ねて描く。2つの係数と、その積が r² になること。点をドラッグで動かせる
+    set: [data]
+    values: [bxy, axy, byx, ayx, r, r2, prod]   # bxy は y を x で回帰した傾き、byx は x を y で回帰した係数
+data: 点は場面ごとに data で渡す（なければ旧版の例題 (1,3)(2,5)(3,4)(4,6)(5,7)）。残差プロットの初期値は値引き率と販売数の5点、回帰の向きの初期値は (1,2)(2,1)(3,4)(4,3)(5,5)
+presets:
+  s1-fit:
+    mode: fit
+    set: {data: "1,3 2,5 3,4 4,6 5,7", px: 5}
+    task: 5週の広告回数 x と来店者数 y（百人）は (1,3)(2,5)(3,4)(4,6)(5,7)。最小二乗の回帰直線の傾き b を（小数で）予想する。
+    predict: {type: number, key: b, label: "傾き b"}
+    expect: 0.9
+    why: 偏差の積の和9 を x の偏差平方和10 で割って0.9。直線は (3, 5) を通るので a＝2.3。点を動かすと、正方形の合計（SSE）が最小になるよう直線がついてくる。
+  s1-line:
+    mode: line
+    set: {data: "1,3 2,5 3,4 4,6 5,7", m: 0.5, c: 4}
+    task: 例題Aの5点に、目分量の直線 ŷ＝4＋0.5x を引いた。この直線の残差平方和（正方形の面積の合計）は（小数で）？
+    predict: {type: number, key: sseUser, label: "残差平方和"}
+    expect: 4.75
+    why: 残差は −1.5, 0, −1.5, 0, 0.5。傾きと切片を動かして小さくしていくと、最小二乗の1.9 より小さくはならない。
+  s3-free:
+    mode: fit
+    modes: [fit, line, resid, dir]
+    task: 解いてから、問題が聞いていること（直線と予測、自分の直線との比較、残差の形、回帰の向き）に合うモードで確かめる。
+  s4-free:
+    mode: fit
+    modes: [fit, resid]
+    task: 自分の売場の2つの数字（たとえば気温と売上）を点で入れ、回帰直線・R²・残差を読む。予測する x を範囲の外に動かして外挿を確かめる。
+  s5-free:
+    mode: fit
+    modes: [fit, resid, dir]
+    task: 「回帰直線」の「くわしく」で平方和の表と F を見る（発展1）。「残差プロット」で残差の形を見る（発展2）。「回帰の向き」で2つの係数の積が r² になることを確かめる（発展3）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（回帰直線、自分で引く、残差プロット、回帰の向き）。
+used_by: [U29]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/reg_lab/check.js          # 本文の値（b＝0.9・a＝2.3・SSE 1.9・R² 0.81・F 12.79、目分量の直線4.75、残差の形、向き）とドラッグ
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null

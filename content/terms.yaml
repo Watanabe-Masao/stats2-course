@@ -281,3 +281,18 @@
 - id: TERM-spurious
   name: 擬相関
   en: spurious correlation
+- id: TERM-ols
+  name: 最小二乗法
+  en: least squares method
+- id: TERM-regcoef
+  name: 回帰係数
+  en: regression coefficient
+- id: TERM-resid
+  name: 残差
+  en: residual
+- id: TERM-r2
+  name: 決定係数
+  en: coefficient of determination
+- id: TERM-extrap
+  name: 外挿
+  en: extrapolation

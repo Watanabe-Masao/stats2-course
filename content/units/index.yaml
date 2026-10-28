@@ -29,7 +29,7 @@
 - {id: U26, number: "26", migrated: true}
 - {id: U27, number: "27", migrated: true}
 - {id: U28, number: "28", migrated: true}
-- {id: U29, number: "29", migrated: false}
+- {id: U29, number: "29", migrated: true}
 - {id: U30, number: "30", migrated: false}
 - {id: U31, number: "31", migrated: false}
 - {id: U32, number: "32", migrated: false}
