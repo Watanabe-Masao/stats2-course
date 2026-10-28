@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数え方ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.chip{display:inline-block;padding:1px 7px;margin:2px;border-radius:6px;border:1px solid var(--line);background:var(--bg);font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.grp{padding:4px 6px;border-radius:8px;margin:4px 0;border-left:5px solid var(--acc);background:var(--card)}
+.grp:nth-child(even){border-left-color:var(--mut)}
+.grp b{display:inline-block;min-width:76px;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.flex{display:flex;flex-wrap:wrap}
+.tri{display:flex;flex-direction:column;align-items:center;gap:3px;margin:6px 0}
+.tri div{display:flex;gap:3px}
+.cell{height:28px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:0;cursor:pointer}
+.cell.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.cell.par{border:2px solid var(--fg);font-weight:700}
+.cell.mir{border:2px dashed var(--acc)}
+.legend span{margin-right:10px;font-size:12px}
+.mono{font-family:ui-monospace,Menlo,monospace}
+table.t{border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-align:right}
+</style></head><body>
+<h1>🧪 数え方ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-list" class="mode">
+ <p class="mut" style="margin:0">n 人から r 人を選ぶ。役割（順番）を区別すると順列、区別しないと組合せ。色の帯1本が「同じ組」。</p>
+ <input type="range" id="ln" min="2" max="10" step="1" value="5" data-name="人数 n">
+ <input type="range" id="lr" min="1" max="4" step="1" value="2" data-name="選ぶ数 r">
+ <div class="row ctl"><label>役割（順番） <select id="lrole" data-key="role"><option value="あり">区別する</option><option value="なし">区別しない</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="lsum"></div>
+ <div class="res det" id="llist"></div>
+</div>
+
+<div id="m-pascal" class="mode">
+ <p class="mut" style="margin:0">パスカルの三角形の n 段目・左から r 番目が ₙCᵣ。上の2つの数の和になっている。p を決めると、その段から二項分布の確率を作る。</p>
+ <input type="range" id="pn" min="0" max="12" step="1" value="5" data-name="段 n">
+ <input type="range" id="pr" min="0" max="12" step="1" value="2" data-name="r">
+ <input type="range" id="pp" min="0" max="1" step="0.05" value="0.5" data-name="確率 p">
+ <div class="legend mut"><span>■ 選んだ数</span><span>太枠 足し合わせる2つ</span><span>┅ 対称な数</span></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="ptri"></div>
+ <div class="card res key" id="pinfo"></div>
+ <div class="res det" id="pbin"></div>
+</div>
+
+<div id="m-multi" class="mode">
+ <p class="mut" style="margin:0">n 種類から r 個を選ぶ。同じ種類を何度選んでもよい。順番を区別すれば nʳ、区別しなければ ● と仕切り ｜ の並べ方。</p>
+ <input type="range" id="mn" min="2" max="10" step="1" value="3" data-name="種類 n">
+ <input type="range" id="mr" min="1" max="6" step="1" value="2" data-name="個数 r">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="msum"></div>
+ <div class="res det" id="mlist"></div>
+</div>
+
+<div id="m-path" class="mode">
+ <p class="mut" style="margin:0">格子の左下 S から右上 G への最短の道。→ と ↑ の並べ方を数える。</p>
+ <input type="range" id="pa" min="1" max="6" step="1" value="3" data-name="右へ">
+ <input type="range" id="pb" min="1" max="5" step="1" value="2" data-name="上へ">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="psvg"></div>
+ <div class="row ctl res key"><button type="button" class="sub" id="pnew">別の道を表示</button></div>
+ <div class="card res key" id="psum"></div>
+ <div class="res det" id="plist"></div>
+</div>
+
+<div id="m-der" class="mode">
+ <p class="mut" style="margin:0">n 人がプレゼントを持ち寄って無作為に配り直す。全員が自分以外の物を受け取る確率は？</p>
+ <input type="range" id="dn" min="2" max="10" step="1" value="4" data-name="人数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="dsum"></div>
+ <div class="row ctl res key"><button type="button" class="act" id="dsim">1000回配り直す</button><button type="button" class="sub" id="dreset">リセット</button></div>
+ <div class="card res key" id="dexp"></div>
+ <div class="res det" id="dtab"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const SUBD="₀₁₂₃₄₅₆₇₈₉",sub=n=>String(n).split("").map(d=>SUBD[+d]).join("");
+const cc=(n,r)=>`${sub(n)}C${sub(r)}`,pp=(n,r)=>`${sub(n)}P${sub(r)}`;
+function C(n,r){if(r<0||r>n)return 0;r=Math.min(r,n-r);let x=1;for(let i=1;i<=r;i++)x=x*(n-r+i)/i;return Math.round(x);}
+function fact(n){let x=1;for(let i=2;i<=n;i++)x*=i;return x;}
+const fmt=x=>x.toLocaleString("ja-JP");
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ---- 並べて数える
+function perms(arr,r){const out=[],used=arr.map(()=>false),cur=[];(function rec(){if(cur.length===r){out.push(cur.slice());return;}
+ for(let i=0;i<arr.length;i++){if(!used[i]){used[i]=true;cur.push(arr[i]);rec();cur.pop();used[i]=false;}}})();return out;}
+function lVals(){const n=+$("ln").value,r=Math.min(+$("lr").value,n),role=$("lrole").value;let perm=1;for(let i=0;i<r;i++)perm*=n-i;const comb=perm/fact(r);return {n,r,role,perm,comb,count:role==="あり"?perm:comb};}
+function lRender(){const L=lVals();$("lr").max=Math.min(4,L.n);
+ const prod=Array.from({length:L.r},(_,i)=>L.n-i).join("×");
+ $("lsum").innerHTML=`<div${L.role==="あり"?' style="font-weight:700"':""}>順列 ${pp(L.n,L.r)}＝${prod}＝${fmt(L.perm)}通り</div><div${L.role==="なし"?' style="font-weight:700"':""}>組合せ ${cc(L.n,L.r)}＝${fmt(L.perm)}÷${L.r}!＝${fmt(L.perm)}÷${fact(L.r)}＝${fmt(L.comb)}通り</div><div class="mut">役割を区別すると、同じ組の中に ${L.r}!＝${fact(L.r)} 通りの並べ方がある。区別しなければ、それを1通りと数える。</div>`;
+ const names="ABCDEFGHIJ".slice(0,L.n).split(""),MAX=20;
+ const ps=L.perm<=2000?perms(names,L.r):[];const groups=new Map();
+ ps.forEach(p=>{const k=p.slice().sort().join("");if(!groups.has(k))groups.set(k,[]);groups.get(k).push(p);});
+ const keys=[...groups.keys()].sort();let h="";
+ if(L.role==="あり")h=keys.slice(0,MAX).map(k=>`<div class="grp"><b>{${k.split("").join(",")}}</b>`+groups.get(k).map(p=>`<span class="chip">${p.join("→")}</span>`).join("")+`</div>`).join("");
+ else h='<div class="flex">'+keys.slice(0,MAX*3).map(k=>`<span class="chip">{${k.split("").join(",")}}</span>`).join("")+"</div>";
+ const shown=L.role==="あり"?Math.min(keys.length,MAX):Math.min(keys.length,MAX*3);
+ if(!ps.length)h=`<p class="mut">数が多いので書き出さない（${fmt(L.perm)}通り）。</p>`;else if(shown<keys.length)h+=`<p class="mut">ほか ${keys.length-shown} 組（表示は ${shown} 組まで）</p>`;
+ $("llist").innerHTML=h;}
+LK.register("list",{name:"並べて数える",
+ init(){LK.stepper($("ln"),lRender);LK.stepper($("lr"),lRender);$("lrole").onchange=lRender;lRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("ln",s.n);$("lr").max=Math.min(4,+$("ln").value);if(s.r!==undefined)LK.setRange("lr",s.r);if(s.role)$("lrole").value=s.role;lRender();},
+ render:lRender,
+ value(key){const L=lVals();return {v:L[key],text:fmt(L[key])};}});
+
+// ---- パスカル
+function bVals(){const n=+$("pn").value,r=Math.min(+$("pr").value,n),p=+$("pp").value;const probs=Array.from({length:n+1},(_,k)=>C(n,k)*p**k*(1-p)**(n-k));
+ return {n,r,p,c:C(n,r),left:C(n-1,r-1),right:C(n-1,r),rowsum:2**n,probs,psum:probs.reduce((a,b)=>a+b,0)};}
+function pRender(){const B=bVals();
+ const rows=Math.max(8,B.n),w=Math.max(22,Math.min(34,Math.floor(340/(rows+1))-3)),fs=w<28?10:12;
+ let h='<div class="tri">';for(let n=0;n<=rows;n++){h+="<div>";for(let r=0;r<=n;r++){let c="cell";
+  if(n===B.n&&r===B.r)c+=" sel";else if(B.n>0&&n===B.n-1&&(r===B.r-1||r===B.r)&&B.r>0&&B.r<B.n)c+=" par";else if(n===B.n&&r===B.n-B.r)c+=" mir";
+  h+=`<button type="button" class="${c}" style="width:${w}px;font-size:${fs}px" data-n="${n}" data-r="${r}">${C(n,r)}</button>`;}h+="</div>";}
+ $("ptri").innerHTML=h+"</div>";
+ $("ptri").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(document.body.classList.contains("lk-locked"))return;LK.setRange("pn",+b.dataset.n);LK.setRange("pr",+b.dataset.r);pRender();});
+ let t;if(B.r===0||B.r===B.n)t=`<div>${cc(B.n,B.r)}＝<b>1</b>：${B.r===0?"誰も選ばない":"全員を選ぶ"}選び方は1通りだけ。</div>`;
+ else t=`<div>${cc(B.n,B.r)}＝${B.left}＋${B.right}＝<b>${B.c}</b></div><div>・特定の1人（A）を<b>含む</b>：残り${B.n-1}人から${B.r-1}人 → ${cc(B.n-1,B.r-1)}＝${B.left}</div><div>・A を<b>含まない</b>：残り${B.n-1}人から${B.r}人 → ${cc(B.n-1,B.r)}＝${B.right}</div>`+(B.r*2===B.n?"":`<div class="mut">対称：${cc(B.n,B.r)}＝${cc(B.n,B.n-B.r)}（選ばない${B.n-B.r}人を選ぶのと同じ）</div>`);
+ t+=`<div class="mut">この段の合計＝${fmt(B.rowsum)}＝2の${B.n}乗（1人ずつ「選ぶ・選ばない」の2択）。p＝${B.p} の二項分布の確率の合計＝${B.psum.toFixed(4)}</div>`;
+ $("pinfo").innerHTML=t;
+ $("pbin").innerHTML=`<table class="t"><tr><th>k</th><th>${sub(B.n)}Cₖ</th><th>確率</th></tr>${B.probs.map((q,k)=>`<tr><td>${k}</td><td>${C(B.n,k)}</td><td>${q.toFixed(4)}</td></tr>`).join("")}<tr><td>計</td><td>${fmt(B.rowsum)}</td><td>${B.psum.toFixed(4)}</td></tr></table><div class="mut">確率＝${sub(B.n)}Cₖ×p^k×(1−p)^(n−k)。合計が1になるのは二項定理 (p＋(1−p))ⁿ＝1 から。</div>`;}
+LK.register("pascal",{name:"パスカル",
+ init(){["pn","pr","pp"].forEach(id=>LK.stepper($(id),pRender));pRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("pn",s.n);if(s.r!==undefined)LK.setRange("pr",s.r);if(s.p!==undefined)LK.setRange("pp",s.p);pRender();},
+ render:pRender,
+ value(key){const B=bVals();return {v:B[key],text:key==="psum"?B.psum.toFixed(4):fmt(B[key])};}});
+
+// ---- 重複を許す
+const NAMES=["あん","クリーム","メロン","カレー","チョコ","ジャム","チーズ","ハム","たまご","ツナ"];
+function comps(n,r){const out=[],cur=[];(function rec(i,left){if(i===n-1){cur.push(left);out.push(cur.slice());cur.pop();return;}for(let k=left;k>=0;k--){cur.push(k);rec(i+1,left-k);cur.pop();}})(0,r);return out;}
+function mVals(){const n=+$("mn").value,r=+$("mr").value;return {n,r,h:C(n+r-1,r),pow:n**r,comb:C(n,r)};}
+function mRender(){const M=mVals();
+ $("msum").innerHTML=`<div>順番を区別する：${M.n}の${M.r}乗＝<b>${fmt(M.pow)}</b>通り（1個ごとに ${M.n} 通り）</div><div>順番を区別しない：${cc(M.n+M.r-1,M.r)}＝<b>${fmt(M.h)}</b>通り（● ${M.r} 個と仕切り ｜ ${M.n-1} 本の並べ方）</div><div class="mut">重複なし・順番なしなら ${M.r<=M.n?cc(M.n,M.r)+"＝"+fmt(M.comb)+"通り":"選べない（r＞n）"}。</div>`;
+ const list=M.h<=500?comps(M.n,M.r):[],show=list.slice(0,40);
+ let h=show.map(v=>`<div class="grp"><span class="mono">${v.map(k=>"●".repeat(k)).join("｜")}</span>　<span class="mut">${v.map((k,i)=>k?`${NAMES[i]}×${k}`:"").filter(Boolean).join("・")}</span></div>`).join("");
+ if(list.length>40)h+=`<p class="mut">ほか ${list.length-40} 通り</p>`;if(!list.length)h=`<p class="mut">数が多いので書き出さない。</p>`;
+ $("mlist").innerHTML=h;}
+LK.register("multi",{name:"重複を許す",
+ init(){LK.stepper($("mn"),mRender);LK.stepper($("mr"),mRender);mRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("mn",s.n);if(s.r!==undefined)LK.setRange("mr",s.r);mRender();},
+ render:mRender,
+ value(key){const M=mVals();return {v:M[key],text:fmt(M[key])};}});
+
+// ---- 道順
+let curPath=null;
+function newPath(){const a=+$("pa").value,b=+$("pb").value;curPath=shuffle(Array(a).fill("R").concat(Array(b).fill("U")));}
+function aVals(){const a=+$("pa").value,b=+$("pb").value;return {a,b,paths:C(a+b,a)};}
+function aRender(){const A=aVals();if(!curPath||curPath.filter(x=>x==="R").length!==A.a||curPath.length!==A.a+A.b)newPath();
+ const s=Math.min(48,Math.floor(300/Math.max(A.a,A.b))),pad=14,W=A.a*s+pad*2,H=A.b*s+pad*2;
+ let g=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="格子の道順">`;
+ for(let i=0;i<=A.a;i++)g+=`<line x1="${pad+i*s}" y1="${pad}" x2="${pad+i*s}" y2="${pad+A.b*s}" stroke="var(--line)" stroke-width="1.5"/>`;
+ for(let j=0;j<=A.b;j++)g+=`<line x1="${pad}" y1="${pad+j*s}" x2="${pad+A.a*s}" y2="${pad+j*s}" stroke="var(--line)" stroke-width="1.5"/>`;
+ let x=0,y=0;const pts=[`${pad},${pad+A.b*s}`];curPath.forEach(d=>{if(d==="R")x++;else y++;pts.push(`${pad+x*s},${pad+(A.b-y)*s}`);});
+ g+=`<polyline points="${pts.join(" ")}" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${pad}" cy="${pad+A.b*s}" r="6" fill="var(--fg)"/><circle cx="${pad+A.a*s}" cy="${pad}" r="6" fill="var(--acc)"/><text x="${pad+6}" y="${pad+A.b*s-8}" font-size="11" fill="var(--fg)">S</text><text x="${pad+A.a*s-16}" y="${pad+14}" font-size="11" fill="var(--fg)">G</text></svg>`;
+ $("psvg").innerHTML=g;
+ $("psum").innerHTML=`<div>今の道：<span class="mono">${curPath.map(d=>d==="R"?"→":"↑").join("")}</span></div><div>最短の道順＝${cc(A.a+A.b,A.a)}＝<b>${fmt(A.paths)}</b>通り</div><div class="mut">→ を ${A.a} 個、↑ を ${A.b} 個並べる。${A.a+A.b} 歩のうち → にする ${A.a} 歩を選ぶ（＝${cc(A.a+A.b,A.b)}）。</div>`;
+ const out=[];(function rec(s,r,u){if(out.length>=60)return;if(r===0&&u===0){out.push(s);return;}if(r>0)rec(s+"→",r-1,u);if(u>0)rec(s+"↑",r,u-1);})("",A.a,A.b);
+ $("plist").innerHTML='<div class="flex">'+out.map(p=>`<span class="chip">${p}</span>`).join("")+"</div>"+(A.paths>out.length?`<p class="mut">ほか ${fmt(A.paths-out.length)} 通り</p>`:"");}
+LK.register("path",{name:"道順",
+ init(){LK.stepper($("pa"),aRender);LK.stepper($("pb"),aRender);$("pnew").onclick=()=>{newPath();aRender();};aRender();},
+ apply(s){if(s.a!==undefined)LK.setRange("pa",s.a);if(s.b!==undefined)LK.setRange("pb",s.b);aRender();},
+ render:aRender,
+ value(){const A=aVals();return {v:A.paths,text:fmt(A.paths)};}});
+
+// ---- 完全順列
+const D=[1,0];for(let n=2;n<=10;n++)D[n]=(n-1)*(D[n-1]+D[n-2]);
+let simT=0,simOK=0;
+function dVals(){const n=+$("dn").value;return {n,d:D[n],all:fact(n),p:D[n]/fact(n)};}
+function dReset(){simT=0;simOK=0;$("dexp").innerHTML='<span class="mut">ボタンを押すと、実際に配り直した結果の割合を表示する（押すたびに少し揺れる）。</span>';}
+function dRender(){const X=dVals();
+ const terms=[];for(let k=0;k<=Math.min(X.n,4);k++)terms.push((k%2?"−":(k?"＋":""))+`1/${k}!`);
+ $("dsum").innerHTML=`<div>全員が他人の物：<b>${fmt(X.d)}</b>通り／全 ${fmt(X.all)} 通り</div><div>確率＝<b>${X.p.toFixed(4)}</b>　1/e＝${(1/Math.E).toFixed(4)}</div><div class="mut">包除原理：確率＝${terms.join(" ")}${X.n>4?" …":""}。n が大きくなると 1/e に近づく。</div>`;
+ let t='<table class="t"><tr><th>n</th><th>全員が他人の物</th><th>確率</th></tr>';for(let k=2;k<=10;k++)t+=`<tr${k===X.n?' style="font-weight:700"':""}><td>${k}</td><td>${fmt(D[k])}</td><td>${(D[k]/fact(k)).toFixed(4)}</td></tr>`;
+ $("dtab").innerHTML=t+"</table>";}
+function dSim(){const n=+$("dn").value;for(let t=0;t<1000;t++){const a=shuffle([...Array(n).keys()]);let ok=true;for(let i=0;i<n;i++)if(a[i]===i){ok=false;break;}if(ok)simOK++;simT++;}
+ $("dexp").innerHTML=`<div>実験：${fmt(simT)} 回中 ${fmt(simOK)} 回 → 割合 <b>${(simOK/simT).toFixed(4)}</b></div><div class="mut">理論値 ${(D[n]/fact(n)).toFixed(4)}。回数を増やすほど近づくが、ぴったり一致するとは限らない。</div>`;}
+LK.register("der",{name:"完全順列",
+ init(){LK.stepper($("dn"),()=>{dReset();dRender();});$("dsim").onclick=dSim;$("dreset").onclick=dReset;dReset();dRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("dn",s.n);dReset();dRender();},
+ render:dRender,
+ value(key){const X=dVals();return {v:X[key],text:key==="p"?X.p.toFixed(4):fmt(X[key])};}});
+
+LK.start("list");
+window.__LAB__={LK,lVals,bVals,mVals,aVals,dVals};
+</script>
+</body></html>

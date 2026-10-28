@@ -16,6 +16,14 @@
   checks:
     - 'perm(6,3) == 120'
     - 'comb(6,3) == 20'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 6, r: 3, role: なし}
+    task: 6人から役割のない委員を3人選ぶ。何通りか。
+    predict: {type: number, key: comb, label: "選び方", unit: "通り"}
+    expect: 20
+    why: 会長・副会長・書記なら 6×5×4＝120。同じ3人の組を 3!＝6 回ずつ数えているので 120÷6＝20。
 
 - id: Q-U09-002
   stage: S1
@@ -28,6 +36,14 @@
   checks:
     - 'perm(7,2) == 42'
     - 'comb(7,2) == 21'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 7, r: 2, role: あり}
+    task: 7人から店長代理と副代理を選ぶ。何通りか。
+    predict: {type: number, key: perm, label: "選び方", unit: "通り"}
+    expect: 42
+    why: 7×6＝42。役割を「区別しない」に切り替えると研修参加者2人の選び方 42÷2＝21。
 
 - id: Q-U09-003
   stage: S1
@@ -38,6 +54,14 @@
   answer: "**12通り**。4×3。役割があるので順列 ₄P₂。"
   checks:
     - 'perm(4,2) == 12'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 4, r: 2, role: あり}
+    task: 4人からリーダーとサブリーダーを選ぶ（兼任なし）。何通りか。
+    predict: {type: number, key: perm, label: "選び方", unit: "通り"}
+    expect: 12
+    why: 4×3＝12。帯1本（同じ2人の組）に「B→C」「C→B」の2通りが並ぶ。
 
 - id: Q-U09-004
   stage: S1
@@ -48,6 +72,14 @@
   answer: "**6通り**。前の問題の12通りでは「リーダーB・サブC」と「リーダーC・サブB」が同じ組 {B, C} になり、どの組も2回ずつ数えているので 12÷2＝6。"
   checks:
     - 'comb(4,2) == 6'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 4, r: 2, role: なし}
+    task: 4人から役割のない委員を2人選ぶ。何通りか。
+    predict: {type: number, key: comb, label: "選び方", unit: "通り"}
+    expect: 6
+    why: 役割ありの12通りを、同じ組の並べ方 2!＝2 で割って6。
 
 - id: Q-U09-005
   stage: S1
@@ -58,6 +90,14 @@
   answer: "**9通り**。3×3＝3²。同じものを何度も選べる（質問2が「選べる」）ので、P や C ではなく nʳ。"
   checks:
     - '3**2 == 9'
+  lab:
+    id: LAB-count
+    mode: multi
+    set: {n: 3, r: 2}
+    task: 3種類のパンから、1個目と2個目を順に選ぶ（同じパンを2回選んでもよい）。何通りか。
+    predict: {type: number, key: pow, label: "選び方", unit: "通り"}
+    expect: 9
+    why: 1個目3通り×2個目3通り＝3²＝9。順番を区別しないなら ₄C₂＝6（くわしくの書き出し）。
 
 - id: Q-U09-010
   stage: S2
@@ -69,6 +109,14 @@
   checks:
     - 'comb(5,3) == 10'
     - 'perm(5,3) == 60'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 5, r: 3, role: あり}
+    task: 5種類のパンから3種類を選び、上段・中段・下段に1種類ずつ並べる。何通りか。
+    predict: {type: number, key: perm, label: "並べ方", unit: "通り"}
+    expect: 60
+    why: 5×4×3＝60。段（役割）を区別しない詰め合わせなら 60÷3!＝10。
 
 - id: Q-U09-011
   stage: S2
@@ -89,6 +137,14 @@
     - 'comb(10,8) == 45'
     - 'comb(7,3) == 35'
     - 'comb(12,10) == 66'
+  lab:
+    id: LAB-count
+    mode: pascal
+    set: {n: 10, r: 8}
+    task: ₁₀C₈ はいくつか。パスカルの三角形で、対称な ₁₀C₂ と比べる。
+    predict: {type: number, key: c, label: "₁₀C₈"}
+    expect: 45
+    why: 選ぶ8人を決めることは、選ばない2人を決めることと同じ。₁₀C₈＝₁₀C₂＝10×9÷2＝45。
 
 - id: Q-U09-012
   stage: S2
@@ -101,6 +157,14 @@
     - '10**4 == 10000'
     - 'comb(8,4) == 70'
     - 'perm(8,3) == 336'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 8, r: 3, role: あり}
+    task: 8人の中の1位・2位・3位の決め方は何通りか。
+    predict: {type: number, key: perm, label: "決め方", unit: "通り"}
+    expect: 336
+    why: 8×7×6＝336。順位は役割なので順列。区別しない委員なら 336÷6＝56。
 
 - id: Q-U09-020
   stage: S3
@@ -110,6 +174,14 @@
   answer: Aさんは決まっているので、残り5人から2人：₅C₂＝**10通り**。
   checks:
     - 'comb(5,2) == 10'
+  lab:
+    id: LAB-count
+    mode: pascal
+    set: {n: 6, r: 3}
+    task: 6人から3人の当番を選ぶ。Aさんを必ず含む選び方は何通りか。
+    predict: {type: number, key: left, label: "Aを含む選び方", unit: "通り"}
+    expect: 10
+    why: Aが決まっているので、残り5人から2人：₅C₂＝10。含まない選び方 ₅C₃＝10 と足すと ₆C₃＝20。
 
 - id: Q-U09-021
   stage: S3
@@ -120,6 +192,14 @@
   checks:
     - 'comb(7,3) - comb(3,3) == 34'
     - 'comb(4,1)*comb(3,2) + comb(4,2)*comb(3,1) + comb(4,3) == 34'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 7, r: 3, role: なし}
+    task: 7人（男性3人・女性4人）から3人を選ぶ選び方は全部で何通りか。そこから「男性だけ」を引く。
+    predict: {type: number, key: comb, label: "全部の選び方", unit: "通り"}
+    expect: 35
+    why: ₇C₃＝35。男性3人だけの選び方 ₃C₃＝1 を引いて、女性を少なくとも1人含むのは34通り。
 
 - id: Q-U09-022
   stage: S3
@@ -129,6 +209,14 @@
   answer: AとBを1つのかたまりとみて4つを並べる 4!＝24、かたまりの中の並び AB・BA の2通り → 24×2＝**48通り**。全部の並び方120通りのうち48通り（確率0.4）。
   checks:
     - "len([p for p in itertools.permutations('ABCDE') if abs(p.index('A')-p.index('B')) == 1]) == 48"
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 4, r: 4, role: あり}
+    task: AとBを1つのかたまり [AB] とみて、[AB]・C・D・E の4つを一列に並べる。何通りか。
+    predict: {type: number, key: perm, label: "4つの並べ方", unit: "通り"}
+    expect: 24
+    why: 4!＝24。かたまりの中の並び AB・BA の2通りを掛けて 48。
 
 - id: Q-U09-023
   stage: S3
@@ -150,6 +238,14 @@
     - 'comb(10,3) == 120'
     - 'perm(10,3) == 720'
     - '10**3 == 1000'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 9, r: 2, role: なし}
+    task: 委員長を決めたあと、残り9人から役割のない委員2人を選ぶ。何通りか。
+    predict: {type: number, key: comb, label: "委員の選び方", unit: "通り"}
+    expect: 36
+    why: ₉C₂＝36。委員長の10通りを掛けて 360。
 
 - id: Q-U09-024
   stage: S3
@@ -160,6 +256,14 @@
   answer: 組合せ：1÷₅C₂＝**1/10**。順列：「A→B」「B→A」の2通り÷20＝**1/10**。分子と分母で**同じ「1通り」**を使えば、どちらで数えてもよい。
   checks:
     - 'Fraction(1, comb(5,2)) == Fraction(2, perm(5,2)) == Fraction(1,10)'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 5, r: 2, role: なし}
+    task: 5人から無作為に2人を選ぶ。選び方は全部で何通りか（確率の分母）。
+    predict: {type: number, key: comb, label: "全部の選び方", unit: "通り"}
+    expect: 10
+    why: ₅C₂＝10。そのうち {A, B} は1通りなので確率 1/10。役割ありで数えると分母20、分子2（A→B・B→A）で同じ 1/10。
 
 - id: Q-U09-025
   stage: S3
@@ -170,6 +274,14 @@
   answer: ₂C₁×₈C₂÷₁₀C₃＝2×28÷120＝**7/15**。超幾何分布（{{unit:U15}}）の形。
   checks:
     - 'Fraction(comb(2,1)*comb(8,2), comb(10,3)) == Fraction(7,15)'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 10, r: 3, role: なし}
+    task: 10個から3個を取り出す取り出し方は全部で何通りか（確率の分母）。
+    predict: {type: number, key: comb, label: "全部の取り出し方", unit: "通り"}
+    expect: 120
+    why: ₁₀C₃＝120。不良1個・良品2個は ₂C₁×₈C₂＝2×28＝56 なので 56÷120＝7/15。
 
 - id: Q-U09-030
   stage: S4
@@ -179,6 +291,14 @@
   answer: 握手1回＝2人の組（区別なし）。₁₀C₂＝**45回**。総当たり戦と同じ構造。
   checks:
     - 'comb(10,2) == 45'
+  lab:
+    id: LAB-count
+    mode: list
+    set: {n: 10, r: 2, role: なし}
+    task: 10人が全員と1回ずつ握手する。握手は全部で何回か。
+    predict: {type: number, key: comb, label: "握手の回数", unit: "回"}
+    expect: 45
+    why: 握手1回＝2人の組（区別なし）。₁₀C₂＝10×9÷2＝45。
 
 - id: Q-U09-031
   stage: S4
@@ -188,6 +308,14 @@
   answer: 7歩のうち右の4歩を選ぶ：₇C₄＝₇C₃＝**35通り**。
   checks:
     - 'comb(7,4) == comb(7,3) == 35'
+  lab:
+    id: LAB-count
+    mode: path
+    set: {a: 4, b: 3}
+    task: 右へ4歩・上へ3歩の最短経路は何通りか。
+    predict: {type: number, key: paths, label: "道順", unit: "通り"}
+    expect: 35
+    why: 7歩のうち右の4歩を選ぶ：₇C₄＝35。上の3歩を選ぶ ₇C₃ と同じ。
 
 - id: Q-U09-032
   stage: S4
@@ -198,6 +326,14 @@
   answer: ₁₀C₅＝**252通り**。252通りのどれも同じ確率で選ぶ（無作為化）と、「良い店ばかり選んだ」という偏りが入りにくい。実験計画（{{unit:U32}}）の基礎になる。
   checks:
     - 'comb(10,5) == 252'
+  lab:
+    id: LAB-count
+    mode: pascal
+    set: {n: 10, r: 5}
+    task: 10店舗から試験を行う5店舗を選ぶ選び方は何通りか。
+    predict: {type: number, key: c, label: "₁₀C₅"}
+    expect: 252
+    why: ₁₀C₅＝252。パスカルの10段目のまん中（一番大きい数）。どの選び方も同じ確率で選ぶのが無作為化。
 
 - id: Q-U09-040
   stage: S5
@@ -210,3 +346,11 @@
   checks:
     - "abs(sum(comb(4,k)*0.25**k*0.75**(4-k) for k in range(5)) - 1) < 1e-12"
     - "[round(comb(4,k)*0.25**k*0.75**(4-k),4) for k in range(5)] == [0.3164, 0.4219, 0.2109, 0.0469, 0.0039]"
+  lab:
+    id: LAB-count
+    mode: pascal
+    set: {n: 4, r: 1, p: 0.25}
+    task: B(4, 0.25) の確率を k＝0〜4 で全部足すといくつか。
+    predict: {type: number, key: psum, label: "確率の合計"}
+    expect: 1
+    why: ₄Cₖ×0.25ᵏ×0.75⁴⁻ᵏ を足すと (0.25＋0.75)⁴＝1。くわしくの表で 0.3164, 0.4219, 0.2109, 0.0469, 0.0039 を確かめる。

@@ -1,16 +1,78 @@
 id: LAB-count
-slug: count                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 name: 数え方ラボ
+slug: count                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 kind: simulator
-file: count_lab.html
-version: 1
-modes:
-  - {key: list, name: 並べて数える}
-  - {key: pascal, name: パスカル}
-  - {key: multi, name: 重複を許す}
-  - {key: path, name: 道順}
-  - {key: der, name: 完全順列}
+src: count_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 2                       # 2：共通部品に移し、予想→結果の版を作れるようにした（モードと slug は旧版と同じ）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: list
+    name: 並べて数える
+    purpose: n 人から r 人。役割を区別する（順列）・しない（組合せ）を書き出して比べる
+    set: [n, r, role]           # role：あり／なし
+    values: [perm, comb, count]
+  - key: pascal
+    name: パスカル
+    purpose: ₙCᵣ＝ₙ₋₁Cᵣ₋₁＋ₙ₋₁Cᵣ、段の合計 2ⁿ、その段から作る二項分布の確率の合計
+    set: [n, r, p]
+    values: [c, left, right, rowsum, psum]
+  - key: multi
+    name: 重複を許す
+    purpose: n 種類から r 個、同じ種類を何度でも。順番あり nʳ、順番なし ₙ₊ᵣ₋₁Cᵣ
+    set: [n, r]
+    values: [pow, h, comb]
+  - key: path
+    name: 道順
+    purpose: 格子の最短経路＝→ と ↑ の並べ方
+    set: [a, b]
+    values: [paths]
+  - key: der
+    name: 完全順列
+    purpose: 全員が他人の物を受け取る数と確率。1/e に近づく
+    set: [n]
+    values: [d, all, p]
+data: スライダーで値を決める（データの読み込みなし）
+presets:
+  s1-list:
+    mode: list
+    set: {n: 5, r: 2, role: なし}
+    unlock: [role]
+    task: 5人からレジと品出しを1人ずつ選ぶと20通り。役割のない当番2人を選ぶだけなら何通りか。
+    predict: {type: number, key: comb, label: "役割なしの選び方", unit: "通り"}
+    expect: 10
+    why: 「レジA・品出しB」と「レジB・品出しA」は同じ組 {A, B}。どの組も 2!＝2 回ずつ数えているので 20÷2＝10。役割を「区別する」に切り替えると、帯1本に2通りずつ並ぶ。
+  s1-exp:
+    mode: list
+    set: {n: 4, r: 3, role: あり}
+    unlock: [role]
+    task: 4人から3人を、役割（1番・2番・3番）を決めて選ぶ。何通りか。
+    predict: {type: number, key: perm, label: "役割ありの選び方", unit: "通り"}
+    expect: 24
+    why: 4×3×2＝24。色の帯1本（同じ3人の組）に 3!＝6 通りずつ並ぶので、役割なしなら 24÷6＝4。
+  s2-pascal:
+    mode: pascal
+    set: {n: 7, r: 3}
+    task: パスカルの三角形の7段目で ₇C₃ を選ぶ。上の段のどの2つの数の和か。₇C₃ はいくつか。
+    predict: {type: number, key: c, label: "₇C₃"}
+    expect: 35
+    why: ₇C₃＝₆C₂＋₆C₃＝15＋20＝35。特定の1人を含む選び方（15）と含まない選び方（20）の和。
+  s3-free:
+    mode: list
+    modes: [list, pascal]
+    task: 解いてから、「並べて数える」で n・r・役割を問題に合わせて書き出しと式を比べる。「パスカル」で数をタップすると、特定の1人を含む・含まないに分かれる。
+  s4-path:
+    mode: path
+    modes: [path, list]
+    task: → を3個、↑ を2個並べる並べ方が、「5歩のうち → にする3歩を選ぶ」ことと同じだと確かめる。くわしくで書き出しを見る。
+  s5-more:
+    mode: pascal
+    modes: [pascal, multi, der]
+    task: 「パスカル」で段の合計と二項分布の確率の合計（発展1）、「重複を許す」で ● と ｜ の並べ方（発展2）、「完全順列」で 1/e への近づき方（発展3）を見る。
+  s6-free:
+    task: 自分の式を小さい例で確かめる。「並べて数える」の書き出しや「道順」の書き出しで、式と書き出しの数が一致するか見る。
 used_by: [U09]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/count_lab/check.js        # 本文の値（₅P₂＝20・₅C₂＝10、₇C₃＝15＋20、₇C₄＝35、₄C₂ の段、完全順列 9/24）
 checked:
-  browser_380px: 2026-10-27
-  notion_iphone: null   # 未確認
+  browser_380px: 2026-10-28
+  notion_iphone: null

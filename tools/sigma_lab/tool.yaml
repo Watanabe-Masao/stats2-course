@@ -1,0 +1,65 @@
+id: LAB-sigma
+name: Σ・階乗ラボ
+slug: sigma                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: sigma_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sigma.html]    # 旧版 教科書02 の「(Σx)² と Σx² の正方形」を sum モードに含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: sum
+    name: Σを書き下す
+    purpose: Σx・Σx²・(Σx)²・平均・偏差平方和を書き下して計算し、(Σx)² の正方形で Σx² との違いを見る
+    set: [data]                 # 2〜5個、0〜10の整数
+    values: [sum, sumsq, sqsum, mean, ss, devsum]
+  - key: rule
+    name: Σの計算ルール
+    purpose: Σ(a×x＋c)＝aΣx＋n×c を書き下して確かめる
+    set: [data, a, c]
+    values: [lhs]
+  - key: fact
+    name: 階乗・組合せ
+    purpose: n!、順列 nPr、組合せ nCr＝nPr÷r!
+    set: [n, r]
+    values: [fact, perm, comb]
+  - key: func
+    name: 関数 f(x)
+    purpose: f(x)＝a×x＋b に値を入れる。グラフの上の点として見る
+    set: [a, b, x]
+    values: [fx]
+data: スライダーで値を決める（データの読み込みなし）
+presets:
+  s1-sum:
+    mode: sum
+    set: {data: [2, 4, 6]}
+    task: 3日間の販売数 2, 4, 6 個。Σx²（2乗してから足す）はいくつか。
+    predict: {type: number, key: sumsq, label: "Σx²"}
+    expect: 56
+    why: 4＋16＋36＝56。足してから2乗する (Σx)² は 12²＝144。正方形の全体が144、色の3つの正方形が56で、灰色の部分の分だけ違う。
+  s1-dev:
+    mode: sum
+    set: {data: [3, 5, 10]}
+    task: 3, 5, 10 の平均からの偏差（x−x̄）を全部足すといくつか。
+    predict: {type: number, key: devsum, label: "偏差の合計"}
+    expect: 0
+    why: 平均は6、偏差は −3, −1, 4 で合計0。値をどう動かしても0のまま。平均の定義から Σx＝n×x̄ だから。
+  s3-rule:
+    mode: rule
+    modes: [rule, sum]
+    task: a と c を動かし、Σ(a×x＋c) と aΣx＋n×c が毎回一致することを確かめる。次に「Σを書き下す」で Σx²−n×x̄² が偏差平方和と一致することを見る。
+  s4-fact:
+    mode: fact
+    modes: [fact, func]
+    task: n と r を動かし、順列と組合せの差（r! 倍）を見る。次に「関数 f(x)」で、表計算の式のように値を入れると1つ出ることを確かめる。
+  s5-rule:
+    mode: rule
+    modes: [rule, sum]
+    task: a を負にしたり c を大きくしたりして、Σ の外に出せるもの（a）と n 回足されるもの（c）を確かめる。
+  s6-free:
+    task: 自分の数字で、Σ・階乗・関数を4つのモードで確かめる（Σを書き下す、Σの計算ルール、階乗・組合せ、関数 f(x)）。
+used_by: [U02]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/sigma_lab/check.js        # 本文の値（2,4,6 の Σx＝12・Σx²＝56・(Σx)²＝144・偏差平方和8、5!＝120、₅C₂＝10、f(3)＝7）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

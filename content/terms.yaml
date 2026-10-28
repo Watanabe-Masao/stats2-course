@@ -5,6 +5,9 @@
 - id: TERM-comb
   name: 組合せ
   en: combination
+- id: TERM-sigma
+  name: 総和記号（Σ）
+  en: summation
 - id: TERM-fact
   name: 階乗
   en: factorial
@@ -92,6 +95,18 @@
 - id: TERM-unbiased
   name: 不偏性
   en: unbiasedness
+- id: TERM-std
+  name: 標準化
+  en: standardization
+- id: TERM-skew
+  name: 歪度
+  en: skewness
+- id: TERM-kurt
+  name: 尖度
+  en: kurtosis
+- id: TERM-normal
+  name: 正規分布
+  en: normal distribution
 - id: TERM-expect
   name: 期待値
   en: expected value

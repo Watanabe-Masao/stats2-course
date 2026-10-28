@@ -1,0 +1,66 @@
+id: LAB-z
+name: 標準化ラボ
+slug: zscore                     # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: z_lab.src.html              # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_normal.html]   # 旧版 教科書08 の「z得点」（μ・σ・x を動かす）を z モードと normal モードに分けて含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: z
+    name: z得点で比べる
+    purpose: 平均も標準偏差も違う2つの集団の値を、z＝(値−平均)÷標準偏差 で同じ物差しに乗せる
+    set: [mA, sA, xA, mB, sB, xB, nameA, nameB]
+    values: [zA, zB, better, rare]   # better＝z が大きい方、rare＝|z| が大きい方（どちらも名前か「同じ」）
+  - key: inv
+    name: z から値へ
+    purpose: x＝平均＋z×標準偏差、偏差値＝50＋10z
+    set: [m, s, z]
+    values: [x, dev]
+  - key: skew
+    name: 歪度・尖度
+    purpose: 裾の向きと歪度の符号。標準化しても形（歪度・尖度）は変わらない
+    set: [skew, std]
+    values: [g1, g1sign, g2]
+  - key: fence
+    name: 外れ値の柵
+    purpose: Q₁−1.5IQR と Q₃＋1.5IQR の柵。外れ値候補かどうか
+    set: [q1, q3, x]
+    values: [hi, lo, isOut]
+  - key: normal
+    name: 正規分布の割合
+    purpose: 標準正規分布で z 以上・以下・±z の内側と外側の割合
+    set: [z]
+    values: [pUp, pDown, pIn, pOut]   # すべて %
+data: 2つの集団は平均・標準偏差・値をスライダーで決める。歪度・尖度は 0〜20 の目盛りに200人（裾の向き −10〜10、ベータ分布の形）。正規分布の割合は誤差関数の近似（誤差 1.5×10⁻⁷ 以下）
+presets:
+  s1-z:
+    mode: z
+    set: {mA: 50, sA: 10, xA: 70, mB: 80, sB: 5, xB: 90, nameA: 店舗A, nameB: 店舗B}
+    task: 店舗Aは平均50万円・標準偏差10万円で70万円の日、店舗Bは平均80万円・標準偏差5万円で90万円の日。店舗Bの日の z得点はいくつか。
+    predict: {type: number, key: zB, label: "店舗Bの z"}
+    expect: 2
+    why: (90−80)÷5＝2。店舗Aも (70−50)÷10＝2 で、金額の差（20万円と10万円）は違っても、それぞれの店の中での位置は同じ。
+  s1-sigma:
+    mode: z
+    set: {mA: 50, sA: 20, xA: 70, mB: 50, sB: 10, xB: 70, nameA: 広がった店, nameB: もとの店}
+    task: 平均50・標準偏差10 で70 なら z＝2。標準偏差が20に広がった店で、同じ70 の z得点はいくつか。
+    predict: {type: number, key: zA, label: "標準偏差20のときの z"}
+    expect: 1
+    why: (70−50)÷20＝1。ばらつきが大きい店では、同じ20万円の差でも珍しさが下がる。値や平均を動かして z の変わり方も見る。
+  s4-normal:
+    mode: normal
+    modes: [normal, inv]
+    task: z を動かし、正規分布で z 以上になる割合と、±z の内側の割合を見る。次に「z から値へ」で、平均・標準偏差と z から元の値と偏差値を出す。
+  s5-skew:
+    mode: skew
+    modes: [skew, normal]
+    task: 裾の向きを動かして歪度・尖度の変わり方を見る。「標準化した目盛りで見る」を入れても、形と歪度が変わらないことを確かめる。
+  s6-free:
+    task: 自分の店の数字で、標準化の使い方を5つのモードで確かめる（z得点で比べる、z から値へ、歪度・尖度、外れ値の柵、正規分布の割合）。
+used_by: [U08]
+tests:
+  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/z_lab/check.js          # 本文の値（z＝2・1.5、x＝21、偏差値65、柵20、P(Z≧2)≒2.28%、歪度の符号）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
