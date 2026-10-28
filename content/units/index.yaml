@@ -25,7 +25,7 @@
 - {id: U22, number: "22", migrated: true}
 - {id: U23, number: "23", migrated: true}
 - {id: U24, number: "24", migrated: true}
-- {id: U25, number: "25", migrated: false}
+- {id: U25, number: "25", migrated: true}
 - {id: U26, number: "26", migrated: false}
 - {id: U27, number: "27", migrated: false}
 - {id: U28, number: "28", migrated: false}
