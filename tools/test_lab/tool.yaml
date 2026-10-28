@@ -1,0 +1,60 @@
+id: LAB-test
+name: 検定の考え方ラボ
+slug: test                       # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: test_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_test.html]   # 旧版 教科書24 の「x̄・σ・n で z と p 値、μ₁ で検出力、α と両側／片側」を z と power に含む。多重検定（旧版の「誤解と条件」の文）を multi にした
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: z
+    name: z 検定と p 値
+    purpose: H₀：μ＝μ₀ のもとで z＝(x̄−μ₀)÷(σ÷√n) と p 値（両側・右片側・左片側）を出し、棄却域の境目（数表の 1.645・1.96・2.576 など）と比べる
+    set: [side, alpha, xbar, mu0, sigma, n]   # side：two／upper／lower。alpha：0.1／0.05／0.01
+    values: [se, z, p, crit, decision]        # decision：「棄却する」／「棄却しない」
+  - key: power
+    name: 検出力と過誤
+    purpose: 本当の平均 μ₁ のときの検出力 1−β と β、x̄ の棄却の境目、検出力0.8 に必要な n。H₀ と本当の分布を重ねて描く。くわしくに n ごとの検出力の表
+    set: [side, alpha, mu0, mu1, sigma, n]    # side：two／upper
+    values: [se, shift, power, beta, xcrit, n80]
+  - key: multi
+    name: 何度も検定
+    purpose: H₀ が正しい検定を k 回行ったとき、どれかが有意になる確率 1−(1−α)ᵏ と、1000組のシミュレーション（固定の乱数 seed 53）。α÷k の調整も切り替える
+    set: [alpha, k, bonf]
+    values: [level, fwer, sim]
+data: スライダーと選択欄で決める（データの読み込みなし）。棄却域の境目は2級の数表の値。p 値と検出力は標準正規分布の累積から計算する
+presets:
+  s1-z:
+    mode: z
+    set: {side: two, alpha: 0.05, xbar: 104.4, mu0: 100, sigma: 10, n: 25}
+    task: 従来の平均100・σ＝10。25人の平均が104.4。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0278
+    why: z＝4.4÷2＝2.2、p＝2×(1−Φ(2.2))≒0.028。0.05 以下なので H₀ を棄却する。α＝1% なら棄却しない。
+  s1-power:
+    mode: power
+    set: {side: two, alpha: 0.05, mu0: 100, mu1: 104, sigma: 10, n: 25}
+    task: 本当の平均が104のとき、25人・両側5%の検定で H₀（μ＝100）を棄却できる確率（検出力）は（小数で）？
+    predict: {type: number, key: power, label: "検出力 1−β"}
+    expect: 0.516
+    why: 本当の z の中心は 4÷2＝2。境目1.96を超える確率は約0.52。約半分は差を見逃す（β≒0.48）。n を100にすると約0.98。
+  s3-free:
+    mode: z
+    modes: [z, power, multi]
+    task: 解いてから、問題が聞いていること（p 値と判断か、検出力と過誤か、何度も検定することか）に合うモードで確かめる。
+  s4-free:
+    mode: z
+    modes: [z, power, multi]
+    task: 自分の売場の数字（基準の平均、施策後の平均、σ、人数）を入れ、p 値と、その人数で差を見つけられる確率を読む。
+  s5-free:
+    mode: power
+    modes: [power, multi]
+    task: 「検出力と過誤」で μ₁ を μ₀ に重ねたとき検出力が α になることを見る（発展1）。「何度も検定」で α÷k の調整を切り替える（発展3）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（z 検定と p 値、検出力と過誤、何度も検定）。
+used_by: [U24]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_lab/check.js         # 本文の値（z＝2.2・p≒0.028、検出力0.516、1−0.95²⁰）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
