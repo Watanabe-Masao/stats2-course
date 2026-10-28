@@ -188,3 +188,15 @@
 - id: TERM-cc
   name: 連続修正
   en: continuity correction
+- id: TERM-t
+  name: t 分布
+  en: t distribution
+- id: TERM-chi2
+  name: カイ二乗分布
+  en: chi-squared distribution
+- id: TERM-f
+  name: F 分布
+  en: F distribution
+- id: TERM-df
+  name: 自由度
+  en: degrees of freedom

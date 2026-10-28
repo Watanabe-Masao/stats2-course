@@ -1,0 +1,65 @@
+id: LAB-tcf
+name: t・χ²・F ラボ
+slug: tchif                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: tcf_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_dist.html]   # 旧版 教科書20 の「t・χ²・F を切り替え、自由度で形と確率点が変わる」を t・chi・f に、例題の t 値の計算を tstat に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: tstat
+    name: t 値を計算
+    purpose: x̄・μ₀・s・n から SE＝s÷√n と t＝(x̄−μ₀)÷SE を出し、t(n−1) の両側5%の点（0.975点）と比べる。分母に s をそのまま入れた誤りの値も並べる
+    set: [xbar, mu0, s, n]
+    values: [se, t, df, tcrit, zcrit, p, judge, wrong]   # judge：|t|＞tcrit なら「基準を超える」、それ以外は「基準以内」
+  - key: t
+    name: t 分布の点
+    purpose: 自由度と両側／片側・有意水準から t の点（左側累積 q の点）を出し、標準正規の点と比べる。くわしくに自由度ごとの点の表
+    set: [df, side, alpha, t]     # side：two／one（上側）。alpha：0.1／0.05／0.01。t：観測した t の値
+    values: [tcrit, zcrit, pval, diff, q]
+  - key: chi
+    name: カイ二乗分布
+    purpose: Q＝(n−1)s²÷σ² と χ²(n−1) の下側・上側2.5%点、上側5%点、Q 以上の確率
+    set: [n, s2, sigma2]
+    values: [q, df, lo, hi, up5, pUp, mean, var]
+  - key: f
+    name: F 分布
+    purpose: F＝s₁²÷s₂² と F(n₁−1, n₂−1) の上側5%・2.5%点、F 以上の確率。自由度を逆にした点も並べる
+    set: [s1, n1, s2, n2]         # s1・s2 は不偏分散（s²）
+    values: [F, d1, d2, fcrit, fcrit975, pUp, rev]
+data: スライダーと選択欄で決める（データの読み込みなし）。分布の値は不完全ベータ関数・不完全ガンマ関数で計算し、確率点は二分法で求める
+presets:
+  s1-t:
+    mode: tstat
+    set: {xbar: 52, mu0: 50, s: 8, n: 16}
+    task: 16店の客単価の平均52百円、標準偏差 s＝8百円、従来の平均50百円。t の値は？
+    predict: {type: number, key: t, label: "t"}
+    expect: 1
+    why: SE＝8÷√16＝2、t＝(52−50)÷2＝1。差は標準誤差のちょうど1つ分で、t(15) の点2.131より小さい。分母に s＝8 をそのまま入れると0.25になってしまう。
+  s1-df:
+    mode: t
+    set: {df: 4, side: two, alpha: 0.05, t: 1}
+    task: 5店（自由度4）のデータで t を使う。両側5%の t の点は？ 正規の1.96と比べて予想する。
+    predict: {type: number, key: tcrit, label: "t(4) の0.975点"}
+    expect: 2.7764
+    why: t(4) の0.975点は約2.776で、1.96よりかなり大きい。自由度を15にすると2.131、120にすると1.980と、1.96に近づく。
+  s3-free:
+    mode: tstat
+    modes: [tstat, t, chi, f]
+    task: 解いてから、問題が調べていること（平均か、分散か、分散の比か）に合うモードで確かめる。
+  s4-free:
+    mode: tstat
+    modes: [tstat, chi, f]
+    task: 自分の売場の数字（平均・標準偏差・日数）を入れ、平均なら t、ばらつきなら χ²、2つのばらつきの比較なら F で読む。
+  s5-free:
+    mode: f
+    modes: [f, t, chi]
+    task: 「F 分布」で n₁＝2（分子の自由度1）にし、上側5%点を「t 分布の点」の両側5%の点の2乗と比べる（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（t 値、t 分布、カイ二乗分布、F 分布）。
+used_by: [U20]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/tcf_lab/check.js          # 本文の値（t・χ²・F の確率点を数表の値と照合）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
