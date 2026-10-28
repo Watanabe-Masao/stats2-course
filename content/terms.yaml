@@ -200,3 +200,18 @@
 - id: TERM-df
   name: 自由度
   en: degrees of freedom
+- id: TERM-estimator
+  name: 推定量
+  en: estimator
+- id: TERM-point-est
+  name: 点推定
+  en: point estimation
+- id: TERM-consistency
+  name: 一致性
+  en: consistency
+- id: TERM-efficiency
+  name: 有効性
+  en: efficiency
+- id: TERM-mse
+  name: 平均二乗誤差（MSE）
+  en: mean squared error
