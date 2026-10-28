@@ -1,0 +1,111 @@
+id: LAB-doe
+name: 実験計画ラボ
+slug: doe                        # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: doe_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [anova.html]    # 旧版 教科書32 の「群の平均の差 d・群内のばらつき s・店舗数 n で SS_B・SS_W・F が変わる」を anova に含む。割り当て方・t 検定のくり返し・交互作用は新しく作った
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: anova
+    name: 分散分析
+    purpose: 群ごとの点・群の平均・全体の平均を並べ、群間の平方和（太い横線）と群内の平方和（細い線）、F と p 値、F の境目（3桁）を出す。平均のずれ・群内のばらつきを何倍かにし、店舗をくり返して自由度を増やす
+    set: [data, kb, kw, rep]        # data：ex／b／rep／two／uneq／flyer／promo／four／five。kb・kw は倍率、rep はくり返しの回数
+    values: [ssb, ssw, sst, msb, msw, F, p, crit, decision, dfb, dfw]
+  - key: assign
+    name: 割り当て方
+    purpose: 規模の違う20店で、くじ・大きい店を選ぶ・規模の近い2店ずつの組でくじ、の割り当てを500回くり返し（固定の乱数 seed 32032）、推定した効果の平均（偏り）とばらつきをヒストグラムで比べる
+    set: [method, tau]              # method：random／choose／block
+    values: [mean, bias, sd, biased, spread]   # biased：「偏りあり」／「偏りなし」、spread：「くじより小さい」／「くじと同じくらい」／「くじより大きい」
+  - key: multi
+    name: t 検定をくり返す
+    purpose: 本当はどの群の平均も同じとき、組ごとの t 検定（5%）をくり返すとどれかが有意になる割合と、F 検定（5%）の割合を2000回の実験で数える（固定の乱数 seed 53032）
+    set: [k, n]
+    values: [pairs, fwerT, fwerF, bonf]
+  - key: inter
+    name: 効果が店で違う
+    purpose: 小型店と大型店で施策の効果を変え、2本の線（交互作用の図）と、店の割合で重みを付けた平均の効果を出す
+    set: [es, el, p]
+    values: [avg, inter, es, el]
+data: 例題A（各2店：1,3・3,5・5,7）、例題B（各3店）、例題Aを各4店にしたもの、AとCの2群、店舗数が違う3群、チラシ3案・陳列3案（各3〜4店）、4つの売場（各6店）、3案（各5店）。20店の規模は20〜58（2ずつ）、誤差の標準偏差2
+presets:
+  s1-anova:
+    mode: anova
+    set: {data: ex, kb: 1, kw: 1, rep: 1}
+    task: 3つの施策（各2店）。A 1,3・B 3,5・C 5,7。F の値は？
+    predict: {type: number, key: F, label: "F"}
+    expect: 4
+    why: 群間の平方和16÷2＝8、群内の平方和6÷3＝2、F＝4。境目9.552 に届かないので棄却しない。くり返しを2回にすると F＝12 で棄却する。
+  s1-assign:
+    mode: assign
+    set: {method: choose, tau: 3}
+    task: 本当の効果は3。施策を「大きい店から10店」に割り当てて500回実験すると、推定した効果は？
+    predict: {type: choice, key: biased, label: "推定は", options: [偏りあり, 偏りなし]}
+    expect: 偏りあり
+    why: 大きい店の売上の高さが効果に混ざり、推定の平均は約23。くじに切り替えると平均は本当の3 に近づく（ばらつきは大きい）。
+  s1-exp:
+    mode: assign
+    modes: [assign]
+    set: {method: block, tau: 3}
+    unlock: [method]
+    task: 規模の近い2店ずつを組にして、組の中でくじを引く。推定した効果のばらつきは、20店からくじで半分を選ぶときと比べて？
+    predict: {type: choice, key: spread, label: "ばらつきは", options: [くじより小さい, くじと同じくらい, くじより大きい]}
+    expect: くじより小さい
+    why: 組の2店は規模がほぼ同じなので、規模の差がばらつきに入らない。くじで半分だと、規模の差（20〜58）がそのまま推定のばらつきになる。
+  s3-rule:
+    mode: anova
+    set: {data: ex, kb: 1, kw: 1, rep: 1}
+    steps:
+      - label: そのまま
+        set: {kb: 1, kw: 1, rep: 1}
+        task: 例題A（各2店）。F の値は？
+        predict: {type: number, key: F, label: "F"}
+        expect: 4
+        why: 群間の平均平方8 ÷ 群内の平均平方2。
+      - label: 平均のずれ2倍
+        set: {kb: 2}
+        task: 群の平均のずれだけを2倍にする。F は？
+        predict: {type: number, key: F, label: "F"}
+        expect: 16
+        why: 群間の平方和は 2²＝4倍の64。群内は変わらない。
+      - label: 群内のばらつき2倍
+        set: {kb: 1, kw: 2}
+        task: 平均のずれを元に戻し、群の中のばらつきだけを2倍にする。F は？
+        predict: {type: number, key: F, label: "F"}
+        expect: 1
+        why: 群内の平方和が4倍の24。F は4分の1。
+      - label: 店舗を2倍
+        set: {kw: 1, rep: 2}
+        task: ばらつきを元に戻し、同じ値の店をもう1組ずつ足す（各4店）。F は？
+        predict: {type: number, key: F, label: "F"}
+        expect: 12
+        why: 群間の平方和は2倍の32、群内は2倍の12 だが、群内の自由度が3から9 に増える。
+    law:
+      title: 式で説明する
+      lines:
+        - F ＝ (群間の平方和 ÷ (a−1)) ÷ (群内の平方和 ÷ (N−a))
+        - 群の平均のずれを k 倍 → 群間の平方和は k² 倍
+        - 群の中のばらつきを k 倍 → 群内の平方和は k² 倍
+        - 店舗を増やす → 群内の自由度が増え、同じずれでも F が大きく、境目は下がる
+      text: F は「群の平均がどれだけ離れているか」を「群の中のばらつき」と比べた量。平均の差だけでも、ばらつきだけでも決まらない。
+      limit: 群の中のばらつきが群ごとに大きく違う、店どうしが独立でない（同じ店を何日も数えた）、割り当てが偏っている、といった場合は、この F の読み方の外にある。
+  s3-free:
+    mode: anova
+    modes: [anova, assign, multi]
+    task: 解いてから、何を確かめたいか（F の計算・割り当て方・検定のくり返し）に合うモードで確かめる。
+  s4-free:
+    mode: anova
+    modes: [anova, assign, multi]
+    task: 自分の売場の施策の数字を思い浮かべ、群の平均のずれ・群内のばらつき・店舗数を動かして F と判断を読む。
+  s5-free:
+    mode: inter
+    modes: [inter, assign]
+    task: 「効果が店で違う」で、平均の効果1つで何が消えるかを見る。「割り当て方」で、なぜ無作為化するのかを確かめる。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（分散分析、割り当て方、t 検定のくり返し、効果が店で違う）。
+used_by: [U32]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/doe_lab/check.js          # 本文の値（16・6・F＝4・9.552、各3店の F＝6.75、割り当て方の偏り、3群の t 検定のくり返し約0.12）
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null

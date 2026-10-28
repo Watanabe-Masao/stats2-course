@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>実験計画ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.8em}
+</style></head><body>
+<h1>🧪 実験計画ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-anova" class="mode">
+ <p class="mut" style="margin:0">全体の変動を「群の平均のずれ（群間）」と「群の中のばらつき（群内）」に分ける。F＝群間の平均平方÷群内の平均平方。群の平均を離すと F は大きく、群の中を散らすと F は小さくなる。</p>
+ <div class="row ctl"><label>データ <select id="adata" data-key="data"></select></label></div>
+ <input type="range" id="akb" min="0" max="3" step="0.25" value="1" data-name="平均のずれ" data-unit="倍">
+ <input type="range" id="akw" min="0.25" max="3" step="0.25" value="1" data-name="群内のばらつき" data-unit="倍">
+ <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="くり返し" data-unit="回">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="aplot"></div>
+ <div class="card res key" id="asum"></div>
+ <div class="res det" id="atab"></div>
+</div>
+
+<div id="m-assign" class="mode">
+ <p class="mut" style="margin:0">規模の違う20店で、施策の効果（本当は＋τ）を調べる実験を500回くり返す。割り当て方で、推定した効果の「偏り」と「ばらつき」がどう変わるかを見る。</p>
+ <div class="row ctl"><label>割り当て方 <select id="smethod" data-key="method"><option value="random">くじで半分</option><option value="choose">大きい店を選ぶ</option><option value="block">近い2店の組でくじ</option></select></label></div>
+ <input type="range" id="stau" min="0" max="6" step="0.5" value="3" data-name="本当の効果 τ">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<div id="m-multi" class="mode">
+ <p class="mut" style="margin:0">本当はどの群の平均も同じとき、群の組ごとに t 検定（5%）をくり返すと、どれかが偶然「有意」になる確率が増える。分散分析の F 検定（5%）と比べる。2000回の実験で数える（固定の乱数）。</p>
+ <input type="range" id="mk" min="2" max="6" step="1" value="3" data-name="群の数">
+ <input type="range" id="mn" min="3" max="20" step="1" value="5" data-name="各群の店舗数">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="mplot"></div>
+ <div class="card res key" id="msum"></div>
+</div>
+
+<div id="m-inter" class="mode">
+ <p class="mut" style="margin:0">施策の効果が店の型で違うとき（交互作用）、平均の効果1つでは語れない。小型店と大型店で効果を変え、平均の効果に何が消えるかを見る。</p>
+ <input type="range" id="ies" min="-4" max="8" step="0.5" value="4" data-name="小型店での効果">
+ <input type="range" id="iel" min="-4" max="8" step="0.5" value="0" data-name="大型店での効果">
+ <input type="range" id="ip" min="0" max="1" step="0.1" value="0.5" data-name="小型店の割合">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="iplot"></div>
+ <div class="card res key" id="isum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(typeof v!=="number"||!isFinite(v))return String(v);const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,s=1/a,d=s;for(let n=0;n<1000;n++){ap++;d*=x/ap;s+=d;if(Math.abs(d)<Math.abs(s)*3e-15)break;}return s*Math.exp(-x+a*Math.log(x)-lgam(a));}
+ let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return 1-Math.exp(-x+a*Math.log(x)-lgam(a))*h;}
+const chiCdf=(q,k)=>gammp(k/2,q/2);
+const fCdf=(x,a,b)=>x<=0?0:ibeta(a/2,b/2,a*x/(a*x+b));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+const r3=v=>Math.round(v*1000)/1000;
+function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+const COL=["var(--acc)","var(--acc2)","#2a9d8f","#e9a23b","#8a63d2","var(--mut)"];
+const NAMES="ABCDEF";
+
+// ---- 一元配置の分散分析
+const DATA={
+ ex:{name:"例題A（各2店）",g:[[1,3],[3,5],[5,7]]},
+ b:{name:"例題B（各3店）",g:[[2,4,6],[5,7,9],[8,10,12]]},
+ rep:{name:"例題Aを各4店に",g:[[1,3,1,3],[3,5,3,5],[5,7,5,7]]},
+ two:{name:"AとCの2群",g:[[1,3],[5,7]]},
+ uneq:{name:"店舗数が違う3群",g:[[2,4],[4,6,8],[7,9]]},
+ flyer:{name:"チラシ3案（各4店）",g:[[10,12,11,13],[14,15,13,16],[12,11,13,12]]},
+ promo:{name:"陳列3案（各3店）",g:[[20,22,24],[24,26,28],[26,28,30]]},
+ four:{name:"4つの売場（各6店）",g:[[6,7.5,8,9,9.5,11],[7,8.5,9,10,10.5,12],[8,9.5,10,11,11.5,13],[9,10.5,11,12,12.5,14]]},
+ five:{name:"3案（各5店）",g:[[7,8,9,10,11],[7,8,9,10,11],[10,11,12,13,14]]}};
+function aGroups(){const d=DATA[$("adata").value],kb=+$("akb").value,kw=+$("akw").value,rep=+$("arep").value;
+ const base=d.g.map(g=>{let x=[];for(let i=0;i<rep;i++)x=x.concat(g);return x;});
+ const all=base.flat(),m=all.reduce((s,x)=>s+x,0)/all.length;
+ return base.map(g=>{const gm=g.reduce((s,x)=>s+x,0)/g.length;return g.map(x=>m+kb*(gm-m)+kw*(x-gm));});}
+function aVals(){const G=aGroups(),all=G.flat(),N=all.length,a=G.length,m=all.reduce((s,x)=>s+x,0)/N,gm=G.map(g=>g.reduce((s,x)=>s+x,0)/g.length);
+ const ssb=G.reduce((s,g,i)=>s+g.length*(gm[i]-m)**2,0),ssw=G.reduce((s,g,i)=>s+g.reduce((t,x)=>t+(x-gm[i])**2,0),0),dfb=a-1,dfw=N-a;
+ const msb=ssb/dfb,msw=ssw/dfw,F=msw>0?msb/msw:Infinity,p=isFinite(F)?1-fCdf(F,dfb,dfw):0,crit=r3(inv(x=>fCdf(x,dfb,dfw),0.95,0,1e4));
+ return {G,N,a,m,gm,ssb,ssw,sst:ssb+ssw,dfb,dfw,msb,msw,F,p,crit,decision:F>crit?"棄却する":"棄却しない"};}
+function aRender(){const A=aVals(),all=A.G.flat(),lo0=Math.min(...all),hi0=Math.max(...all),pad=Math.max(1,(hi0-lo0)*0.08),lo=Math.floor(lo0-pad),hi=Math.ceil(hi0+pad),X=v=>40+(v-lo)/(hi-lo)*(W-56),rh=40;
+ let s=`<svg viewBox="0 0 ${W} ${A.a*rh+34}" width="${W}" role="img" aria-label="群ごとの点と平均">`;
+ s+=`<line x1="${X(A.m)}" y1="6" x2="${X(A.m)}" y2="${A.a*rh+12}" stroke="var(--fg)" stroke-dasharray="4 3" stroke-opacity=".7"/><text x="${X(A.m)}" y="${A.a*rh+26}" font-size="10.5" text-anchor="middle" fill="var(--fg)">全体の平均 ${f(A.m,2)}</text>`;
+ A.G.forEach((g,i)=>{const y=i*rh+24,c=COL[i%6],gx=X(A.gm[i]);
+  s+=`<text x="2" y="${y+4}" font-size="12" font-weight="700" fill="var(--fg)">${NAMES[i]}</text>`;
+  s+=`<line x1="${X(A.m)}" y1="${y-12}" x2="${gx}" y2="${y-12}" stroke="${c}" stroke-width="3" stroke-opacity=".6"/>`;
+  g.forEach((x,j)=>{const yy=y+((j%4)-1.5)*3.2;s+=`<line x1="${X(x)}" y1="${yy}" x2="${gx}" y2="${yy}" stroke="${c}" stroke-opacity=".35"/><circle cx="${X(x)}" cy="${yy}" r="4" fill="${c}" fill-opacity=".85"/>`;});
+  s+=`<line x1="${gx}" y1="${y-14}" x2="${gx}" y2="${y+10}" stroke="${c}" stroke-width="3"/>`;});
+ s+=`</svg><div class="legend mut"><span>太い横線＝群の平均のずれ（群間）</span><span>細い線＝群の中のずれ（群内）</span></div>`;
+ $("aplot").innerHTML=s;
+ $("asum").innerHTML=`<div>群間の平方和 ${f(A.ssb,3)}（自由度 ${A.dfb}）　群内の平方和 ${f(A.ssw,3)}（自由度 ${A.dfw}）</div><div>F＝(${f(A.ssb,3)}÷${A.dfb})÷(${f(A.ssw,3)}÷${A.dfw})＝<b>${f(A.F,3)}</b>　境目 F(${A.dfb}, ${A.dfw})＝${A.crit.toFixed(3)}</div><div>p 値 ${f(A.p)} → 「平均はすべて同じ」を <b>${A.decision}</b></div><div class="mut">平均のずれを2倍にすると群間の平方和は4倍。群の中のばらつきを2倍にすると群内の平方和は4倍。店舗をくり返すと群内の自由度が増え、境目が下がる。</div>`;
+ $("atab").innerHTML=`<table><tr><th>変動</th><th>平方和</th><th>自由度</th><th>平均平方</th></tr><tr><td>群間</td><td>${f(A.ssb,3)}</td><td>${A.dfb}</td><td>${f(A.msb,3)}</td></tr><tr><td>群内</td><td>${f(A.ssw,3)}</td><td>${A.dfw}</td><td>${f(A.msw,3)}</td></tr><tr><td>全体</td><td>${f(A.sst,3)}</td><td>${A.N-1}</td><td>—</td></tr></table>`;}
+LK.register("anova",{name:"分散分析",
+ init(){$("adata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("adata").onchange=aRender;["akb","akw","arep"].forEach(id=>LK.stepper($(id),aRender));aRender();},
+ apply(s){if(s.data)$("adata").value=s.data;if(s.kb!==undefined)LK.setRange("akb",s.kb);if(s.kw!==undefined)LK.setRange("akw",s.kw);if(s.rep!==undefined)LK.setRange("arep",s.rep);aRender();},
+ render:aRender,
+ value(key){const A=aVals(),v=A[key];return {v,text:typeof v==="string"?v:f(v,key==="crit"?3:4)};}});
+
+// ---- 割り当て方
+const SIZE=Array.from({length:20},(_,i)=>20+2*i);   // 店の規模（施策なしの売上の見込み）
+function assign(method,r){const idx=SIZE.map((_,i)=>i);let T=[];
+ if(method==="choose")T=idx.slice(10);
+ else if(method==="block"){for(let k=0;k<20;k+=2)T.push(r()<0.5?k:k+1);}
+ else{const a=[...idx];for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}T=a.slice(0,10);}
+ return new Set(T);}
+let sCache={};
+function sSim(method,tau){const key=method+"|"+tau;if(sCache[key])return sCache[key];const r=rng(32032),est=[];let last=null;
+ for(let k=0;k<500;k++){const T=assign(method,r);let st=0,sc=0;SIZE.forEach((b,i)=>{const y=b+(T.has(i)?tau:0)+gauss(r)*2;if(T.has(i))st+=y;else sc+=y;});est.push(st/10-sc/10);last=T;}
+ const mean=est.reduce((a,b)=>a+b,0)/est.length,sd=Math.sqrt(est.reduce((a,b)=>a+(b-mean)**2,0)/(est.length-1));return sCache[key]={est,mean,sd,last};}
+function sVals(){const method=$("smethod").value,tau=+$("stau").value,R=sSim(method,tau),Rr=sSim("random",tau),bias=R.mean-tau,ratio=R.sd/Rr.sd;
+ return {method,tau,mean:R.mean,bias,sd:R.sd,est:R.est,last:R.last,biased:Math.abs(bias)>1?"偏りあり":"偏りなし",spread:ratio<0.8?"くじより小さい":ratio>1.25?"くじより大きい":"くじと同じくらい",sdRandom:Rr.sd};}
+function sRender(){const S=sVals(),lo=Math.floor(Math.min(-6,...S.est)),hi=Math.ceil(Math.max(30,...S.est)),X=v=>16+(v-lo)/(hi-lo)*(W-32),bins=34,bw=(hi-lo)/bins,cnt=Array(bins).fill(0);
+ S.est.forEach(e=>cnt[Math.min(bins-1,Math.max(0,Math.floor((e-lo)/bw)))]++);const mx=Math.max(...cnt),H=110;
+ let s=`<div class="glab mut" style="font-size:12px">いまの割り当て（1回分）：●＝施策あり　○＝なし（左ほど小さい店）</div><svg viewBox="0 0 ${W} 30" width="${W}" role="img" aria-label="割り当て">`;
+ SIZE.forEach((b,i)=>{const x=16+i*(W-32)/19;s+=S.last.has(i)?`<circle cx="${x}" cy="15" r="6" fill="var(--acc2)"/>`:`<circle cx="${x}" cy="15" r="6" fill="none" stroke="var(--fg)" stroke-opacity=".6"/>`;});
+ s+=`</svg><svg viewBox="0 0 ${W} ${H+34}" width="${W}" role="img" aria-label="推定した効果のヒストグラム">`;
+ cnt.forEach((n,b)=>{const h=n/mx*(H-14);s+=`<rect x="${X(lo+b*bw)}" y="${H-h}" width="${Math.max(1,X(lo+(b+1)*bw)-X(lo+b*bw)-1)}" height="${h}" fill="var(--acc)" fill-opacity=".7"/>`;});
+ s+=`<line x1="${X(S.tau)}" y1="4" x2="${X(S.tau)}" y2="${H}" stroke="var(--ok)" stroke-width="2"/><text x="${X(S.tau)}" y="${H+14}" font-size="10.5" text-anchor="middle" fill="var(--ok)">本当 ${S.tau}</text>`;
+ s+=`<line x1="${X(S.mean)}" y1="4" x2="${X(S.mean)}" y2="${H}" stroke="var(--acc2)" stroke-dasharray="4 3" stroke-width="2"/><text x="${X(S.mean)}" y="${H+28}" font-size="10.5" text-anchor="middle" fill="var(--acc2)">推定の平均 ${f(S.mean,1)}</text>`;
+ s+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/></svg>`;
+ $("splot").innerHTML=s;
+ $("ssum").innerHTML=`<div>500回の推定の平均 <b>${f(S.mean,2)}</b>（本当は ${S.tau}）→ 偏り ${f(S.bias,2)}：<b>${S.biased}</b></div><div>推定のばらつき（標準偏差）<b>${f(S.sd,2)}</b>（くじで半分なら ${f(S.sdRandom,2)}）→ <b>${S.spread}</b></div><div class="mut">大きい店を選ぶと、店の規模の差が効果に混ざる（交絡）。くじで割り当てると偏りは消えるが、規模の差がばらつきとして残る。規模の近い店どうしでくじを引く（ブロック化）と、そのばらつきも小さくなる。</div>`;}
+LK.register("assign",{name:"割り当て方",
+ init(){$("smethod").onchange=sRender;LK.stepper($("stau"),sRender);sRender();},
+ apply(s){if(s.method)$("smethod").value=s.method;if(s.tau!==undefined)LK.setRange("stau",s.tau);sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:typeof v==="string"?v:f(v,2)};}});
+
+// ---- t 検定をくり返す
+let mCache={};
+function mSim(k,n){const key=k+"|"+n;if(mCache[key])return mCache[key];const r=rng(53032),dfT=2*n-2,tc=inv(t=>tcdf(t,dfT),0.975,0,1e3),dfb=k-1,dfw=k*n-k,fc=inv(x=>fCdf(x,dfb,dfw),0.95,0,1e4);let hitT=0,hitF=0;
+ for(let s=0;s<2000;s++){const G=[];for(let i=0;i<k;i++){const g=[];for(let j=0;j<n;j++)g.push(gauss(r));G.push(g);}
+  const m=G.map(g=>g.reduce((a,b)=>a+b,0)/n),v=G.map((g,i)=>g.reduce((a,b)=>a+(b-m[i])**2,0)/(n-1));let any=false;
+  for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){const sp=((n-1)*v[i]+(n-1)*v[j])/(2*n-2),t=(m[i]-m[j])/Math.sqrt(sp*2/n);if(Math.abs(t)>tc)any=true;}
+  if(any)hitT++;const gm=m.reduce((a,b)=>a+b,0)/k,msb=n*m.reduce((a,b)=>a+(b-gm)**2,0)/dfb,msw=v.reduce((a,b)=>a+b,0)/k;if(msb/msw>fc)hitF++;}
+ return mCache[key]={fwerT:hitT/2000,fwerF:hitF/2000};}
+function mVals(){const k=+$("mk").value,n=+$("mn").value,pairs=k*(k-1)/2,R=mSim(k,n);return {k,n,pairs,fwerT:R.fwerT,fwerF:R.fwerF,bonf:0.05/pairs,naive:1-Math.pow(0.95,pairs)};}
+function mRender(){const M=mVals(),H=130,bar=(x,v,c,l)=>{const h=v*(H-20)/0.5;return `<rect x="${x}" y="${H-h}" width="90" height="${h}" rx="3" fill="${c}" fill-opacity=".8"/><text x="${x+45}" y="${H-h-5}" font-size="12" text-anchor="middle" fill="var(--fg)">${f(v,3)}</text><text x="${x+45}" y="${H+15}" font-size="11.5" text-anchor="middle" fill="var(--fg)">${l}</text>`;};
+ let s=`<svg viewBox="0 0 ${W} ${H+24}" width="${W}" role="img" aria-label="誤って有意になる割合">`;
+ s+=`<line x1="10" y1="${H-0.05*(H-20)/0.5}" x2="${W-10}" y2="${H-0.05*(H-20)/0.5}" stroke="var(--ng)" stroke-dasharray="4 3"/><text x="${W-10}" y="${H-0.05*(H-20)/0.5-4}" font-size="10.5" text-anchor="end" fill="var(--ng)">5%</text>`;
+ s+=bar(50,M.fwerT,"var(--acc2)",`t 検定 ${M.pairs} 組`)+bar(200,M.fwerF,"var(--acc)","F 検定 1回")+`<line x1="10" y1="${H}" x2="${W-10}" y2="${H}" stroke="var(--line)"/></svg>`;
+ $("mplot").innerHTML=s;
+ $("msum").innerHTML=`<div>群 ${M.k}・各 ${M.n} 店。組の数 ${M.k}×${M.k-1}÷2＝<b>${M.pairs}</b></div><div>どれかの組で偶然「有意」：t 検定のくり返し <b>${f(M.fwerT,3)}</b>　F 検定 <b>${f(M.fwerF,3)}</b></div><div class="mut">組ごとの検定は同じデータを使い回すので独立ではなく、1−0.95^${M.pairs}＝${f(M.naive,3)} より少し小さくなる。組ごとに比べるなら、たとえば 0.05÷${M.pairs}＝${f(M.bonf,4)} で判断する（ボンフェローニ）。</div>`;}
+LK.register("multi",{name:"t 検定をくり返す",
+ init(){["mk","mn"].forEach(id=>LK.stepper($(id),mRender));mRender();},
+ apply(s){if(s.k!==undefined)LK.setRange("mk",s.k);if(s.n!==undefined)LK.setRange("mn",s.n);mRender();},
+ render:mRender,
+ value(key){const M=mVals(),v=M[key];return {v,text:key==="pairs"?String(v):f(v,3)};}});
+
+// ---- 交互作用
+function iVals(){const es=+$("ies").value,el=+$("iel").value,p=+$("ip").value;return {es,el,p,avg:p*es+(1-p)*el,inter:es-el};}
+function iRender(){const I=iVals(),base={s:20,l:30},lo=Math.min(14,base.s+Math.min(0,I.es),base.l+Math.min(0,I.el))-2,hi=Math.max(base.s+I.es,base.l+I.el,32)+2,H=150,Y=v=>H-8-(v-lo)/(hi-lo)*(H-20),x0=80,x1=W-60;
+ let s=`<svg viewBox="0 0 ${W} ${H+22}" width="${W}" role="img" aria-label="交互作用の図">`;
+ [["小型店",base.s,I.es,"var(--acc)"],["大型店",base.l,I.el,"var(--acc2)"]].forEach(([n,b,e,c])=>{s+=`<line x1="${x0}" y1="${Y(b)}" x2="${x1}" y2="${Y(b+e)}" stroke="${c}" stroke-width="3"/><circle cx="${x0}" cy="${Y(b)}" r="5" fill="${c}"/><circle cx="${x1}" cy="${Y(b+e)}" r="5" fill="${c}"/><text x="${x1+8}" y="${Y(b+e)+4}" font-size="11.5" fill="${c}">${n}</text><text x="${x0-8}" y="${Y(b)+4}" font-size="11" text-anchor="end" fill="${c}">${b}</text>`;});
+ s+=`<text x="${x0}" y="${H+16}" font-size="11.5" text-anchor="middle" fill="var(--fg)">施策なし</text><text x="${x1}" y="${H+16}" font-size="11.5" text-anchor="middle" fill="var(--fg)">施策あり</text></svg><div class="mut" style="font-size:12px">線が平行なら交互作用なし。傾きが違えば、効果が店の型で違う。</div>`;
+ $("iplot").innerHTML=s;
+ $("isum").innerHTML=`<div>小型店の効果 ${f(I.es,1)}、大型店の効果 ${f(I.el,1)}、小型店の割合 ${f(I.p,1)}</div><div>平均の効果＝${f(I.p,1)}×${f(I.es,1)}＋${f(1-I.p,1)}×${f(I.el,1)}＝<b>${f(I.avg,2)}</b>　効果の違い（交互作用）＝<b>${f(I.inter,1)}</b></div><div class="mut">平均の効果1つにまとめると、「どの店で効くか」が消える。店の割合が変われば、平均の効果も変わる。</div>`;}
+LK.register("inter",{name:"効果が店で違う",
+ init(){["ies","iel","ip"].forEach(id=>LK.stepper($(id),iRender));iRender();},
+ apply(s){if(s.es!==undefined)LK.setRange("ies",s.es);if(s.el!==undefined)LK.setRange("iel",s.el);if(s.p!==undefined)LK.setRange("ip",s.p);iRender();},
+ render:iRender,
+ value(key){const I=iVals(),v=I[key];return {v,text:f(v,2)};}});
+
+LK.start("anova");
+window.__LAB__={LK,aVals,sVals,mVals,iVals,fCdf,tcdf};
+</script>
+</body></html>

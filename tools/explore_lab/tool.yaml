@@ -33,10 +33,14 @@ presets:
     mode: sandbox
     set: {value: sales, group: camp, filter: weekday, chart: box}
     task: キャンペーンの効果は、何をそろえれば言えるか。平日だけ・週末だけ・店だけに絞り、分け方や図を変えて、そろえる条件で差がどう変わるかを見る。
+  s6-design:
+    mode: sandbox
+    set: {value: sales, group: camp, filter: all, chart: cross, second: week}
+    task: キャンペーンの日は売上が高いが、キャンペーンは週末に多い。この観察データで言えることと言えないことを分け、効果を確かめるならどの日にキャンペーンをするかをどう決めるかを考える。
   s6-free:
     mode: sandbox
     task: 自分で問いを立て、見る値・分け方・絞り方・図を選んで動かす。統計で言えることと、自分の解釈を分けて書く。
-used_by: [U05, U27, U28, U29, U30]
+used_by: [U05, U27, U28, U29, U30, U32]
 tests:
   - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・埋め込み
   - node tools/explore_lab/check.js      # データの仕組み（キャンペーンの差が、平日だけに絞ると小さくなる）

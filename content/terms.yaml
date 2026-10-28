@@ -329,3 +329,15 @@
 - id: TERM-nonsampling-error
   name: 非標本誤差
   en: non-sampling error
+- id: TERM-randomize
+  name: 無作為化
+  en: randomization
+- id: TERM-confound
+  name: 交絡
+  en: confounding
+- id: TERM-anova
+  name: 分散分析
+  en: analysis of variance
+- id: TERM-multcomp
+  name: 多重比較
+  en: multiple comparisons
