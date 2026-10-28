@@ -11,7 +11,7 @@
 - {id: U08, number: "08", migrated: true}
 - {id: U09, number: "09", migrated: true}
 - {id: U10, number: "10", migrated: true}
-- {id: U11, number: "11", migrated: false}
+- {id: U11, number: "11", migrated: true}
 - {id: U12, number: "12", migrated: false}
 - {id: U13, number: "13", migrated: false}
 - {id: U14, number: "14", migrated: false}

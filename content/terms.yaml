@@ -131,3 +131,6 @@
 - id: TERM-indep
   name: 独立
   en: independence
+- id: TERM-cond
+  name: 条件付き確率
+  en: conditional probability
