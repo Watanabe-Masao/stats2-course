@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平均の t 検定ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 平均の t 検定ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-one" class="mode">
+ <p class="mut" style="margin:0">σ が分からないので s で代わりにする。t＝(x̄−μ₀)÷(s÷√n) は、H₀ のもとで自由度 n−1 の t 分布に従う。境目は正規の1.96より外側にある。</p>
+ <div class="row ctl"><label>対立仮説 <select id="oside" data-key="side"><option value="two">μ≠μ₀（両側）</option><option value="upper">μ＞μ₀（右片側）</option><option value="lower">μ＜μ₀（左片側）</option></select></label><label>α <select id="oalpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="ox" min="0" max="2000" step="0.1" value="104" data-name="平均 x̄">
+ <input type="range" id="om" min="0" max="2000" step="0.1" value="100" data-name="基準 μ₀">
+ <input type="range" id="os" min="0.1" max="500" step="0.1" value="8" data-name="標準偏差 s">
+ <input type="range" id="on" min="2" max="500" step="1" value="16" data-name="個数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="oplot"></div>
+ <div class="card res key" id="osum"></div>
+</div>
+
+<div id="m-paired" class="mode">
+ <p class="mut" style="margin:0">同じ店・同じ人の前後は、1組ごとの差 D を1つのデータにする。t＝D̄÷(s_D÷√n)、自由度 n−1（差の1標本 t 検定）。</p>
+ <div class="row ctl"><label>対立仮説 <select id="pside" data-key="side"><option value="two">差≠0（両側）</option><option value="upper">差＞0（右片側）</option><option value="lower">差＜0（左片側）</option></select></label><label>α <select id="palpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="pd" min="-1000" max="1000" step="0.1" value="2" data-name="差の平均 D̄">
+ <input type="range" id="ps" min="0.1" max="500" step="0.1" value="5" data-name="差の標準偏差">
+ <input type="range" id="pn" min="2" max="500" step="1" value="25" data-name="組の数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+</div>
+
+<div id="m-two" class="mode">
+ <p class="mut" style="margin:0">別々の2群の平均の差。ウェルチは各群の s² をそのまま使い、等分散は2群の s² を合わせる。標準誤差と自由度が変わり、結論が変わることがある。</p>
+ <div class="row ctl"><label>方法 <select id="tmeth" data-key="method"><option value="welch">ウェルチ</option><option value="pooled">等分散を仮定</option></select></label><label>対立仮説 <select id="tside" data-key="side"><option value="two">両側</option><option value="upper">μ₁＞μ₂</option><option value="lower">μ₁＜μ₂</option></select></label><label>α <select id="talpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="tx1" min="0" max="5000" step="0.1" value="30" data-name="平均 x̄₁">
+ <input type="range" id="ts1" min="0.1" max="1000" step="0.1" value="2" data-name="標準偏差 s₁">
+ <input type="range" id="tn1" min="2" max="500" step="1" value="10" data-name="個数 n₁">
+ <input type="range" id="tx2" min="0" max="5000" step="0.1" value="25" data-name="平均 x̄₂">
+ <input type="range" id="ts2" min="0.1" max="1000" step="0.1" value="8" data-name="標準偏差 s₂">
+ <input type="range" id="tn2" min="2" max="500" step="1" value="20" data-name="個数 n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+function tq(p,df){let lo=-1e3,hi=1e3;for(let i=0;i<200;i++){const m=(lo+hi)/2;if(tcdf(m,df)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const tden=(x,df)=>Math.exp(lgam((df+1)/2)-lgam(df/2)-0.5*Math.log(df*Math.PI)-(df+1)/2*Math.log(1+x*x/df));
+const dn=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+const ZQ={two:{"0.1":1.645,"0.05":1.96,"0.01":2.576},one:{"0.1":1.282,"0.05":1.645,"0.01":2.326}};   // 2級の数表の値（比べるための正規の境目）
+// 検定のまとめ：side・α・t・自由度 → p 値・境目・判断
+function judge(side,alpha,t,df){const a=+alpha,p=side==="two"?2*(1-tcdf(Math.abs(t),df)):side==="upper"?1-tcdf(t,df):tcdf(t,df);
+ const crit=side==="two"?tq(1-a/2,df):tq(1-a,df),zcrit=side==="two"?ZQ.two[alpha]:ZQ.one[alpha];
+ return {p,crit,zcrit,decision:p<=a?"棄却する":"棄却しない"};}
+// t 分布（実線）と標準正規（点線）、p 値の塗り、境目
+function curve(J,t,df,side,label){const H=152,L=12,R=W-12,base=H-24,top=28,x0=-4.5,x1=4.5,X=x=>L+(x-x0)/(x1-x0)*(R-L),mx=dn(0)*1.1,Y=y=>base-y/mx*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label)}">`;
+ const sh=side==="two"?[[-9,-Math.abs(t)],[Math.abs(t),9]]:side==="upper"?[[t,9]]:[[-9,t]];
+ sh.forEach(([a,b])=>{const lo=Math.max(a,x0),hi=Math.min(b,x1);if(hi<=lo)return;let p=`M${X(lo).toFixed(1)} ${base}`;for(let i=0;i<=60;i++){const x=lo+(hi-lo)*i/60;p+=` L${X(x).toFixed(1)} ${Y(tden(x,df)).toFixed(1)}`;}s+=`<path d="${p} L${X(hi).toFixed(1)} ${base} Z" fill="var(--acc2)" fill-opacity=".45"/>`;});
+ let dz="",dt="";for(let i=0;i<=200;i++){const x=x0+(x1-x0)*i/200;dz+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(dn(x)).toFixed(1);dt+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(tden(x,df)).toFixed(1);}
+ s+=`<path d="${dz}" fill="none" stroke="var(--fg)" stroke-opacity=".45" stroke-width="1.2" stroke-dasharray="3 3"/><path d="${dt}" fill="none" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [-4,-2,0,2,4].forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x}</text>`);
+ const ln=[{x:t,label:`t＝${f(t,2)}`,col:"var(--fg)",dash:"2 2"}];if(side!=="lower")ln.push({x:J.crit,label:f(J.crit,3),col:"var(--acc)"});if(side!=="upper")ln.push({x:-J.crit,label:f(-J.crit,3),col:"var(--acc)"});
+ const placed=[];ln.forEach(o=>{const x=Math.max(x0,Math.min(x1,o.x)),lx=X(x),near=o.label&&placed.some(p=>Math.abs(p-lx)<36),ly=near?top-16:top-4;if(o.label&&!near)placed.push(lx);s+=`<line x1="${lx}" y1="${top}" x2="${lx}" y2="${base}" stroke="${o.col}" stroke-dasharray="${o.dash||"4 3"}" stroke-width="1.5"/><text x="${lx}" y="${ly}" font-size="10.5" text-anchor="${lx>W*0.75?"end":lx<W*0.25?"start":"middle"}" fill="${o.col}">${esc(o.label)}</text>`;});
+ return s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${f(df,2)})</span><span>┄ 標準正規</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>p 値</span></div>`;}
+const sideTxt=s=>s==="two"?"両側":"片側";
+const judgeTxt=(J,t,side)=>`<div>p 値＝<b>${f(J.p)}</b>（${sideTxt(side)}）　境目 t＝${side==="lower"?"−":side==="two"?"±":""}${f(J.crit,3)}（正規なら ${side==="lower"?"−":side==="two"?"±":""}${J.zcrit}）</div><div>→ H₀ を <b>${J.decision}</b></div>`;
+
+// ---- 1標本
+function oVals(){const side=$("oside").value,alpha=$("oalpha").value,xb=+$("ox").value,m=+$("om").value,s=+$("os").value,n=+$("on").value,se=s/Math.sqrt(n),t=(xb-m)/se,df=n-1,J=judge(side,alpha,t,df);
+ return {side,alpha:+alpha,xbar:xb,mu0:m,s,n,se,t,df,...J};}
+function oRender(){const O=oVals();
+ $("oplot").innerHTML=curve(O,O.t,O.df,O.side,"H0 のもとでの t の分布");
+ $("osum").innerHTML=`<div>SE＝s÷√n＝${f(O.s,2)}÷√${O.n}＝${f(O.se)}　t＝(${f(O.xbar,2)}−${f(O.mu0,2)})÷${f(O.se)}＝<b>${f(O.t,3)}</b>　自由度 ${O.df}</div>${judgeTxt(O,O.t,O.side)}<div class="mut">自由度が小さいほど t 分布の裾は重く、境目は外へ動く。n が大きくなると正規の値に近づく。</div>`;}
+LK.register("one",{name:"1標本",
+ init(){["ox","om","os","on"].forEach(id=>LK.stepper($(id),oRender));["oside","oalpha"].forEach(id=>$(id).onchange=oRender);oRender();},
+ apply(s){if(s.side)$("oside").value=s.side;if(s.alpha!==undefined)$("oalpha").value=String(s.alpha);const m={xbar:"ox",mu0:"om",s:"os",n:"on"};for(const k in m)if(s[k]!==undefined)LK.setRange(m[k],s[k]);oRender();},
+ render:oRender,
+ value(key){const O=oVals(),v=O[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 対応あり
+function pVals(){const side=$("pside").value,alpha=$("palpha").value,d=+$("pd").value,s=+$("ps").value,n=+$("pn").value,se=s/Math.sqrt(n),t=d/se,df=n-1,J=judge(side,alpha,t,df);
+ return {side,alpha:+alpha,dbar:d,sd:s,n,se,t,df,...J};}
+function pRender(){const P=pVals();
+ $("pplot").innerHTML=curve(P,P.t,P.df,P.side,"H0 のもとでの差の t の分布");
+ $("psum").innerHTML=`<div>SE＝差の標準偏差÷√n＝${f(P.sd,2)}÷√${P.n}＝${f(P.se)}　t＝${f(P.dbar,2)}÷${f(P.se)}＝<b>${f(P.t,3)}</b>　自由度 ${P.df}</div>${judgeTxt(P,P.t,P.side)}<div class="mut">同じ店の前後を別々の2群として計算すると、店ごとの大きさの違いがばらつきに入り、SE が大きくなって差を見逃しやすい。</div>`;}
+LK.register("paired",{name:"対応あり",
+ init(){["pd","ps","pn"].forEach(id=>LK.stepper($(id),pRender));["pside","palpha"].forEach(id=>$(id).onchange=pRender);pRender();},
+ apply(s){if(s.side)$("pside").value=s.side;if(s.alpha!==undefined)$("palpha").value=String(s.alpha);const m={dbar:"pd",sd:"ps",n:"pn"};for(const k in m)if(s[k]!==undefined)LK.setRange(m[k],s[k]);pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 独立2群
+function tVals(){const meth=$("tmeth").value,side=$("tside").value,alpha=$("talpha").value,x1=+$("tx1").value,s1=+$("ts1").value,n1=+$("tn1").value,x2=+$("tx2").value,s2=+$("ts2").value,n2=+$("tn2").value,a=s1*s1/n1,b=s2*s2/n2;
+ const sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/(n1+n2-2),dfW=(a+b)**2/(a*a/(n1-1)+b*b/(n2-1)),seW=Math.sqrt(a+b),seP=Math.sqrt(sp2*(1/n1+1/n2));
+ const se=meth==="welch"?seW:seP,df=meth==="welch"?dfW:n1+n2-2,diff=x1-x2,t=diff/se,J=judge(side,alpha,t,df);
+ const other=meth==="welch"?judge(side,alpha,diff/seP,n1+n2-2):judge(side,alpha,diff/seW,dfW);
+ return {method:meth,side,alpha:+alpha,diff,se,df,t,sp2,seW,seP,dfW,dfP:n1+n2-2,...J,other};}
+function tRender(){const T=tVals(),o=T.other;
+ $("tplot").innerHTML=curve(T,T.t,T.df,T.side,"H0 のもとでの2群の t の分布");
+ $("tsum").innerHTML=`<div>差 x̄₁−x̄₂＝<b>${f(T.diff)}</b></div><div>${T.method==="welch"?`ウェルチ：SE＝√(s₁²/n₁＋s₂²/n₂)＝<b>${f(T.se)}</b>、自由度≒<b>${f(T.df,2)}</b>`:`等分散：合わせた分散 s²＝${f(T.sp2)}、SE＝<b>${f(T.se)}</b>、自由度 <b>${T.df}</b>`}　t＝<b>${f(T.t,3)}</b></div>${judgeTxt(T,T.t,T.side)}<div class="mut">もう一方の方法：${T.method==="welch"?`等分散なら SE ${f(T.seP)}・自由度 ${T.dfP}・p ${f(o.p)}（${o.decision}）`:`ウェルチなら SE ${f(T.seW)}・自由度 ${f(T.dfW,2)}・p ${f(o.p)}（${o.decision}）`}。ばらつきも人数も違うときは、ウェルチを使う。</div>`;}
+LK.register("two",{name:"2群",
+ init(){["tx1","ts1","tn1","tx2","ts2","tn2"].forEach(id=>LK.stepper($(id),tRender));["tmeth","tside","talpha"].forEach(id=>$(id).onchange=tRender);tRender();},
+ apply(s){if(s.method)$("tmeth").value=s.method;if(s.side)$("tside").value=s.side;if(s.alpha!==undefined)$("talpha").value=String(s.alpha);const m={x1:"tx1",s1:"ts1",n1:"tn1",x2:"tx2",s2:"ts2",n2:"tn2"};for(const k in m)if(s[k]!==undefined)LK.setRange(m[k],s[k]);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+LK.start("one");
+window.__LAB__={LK,oVals,pVals,tVals,tq,tcdf};
+</script>
+</body></html>

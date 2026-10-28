@@ -1,0 +1,60 @@
+id: LAB-ttest
+name: 平均の t 検定ラボ
+slug: ttest                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: ttest_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_dist.html, sim_test.html, twot.html]   # 旧版 教科書25 の「t(15) の境目2.131」を one に、「2群の t 検定（平均の差・標準偏差・日数で t と p 値）」を two に含む。対応ありを paired にした
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: one
+    name: 1標本
+    purpose: H₀：μ＝μ₀ の1標本 t 検定。t＝(x̄−μ₀)÷(s÷√n)、自由度 n−1 の p 値と境目。t 分布と標準正規を重ねて描き、正規の境目（数表の1.96など）も並べる
+    set: [side, alpha, xbar, mu0, s, n]      # side：two／upper／lower。alpha：0.1／0.05／0.01
+    values: [se, t, df, p, crit, zcrit, decision]   # decision：「棄却する」／「棄却しない」
+  - key: paired
+    name: 対応あり
+    purpose: 1組ごとの差 D の平均が0かを、差の1標本 t 検定（自由度 n−1）で調べる
+    set: [side, alpha, dbar, sd, n]
+    values: [se, t, df, p, crit, decision]
+  - key: two
+    name: 2群
+    purpose: 独立2群の平均の差の t 検定。ウェルチ（近似の自由度）と等分散（合わせた分散、自由度 n₁＋n₂−2）を切り替え、もう一方の方法の SE・自由度・p 値・判断も並べる
+    set: [method, side, alpha, x1, s1, n1, x2, s2, n2]   # method：welch／pooled
+    values: [diff, se, df, t, p, crit, decision, sp2]
+data: スライダーと選択欄で決める（データの読み込みなし）。t の p 値と境目は不完全ベータ関数から求める（二分法）。比べるための正規の境目は2級の数表の値
+presets:
+  s1-t:
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 104, mu0: 100, s: 8, n: 16}
+    task: 16店の平均104・s＝8、基準100。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0639
+    why: t＝4÷2＝2.0、自由度15。p≒0.064 で5%を超える。正規なら p≒0.046 で棄却してしまうが、s で代わりにしたぶん t 分布の裾が重い。
+  s1-df:
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 104, mu0: 100, s: 8, n: 16}
+    task: 16店（自由度15）、両側5%。t の境目は（小数で）？
+    predict: {type: number, key: crit, label: "境目 t"}
+    expect: 2.1314
+    why: 約2.131。正規の1.96より外側。n を5に減らすと2.776、100に増やすと1.984 に近づく。
+  s3-free:
+    mode: one
+    modes: [one, paired, two]
+    task: 解いてから、データの取り方（基準と比べる1標本・同じ対象の前後・別々の2群）に合うモードで確かめる。
+  s4-free:
+    mode: two
+    modes: [two, paired, one]
+    task: 自分の売場の数字（2店の平均・標準偏差・日数、施策前後の差）を入れ、p 値と判断を読む。2群ではウェルチと等分散を切り替えて比べる。
+  s5-free:
+    mode: one
+    modes: [one, two]
+    task: 「1標本」で n を増やし、境目が1.96 に近づく様子を見る（発展1）。「2群」でばらつきと人数を変え、ウェルチの自由度がどう変わるかを見る（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（1標本、対応あり、2群）。
+used_by: [U25]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/ttest_lab/check.js        # 本文の値（t＝2・p≒0.064、t の境目、ウェルチと等分散、対応あり）
+checked:
+  browser_380px: null
+  notion_iphone: null

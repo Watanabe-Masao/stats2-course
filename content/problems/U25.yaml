@@ -1,0 +1,309 @@
+# 単元U25の問題。id は変えない（個人の解答記録がこの id を指す）。
+# t 分布の累積は数値積分で照合：(lambda x,k: 0.5+sum(...))(x, 自由度)
+- id: Q-U25-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    同じ25店で、新しい陳列の前後の売上の差 D を取ると、平均は2万円、差の標準偏差は5万円だった。「前後で売上が変わった」と言えるかを両側5%で検定せよ。（t(24) の0.975点は2.064）
+
+    H₀：差の平均＝□。SE＝□÷√□＝□、t＝□÷□＝□、自由度□。|t|□2.064 なので H₀ を□。
+  answer_title: 答え（埋めてから開く）
+  answer: H₀：差の平均＝**0**。SE＝5÷√25＝**1**、t＝2÷1＝**2.0**、自由度**24**。|t|**＜**2.064 なので H₀ を**棄却しない**（p≒0.057）。「前後で売上が変わったとは言えない」。差の95%信頼区間 −0.064〜4.064（{{unit:U23}}）が0を含むことと一致する。
+  checks:
+    - '5/math.sqrt(25) == 1 and 2/1 == 2 and 25-1 == 24 and 2 < 2.064 and abs(2-2.064 + 0.064) < 1e-9 and abs(2+2.064 - 4.064) < 1e-9'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2,24)) - 0.057) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: paired
+    set: {side: two, alpha: 0.05, dbar: 2, sd: 5, n: 25}
+    task: 同じ25店の前後の差は平均2万円、差の標準偏差5万円。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0569
+    why: t＝2、自由度24で p≒0.057。5%をわずかに超えるので棄却しない。差の区間が0を含むのと同じ判断。
+
+- id: Q-U25-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 店A（10日、平均30万円・s₁＝2）と店B（20日、平均25万円・s₂＝8）の1日の売上の平均に差があるかを、ウェルチの t 検定（両側5%）で調べよ。SE＝√(s₁²÷n₁＋s₂²÷n₂)、自由度≒23.3、t の0.975点≒2.067。
+  answer: SE＝√(4÷10＋64÷20)＝√3.6≒1.897、t＝5÷1.897≒**2.64**。|t|＞2.067 なので H₀ を**棄却**（p≒0.015）。「2店の平均に差があると言える」。等分散を仮定すると SE≒2.59・t≒1.93・自由度28 で棄却しない（p≒0.064）。ばらつきも日数も違うので、ウェルチを使う。
+  checks:
+    - 'abs(math.sqrt(4/10+64/20) - 1.897) < 0.0005 and abs(5/math.sqrt(3.6) - 2.64) < 0.005 and abs((0.4+3.2)**2/(0.4**2/9+3.2**2/19) - 23.3) < 0.05 and 5/math.sqrt(3.6) > 2.067'
+    - 'abs(math.sqrt((9*4+19*64)/28*(1/10+1/20)) - 2.59) < 0.005 and abs(5/math.sqrt((9*4+19*64)/28*(1/10+1/20)) - 1.93) < 0.005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(5/math.sqrt(3.6),23.279)) - 0.015) < 0.0005'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(5/math.sqrt((9*4+19*64)/28*(1/10+1/20)),28)) - 0.064) < 0.0005 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.067,23.279) - 0.975) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: two
+    set: {method: welch, side: two, alpha: 0.05, x1: 30, s1: 2, n1: 10, x2: 25, s2: 8, n2: 20}
+    task: 店A（10日・平均30・s＝2）と店B（20日・平均25・s＝8）。ウェルチの t 検定（両側5%）で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: t≒2.64、p≒0.015。方法を「等分散を仮定」に変えると t≒1.93・p≒0.064 で棄却しない。
+
+- id: Q-U25-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 9店の新商品の1日の販売数は、平均53個・標準偏差 s＝6個だった。目標の48個と違うと言えるかを両側5%で検定せよ。（t(8) の0.975点は2.306）
+  answer: SE＝6÷√9＝2、t＝(53−48)÷2＝**2.5**、自由度8。|t|＞2.306 なので H₀ を**棄却**（p≒0.037）。「平均は目標と違うと言える」。
+  checks:
+    - '6/math.sqrt(9) == 2 and (53-48)/2 == 2.5 and 2.5 > 2.306 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.5,8)) - 0.037) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 53, mu0: 48, s: 6, n: 9}
+    task: 9店の平均53・s＝6、目標48。t の値は（小数で）？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2.5
+    why: SE＝2、t＝2.5。自由度8の境目2.306を超え、p≒0.037 で棄却する。
+
+- id: Q-U25-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P3]
+  prompt: 別々の10店ずつで2つの陳列を試した。平均は12と10、どちらも s²＝4。等分散を仮定して、平均に差があるかを両側5%で検定せよ。ウェルチで計算すると何が変わるか。（t(18) の0.975点は2.101）
+  answer: 合わせた分散＝(9×4＋9×4)÷18＝4、SE＝√(4×(1÷10＋1÷10))＝√0.8≒0.8944、t＝2÷0.8944≒**2.236**、自由度18。|t|＞2.101 で H₀ を**棄却**（p≒0.038）。人数もばらつきも同じなので、ウェルチでも SE・自由度（18）は同じで、結論も変わらない。
+  checks:
+    - '(9*4+9*4)/18 == 4 and abs(math.sqrt(0.8) - 0.8944) < 0.00005 and abs(2/math.sqrt(0.8) - 2.236) < 0.0005 and 2/math.sqrt(0.8) > 2.101 and abs((0.4+0.4)**2/(0.4**2/9+0.4**2/9) - 18) < 1e-9'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2/math.sqrt(0.8),18)) - 0.038) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: two
+    set: {method: pooled, side: two, alpha: 0.05, x1: 12, s1: 2, n1: 10, x2: 10, s2: 2, n2: 10}
+    task: 10店ずつ、平均12と10、どちらも s＝2。等分散を仮定した t の値は（小数で）？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2.2361
+    why: SE≒0.8944、t≒2.236。ウェルチに切り替えても同じ値になる（人数とばらつきが同じとき）。
+
+- id: Q-U25-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 同じ8店で、施策の前の売上は平均50・標準偏差10、後は平均53・標準偏差10。1店ごとの差 D は平均3・標準偏差2.4だった。① 対応ありの t 検定 ② 誤って独立2群（等分散）として計算した t 検定で、両側5%の結論をそれぞれ出せ。（t(7) の0.975点は2.365、t(14) の0.975点は2.145）
+  answer: ① SE＝2.4÷√8≒0.849、t＝3÷0.849≒**3.54**、自由度7。|t|＞2.365 で**棄却**（p≒0.010）。② SE＝√(100÷8＋100÷8)＝5、t＝3÷5＝**0.6**、自由度14 で**棄却しない**（p≒0.56）。店ごとの大きさの違い（標準偏差10）が②ではばらつきに入り、差が見えなくなる。同じ店の前後は差を取る。
+  checks:
+    - 'abs(2.4/math.sqrt(8) - 0.849) < 0.0005 and abs(3/(2.4/math.sqrt(8)) - 3.54) < 0.005 and 3/(2.4/math.sqrt(8)) > 2.365 and math.sqrt(100/8+100/8) == 5 and 3/5 == 0.6 and 0.6 < 2.145'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(3/(2.4/math.sqrt(8)),7)) - 0.010) < 0.0005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(0.6,14)) - 0.56) < 0.005'
+  lab:
+    id: LAB-ttest
+    mode: paired
+    set: {side: two, alpha: 0.05, dbar: 3, sd: 2.4, n: 8}
+    task: 同じ8店の前後の差は平均3・標準偏差2.4。対応ありの t の値は（小数で）？
+    predict: {type: number, key: t, label: "t"}
+    expect: 3.5355
+    why: t≒3.54、p≒0.010 で棄却する。「2群」で 53・s10・8店 と 50・s10・8店 を入れると t＝0.6 で棄却しない。
+
+- id: Q-U25-010
+  stage: S2
+  format: written
+  powers: [P1, P2]
+  prompt: 例題A（16店、平均104・s＝8、基準100）で、調べる前に「売上が上がったか」を見る右片側5%の検定と決めていた。結論はどうなるか。（t(15) の0.95点は1.753）
+  answer: t＝2.0、自由度15。右片側では t＞1.753 なので H₀ を**棄却**（p≒0.032）。両側（境目2.131）とは結論が変わる。片側か両側かは、データを見る前に決めた方で判断する。
+  checks:
+    - '2.0 > 1.753 and 2.0 < 2.131 and abs(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2,15) - 0.032) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: upper, alpha: 0.05, xbar: 104, mu0: 100, s: 8, n: 16}
+    task: 例題Aの数で、右片側5%。H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: 右側だけの面積で p≒0.032。両側に戻すと p≒0.064 で棄却しない。
+
+- id: Q-U25-011
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 同じ10人の店員で、研修の前後に接客の評価点を比べた。差 D の平均は1.2点、差の標準偏差は2点。研修で評価が変わったかを両側5%で検定せよ。（t(9) の0.975点は2.262）
+  answer: SE＝2÷√10≒0.632、t＝1.2÷0.632≒**1.90**、自由度9。|t|＜2.262 で H₀ を**棄却しない**（p≒0.090）。「評価が変わったとは言えない」。差の95%信頼区間 −0.231〜2.631（{{unit:U23}}）が0を含むのと同じ。
+  checks:
+    - 'abs(2/math.sqrt(10) - 0.632) < 0.0005 and abs(1.2/(2/math.sqrt(10)) - 1.90) < 0.005 and 1.2/(2/math.sqrt(10)) < 2.262 and abs(1.2-2.262*2/math.sqrt(10) + 0.231) < 0.0005 and abs(1.2+2.262*2/math.sqrt(10) - 2.631) < 0.0005'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.2/(2/math.sqrt(10)),9)) - 0.090) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: paired
+    set: {side: two, alpha: 0.05, dbar: 1.2, sd: 2, n: 10}
+    task: 同じ10人の前後の差は平均1.2・標準偏差2。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0903
+    why: t≒1.90、自由度9で p≒0.090。人数を増やすと、同じ平均差でも有意になりやすい。
+
+- id: Q-U25-012
+  stage: S2
+  format: written
+  powers: [P1, P3]
+  prompt: 同じ8店で新しい陳列の前後を比べると、差 D の平均2万円・差の標準偏差1.5万円で、差の平均の95%信頼区間は0.746〜3.254（{{unit:U23}}）。「差の平均＝0」を両側5%で検定するとどうなるか。区間との関係も述べよ。（t(7) の0.975点は2.365）
+  answer: SE＝1.5÷√8≒0.530、t＝2÷0.530≒**3.77**、|t|＞2.365 で H₀ を**棄却**（p≒0.007）。区間が0を含まないことと一致する。「95%信頼区間に入らない値」は「両側5%で棄却される値」。
+  checks:
+    - 'abs(1.5/math.sqrt(8) - 0.530) < 0.0005 and abs(2/(1.5/math.sqrt(8)) - 3.77) < 0.005 and 2/(1.5/math.sqrt(8)) > 2.365 and abs(2-2.365*1.5/math.sqrt(8) - 0.746) < 0.0005 and abs(2+2.365*1.5/math.sqrt(8) - 3.254) < 0.0005'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2/(1.5/math.sqrt(8)),7)) - 0.007) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: paired
+    set: {side: two, alpha: 0.05, dbar: 2, sd: 1.5, n: 8}
+    task: 同じ8店の前後の差は平均2・標準偏差1.5。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: t≒3.77、p≒0.007。区間（0.746〜3.254）が0を含まないことと同じ結論。
+
+- id: Q-U25-020
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 店A（12日、平均68・s₁＝3）と店B（8日、平均62・s₂＝9）の平均に差があるかを両側5%で調べる。① 等分散を仮定（t(18) の0.975点2.101）② ウェルチ（自由度≒8.0、t の点≒2.306）で検定し、どちらを使うべきか答えよ。
+  answer: ① 合わせた分散＝(11×9＋7×81)÷18＝37、SE≒2.776、t＝6÷2.776≒**2.16**＞2.101 で棄却（p≒0.044）。② SE＝√(9÷12＋81÷8)≒3.298、t＝6÷3.298≒**1.82**＜2.306 で棄却しない（p≒0.11）。ばらつきが3倍違い、ばらつきの大きい B の日数が少ないので、等分散は SE を小さく見積もる。**ウェルチ**を使い、「差があるとは言えない」とする。
+  checks:
+    - '(11*9+7*81)/18 == 37 and abs(math.sqrt(37*(1/12+1/8)) - 2.776) < 0.0005 and abs(6/math.sqrt(37*(1/12+1/8)) - 2.16) < 0.005 and abs(math.sqrt(9/12+81/8) - 3.298) < 0.0005 and abs(6/math.sqrt(9/12+81/8) - 1.82) < 0.005 and abs((0.75+10.125)**2/(0.75**2/11+10.125**2/7) - 8.0) < 0.05'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(6/math.sqrt(37*(1/12+1/8)),18)) - 0.044) < 0.0005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(6/math.sqrt(9/12+81/8),8.0473)) - 0.11) < 0.005'
+  lab:
+    id: LAB-ttest
+    mode: two
+    set: {method: welch, side: two, alpha: 0.05, x1: 68, s1: 3, n1: 12, x2: 62, s2: 9, n2: 8}
+    task: 店A（12日・平均68・s＝3）と店B（8日・平均62・s＝9）。ウェルチの両側 p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.1061
+    why: p≒0.11 で棄却しない。等分散に切り替えると p≒0.044 で棄却してしまう。
+
+- id: Q-U25-021
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 新しいレジで、1回の処理時間が従来の60秒より**短くなった**かを調べる（長くなることは考えない）。12回測ると平均57秒・s＝6秒。有意水準5%で検定せよ。（t(11) の0.95点は1.796）
+  answer: H₁：μ＜60（左片側）。SE＝6÷√12≒1.732、t＝(57−60)÷1.732≒**−1.73**、自由度11。t＞−1.796 なので H₀ を**棄却しない**（p≒0.056）。「短くなったとは言えない」。正規の境目−1.645 を使うと誤って棄却してしまう。
+  checks:
+    - 'abs(6/math.sqrt(12) - 1.732) < 0.0005 and abs(-3/(6/math.sqrt(12)) + 1.73) < 0.005 and -3/(6/math.sqrt(12)) > -1.796 and -3/(6/math.sqrt(12)) < -1.645'
+    - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(-3/(6/math.sqrt(12)),11) - 0.056) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: lower, alpha: 0.05, xbar: 57, mu0: 60, s: 6, n: 12}
+    task: 12回の平均57秒・s＝6、従来60秒。左片側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
+    why: t≒−1.73、p≒0.056。境目は t(11) の−1.796 で、正規の−1.645 より外側。
+
+- id: Q-U25-022
+  stage: S3
+  format: written
+  powers: [P1, P3]
+  prompt: 6店で試した新商品の売上指数は平均105・s＝5、基準100。ある報告は「t＝2.45 が1.96 を超えたので有意」とした。両側5%で正しく判断せよ。（t(5) の0.975点は2.571）
+  answer: SE＝5÷√6≒2.041、t≒**2.45**、自由度5。境目は2.571 なので H₀ を**棄却しない**（p≒0.058）。σ が分からず s を使うので、境目は正規の1.96 ではなく t(5) の2.571。n が小さいほど差は大きい。
+  checks:
+    - 'abs(5/math.sqrt(6) - 2.041) < 0.0005 and abs(5/(5/math.sqrt(6)) - 2.45) < 0.005 and 1.96 < 5/(5/math.sqrt(6)) < 2.571'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(5/(5/math.sqrt(6)),5)) - 0.058) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 105, mu0: 100, s: 5, n: 6}
+    task: 6店の平均105・s＝5、基準100。両側5%の t の境目は（小数で）？
+    predict: {type: number, key: crit, label: "境目 t"}
+    expect: 2.5706
+    why: 約2.571。t≒2.45 は1.96 は超えるが、この境目には届かない。
+
+- id: Q-U25-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: 平均の t 検定について、正しいものはどれか。
+  choices:
+    - 母標準偏差が分からないときも、両側5%の境目には1.96 を使う。
+    - 同じ店の施策前後の売上は、前と後を別々の2群として t 検定する。
+    - 2群のばらつきも人数も大きく違うときは、ウェルチの t 検定を使うのがよい。
+    - t 検定で H₀ を棄却できなければ、2群の平均は等しいと結論できる。
+    - 自由度が大きくなるほど、t 分布の境目は1.96 から離れていく。
+  correct: 3
+  answer: ウェルチは各群の s² をそのまま使い、自由度も近似で調整する。等分散を仮定すると、ばらつきの大きい群の人数が少ないときに SE を小さく見積もり、差を言いすぎる（応用の問1では等分散で p≒0.044、ウェルチで p≒0.11）。
+  misconceptions:
+    1: σ が分からず s を使うと t 分布になり、境目は自由度で決まる（自由度15なら2.131）
+    2: 同じ店の前後は対応あり。1店ごとの差を取り、差の1標本 t 検定にする
+    4: 棄却しないのは「差があるとは言えない」で、等しいことの証明ではない
+    5: 自由度が大きくなると t 分布は正規に近づき、境目は1.96 に近づく
+  checks:
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(6/math.sqrt(37*(1/12+1/8)),18)) - 0.044) < 0.0005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(6/math.sqrt(9/12+81/8),8.0473)) - 0.11) < 0.005'
+  lab:
+    id: LAB-ttest
+    mode: two
+    set: {method: pooled, side: two, alpha: 0.05, x1: 68, s1: 3, n1: 12, x2: 62, s2: 9, n2: 8}
+    task: 店A（12日・平均68・s＝3）と店B（8日・平均62・s＝9）を、等分散を仮定して検定。H₀ をどうするか（このあとウェルチに切り替えて比べる）。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: 等分散では p≒0.044 で棄却するが、ウェルチでは p≒0.11 で棄却しない。ばらつきの違いを無視すると差を言いすぎる。
+
+- id: Q-U25-030
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 店A（40日、客単価の平均1250円・s₁＝300円）と店B（50日、平均1120円・s₂＝200円）の客単価に差があるかを、ウェルチの t 検定（両側5%）で調べ、結論を報告の文で書け。（自由度≒65、t の0.975点≒1.997）
+  answer: SE＝√(300²÷40＋200²÷50)＝√3050≒55.2、t＝130÷55.2≒**2.35**＞1.997 で H₀ を**棄却**（p≒0.022）。「店Aの客単価は店Bより高いと言える（有意水準5%、ウェルチの t 検定）。差は約130円」。日数が多いので、境目は正規の1.96 に近い。
+  checks:
+    - '300**2/40+200**2/50 == 3050 and abs(math.sqrt(3050) - 55.2) < 0.05 and abs(130/math.sqrt(3050) - 2.35) < 0.005 and abs((2250+800)**2/(2250**2/39+800**2/49) - 65) < 0.5 and 130/math.sqrt(3050) > 1.997'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(130/math.sqrt(3050),65.112)) - 0.022) < 0.0005 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.997,65.112) - 0.975) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: two
+    set: {method: welch, side: two, alpha: 0.05, x1: 1250, s1: 300, n1: 40, x2: 1120, s2: 200, n2: 50}
+    task: 店A（40日・1250円・s＝300）と店B（50日・1120円・s＝200）。ウェルチの t の値は（小数で）？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2.3539
+    why: t≒2.35、p≒0.022。自由度≒65 で、境目は1.997。日数が多いと t と正規の差は小さい。
+
+- id: Q-U25-031
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 同じ20人のレジ係で、新旧のレジの1回の処理時間を測った。1人ごとの差（新−旧）の平均は−4秒、差の標準偏差は6秒。処理時間が変わったかを両側5%で検定せよ。（t(19) の0.975点は2.093）
+  answer: SE＝6÷√20≒1.342、t＝−4÷1.342≒**−2.98**、自由度19。|t|＞2.093 で H₀ を**棄却**（p≒0.008）。「新しいレジで処理時間は変わった（短くなった）と言える」。同じ人で比べたので、人ごとの速さの違いは差を取ると消えている。
+  checks:
+    - 'abs(6/math.sqrt(20) - 1.342) < 0.0005 and abs(-4/(6/math.sqrt(20)) + 2.98) < 0.005 and 4/(6/math.sqrt(20)) > 2.093'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(4/(6/math.sqrt(20)),19)) - 0.008) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: paired
+    set: {side: two, alpha: 0.05, dbar: -4, sd: 6, n: 20}
+    task: 同じ20人の差（新−旧）は平均−4秒・標準偏差6秒。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0077
+    why: t≒−2.98、p≒0.008。差の平均が負でも、両側なら |t| で判断する。
+
+- id: Q-U25-032
+  stage: S4
+  format: written
+  powers: [P1, P3]
+  prompt: 内容量500g と表示した商品を25袋測ると、平均498.5g・s＝3g だった。表示と違うと言えるかを両側5%で検定せよ。（t(24) の0.975点は2.064）
+  answer: SE＝3÷√25＝0.6、t＝(498.5−500)÷0.6＝**−2.5**、自由度24。|t|＞2.064 で H₀ を**棄却**（p≒0.020）。「平均の内容量は表示と違う（少ない）と言える」。差は1.5g で、実務上の扱い（許容の範囲か）は別に判断する。
+  checks:
+    - '3/math.sqrt(25) == 0.6 and abs((498.5-500)/0.6 + 2.5) < 1e-9 and 2.5 > 2.064'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.5,24)) - 0.020) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 498.5, mu0: 500, s: 3, n: 25}
+    task: 25袋の平均498.5g・s＝3、表示500g。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: t＝−2.5、p≒0.020。平均を499 にすると t≒−1.67 で棄却しない。
+
+- id: Q-U25-040
+  stage: S5
+  format: written
+  powers: [P1, P3]
+  prompt: 同じ t＝2.1 でも、① 16店（自由度15）② 64店（自由度63）で、両側 p 値と5%での判断はどう違うか。（t(15) の0.975点は2.131、t(63) の0.975点は1.998）
+  answer: ① |t|＜2.131 で**棄却しない**（p≒0.053）。② |t|＞1.998 で**棄却**（p≒0.040）。自由度が大きいほど t 分布は正規に近づき、境目が1.96 に近づく。少ない店数では、同じ t でも証拠として弱い。
+  checks:
+    - '2.1 < 2.131 and 2.1 > 1.998'
+    - 'abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.1,15)) - 0.053) < 0.0005 and abs(2*(1-(lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.1,63)) - 0.040) < 0.0005 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.998,63) - 0.975) < 0.0005'
+  lab:
+    id: LAB-ttest
+    mode: one
+    set: {side: two, alpha: 0.05, xbar: 102.1, mu0: 100, s: 8, n: 64}
+    task: 64店の平均102.1・s＝8、基準100（t＝2.1、自由度63）。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0397
+    why: p≒0.040 で棄却する。n を16、平均を104.2 にすると同じ t＝2.1 でも p≒0.053 で棄却しない。
