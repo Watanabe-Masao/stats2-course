@@ -1,0 +1,305 @@
+# 単元U01の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U01-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    原価900円が売価の75%になるとき、売価はいくらか。
+
+    基準量は□。0.75×P＝□ → P＝□÷0.75＝□円
+  answer_title: 答え（埋めてから開く）
+  answer: 基準量は**売価**。0.75×P＝**900** → P＝**900**÷0.75＝**1,200円**。900×1.25＝1,125円 とすると「原価の125%」になり、基準が違う。
+  checks:
+    - '900 / Fraction(75,100) == 1200 and 900 * Fraction(125,100) == 1125'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: base, part: 900, rate: 75}
+    task: 原価900円が「売価の75%」になる売価はいくらか。
+    predict: {type: number, key: base, label: "売価", unit: "円"}
+    expect: 1200
+    why: 「売価の75%」なので基準量は売価。売価＝900÷0.75＝1,200円。帯の全体が売価、色の部分が原価900円。
+
+- id: Q-U01-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: ある売場の購入率が10%から12%になった。この変化を「ポイント」と「%」の両方で言え。
+  answer_title: 答え（解いてから開く）
+  answer: 差は 12−10＝**2ポイント**増。前の購入率10%を基準にすると (12−10)÷10＝**20%増**。「2%増えた」と言うと、10%の2%（0.2ポイント）と誤解される。
+  checks:
+    - '12 - 10 == 2 and Fraction(12-10, 10) == Fraction(20,100) and Fraction(10*2, 100) == Fraction(2,10)'
+  lab:
+    id: LAB-ratio
+    mode: point
+    set: {p1: 10, p2: 12}
+    task: 購入率が10%から12%になった。前の購入率を基準にすると何%増か。
+    predict: {type: number, key: rel, label: "前を基準にした変化", unit: "%"}
+    expect: 20
+    why: 差は2ポイント。それを前の10で割ると 2÷10＝0.2 で20%増。差（ポイント）と変化（%）は別の数になる。
+
+- id: Q-U01-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 客200人のうち50人が購入した。購入率は何%か。
+  answer: 50÷200＝0.25＝**25%**。基準量は来店客200人。
+  checks:
+    - 'Fraction(50, 200) == Fraction(25,100)'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: rate, part: 50, base: 200}
+    task: 客200人のうち50人が購入した。購入率は何%か。
+    predict: {type: number, key: rate, label: "購入率", unit: "%"}
+    expect: 25
+    why: 基準量は来店客200人、部分は購入した50人。50÷200＝0.25＝25%。
+
+- id: Q-U01-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 売上1,000万円の店が、翌年20%増え、その翌年10%減った。2年後の売上はいくらか。最初と比べて何%増か。
+  answer: 1,000×1.2×0.9＝**1,080万円**。倍率 1.2×0.9＝1.08 で、最初より**8%増**。20−10＝10%増ではない（2年目の基準は1,200万円）。
+  checks:
+    - '1000 * Fraction(6,5) * Fraction(9,10) == 1080 and Fraction(6,5) * Fraction(9,10) == Fraction(108,100) and 1000 * Fraction(6,5) == 1200'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 1000, r1: 20, r2: -10}
+    task: 1,000万円が20%増えてから10%減った。最初と比べて全体で何%か。
+    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    expect: 8
+    why: 1,000×1.2＝1,200、1,200×0.9＝1,080。倍率 1.2×0.9＝1.08 で8%増。率を足した10%にはならない。
+
+- id: Q-U01-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 数量が 200→180→198 と変わった。各期の増減率と累計の増減率を求めよ。
+  answer: 200→180：**−10%**（基準200）。180→198：18÷180＝**＋10%**（基準180）。累計 198÷200−1＝**−1%**（0.9×1.1＝0.99）。分母が違うので−10%と＋10%は打ち消し合わない。
+  checks:
+    - 'Fraction(180-200, 200) == Fraction(-10,100) and Fraction(198-180, 180) == Fraction(10,100) and Fraction(198, 200) - 1 == Fraction(-1,100) and Fraction(9,10)*Fraction(11,10) == Fraction(99,100)'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 200, r1: -10, r2: 10}
+    task: 200 が10%減ってから10%増えた。最初と比べて全体で何%か。
+    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    expect: -1
+    why: 200×0.9＝180、180×1.1＝198。倍率 0.9×1.1＝0.99 で1%減。増やすときの基準は減った後の180。
+
+- id: Q-U01-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1]
+  prompt: 3x＋6＝21 を解け。
+  answer: 両辺から6を引いて 3x＝15、両辺を3で割って **x＝5**。両辺に同じ操作をすれば等式は保たれる。確かめ：3×5＋6＝21。
+  checks:
+    - '21 - 6 == 15 and Fraction(15, 3) == 5 and 3*5 + 6 == 21'
+  lab:
+    id: LAB-ratio
+    mode: eq
+    set: {a: 3, b: 6, c: 21}
+    task: 3x＋6＝21 を x について解く。
+    predict: {type: number, key: x, label: "x"}
+    expect: 5
+    why: 両辺から6を引いて 3x＝15、両辺を3で割って x＝5。元の式に戻すと 3×5＋6＝21 で合う。
+
+- id: Q-U01-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 売価を25%上げた。元の売価に戻すには、上げた後の売価から何%下げればよいか。
+  answer: 上げた後は元の1.25倍。元に戻す倍率は 1÷1.25＝0.8 なので**20%下げる**。25%ではない（下げるときの基準は上げた後の大きい値）。
+  checks:
+    - '1 / Fraction(125,100) == Fraction(4,5) and 1 - Fraction(4,5) == Fraction(20,100)'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 1000, r1: 25, r2: -20}
+    task: 売価を25%上げた。元に戻すには、上げた後から何%下げればよいか。
+    predict: {type: number, key: back, label: "元に戻す率", unit: "%"}
+    expect: -20
+    why: 1÷1.25−1＝−0.2 で20%下げる。1,000×1.25＝1,250、1,250×0.8＝1,000 で元に戻る。
+
+- id: Q-U01-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: z＝(x−μ)÷σ を x について解け。また、平均50点・標準偏差10点の試験で z＝−0.5 に当たる点数を求めよ（{{unit:U08}}）。
+  answer: 両辺に σ を掛けて zσ＝x−μ、両辺に μ を足して **x＝μ＋zσ**。50＋(−0.5)×10＝**45点**。
+  checks:
+    - '50 + Fraction(-1,2)*10 == 45'
+  lab:
+    id: LAB-z
+    mode: inv
+    set: {m: 50, s: 10, z: -0.5}
+    task: 平均50点・標準偏差10点の試験で、z＝−0.5 に当たる点数はいくつか。
+    predict: {type: number, key: x, label: "点数", unit: "点"}
+    expect: 45
+    why: x＝μ＋zσ＝50＋(−0.5)×10＝45。z が負なので平均より下。式の変形は割合の逆算と同じ手順。
+
+- id: Q-U01-020
+  stage: S3
+  tag: 原価率と値入率
+  format: written
+  powers: [P1, P3]
+  prompt: 売価1,000円・原価700円の商品。原価率と値入率（利益÷売価）を求めよ。利益÷原価で求めた率とはどう違うか。
+  answer: 原価率＝700÷1,000＝**70%**、値入率＝300÷1,000＝**30%**。利益÷原価＝300÷700≒**42.9%**（マークアップ率）。同じ300円の利益でも、売価で割るか原価で割るかで率が違う。
+  checks:
+    - 'Fraction(700,1000) == Fraction(70,100) and Fraction(1000-700, 1000) == Fraction(30,100) and abs(300/700*100 - 42.9) < 0.05'
+  lab:
+    id: LAB-ratio
+    mode: margin
+    set: {price: 1000, cost: 700}
+    task: 売価1,000円・原価700円。値入率（利益÷売価）は何%か。
+    predict: {type: number, key: margin, label: "値入率", unit: "%"}
+    expect: 30
+    why: 利益300円を売価1,000円で割って30%。原価700円で割ると約42.9%（マークアップ率）。分母を書き添えないと、どちらの率か分からない。
+
+- id: Q-U01-021
+  stage: S3
+  tag: 必要な売上
+  format: written
+  powers: [P1, P2]
+  prompt: 粗利率25%の売場で、粗利300万円を得るには売上がいくら必要か。
+  answer: 粗利率＝粗利÷売上 なので、売上＝粗利÷粗利率＝300÷0.25＝**1,200万円**。300×1.25＝375万円 としないこと（基準量は売上）。
+  checks:
+    - '300 / Fraction(25,100) == 1200 and 300 * Fraction(125,100) == 375'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: base, part: 300, rate: 25}
+    task: 粗利率25%で粗利300万円を得るには、売上がいくら必要か。
+    predict: {type: number, key: base, label: "売上", unit: "万円"}
+    expect: 1200
+    why: 「売上の25%が粗利」なので基準量は売上。300÷0.25＝1,200万円。
+
+- id: Q-U01-022
+  stage: S3
+  tag: 割引の重ね
+  format: written
+  powers: [P1, P3]
+  prompt: 20%引きの商品を、レジでさらに10%引きにした。元の価格から合わせて何%引きか。
+  answer: 0.8×0.9＝0.72 なので**28%引き**。2回目の10%引きの基準は、20%引いた後の価格。30%引きではない。
+  checks:
+    - 'Fraction(4,5) * Fraction(9,10) == Fraction(72,100) and 1 - Fraction(72,100) == Fraction(28,100)'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 1000, r1: -20, r2: -10}
+    task: 1,000円を20%引きにしてから、さらに10%引きにした。全体で何%か。
+    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    expect: -28
+    why: 1,000×0.8＝800円、800×0.9＝720円。倍率 0.72 で28%引き。
+
+- id: Q-U01-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: ある店の会員の割合が、昨年の20%から今年25%になった。この変化について、正しい記述はどれか。
+  choices:
+    - 会員の割合は5%増えた。
+    - 会員の割合は5ポイント増えた。昨年を基準にすると25%増えた。
+    - 会員の割合は25%増えた。昨年を基準にすると5ポイント増えた。
+    - 割合が増えたので、会員の人数も必ず増えた。
+    - 増加率は 25÷20＝1.25 なので125%増えた。
+  correct: 2
+  answer: 差は 25−20＝5ポイント。昨年の20%を基準にすると 5÷20＝0.25 で25%増。割合が増えても、全体の人数が減れば会員の人数は減ることがある。
+  misconceptions:
+    1: 「5%増」は昨年の20%の5%（1ポイント）とも読めて紛らわしい。差はポイントで言う
+    3: ポイントと%が逆
+    4: 割合だけでは人数は分からない。分母（全体の人数）も確かめる
+    5: 1.25 は倍率。増加率は 1.25−1＝0.25 で25%
+  checks:
+    - '25 - 20 == 5 and Fraction(25-20, 20) == Fraction(25,100) and Fraction(25,20) == Fraction(125,100)'
+  lab:
+    id: LAB-ratio
+    mode: point
+    set: {p1: 20, p2: 25}
+    task: 会員の割合が20%から25%になった。差は何ポイントか。
+    predict: {type: number, key: pt, label: "差", unit: "ポイント"}
+    expect: 5
+    why: 25−20＝5ポイント。前の20で割ると25%増。同じ変化でも、差と相対的な変化で数が違う。
+
+- id: Q-U01-030
+  stage: S4
+  tag: 売上の前年比
+  format: written
+  powers: [P1, P3]
+  prompt: 客数が前年比110%、客単価が前年比95%だった。売上（客数×客単価）は前年比何%か。
+  answer: 1.1×0.95＝1.045 で**前年比104.5%**（4.5%増）。10−5＝5%増 と足してはいけない（掛け算で重なる）。
+  checks:
+    - 'Fraction(11,10) * Fraction(95,100) == Fraction(1045,1000)'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 100, r1: 10, r2: -5}
+    task: 客数が10%増え、客単価が5%減った。売上は全体で何%か（前年を100として見る）。
+    predict: {type: number, key: total, label: "売上の増減率", unit: "%"}
+    expect: 4.5
+    why: 売上＝客数×客単価なので倍率を掛ける。1.1×0.95＝1.045 で4.5%増。
+
+- id: Q-U01-031
+  stage: S4
+  tag: 変動係数
+  format: written
+  powers: [P1, P3]
+  prompt: 日販の平均200万円・標準偏差30万円の店の変動係数（標準偏差÷平均）は何%か。何を基準にした割合か（{{unit:U07}}）。
+  answer: 30÷200＝0.15＝**15%**。平均を基準量にして、ばらつきが平均の何%かを表す。
+  checks:
+    - 'Fraction(30, 200) == Fraction(15,100)'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: rate, part: 30, base: 200}
+    task: 平均200万円・標準偏差30万円。標準偏差は平均の何%か。
+    predict: {type: number, key: rate, label: "変動係数", unit: "%"}
+    expect: 15
+    why: 基準量は平均200、部分は標準偏差30。30÷200＝15%。変動係数も割合の1つ。
+
+- id: Q-U01-032
+  stage: S4
+  tag: 原価率から粗利
+  format: written
+  powers: [P1, P2]
+  prompt: 売上500万円・原価率65%の月の粗利はいくらか。
+  answer: 粗利率＝1−0.65＝0.35。粗利＝500×0.35＝**175万円**。基準量はどちらも売上。
+  checks:
+    - '1 - Fraction(65,100) == Fraction(35,100) and 500 * Fraction(35,100) == 175'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: part, base: 500, rate: 35}
+    task: 売上500万円で粗利率35%（原価率65%）。粗利はいくらか。
+    predict: {type: number, key: part, label: "粗利", unit: "万円"}
+    expect: 175
+    why: 部分＝基準量×割合＝500×0.35＝175万円。原価は 500×0.65＝325万円。
+  
+- id: Q-U01-040
+  stage: S5
+  tag: 元に戻す率
+  format: written
+  powers: [P1, P2]
+  prompt: 50%値上げした後、元の価格に戻すには何%値下げすればよいか。
+  answer: 1÷1.5−1＝−1/3 なので約**33.3%**値下げ。50%下げると元の75%（1.5×0.5）になってしまう。
+  checks:
+    - '1 / Fraction(3,2) - 1 == Fraction(-1,3) and Fraction(3,2) * Fraction(1,2) == Fraction(3,4)'
+  lab:
+    id: LAB-ratio
+    mode: chain
+    set: {x0: 1000, r1: 50, r2: -50}
+    task: 50%値上げした後、元に戻すには何%下げればよいか（くわしくの「元に戻す率」）。
+    predict: {type: number, key: back, label: "元に戻す率", unit: "%"}
+    expect: -33.333
+    why: 1÷1.5−1≒−0.333 で約33.3%下げる。2回目を−50%にすると750円で、元の75%になる。

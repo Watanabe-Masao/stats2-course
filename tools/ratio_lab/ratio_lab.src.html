@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>割合ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+</style></head><body>
+<h1>🧪 割合ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-base" class="mode">
+ <p class="mut" style="margin:0">割合＝部分÷基準量。3つのうち2つが分かれば、残りの1つが決まる。「〇〇の何%」の〇〇が基準量。</p>
+ <div class="row ctl"><label>求めるもの <select id="bfind" data-key="find"><option value="rate">割合</option><option value="base">基準量</option><option value="part">部分</option></select></label></div>
+ <input type="range" id="bpart" min="0" max="2000" step="1" value="800" data-name="部分">
+ <input type="range" id="bbase" min="1" max="3000" step="1" value="1000" data-name="基準量">
+ <input type="range" id="brate" min="1" max="200" step="1" value="80" data-name="割合" data-unit="%">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+</div>
+
+<div id="m-chain" class="mode">
+ <p class="mut" style="margin:0">2回続けて増減する。2回目の基準は1回目のあとの値なので、率を足さずに倍率（1＋率）を掛ける。</p>
+ <input type="range" id="cx" min="10" max="2000" step="10" value="1000" data-name="最初">
+ <input type="range" id="cr1" min="-50" max="50" step="1" value="20" data-name="1回目" data-unit="%">
+ <input type="range" id="cr2" min="-50" max="50" step="1" value="-20" data-name="2回目" data-unit="%">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+ <div id="cform"></div>
+</div>
+
+<div id="m-point" class="mode">
+ <p class="mut" style="margin:0">割合どうしの差は「ポイント」、前の割合を基準にした変化は「%」。同じ変化でも言い方で数が違う。</p>
+ <input type="range" id="pp1" min="1" max="100" step="1" value="10" data-name="前" data-unit="%">
+ <input type="range" id="pp2" min="0" max="100" step="1" value="12" data-name="後" data-unit="%">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+</div>
+
+<div id="m-eq" class="mode">
+ <p class="mut" style="margin:0">a×x＋b＝c を x について解く。両辺から b を引き、両辺を a で割る。両辺に同じ操作をすれば等式は保たれる。</p>
+ <input type="range" id="ea" min="0.1" max="10" step="0.1" value="3" data-name="a">
+ <input type="range" id="eb" min="-100" max="200" step="1" value="6" data-name="b">
+ <input type="range" id="ec" min="-100" max="300" step="1" value="21" data-name="c">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="eplot"></div>
+ <div class="card res key" id="esum"></div>
+</div>
+
+<div id="m-margin" class="mode">
+ <p class="mut" style="margin:0">売価と原価から、売価を基準にした率（原価率・値入率）と、原価を基準にした率（マークアップ率）を出す。同じ「利益」でも分母で数が変わる。</p>
+ <input type="range" id="mp" min="10" max="3000" step="10" value="1000" data-name="売価" data-unit="円">
+ <input type="range" id="mc" min="0" max="3000" step="10" value="700" data-name="原価" data-unit="円">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="mplot"></div>
+ <div class="card res key" id="msum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const W=340;
+const r2=v=>+v.toFixed(2),yen=v=>Math.round(v).toLocaleString("ja-JP");
+const pct=v=>(v>=0?"＋":"−")+f(Math.abs(r2(v)))+"%";
+function bar(parts,total,H=56){ // parts:[[値,色,ラベル]] を total の幅に並べる
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="割合の帯">`,x=10;const w=W-20;
+ s+=`<rect x="10" y="12" width="${w}" height="26" rx="4" fill="var(--card)" stroke="var(--line)"/>`;
+ parts.forEach(([v,c,t])=>{const ww=Math.max(0,Math.min(w-(x-10),v/total*w));s+=`<rect x="${x}" y="12" width="${ww}" height="26" rx="4" fill="${c}" fill-opacity=".7"/>`;if(t)s+=`<text x="${x+ww/2}" y="30" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${esc(t)}</text>`;x+=ww;});
+ return s+"</svg>";}
+
+// ---- 割合・基準量・部分
+function bVals(){const find=$("bfind").value;let part=+$("bpart").value,base=+$("bbase").value,rate=+$("brate").value/100;
+ if(find==="rate")rate=part/base;else if(find==="base")base=part/rate;else part=base*rate;return {find,part,base,rate};}
+function bRender(){const B=bVals();["bpart","bbase","brate"].forEach(id=>{const w=$(id).closest(".lk-step");if(w)w.style.display=({rate:"brate",base:"bbase",part:"bpart"}[B.find]===id)?"none":"";});
+ $("bplot").innerHTML=bar([[Math.min(B.part,B.base),"var(--acc)",`部分 ${f(r2(B.part))}`]],Math.max(B.base,B.part))+`<div class="mut">帯の全体＝基準量 ${f(r2(B.base))}、色の部分＝部分 ${f(r2(B.part))}</div>`;
+ const line={rate:`割合＝${f(r2(B.part))}÷${f(r2(B.base))}＝<b>${f(r2(B.rate*100))}%</b>`,base:`基準量＝${f(r2(B.part))}÷${f(r2(B.rate))}＝<b>${f(r2(B.base))}</b>`,part:`部分＝${f(r2(B.base))}×${f(r2(B.rate))}＝<b>${f(r2(B.part))}</b>`}[B.find];
+ $("bsum").innerHTML=`<div>${line}</div><div class="mut">割合＝部分÷基準量 を、求めたいものについて変形している。基準量で割る・掛けるのどちらかを取り違えないよう、「何の何%か」を先に言う。</div>`;}
+LK.register("base",{name:"割合と基準量",
+ init(){$("bfind").onchange=bRender;["bpart","bbase","brate"].forEach(id=>LK.stepper($(id),bRender));bRender();},
+ apply(s){if(s.find)$("bfind").value=s.find;if(s.part!==undefined)LK.setRange("bpart",s.part);if(s.base!==undefined)LK.setRange("bbase",s.base);if(s.rate!==undefined)LK.setRange("brate",s.rate);bRender();},
+ render:bRender,
+ value(key){const B=bVals(),v={rate:B.rate*100,base:B.base,part:B.part}[key];return {v,text:f(r2(v))+(key==="rate"?"%":"")};}});
+
+// ---- 増減を重ねる
+function cVals(){const x0=+$("cx").value,r1=+$("cr1").value/100,r2_=+$("cr2").value/100,x1=x0*(1+r1),x2=x1*(1+r2_);return {x0,r1,r2:r2_,x1,x2,total:(x2/x0-1)*100,back:(1/(1+r1)-1)*100};}
+function cRender(){const C=cVals(),H=150,mx=Math.max(C.x0,C.x1,C.x2)*1.15,Y=v=>H-24-v/mx*(H-40),xs=[60,170,280],vals=[C.x0,C.x1,C.x2],lab=["最初","1回目のあと","2回目のあと"];
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="増減の推移"><line x1="10" y1="${H-24}" x2="${W-10}" y2="${H-24}" stroke="var(--line)"/>`;
+ vals.forEach((v,i)=>{s+=`<rect x="${xs[i]-28}" y="${Y(v)}" width="56" height="${H-24-Y(v)}" rx="3" fill="${i===0?"var(--mut)":"var(--acc)"}" fill-opacity=".6"/><text x="${xs[i]}" y="${Y(v)-6}" font-size="12" text-anchor="middle" fill="var(--fg)" font-weight="700">${f(r2(v))}</text><text x="${xs[i]}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--mut)">${lab[i]}</text>`;});
+ s+=`<line x1="10" y1="${Y(C.x0)}" x2="${W-10}" y2="${Y(C.x0)}" stroke="var(--mut)" stroke-dasharray="4 4"/>`;
+ $("cplot").innerHTML=s+"</svg>";
+ $("csum").innerHTML=`<div>倍率 ${f(1+C.r1)}×${f(1+C.r2)}＝<b>${f(+((1+C.r1)*(1+C.r2)).toFixed(4))}</b> → 全体で <b>${pct(C.total)}</b>（${f(r2(C.x0))}→${f(r2(C.x2))}）</div><div class="mut">率を足すと ${pct((C.r1+C.r2)*100)}。元に戻すには、1回目のあとから ${pct(C.back)} が必要（基準が大きくなっているから）。</div>`;
+ $("cform").innerHTML=LK.formula([`${f(r2(C.x0))}×${f(1+C.r1)}＝${f(r2(C.x1))}`,`${f(r2(C.x1))}×${f(1+C.r2)}＝${f(r2(C.x2))}`,`元に戻す率＝1÷${f(1+C.r1)}−1＝${f(+(C.back/100).toFixed(4))}`]);}
+LK.register("chain",{name:"増減を重ねる",
+ init(){["cx","cr1","cr2"].forEach(id=>LK.stepper($(id),cRender));cRender();},
+ apply(s){if(s.x0!==undefined)LK.setRange("cx",s.x0);if(s.r1!==undefined)LK.setRange("cr1",s.r1);if(s.r2!==undefined)LK.setRange("cr2",s.r2);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v={total:C.total,final:C.x2,mid:C.x1,back:C.back}[key];return {v,text:key==="total"||key==="back"?pct(v):f(r2(v))};}});
+
+// ---- % とポイント
+function pVals(){const p1=+$("pp1").value,p2=+$("pp2").value;return {p1,p2,pt:p2-p1,rel:(p2-p1)/p1*100};}
+function pRender(){const P=pVals(),H=130,Y=v=>H-24-v/Math.max(P.p1,P.p2,1)/1.25*(H-40);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="割合の比較"><line x1="10" y1="${H-24}" x2="${W-10}" y2="${H-24}" stroke="var(--line)"/>`;
+ [[P.p1,"前",90],[P.p2,"後",250]].forEach(([v,t,x])=>{s+=`<rect x="${x-35}" y="${Y(v)}" width="70" height="${H-24-Y(v)}" rx="3" fill="var(--acc)" fill-opacity="${t==="前"?".35":".7"}"/><text x="${x}" y="${Y(v)-6}" font-size="12" text-anchor="middle" fill="var(--fg)" font-weight="700">${v}%</text><text x="${x}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--mut)">${t}</text>`;});
+ $("pplot").innerHTML=s+"</svg>";
+ $("psum").innerHTML=`<div>差：${P.p2}−${P.p1}＝<b>${P.pt>=0?"＋":"−"}${Math.abs(P.pt)}ポイント</b>　前を基準にした変化：${P.pt}÷${P.p1}＝<b>${pct(P.rel)}</b></div><div class="mut">「2%改善」と言うと、どちらの意味か分からない。差はポイント、相対的な変化は%と言い分ける。</div>`;}
+LK.register("point",{name:"%とポイント",
+ init(){LK.stepper($("pp1"),pRender);LK.stepper($("pp2"),pRender);pRender();},
+ apply(s){if(s.p1!==undefined)LK.setRange("pp1",s.p1);if(s.p2!==undefined)LK.setRange("pp2",s.p2);pRender();},
+ render:pRender,
+ value(key){const P=pVals();if(key==="pt")return {v:P.pt,text:f(P.pt)+"ポイント"};return {v:P.rel,text:pct(P.rel)};}});
+
+// ---- 式の変形 a x ＋ b ＝ c
+function eVals(){const a=+$("ea").value,b=+$("eb").value,c=+$("ec").value;return {a,b,c,ax:c-b,x:(c-b)/a};}
+function eRender(){const E=eVals();
+ const step=(t,d)=>`<div class="card" style="margin:4px 0;padding:6px 10px"><b>${t}</b>　<span class="mut">${d}</span></div>`;
+ $("eplot").innerHTML=step(`${f(E.a)}x＋${f(E.b)}＝${f(E.c)}`,"はじめ")+step(`${f(E.a)}x＝${f(E.c)}−${f(E.b)}＝${f(r2(E.ax))}`,"両辺から b を引く")+step(`x＝${f(r2(E.ax))}÷${f(E.a)}＝${f(r2(E.x))}`,"両辺を a で割る");
+ $("esum").innerHTML=`<div>x＝<b>${f(r2(E.x))}</b>　確かめ：${f(E.a)}×${f(r2(E.x))}＋${f(E.b)}＝${f(r2(E.a*E.x+E.b))}</div><div class="mut">a は0にできない（0で割れない）。解いたら元の式に戻して確かめる。</div>`;}
+LK.register("eq",{name:"式の変形",
+ init(){["ea","eb","ec"].forEach(id=>LK.stepper($(id),eRender));eRender();},
+ apply(s){if(s.a!==undefined)LK.setRange("ea",s.a);if(s.b!==undefined)LK.setRange("eb",s.b);if(s.c!==undefined)LK.setRange("ec",s.c);eRender();},
+ render:eRender,
+ value(){const E=eVals();return {v:E.x,text:f(r2(E.x))};}});
+
+// ---- 原価率・値入率・マークアップ率
+function mVals(){const p=+$("mp").value,c=+$("mc").value,g=p-c;return {p,c,g,cost:c/p*100,margin:g/p*100,markup:c>0?g/c*100:NaN};}
+function mRender(){const M=mVals();
+ $("mplot").innerHTML=bar([[Math.max(0,Math.min(M.c,M.p)),"var(--mut)",`原価 ${yen(M.c)}`],[Math.max(0,M.g),"var(--acc)",M.g>0?`値入 ${yen(M.g)}`:""]],Math.max(M.p,M.c))+`<div class="mut">帯の全体＝売価 ${yen(M.p)}円</div>`;
+ $("msum").innerHTML=`<div>原価率＝${yen(M.c)}÷${yen(M.p)}＝<b>${f(r2(M.cost))}%</b>　値入率（売価基準）＝${yen(M.g)}÷${yen(M.p)}＝<b>${f(r2(M.margin))}%</b></div><div>マークアップ率（原価基準）＝${yen(M.g)}÷${yen(M.c)}＝<b>${isNaN(M.markup)?"—":f(r2(M.markup))+"%"}</b></div><div class="mut">同じ値入額でも、売価で割るか原価で割るかで率が違う。会議や資料では分母を書き添える。</div>`;}
+LK.register("margin",{name:"原価率・値入率",
+ init(){LK.stepper($("mp"),mRender);LK.stepper($("mc"),mRender);mRender();},
+ apply(s){if(s.price!==undefined)LK.setRange("mp",s.price);if(s.cost!==undefined)LK.setRange("mc",s.cost);mRender();},
+ render:mRender,
+ value(key){const M=mVals(),v={costRate:M.cost,margin:M.margin,markup:M.markup}[key];return {v,text:f(r2(v))+"%"};}});
+
+LK.start("base");
+window.__LAB__={LK,bVals,cVals,pVals,eVals,mVals};
+</script>
+</body></html>

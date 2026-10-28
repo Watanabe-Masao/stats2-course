@@ -1,0 +1,66 @@
+id: LAB-ratio
+name: 割合ラボ
+slug: ratio                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: ratio_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [ratio.html]    # 旧版 教科書01 の「増減率を重ねる」（＋20%→−20%）を chain モードに含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: base
+    name: 割合と基準量
+    purpose: 割合＝部分÷基準量 を、割合・基準量・部分のどれについても解く
+    set: [find, part, base, rate]
+    values: [rate, base, part]        # rate は %
+  - key: chain
+    name: 増減を重ねる
+    purpose: 2回の増減は倍率を掛ける。元に戻すのに必要な率も出す
+    set: [x0, r1, r2]
+    values: [total, final, mid, back]  # total・back は %
+  - key: point
+    name: "%とポイント"
+    purpose: 割合どうしの差（ポイント）と、前を基準にした変化（%）
+    set: [p1, p2]
+    values: [pt, rel]
+  - key: eq
+    name: 式の変形
+    purpose: a×x＋b＝c を x について解く（両辺に同じ操作）
+    set: [a, b, c]
+    values: [x]
+  - key: margin
+    name: 原価率・値入率
+    purpose: 売価と原価から、売価基準の率（原価率・値入率）と原価基準の率（マークアップ率）
+    set: [price, cost]
+    values: [costRate, margin, markup]   # すべて %
+data: スライダーで値を決める（データの読み込みなし）
+presets:
+  s1-base:
+    mode: base
+    set: {find: base, part: 800, rate: 80}
+    task: 原価800円が「売価の80%」になるように売価を決める。売価はいくらか。
+    predict: {type: number, key: base, label: "売価", unit: "円"}
+    expect: 1000
+    why: 「売価の80%」なので基準量は売価。0.8×売価＝800 から、売価＝800÷0.8＝1,000円。800×1.2＝960円 は「原価の120%」で、基準が違う。
+  s1-chain:
+    mode: chain
+    set: {x0: 1000, r1: 20, r2: -20}
+    task: 1,000円の売価を20%上げてから20%下げる。最初と比べて全体で何%か。
+    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    expect: -4
+    why: 1,000×1.2＝1,200円、1,200×0.8＝960円。倍率 1.2×0.8＝0.96 で4%減。下げるときの基準は上げた後の1,200円。
+  s4-margin:
+    mode: margin
+    modes: [margin, base]
+    task: 売価と原価を動かし、原価率・値入率（売価基準）とマークアップ率（原価基準）がどう違うかを見る。次に「割合と基準量」で、粗利率から必要な売上を逆算する。
+  s5-chain:
+    mode: chain
+    modes: [chain, point]
+    task: 1回目の率を動かし、元に戻すのに必要な2回目の率（くわしくの式）がどう変わるかを見る。次に「%とポイント」で差と変化を言い分ける。
+  s6-free:
+    task: 自分の店の数字で、割合の基準を5つのモードで確かめる（割合と基準量、増減を重ねる、%とポイント、式の変形、原価率・値入率）。
+used_by: [U01]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/ratio_lab/check.js        # 本文の値（売価1,000円、960円、−1%、20%・2ポイント、x＝5、値入率30%）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
