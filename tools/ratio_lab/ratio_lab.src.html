@@ -52,7 +52,7 @@
 </div>
 
 <div id="m-margin" class="mode">
- <p class="mut" style="margin:0">売価と原価から、売価を基準にした率（原価率・値入率）と、原価を基準にした率（マークアップ率）を出す。同じ「利益」でも分母で数が変わる。</p>
+ <p class="mut" style="margin:0">売価と原価から、売価を基準にした率（原価率・値入率＝値入額÷売価）と、原価を基準にした率（マークアップ率）を出す。同じ値入額でも分母で数が変わる。</p>
  <input type="range" id="mp" min="10" max="3000" step="10" value="1000" data-name="売価" data-unit="円">
  <input type="range" id="mc" min="0" max="3000" step="10" value="700" data-name="原価" data-unit="円">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
@@ -130,7 +130,7 @@ LK.register("eq",{name:"式の変形",
 function mVals(){const p=+$("mp").value,c=+$("mc").value,g=p-c;return {p,c,g,cost:c/p*100,margin:g/p*100,markup:c>0?g/c*100:NaN};}
 function mRender(){const M=mVals();
  $("mplot").innerHTML=bar([[Math.max(0,Math.min(M.c,M.p)),"var(--mut)",`原価 ${yen(M.c)}`],[Math.max(0,M.g),"var(--acc)",M.g>0?`値入 ${yen(M.g)}`:""]],Math.max(M.p,M.c))+`<div class="mut">帯の全体＝売価 ${yen(M.p)}円</div>`;
- $("msum").innerHTML=`<div>原価率＝${yen(M.c)}÷${yen(M.p)}＝<b>${f(r2(M.cost))}%</b>　値入率（売価基準）＝${yen(M.g)}÷${yen(M.p)}＝<b>${f(r2(M.margin))}%</b></div><div>マークアップ率（原価基準）＝${yen(M.g)}÷${yen(M.c)}＝<b>${isNaN(M.markup)?"—":f(r2(M.markup))+"%"}</b></div><div class="mut">同じ値入額でも、売価で割るか原価で割るかで率が違う。会議や資料では分母を書き添える。</div>`;}
+ $("msum").innerHTML=`<div>原価率＝${yen(M.c)}÷${yen(M.p)}＝<b>${f(r2(M.cost))}%</b>　値入率＝${yen(M.g)}÷${yen(M.p)}＝<b>${f(r2(M.margin))}%</b></div><div class="mut">値入額＝売価−原価＝${yen(M.g)}円。原価率＋値入率＝100%</div><div>マークアップ率（原価基準）＝${yen(M.g)}÷${yen(M.c)}＝<b>${isNaN(M.markup)?"—":f(r2(M.markup))+"%"}</b></div><div class="mut">同じ値入額でも、売価で割るか原価で割るかで率が違う。会議や資料では分母を書き添える。</div>`;}
 LK.register("margin",{name:"原価率・値入率",
  init(){LK.stepper($("mp"),mRender);LK.stepper($("mc"),mRender);mRender();},
  apply(s){if(s.price!==undefined)LK.setRange("mp",s.price);if(s.cost!==undefined)LK.setRange("mc",s.cost);mRender();},

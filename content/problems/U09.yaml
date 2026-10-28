@@ -144,7 +144,7 @@
     task: ₁₀C₈ はいくつか。パスカルの三角形で、対称な ₁₀C₂ と比べる。
     predict: {type: number, key: c, label: "₁₀C₈"}
     expect: 45
-    why: 選ぶ8人を決めることは、選ばない2人を決めることと同じ。₁₀C₈＝₁₀C₂＝10×9÷2＝45。
+    why: 選ぶ8人を決めることは、選ばない2人を決めることと同じ。₁₀C₈＝₁₀C₂＝10×9÷2＝45。続けて n・r を 7・3、12・10 に動かし、2・3 の答え（35、66）も確かめる。
 
 - id: Q-U09-012
   stage: S2
@@ -176,12 +176,12 @@
     - 'comb(5,2) == 10'
   lab:
     id: LAB-count
-    mode: pascal
-    set: {n: 6, r: 3}
-    task: 6人から3人の当番を選ぶ。Aさんを必ず含む選び方は何通りか。
-    predict: {type: number, key: left, label: "Aを含む選び方", unit: "通り"}
+    mode: cond
+    set: {kind: include, n: 6, r: 3}
+    task: 6人（A〜F）から3人の当番を選ぶ。A を必ず含む選び方は何通りか。
+    predict: {type: number, key: count, label: "A を含む選び方", unit: "通り"}
     expect: 10
-    why: Aが決まっているので、残り5人から2人：₅C₂＝10。含まない選び方 ₅C₃＝10 と足すと ₆C₃＝20。
+    why: A を先に入れて、残り5人から2人：₅C₂＝10。くわしくの書き出しで、太枠（A を含む組）が10個あることを確かめる。含まないのも ₅C₃＝10 で、合わせて ₆C₃＝20。
 
 - id: Q-U09-021
   stage: S3
@@ -194,12 +194,12 @@
     - 'comb(4,1)*comb(3,2) + comb(4,2)*comb(3,1) + comb(4,3) == 34'
   lab:
     id: LAB-count
-    mode: list
-    set: {n: 7, r: 3, role: なし}
-    task: 7人（男性3人・女性4人）から3人を選ぶ選び方は全部で何通りか。そこから「男性だけ」を引く。
-    predict: {type: number, key: comb, label: "全部の選び方", unit: "通り"}
-    expect: 35
-    why: ₇C₃＝35。男性3人だけの選び方 ₃C₃＝1 を引いて、女性を少なくとも1人含むのは34通り。
+    mode: cond
+    set: {kind: atleast, n: 7, r: 3, m: 4}
+    task: 7人（印の付いた女性4人と男性3人）から3人を選ぶ。女性を少なくとも1人含む選び方は何通りか。
+    predict: {type: number, key: count, label: "女性を含む選び方", unit: "通り"}
+    expect: 34
+    why: 全部 ₇C₃＝35 から、男性3人だけの ₃C₃＝1 を引いて34。くわしくの書き出しで、太枠でない組が1つだけあることを確かめる。
 
 - id: Q-U09-022
   stage: S3
@@ -211,12 +211,12 @@
     - "len([p for p in itertools.permutations('ABCDE') if abs(p.index('A')-p.index('B')) == 1]) == 48"
   lab:
     id: LAB-count
-    mode: list
-    set: {n: 4, r: 4, role: あり}
-    task: AとBを1つのかたまり [AB] とみて、[AB]・C・D・E の4つを一列に並べる。何通りか。
-    predict: {type: number, key: perm, label: "4つの並べ方", unit: "通り"}
-    expect: 24
-    why: 4!＝24。かたまりの中の並び AB・BA の2通りを掛けて 48。
+    mode: cond
+    set: {kind: adjacent, n: 5}
+    task: A〜E の5人を一列に並べる。A と B が隣り合う並び方は何通りか。
+    predict: {type: number, key: count, label: "隣り合う並び方", unit: "通り"}
+    expect: 48
+    why: A と B をかたまりとみて4つを並べる 4!＝24、かたまりの中の AB・BA の2通りで48。全部の120通りのうち、くわしくの太枠が48個。
 
 - id: Q-U09-023
   stage: S3
@@ -276,12 +276,12 @@
     - 'Fraction(comb(2,1)*comb(8,2), comb(10,3)) == Fraction(7,15)'
   lab:
     id: LAB-count
-    mode: list
-    set: {n: 10, r: 3, role: なし}
-    task: 10個から3個を取り出す取り出し方は全部で何通りか（確率の分母）。
-    predict: {type: number, key: comb, label: "全部の取り出し方", unit: "通り"}
-    expect: 120
-    why: ₁₀C₃＝120。不良1個・良品2個は ₂C₁×₈C₂＝2×28＝56 なので 56÷120＝7/15。
+    mode: cond
+    set: {kind: hyper, n: 10, r: 3, m: 2, k: 1}
+    task: 10個のうち2個が不良（印）。3個を戻さずに取り出すとき、不良がちょうど1個の確率は（小数で）？
+    predict: {type: number, key: prob, label: "確率（小数）"}
+    expect: 0.4667
+    why: 不良1個の選び方 ₂C₁＝2、良品2個 ₈C₂＝28 で 2×28＝56 通り。全部 ₁₀C₃＝120 通りなので 56÷120＝7/15≒0.4667。
 
 - id: Q-U09-030
   stage: S4

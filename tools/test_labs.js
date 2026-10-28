@@ -2,13 +2,13 @@
 // 使い方: node tools/test_labs.js [スクリーンショットの保存先]
 //  - アップロード用の版（out/labs）と公開サイト（out/site の ?p=場面）の両方
 //  - エラーがない、380px で横にはみ出さない（ライト／ダーク）
-//  - 予想がある版：予想する前は結果（.res）が見えない。予想を入れると結果が出る
+//  - 予想がある版：予想する前は結果（.res）が見えない。.res の外にも答えの数が出ていない。予想を入れると結果が出る
 //  - expect：ラボが計算した値（LK.last）と一致する
 //  - ラボのモードが tool.yaml の modes と一致し、全モードを開いてボタンを押してもエラーが出ない
 const {chromium}=require('playwright');const path=require('path');const fs=require('fs');
 const ROOT=path.resolve(__dirname,'..');
 (async()=>{const read=f=>fs.existsSync(path.join(ROOT,f))?JSON.parse(fs.readFileSync(path.join(ROOT,f),'utf8')):[];
- const man=[...read('out/labs/manifest.json'),...read('out/site_manifest.json').map(v=>({...v,site:true}))];
+ const man=[...read('out/labs/manifest.json'),...read('out/site_manifest.json').map(v=>({...v,site:true}))].filter(v=>!process.env.ONLY||v.asset.includes(process.env.ONLY));  // ONLY=LAB-sigma で絞れる
  const shots=process.argv[2];const b=await chromium.launch();let fail=0;const embedH=[];
  const bad=(m)=>{console.log('❌ '+m);fail++;};
  for(const v of man){for(const scheme of ['light','dark']){
@@ -25,6 +25,17 @@ const ROOT=path.resolve(__dirname,'..');
   if(pr){
    const vis=await p.evaluate(()=>[...document.querySelectorAll('.mode').values()].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
    if(vis)bad(`${tag}: 予想の前に結果が見えている`);
+   // .res の付け忘れも見逃さない：予想の前に、課題・操作・説明文の外に答えの数が出ていないか
+   if(typeof v.expect==='number'&&v.expect!==0){
+    const given=[String(v.cfg.task||''),JSON.stringify(v.cfg.set||{})].join(' ');
+    const nums=t=>(t.replace(/[,，]/g,'').replace(/[−–]/g,'-').match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);
+    const near=x=>Math.abs(Math.abs(x)-Math.abs(v.expect))<=Math.max(1e-9,Math.abs(v.expect)*1e-3);
+    if(!nums(given).some(near)){
+     const txt=await p.evaluate(()=>{const m=[...document.querySelectorAll('.mode')].find(d=>d.style.display!=='none');if(!m)return '';
+      return [...m.querySelectorAll(':scope *')].filter(e=>e.children.length===0&&e.offsetParent!==null&&!e.closest('.lk-step,select,.res,.lk-wait')&&!(e.closest('p.mut')&&e.closest('p.mut').parentElement===m)).map(e=>e.textContent).join(' ');});
+     const hit=nums(txt).find(near);
+     if(hit!==undefined)bad(`${tag}: 予想の前に答えの数（${hit}）が見えている（.res の付け忘れ？）`);}
+   }
    if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}_before.png`,fullPage:true});
    if(pr.type==='number')await p.fill('#lk-in',String(v.expect));
    else await p.click(`#lk-ch button[data-v="${v.expect}"]`);
