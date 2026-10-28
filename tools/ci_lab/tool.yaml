@@ -1,0 +1,60 @@
+id: LAB-ci
+name: 信頼区間ラボ
+slug: interval                   # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: ci_lab.src.html             # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_ci.html, prop.html]   # 旧版 教科書22 の「σ・n・信頼係数で誤差幅と30本の区間が変わる」を mean と cover に、「比率の区間（n を4倍で幅が半分）」を prop に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: mean
+    name: 平均の区間
+    purpose: x̄ ± 確率点×SE。σ が分かれば z（数表の 1.645・1.96・2.576）、分からなければ t(n−1)。目標の誤差幅に必要な n＝(zσ÷d)² の切り上げも出す。t のときは z で作った狭すぎる区間も並べる
+    set: [kind, level, xbar, s, n, d]     # kind：z／t。level：0.9／0.95／0.99
+    values: [se, crit, margin, lo, hi, width, nFor]
+  - key: prop
+    name: 割合の区間
+    purpose: p̂ ± z×√(p̂(1−p̂)÷n)。目標の誤差幅に必要な人数（p̂ を使う・p＝0.5 とする）と、ウィルソンの区間（発展）も出す
+    set: [level, x, n, d]
+    values: [phat, se, margin, lo, hi, width, nFor, nWorst, wLo, wHi]
+  - key: cover
+    name: くり返し
+    purpose: μ＝50 の正規母集団から n 個取って区間を作る手順を1000回くり返し（固定の乱数 seed 41。「別の乱数で作り直す」で変わる）、μ を含んだ割合を数える。最初の30本を描く
+    set: [kind, level, n, sigma]   # kind：z（σ を使う）／t（s と t）／zs（s と z の誤り）
+    values: [rate, hit, miss30, coverLabel]   # coverLabel：含んだ割合が名目−2.5ポイント以上なら「約95%が含む」（90%・99%も同様）、それ未満なら「95%より少ない」
+data: スライダーと選択欄で決める（データの読み込みなし）。z の点は2級の数表の値、t の点は不完全ベータ関数から二分法で求める
+presets:
+  s1-mean:
+    mode: mean
+    set: {kind: z, level: 0.95, xbar: 50, s: 10, n: 100, d: 1}
+    task: σ＝10 が分かっている。100人の客単価の平均は50百円。母平均の95%信頼区間の下の端は？
+    predict: {type: number, key: lo, label: "区間の下の端"}
+    expect: 48.04
+    why: SE＝10÷√100＝1、誤差幅 1.96×1＝1.96。50−1.96＝48.04、上の端は51.96。n を400にすると誤差幅は0.98で半分。
+  s1-cover:
+    mode: cover
+    set: {kind: z, level: 0.95, n: 25, sigma: 10}
+    task: 同じ作り方で95%信頼区間を1000回作る。μ を含む区間はどれくらいか。
+    predict: {type: choice, key: coverLabel, label: "μ を含む区間は", options: [約95%が含む, 95%より少ない]}
+    expect: 約95%が含む
+    why: 1000回のうち約950回が μ を含み、残りは外れる。μ は動かず、動くのは区間。1本の区間が μ を含むかどうかは、確率ではなく「含む」か「含まない」か。
+  s3-free:
+    mode: mean
+    modes: [mean, prop, cover]
+    task: 解いてから、問題が求めているもの（平均の区間か、割合の区間か、95%の意味か）に合うモードで確かめる。
+  s4-free:
+    mode: prop
+    modes: [prop, mean, cover]
+    task: 自分の売場の数字（アンケートの人数と回答、日別売上の平均と標準偏差）を入れ、区間と、目標の誤差幅に必要な人数を読む。
+  s5-free:
+    mode: prop
+    modes: [prop, cover]
+    task: 「割合の区間」で n を20、x を2にし、p̂±z×SE の区間が0未満にはみ出すこととウィルソンの区間を比べる（発展1）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（平均の区間、割合の区間、くり返して確かめる）。
+used_by: [U22]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/ci_lab/check.js           # 本文の値（48.04〜51.96、0.1608〜0.2392、必要な n、t の区間、ウィルソン、くり返しの割合）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

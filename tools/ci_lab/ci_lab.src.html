@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>信頼区間ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.dim{opacity:.45}
+</style></head><body>
+<h1>🧪 信頼区間ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-mean" class="mode">
+ <p class="mut" style="margin:0">母平均の信頼区間＝x̄ ± 確率点 × 標準誤差。σ が分かれば z の点と σ÷√n、分からなければ t(n−1) の点と s÷√n を使う。</p>
+ <div class="row ctl"><label><select id="mkind" data-key="kind"><option value="z">σ が分かる（z）</option><option value="t">σ が分からない（s と t）</option></select></label><label>信頼係数 <select id="mlevel" data-key="level"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <input type="range" id="mx" min="0" max="2000" step="0.1" value="50" data-name="平均 x̄">
+ <input type="range" id="ms" min="0.1" max="500" step="0.1" value="10" data-name="σ または s">
+ <input type="range" id="mn" min="2" max="2000" step="1" value="100" data-name="個数 n">
+ <input type="range" id="md" min="0.1" max="100" step="0.1" value="1" data-name="目標の誤差幅">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="mplot"></div>
+ <div class="card res key" id="msum"></div>
+ <div class="res det" id="mtab"></div>
+</div>
+
+<div id="m-prop" class="mode">
+ <p class="mut" style="margin:0">母比率の信頼区間＝p̂ ± z の点 × √(p̂(1−p̂)÷n)。n が十分大きく、np̂ と n(1−p̂) がどちらも大きいときの近似。</p>
+ <div class="row ctl"><label>信頼係数 <select id="plevel" data-key="level"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <input type="range" id="px" min="0" max="5000" step="1" value="80" data-name="当てはまる数 x">
+ <input type="range" id="pn" min="1" max="5000" step="1" value="400" data-name="人数 n">
+ <input type="range" id="pd" min="0.005" max="0.2" step="0.005" value="0.03" data-name="目標の誤差幅">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+ <div class="res det" id="ptab"></div>
+</div>
+
+<div id="m-cover" class="mode">
+ <p class="mut" style="margin:0">μ＝50 の正規母集団から n 個取って区間を作る手順を、何度もくり返す。μ は動かず、動くのは区間の方。95%は「この作り方で作った区間のうち、μ を含むものの割合」。</p>
+ <div class="row ctl"><label>作り方 <select id="ckind" data-key="kind"><option value="z">σ を使って z</option><option value="t">s を使って t</option><option value="zs">s を使って z（誤り）</option></select></label><label>信頼係数 <select id="clevel" data-key="level"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <input type="range" id="cn" min="2" max="100" step="1" value="25" data-name="個数 n">
+ <input type="range" id="cs" min="1" max="30" step="1" value="10" data-name="標準偏差 σ">
+ <div class="row ctl"><button type="button" class="sub" id="cagain">別の乱数で作り直す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const ZQ={"0.9":1.645,"0.95":1.96,"0.99":2.576};   // 2級の数表の値
+const tq=(p,df)=>inv(t=>tcdf(t,df),p,0,1e3);
+function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+function gauss(r){const u=r()||1e-12,v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+// 区間を数直線に描く
+function bar(lo,hi,c,mark,label,cmp){const H=96,L=16,R=W-16,span=(hi-lo)||1,a=Math.min(lo,cmp?cmp[0]:lo)-span*0.35,b=Math.max(hi,cmp?cmp[1]:hi)+span*0.35,X=x=>L+(x-a)/(b-a)*(R-L),y=40;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label)}">`;
+ if(cmp)s+=`<line x1="${X(cmp[0])}" y1="${y+20}" x2="${X(cmp[1])}" y2="${y+20}" stroke="var(--mut)" stroke-width="4" stroke-linecap="round" stroke-opacity=".6"/><text x="${X(cmp[1])+4}" y="${y+24}" font-size="10" fill="var(--mut)">${esc(cmp[2])}</text>`;
+ s+=`<line x1="${X(lo)}" y1="${y}" x2="${X(hi)}" y2="${y}" stroke="var(--acc)" stroke-width="6" stroke-linecap="round"/><circle cx="${X(c)}" cy="${y}" r="6" fill="var(--fg)"/>`;
+ s+=`<text x="${X(lo)}" y="${y-12}" font-size="11" text-anchor="middle" fill="var(--fg)">${f(lo,4)}</text><text x="${X(hi)}" y="${y-12}" font-size="11" text-anchor="middle" fill="var(--fg)">${f(hi,4)}</text><text x="${X(c)}" y="${y+16}" font-size="10.5" text-anchor="middle" fill="var(--fg)">${esc(mark)}</text>`;
+ return s+`</svg>`;}
+
+// ---- 平均の区間
+function mVals(){const kind=$("mkind").value,level=$("mlevel").value,xb=+$("mx").value,s=+$("ms").value,n=+$("mn").value,d=+$("md").value,q=1-(1-(+level))/2;
+ const z=ZQ[level],crit=kind==="z"?z:tq(q,n-1),se=s/Math.sqrt(n),m=crit*se;
+ return {kind,level:+level,xbar:xb,s,n,d,crit,z,se,margin:m,lo:xb-m,hi:xb+m,width:2*m,df:n-1,nFor:Math.ceil((z*s/d)**2-1e-9),n4:m/2,zlo:xb-z*se,zhi:xb+z*se};}
+function mRender(){const M=mVals();
+ $("mplot").innerHTML=bar(M.lo,M.hi,M.xbar,`x̄＝${f(M.xbar,2)}`,"平均の信頼区間",M.kind==="t"?[M.zlo,M.zhi,"z なら"]:null)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>${M.level*100}%信頼区間</span>${M.kind==="t"?`<span><i class="sw" style="background:var(--mut);opacity:.6"></i>z の点で作ると（狭すぎる）</span>`:""}</div>`;
+ $("msum").innerHTML=`<div>標準誤差＝${M.kind==="z"?"σ":"s"}÷√n＝${f(M.s,2)}÷√${M.n}＝<b>${f(M.se)}</b></div><div>確率点：${M.kind==="z"?`z＝<b>${f(M.crit,3)}</b>`:`t(${M.df}) の ${f(1-(1-M.level)/2,3)} 点＝<b>${f(M.crit,3)}</b>（z なら ${f(M.z,3)}）`}</div><div>誤差幅＝${f(M.crit,3)}×${f(M.se)}＝<b>${f(M.margin)}</b></div><div>区間：<b>${f(M.lo)}〜${f(M.hi)}</b>（幅 ${f(M.width)}）</div><div>誤差幅を ${f(M.d,2)} 以下にする n：(z×σ÷誤差幅)²＝(${f(M.z,3)}×${f(M.s,2)}÷${f(M.d,2)})²→ 切り上げて <b>${M.nFor}</b></div><div class="mut">n を4倍にすると誤差幅は半分。信頼係数を上げると区間は広がる。区間は μ についての幅で、1人1人の値の95%が入る範囲ではない。</div>`;
+ $("mtab").innerHTML=`<table><tr><th>信頼係数</th><th>z の点</th><th>誤差幅（z）</th></tr>${["0.9","0.95","0.99"].map(l=>`<tr><td>${+l*100}%</td><td>${ZQ[l]}</td><td>${f(ZQ[l]*M.se)}</td></tr>`).join("")}</table>`;}
+LK.register("mean",{name:"平均の区間",
+ init(){["mx","ms","mn","md"].forEach(id=>LK.stepper($(id),mRender));["mkind","mlevel"].forEach(id=>$(id).onchange=mRender);mRender();},
+ apply(s){if(s.kind)$("mkind").value=s.kind;if(s.level!==undefined)$("mlevel").value=String(s.level);if(s.xbar!==undefined)LK.setRange("mx",s.xbar);if(s.s!==undefined)LK.setRange("ms",s.s);if(s.n!==undefined)LK.setRange("mn",s.n);if(s.d!==undefined)LK.setRange("md",s.d);mRender();},
+ render:mRender,
+ value(key){const M=mVals(),v=M[key];return {v,text:key==="nFor"?String(v):f(v)};}});
+
+// ---- 割合の区間
+function pVals(){const level=$("plevel").value,x=Math.min(+$("px").value,+$("pn").value),n=+$("pn").value,d=+$("pd").value,z=ZQ[level],ph=x/n,se=Math.sqrt(ph*(1-ph)/n),m=z*se;
+ const z2=z*z,den=1+z2/n,wc=(ph+z2/(2*n))/den,wh=z*Math.sqrt(ph*(1-ph)/n+z2/(4*n*n))/den;
+ return {level:+level,x,n,d,z,phat:ph,se,margin:m,lo:ph-m,hi:ph+m,width:2*m,nFor:Math.ceil(z2*ph*(1-ph)/(d*d)-1e-9),nWorst:Math.ceil(z2*0.25/(d*d)-1e-9),wLo:wc-wh,wHi:wc+wh,np:n*ph,nq:n*(1-ph)};}
+function pRender(){const P=pVals();
+ $("pplot").innerHTML=bar(P.lo,P.hi,P.phat,`p̂＝${f(P.phat,4)}`,"割合の信頼区間",[P.wLo,P.wHi,"ウィルソン"])+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>${P.level*100}%信頼区間（p̂±z×SE）</span><span><i class="sw" style="background:var(--mut);opacity:.6"></i>ウィルソンの区間（発展）</span></div>`;
+ $("psum").innerHTML=`<div>p̂＝${P.x}÷${P.n}＝<b>${f(P.phat)}</b>　SE＝√(p̂(1−p̂)÷n)＝<b>${f(P.se)}</b></div><div>誤差幅＝${f(P.z,3)}×${f(P.se)}＝<b>${f(P.margin)}</b>　区間：<b>${f(P.lo)}〜${f(P.hi)}</b></div><div>誤差幅を ${f(P.d,3)} 以下にする人数：p̂ を使うと <b>${P.nFor}</b> 人、p が分からず p＝0.5 とすると <b>${P.nWorst}</b> 人</div><div class="mut">np̂＝${f(P.np,1)}、n(1−p̂)＝${f(P.nq,1)}。どちらかが小さいと近似が悪く、区間が0未満や1超えになることもある。${P.lo<0||P.hi>1?"<b>いまの区間は0〜1の外にはみ出している。</b>":""}</div>`;
+ $("ptab").innerHTML=`<table><tr><th>区間</th><th>下</th><th>上</th></tr><tr><td>p̂±z×SE</td><td>${f(P.lo)}</td><td>${f(P.hi)}</td></tr><tr><td>ウィルソン</td><td>${f(P.wLo)}</td><td>${f(P.wHi)}</td></tr></table>`;}
+LK.register("prop",{name:"割合の区間",
+ init(){["px","pn","pd"].forEach(id=>LK.stepper($(id),pRender));$("plevel").onchange=pRender;pRender();},
+ apply(s){if(s.level!==undefined)$("plevel").value=String(s.level);if(s.n!==undefined)LK.setRange("pn",s.n);if(s.x!==undefined)LK.setRange("px",s.x);if(s.d!==undefined)LK.setRange("pd",s.d);pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:key==="nFor"||key==="nWorst"?String(v):f(v)};}});
+
+// ---- くり返して確かめる
+let cSeed=41,cCache={};
+function cSim(kind,level,n,sig){const key=[kind,level,n,sig,cSeed].join();if(cCache.key===key)return cCache.r;const r=rng(cSeed),z=ZQ[level],tc=tq(1-(1-(+level))/2,n-1),iv=[];
+ for(let k=0;k<1000;k++){let sum=0,sq=0;const xs=[];for(let i=0;i<n;i++){const x=50+sig*gauss(r);xs.push(x);sum+=x;}const m=sum/n;xs.forEach(x=>sq+=(x-m)**2);const s=Math.sqrt(sq/(n-1));
+  const h=kind==="z"?z*sig/Math.sqrt(n):kind==="t"?tc*s/Math.sqrt(n):z*s/Math.sqrt(n);iv.push([m-h,m+h]);}
+ cCache={key,r:iv};return iv;}
+function cVals(){const kind=$("ckind").value,level=$("clevel").value,n=+$("cn").value,sig=+$("cs").value,iv=cSim(kind,level,n,sig);
+ const hit=iv.filter(([a,b])=>a<=50&&50<=b).length,rate=hit/iv.length,miss30=iv.slice(0,30).filter(([a,b])=>a>50||b<50).length,nominal=+level;
+ const lab=rate>=nominal-0.025?`約${nominal*100}%が含む`:`${nominal*100}%より少ない`;
+ return {kind,level:nominal,n,sigma:sig,rate,hit,miss30,coverLabel:lab,iv};}
+function cRender(){const C=cVals(),H=30*7+26,L=10,R=W-10,lo=50-4*C.sigma/Math.sqrt(Math.max(2,C.n))*1.6,hi=100-lo,X=x=>L+(Math.max(lo,Math.min(hi,x))-lo)/(hi-lo)*(R-L);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="30本の信頼区間">`;
+ C.iv.slice(0,30).forEach(([a,b],i)=>{const y=8+i*7,ok=a<=50&&50<=b;s+=`<line x1="${X(a)}" y1="${y}" x2="${X(b)}" y2="${y}" stroke="${ok?"var(--acc)":"var(--acc2)"}" stroke-width="${ok?2.5:3.5}" stroke-linecap="round"/>`;});
+ s+=`<line x1="${X(50)}" y1="2" x2="${X(50)}" y2="${H-18}" stroke="var(--fg)" stroke-dasharray="3 3"/><text x="${X(50)}" y="${H-4}" font-size="10.5" text-anchor="middle" fill="var(--fg)">μ＝50</text></svg>`;
+ $("cplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>μ を含む</span><span><i class="sw" style="background:var(--acc2)"></i>μ を外す</span><span>最初の30本</span></div>`;
+ const nm={z:"σ を使って z",t:"s を使って t",zs:"s を使って z"}[C.kind];
+ $("csum").innerHTML=`<div>作り方：${nm}・${C.level*100}%・n＝${C.n}</div><div>1000回のうち μ を含んだ区間：<b>${C.hit}</b>回（<b>${f(C.rate*100,1)}%</b>）→ <b>${C.coverLabel}</b></div><div>上の30本のうち μ を外したのは ${C.miss30} 本</div><div class="mut">μ は動かない。1本の区間は μ を含むか含まないかのどちらか。95%は作り方の性質。σ を知らずに s を使ったのに z の点を使うと、n が小さいとき区間が狭すぎて、含む割合が名目より下がる。</div>`;}
+LK.register("cover",{name:"くり返し",
+ init(){["cn","cs"].forEach(id=>LK.stepper($(id),cRender));["ckind","clevel"].forEach(id=>$(id).onchange=cRender);$("cagain").onclick=()=>{cSeed=(cSeed*48271)%2147483647;cRender();};cRender();},
+ apply(s){if(s.kind)$("ckind").value=s.kind;if(s.level!==undefined)$("clevel").value=String(s.level);if(s.n!==undefined)LK.setRange("cn",s.n);if(s.sigma!==undefined)LK.setRange("cs",s.sigma);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+LK.start("mean");
+window.__LAB__={LK,mVals,pVals,cVals,tq};
+</script>
+</body></html>
