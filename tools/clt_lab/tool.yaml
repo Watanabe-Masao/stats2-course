@@ -1,0 +1,65 @@
+id: LAB-clt
+name: 中心極限定理ラボ
+slug: clt                        # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: clt_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_clt.html, sim_binom.html, lln.html]   # 旧版 教科書19 の「歪んだ母集団でも x̄ は正規に近づく」を clt、「二項の正規近似」を bin、「当たりの割合が p に落ち着く」を lln に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: clt
+    name: 中心極限定理
+    purpose: 4つの形の母集団から n 個の平均を2000回取り直し（固定の乱数）、x̄ の分布と N(μ, σ²/n) を重ねる。x̄ の歪度＝母集団の歪度÷√n
+    set: [shape, n, p]            # shape：expo／unif／bimodal／bern。p は bern のときの1の割合
+    values: [mu, sd, se, g1, gmean, skew, shapeLabel, simmean, simsd, within2]   # shapeLabel：|x̄ の歪度|＜0.5 なら「左右対称に近い」、それ以外は「右に歪む」「左に歪む」
+  - key: lln
+    name: 大数の法則
+    purpose: 当たりの割合が p に近づく様子（固定の乱数）と、ずれの目安 ±2√(p(1−p)÷N)
+    set: [p, N]
+    values: [se, band, final, dev, n4]
+  - key: bin
+    name: 二項の正規近似
+    purpose: B(n, p) の正確な確率と、連続修正あり・なしの正規近似を並べる
+    set: [n, p, k, kind]          # kind：le／ge／eq
+    values: [exact, approx, nocc, z, znocc, mean, sd, np, nq]
+  - key: cheb
+    name: チェビシェフ
+    purpose: 平均から kσ 以上離れる確率の上限 1÷k² と、正規分布での実際の値
+    set: [k]
+    values: [bound, normal]
+data: スライダーと選択欄で決める（データの読み込みなし）。中心極限定理は固定の乱数（seed 17）で2000回、大数の法則は固定の乱数（seed 23。「別の乱数で引き直す」で変わる）
+presets:
+  s1-bin:
+    mode: bin
+    set: {n: 100, p: 0.5, k: 55, kind: le}
+    task: 当選率0.5で100人が応募する。当選者が55人以下になる確率を、連続修正ありの正規近似で（小数で）。
+    predict: {type: number, key: approx, label: "正規近似の P(X≦55)"}
+    expect: 0.8643
+    why: 平均50・標準偏差5、55.5 まで含めて z＝1.1、Φ(1.1)≒0.864。正確な二項の値0.8644とほとんど同じ。連続修正なし（z＝1）だと0.841で少し小さい。
+  s1-clt:
+    mode: clt
+    set: {shape: expo, n: 30}
+    task: 待ち時間（右に長い裾、平均5分）から30人分の平均を2000回取り直す。x̄ の分布の形はどうなるか。
+    predict: {type: choice, key: shapeLabel, label: "x̄ の分布は", options: [右に歪む, 左右対称に近い]}
+    expect: 左右対称に近い
+    why: x̄ の歪度は 2÷√30≒0.37 まで小さくなり、正規曲線とほぼ重なる。n を1にすると母集団そのままの右に長い形。n＝5 ではまだ右に歪む。
+  s3-free:
+    mode: clt
+    modes: [clt, lln, bin, cheb]
+    task: 解いてから、問題が聞いていること（x̄ の分布の形か、割合が落ち着く様子か、二項の近似か、形が分からないときの上限か）に合うモードで確かめる。
+  s4-free:
+    mode: bin
+    modes: [bin, clt, lln]
+    task: 自分の売場の数字（応募者数と当選率、1日の客数と購入率）を入れ、正規近似で「k 以下」「k 以上」の確率を読む。
+  s5-free:
+    mode: cheb
+    modes: [cheb, clt]
+    task: 「チェビシェフ」で k を動かし、上限と正規分布の実際の差を見る（発展1）。「中心極限定理」で「0か1」の p を0.05にし、正規に近づくのに必要な n を探す（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（中心極限定理、大数の法則、二項の正規近似、チェビシェフ）。
+used_by: [U19]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/clt_lab/check.js          # 本文の値（0.8643・0.8644、x̄ の歪度 2÷√30、SE 0.0458、上限 1/4）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
