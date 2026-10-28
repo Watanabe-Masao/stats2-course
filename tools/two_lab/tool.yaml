@@ -1,0 +1,82 @@
+id: LAB-two
+name: 2群・分散の区間ラボ
+slug: twogroup                   # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: two_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_dist.html, twot.html]   # 旧版 教科書23 の「χ²(9) の 2.700 と 19.023」を var に、「2つの平均の差（Welch と等分散）」を diff に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: var
+    name: 母分散
+    purpose: (n−1)s² を χ²(n−1) の上側の点で割った下限〜下側の点で割った上限。母標準偏差の区間（平方根）と、上限÷下限の倍率も出す
+    set: [level, n, s2]
+    values: [ss, qlo, qhi, lo, hi, sdLo, sdHi, ratio]
+  - key: diff
+    name: 平均の差
+    purpose: 独立2群の x̄₁−x̄₂ の95%区間。ウェルチ（SE＝√(s₁²/n₁＋s₂²/n₂)、近似の自由度）と等分散（合わせた分散、自由度 n₁＋n₂−2）を切り替え、もう一方の SE・自由度も並べる
+    set: [method, x1, s1, n1, x2, s2, n2]   # method：welch／pooled
+    values: [diff, se, df, tcrit, margin, lo, hi, sp2, contains0]   # contains0：「0を含む」／「0を含まない」
+  - key: paired
+    name: 対応あり
+    purpose: 1組ごとの差 D の平均 D̄ の95%区間（1標本の t、自由度 n−1）
+    set: [dbar, sd, n]
+    values: [se, df, tcrit, margin, lo, hi, contains0]
+  - key: prop2
+    name: 比率の差
+    purpose: p̂₁−p̂₂ の95%区間。SE は各群の p̂ を使う
+    set: [x1, n1, x2, n2]
+    values: [p1, p2, diff, se, margin, lo, hi, contains0]
+  - key: ratio
+    name: 分散の比
+    purpose: σ₁²÷σ₂² の95%区間。R＝s₁²÷s₂² を F(n₁−1, n₂−1) の上側2.5%点で割った下限〜下側2.5%点で割った上限
+    set: [s1, n1, s2, n2]
+    values: [R, fhi, flo, lo, hi, contains1]   # contains1：「1を含む」／「1を含まない」
+  - key: corr
+    name: 相関係数
+    purpose: フィッシャーの z 変換で ρ の95%区間（近似）。z±1.96÷√(n−3) を tanh で戻す
+    set: [r, n]
+    values: [zr, zlo, zhi, lo, hi]
+data: スライダーと選択欄で決める（データの読み込みなし）。t・χ²・F の点は不完全ベータ関数・不完全ガンマ関数から二分法で求める。比率の差と相関の z の点は1.96
+presets:
+  s1-var:
+    mode: var
+    set: {level: 0.95, n: 10, s2: 4}
+    task: 袋詰め10回の重さの不偏分散 s²＝4。母分散の95%信頼区間の下の端は（小数で）？
+    predict: {type: number, key: lo, label: "区間の下の端"}
+    expect: 1.8925
+    why: (n−1)s²＝36 を χ²(9) の大きい方の点19.023で割って約1.89。上の端は36÷2.700≒13.33。s²＝4 は真ん中にない。
+  s1-paired:
+    mode: paired
+    set: {dbar: 3, sd: 4, n: 16}
+    task: 同じ16店の施策前後の差は平均3万円、差の標準偏差4万円。差の平均の95%信頼区間の下の端は（小数で）？
+    predict: {type: number, key: lo, label: "区間の下の端"}
+    expect: 0.8686
+    why: SE＝4÷√16＝1、t(15) の点2.131。3−2.131≒0.869、上の端は5.131。0を含まないので、施策の前後で差があると言える。
+  s1-diff:
+    mode: diff
+    set: {method: welch, x1: 30, s1: 2, n1: 10, x2: 25, s2: 8, n2: 20}
+    task: 店A（10日、平均30・s＝2）と店B（20日、平均25・s＝8）の平均の差。ウェルチの95%信頼区間は0を含むか。
+    predict: {type: choice, key: contains0, label: "ウェルチの区間は", options: [0を含む, 0を含まない]}
+    expect: 0を含まない
+    why: SE≒1.90、自由度≒23.3 で、区間は約1.08〜8.92。等分散を仮定すると、ばらつきの大きい B に引っぱられて SE≒2.59 になり、区間は0を含む。
+  s3-free:
+    mode: diff
+    modes: [diff, paired, prop2, var, ratio, corr]
+    task: 解いてから、問題が推定しているもの（母分散、平均の差、対応ありの差、比率の差、分散の比、相関）に合うモードで確かめる。
+  s4-free:
+    mode: paired
+    modes: [paired, diff, prop2, ratio]
+    task: 自分の売場の数字（施策前後の差、2店の平均、2つのキャンペーンの購入率）を入れ、区間が0（比なら1）を含むかを読む。
+  s5-free:
+    mode: var
+    modes: [var, corr, ratio]
+    task: 「母分散」で n を10→100 と変え、上限÷下限の倍率がどう縮むかを見る（発展1）。「相関係数」で r と n を動かし、区間が左右非対称になることを見る（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（母分散、平均の差、対応あり、比率の差、分散の比、相関係数）。
+used_by: [U23]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/two_lab/check.js          # 本文の値（1.892〜13.333、0.869〜5.131、ウェルチと等分散、比率の差、分散比、フィッシャーの z）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

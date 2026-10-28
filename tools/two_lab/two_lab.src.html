@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2群・分散の区間ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 2群・分散の区間ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-var" class="mode">
+ <p class="mut" style="margin:0">母分散の区間は (n−1)s² を χ²(n−1) の上側の点で割ったもの〜下側の点で割ったもの。χ² が左右対称でないので、s² ± の形にはならない。</p>
+ <div class="row ctl"><label>信頼係数 <select id="vlevel" data-key="level"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <input type="range" id="vn" min="2" max="200" step="1" value="10" data-name="個数 n">
+ <input type="range" id="vs" min="0.1" max="1000" step="0.1" value="4" data-name="不偏分散 s²">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="vplot"></div>
+ <div class="card res key" id="vsum"></div>
+</div>
+
+<div id="m-diff" class="mode">
+ <p class="mut" style="margin:0">別々の2群の平均の差 x̄₁−x̄₂ の区間。標準誤差は √(s₁²÷n₁＋s₂²÷n₂)。等分散を仮定しないウェルチの方法か、等分散を仮定して分散を合わせる方法かで、標準誤差と自由度が変わる。</p>
+ <div class="row ctl"><label>方法 <select id="dmeth" data-key="method"><option value="welch">ウェルチ（等分散を仮定しない）</option><option value="pooled">等分散を仮定</option></select></label></div>
+ <input type="range" id="dx1" min="0" max="2000" step="0.1" value="52" data-name="平均 x̄₁">
+ <input type="range" id="ds1" min="0.1" max="500" step="0.1" value="8" data-name="標準偏差 s₁">
+ <input type="range" id="dn1" min="2" max="500" step="1" value="16" data-name="個数 n₁">
+ <input type="range" id="dx2" min="0" max="2000" step="0.1" value="48" data-name="平均 x̄₂">
+ <input type="range" id="ds2" min="0.1" max="500" step="0.1" value="6" data-name="標準偏差 s₂">
+ <input type="range" id="dn2" min="2" max="500" step="1" value="16" data-name="個数 n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+</div>
+
+<div id="m-paired" class="mode">
+ <p class="mut" style="margin:0">同じ店・同じ人の前と後のように対応があるときは、1組ごとの差 D を1つのデータにして、差の平均 D̄ の区間（1標本の t）を作る。</p>
+ <input type="range" id="pd" min="-100" max="100" step="0.1" value="3" data-name="差の平均 D̄">
+ <input type="range" id="ps" min="0.1" max="100" step="0.1" value="4" data-name="差の標準偏差">
+ <input type="range" id="pn" min="2" max="200" step="1" value="16" data-name="組の数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+</div>
+
+<div id="m-prop2" class="mode">
+ <p class="mut" style="margin:0">2つの比率の差 p̂₁−p̂₂ の区間。標準誤差は √(p̂₁(1−p̂₁)÷n₁＋p̂₂(1−p̂₂)÷n₂)（それぞれの p̂ を使う）。</p>
+ <input type="range" id="qx1" min="0" max="5000" step="1" value="60" data-name="x₁">
+ <input type="range" id="qn1" min="1" max="5000" step="1" value="200" data-name="n₁">
+ <input type="range" id="qx2" min="0" max="5000" step="1" value="40" data-name="x₂">
+ <input type="range" id="qn2" min="1" max="5000" step="1" value="200" data-name="n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="qplot"></div>
+ <div class="card res key" id="qsum"></div>
+</div>
+
+<div id="m-ratio" class="mode">
+ <p class="mut" style="margin:0">2つの母分散の比 σ₁²÷σ₂² の区間。R＝s₁²÷s₂² を F(n₁−1, n₂−1) の上側の点で割ったもの〜下側の点で割ったもの。区間が1を含めば「ばらつきが違うとは言えない」。</p>
+ <input type="range" id="rs1" min="0.1" max="2000" step="0.1" value="18" data-name="s₁²">
+ <input type="range" id="rn1" min="2" max="200" step="1" value="11" data-name="n₁">
+ <input type="range" id="rs2" min="0.1" max="2000" step="0.1" value="9" data-name="s₂²">
+ <input type="range" id="rn2" min="2" max="200" step="1" value="13" data-name="n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="rplot"></div>
+ <div class="card res key" id="rsum"></div>
+</div>
+
+<div id="m-corr" class="mode">
+ <p class="mut" style="margin:0">相関係数 ρ の区間（2変量正規・近似）。r をフィッシャーの z＝0.5 log((1＋r)÷(1−r)) に変換し、z ± 1.96÷√(n−3) を作ってから元に戻す。</p>
+ <input type="range" id="cr" min="-0.99" max="0.99" step="0.01" value="0.5" data-name="相関係数 r">
+ <input type="range" id="cn" min="4" max="2000" step="1" value="100" data-name="個数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,s=1/a,d=s;for(let n=0;n<1000;n++){ap++;d*=x/ap;s+=d;if(Math.abs(d)<Math.abs(s)*3e-15)break;}return s*Math.exp(-x+a*Math.log(x)-lgam(a));}
+ let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return 1-Math.exp(-x+a*Math.log(x)-lgam(a))*h;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+const chicdf=(q,df)=>gammp(df/2,q/2);
+const fcdf=(F,d1,d2)=>F<=0?0:ibeta(d1/2,d2/2,d1*F/(d1*F+d2));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const tq=(p,df)=>inv(t=>tcdf(t,df),p,0,1e3);
+const chiq=(p,df)=>inv(q=>chicdf(q,df),p,0,df+200*Math.sqrt(2*df)+100);
+const fq=(p,d1,d2)=>inv(F=>fcdf(F,d1,d2),p,0,1e4);
+const ZQ={"0.9":1.645,"0.95":1.96,"0.99":2.576};
+function bar(lo,hi,c,mark,label,ref){const H=96,L=16,R=W-16,span=(hi-lo)||1,a=Math.min(lo,ref!==undefined?ref:lo)-span*0.35,b=Math.max(hi,ref!==undefined?ref:hi)+span*0.35,X=x=>L+(x-a)/(b-a)*(R-L),y=40;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label)}">`;
+ if(ref!==undefined)s+=`<line x1="${X(ref)}" y1="12" x2="${X(ref)}" y2="${H-8}" stroke="var(--acc2)" stroke-dasharray="4 3"/><text x="${X(ref)}" y="${H-0}" font-size="10" text-anchor="middle" fill="var(--acc2)">${f(ref,2)}</text>`;
+ s+=`<line x1="${X(lo)}" y1="${y}" x2="${X(hi)}" y2="${y}" stroke="var(--acc)" stroke-width="6" stroke-linecap="round"/><circle cx="${X(c)}" cy="${y}" r="6" fill="var(--fg)"/>`;
+ s+=`<text x="${X(lo)}" y="${y-12}" font-size="11" text-anchor="middle" fill="var(--fg)">${f(lo,4)}</text><text x="${X(hi)}" y="${y-12}" font-size="11" text-anchor="middle" fill="var(--fg)">${f(hi,4)}</text><text x="${X(c)}" y="${y+18}" font-size="10.5" text-anchor="middle" fill="var(--fg)">${esc(mark)}</text>`;
+ return s+`</svg>`;}
+const inc=(lo,hi,v)=>lo<=v&&v<=hi;
+
+// ---- 母分散
+function vVals(){const level=$("vlevel").value,n=+$("vn").value,s2=+$("vs").value,a=1-(+level),df=n-1,ss=df*s2,qhi=chiq(1-a/2,df),qlo=chiq(a/2,df);
+ return {level:+level,n,s2,df,ss,qhi,qlo,lo:ss/qhi,hi:ss/qlo,sdLo:Math.sqrt(ss/qhi),sdHi:Math.sqrt(ss/qlo),ratio:qhi/qlo};}
+function vRender(){const V=vVals();
+ $("vplot").innerHTML=bar(V.lo,V.hi,V.s2,`s²＝${f(V.s2,2)}`,"母分散の信頼区間")+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>母分散の${V.level*100}%信頼区間</span><span>● s²（中心にない）</span></div>`;
+ $("vsum").innerHTML=`<div>(n−1)s²＝${V.df}×${f(V.s2,2)}＝<b>${f(V.ss)}</b>　χ²(${V.df}) の点：下 ${f(V.qlo,3)}・上 ${f(V.qhi,3)}</div><div>下限＝${f(V.ss)}÷${f(V.qhi,3)}＝<b>${f(V.lo)}</b>（大きい点で割る）　上限＝${f(V.ss)}÷${f(V.qlo,3)}＝<b>${f(V.hi)}</b>（小さい点で割る）</div><div>母標準偏差の区間（両端の平方根）：<b>${f(V.sdLo)}〜${f(V.sdHi)}</b></div><div class="mut">上限÷下限＝${f(V.ratio,2)}倍。n が小さいとばらつきの推定はとても不確か。</div>`;}
+LK.register("var",{name:"母分散",
+ init(){["vn","vs"].forEach(id=>LK.stepper($(id),vRender));$("vlevel").onchange=vRender;vRender();},
+ apply(s){if(s.level!==undefined)$("vlevel").value=String(s.level);if(s.n!==undefined)LK.setRange("vn",s.n);if(s.s2!==undefined)LK.setRange("vs",s.s2);vRender();},
+ render:vRender,
+ value(key){const V=vVals(),v=V[key];return {v,text:f(v)};}});
+
+// ---- 独立2群の平均の差
+function dVals(){const meth=$("dmeth").value,x1=+$("dx1").value,s1=+$("ds1").value,n1=+$("dn1").value,x2=+$("dx2").value,s2=+$("ds2").value,n2=+$("dn2").value,a=s1*s1/n1,b=s2*s2/n2;
+ const sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/(n1+n2-2),dfW=(a+b)**2/(a*a/(n1-1)+b*b/(n2-1)),seW=Math.sqrt(a+b),seP=Math.sqrt(sp2*(1/n1+1/n2));
+ const se=meth==="welch"?seW:seP,df=meth==="welch"?dfW:n1+n2-2,tc=tq(0.975,df),diff=x1-x2,m=tc*se;
+ return {method:meth,diff,se,df,tcrit:tc,margin:m,lo:diff-m,hi:diff+m,sp2,seW,seP,dfW,dfP:n1+n2-2,contains0:inc(diff-m,diff+m,0)?"0を含む":"0を含まない"};}
+function dRender(){const D=dVals();
+ $("dplot").innerHTML=bar(D.lo,D.hi,D.diff,`x̄₁−x̄₂＝${f(D.diff,2)}`,"平均の差の信頼区間",0)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>差の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>差0</span></div>`;
+ $("dsum").innerHTML=`<div>差 x̄₁−x̄₂＝<b>${f(D.diff)}</b></div><div>${D.method==="welch"?`ウェルチ：SE＝√(s₁²/n₁＋s₂²/n₂)＝<b>${f(D.se)}</b>、自由度≒<b>${f(D.df,2)}</b>`:`等分散：合わせた分散 s²＝${f(D.sp2)}、SE＝√(s²(1/n₁＋1/n₂))＝<b>${f(D.se)}</b>、自由度 <b>${D.df}</b>`}</div><div>t の0.975点＝${f(D.tcrit,3)}　誤差幅＝<b>${f(D.margin)}</b>　区間：<b>${f(D.lo)}〜${f(D.hi)}</b>（${D.contains0}）</div><div class="mut">もう一方の方法：${D.method==="welch"?`等分散なら SE ${f(D.seP)}・自由度 ${D.dfP}`:`ウェルチなら SE ${f(D.seW)}・自由度 ${f(D.dfW,2)}`}。区間が0を含めば「差があるとは言えない」。</div>`;}
+LK.register("diff",{name:"平均の差",
+ init(){["dx1","ds1","dn1","dx2","ds2","dn2"].forEach(id=>LK.stepper($(id),dRender));$("dmeth").onchange=dRender;dRender();},
+ apply(s){if(s.method)$("dmeth").value=s.method;const m={x1:"dx1",s1:"ds1",n1:"dn1",x2:"dx2",s2:"ds2",n2:"dn2"};for(const k in m)if(s[k]!==undefined)LK.setRange(m[k],s[k]);dRender();},
+ render:dRender,
+ value(key){const D=dVals(),v=D[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 対応あり
+function pVals(){const d=+$("pd").value,s=+$("ps").value,n=+$("pn").value,se=s/Math.sqrt(n),tc=tq(0.975,n-1),m=tc*se;
+ return {dbar:d,sd:s,n,se,df:n-1,tcrit:tc,margin:m,lo:d-m,hi:d+m,contains0:inc(d-m,d+m,0)?"0を含む":"0を含まない"};}
+function pRender(){const P=pVals();
+ $("pplot").innerHTML=bar(P.lo,P.hi,P.dbar,`D̄＝${f(P.dbar,2)}`,"差の平均の信頼区間",0)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>差の平均の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>差0</span></div>`;
+ $("psum").innerHTML=`<div>SE＝差の標準偏差÷√n＝${f(P.sd,2)}÷√${P.n}＝<b>${f(P.se)}</b>　自由度 ${P.df}</div><div>t(${P.df}) の0.975点＝${f(P.tcrit,3)}　誤差幅＝<b>${f(P.margin)}</b></div><div>区間：<b>${f(P.lo)}〜${f(P.hi)}</b>（${P.contains0}）</div><div class="mut">同じ店の前後を別々の2群として扱うと、店ごとの差（店の大きさなど）がばらつきに入り、区間が広くなりすぎる。</div>`;}
+LK.register("paired",{name:"対応あり",
+ init(){["pd","ps","pn"].forEach(id=>LK.stepper($(id),pRender));pRender();},
+ apply(s){if(s.dbar!==undefined)LK.setRange("pd",s.dbar);if(s.sd!==undefined)LK.setRange("ps",s.sd);if(s.n!==undefined)LK.setRange("pn",s.n);pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 比率の差
+function qVals(){const n1=+$("qn1").value,n2=+$("qn2").value,x1=Math.min(+$("qx1").value,n1),x2=Math.min(+$("qx2").value,n2),p1=x1/n1,p2=x2/n2,se=Math.sqrt(p1*(1-p1)/n1+p2*(1-p2)/n2),m=1.96*se,d=p1-p2;
+ return {x1,n1,x2,n2,p1,p2,diff:d,se,margin:m,lo:d-m,hi:d+m,contains0:inc(d-m,d+m,0)?"0を含む":"0を含まない"};}
+function qRender(){const Q=qVals();
+ $("qplot").innerHTML=bar(Q.lo,Q.hi,Q.diff,`p̂₁−p̂₂＝${f(Q.diff,4)}`,"比率の差の信頼区間",0)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>比率の差の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>差0</span></div>`;
+ $("qsum").innerHTML=`<div>p̂₁＝${Q.x1}÷${Q.n1}＝${f(Q.p1)}　p̂₂＝${Q.x2}÷${Q.n2}＝${f(Q.p2)}　差＝<b>${f(Q.diff)}</b></div><div>SE＝√(p̂₁(1−p̂₁)/n₁＋p̂₂(1−p̂₂)/n₂)＝<b>${f(Q.se)}</b>　誤差幅＝1.96×SE＝<b>${f(Q.margin)}</b></div><div>区間：<b>${f(Q.lo)}〜${f(Q.hi)}</b>（${Q.contains0}）</div><div class="mut">区間では各群の p̂ を使う。比率の差の検定で「差がない」と仮定して2群を合わせた比率を使うのとは別。</div>`;}
+LK.register("prop2",{name:"比率の差",
+ init(){["qx1","qn1","qx2","qn2"].forEach(id=>LK.stepper($(id),qRender));qRender();},
+ apply(s){if(s.n1!==undefined)LK.setRange("qn1",s.n1);if(s.n2!==undefined)LK.setRange("qn2",s.n2);if(s.x1!==undefined)LK.setRange("qx1",s.x1);if(s.x2!==undefined)LK.setRange("qx2",s.x2);qRender();},
+ render:qRender,
+ value(key){const Q=qVals(),v=Q[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 分散の比
+function rVals(){const s1=+$("rs1").value,n1=+$("rn1").value,s2=+$("rs2").value,n2=+$("rn2").value,R=s1/s2,d1=n1-1,d2=n2-1,fhi=fq(0.975,d1,d2),flo=fq(0.025,d1,d2);
+ return {R,d1,d2,fhi,flo,lo:R/fhi,hi:R/flo,contains1:inc(R/fhi,R/flo,1)?"1を含む":"1を含まない"};}
+function rRender(){const Rv=rVals();
+ $("rplot").innerHTML=bar(Rv.lo,Rv.hi,Rv.R,`R＝${f(Rv.R,3)}`,"分散の比の信頼区間",1)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>σ₁²÷σ₂² の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>比1（ばらつきが同じ）</span></div>`;
+ $("rsum").innerHTML=`<div>R＝s₁²÷s₂²＝<b>${f(Rv.R)}</b>　F(${Rv.d1}, ${Rv.d2}) の点：下 ${f(Rv.flo,4)}・上 ${f(Rv.fhi,3)}</div><div>下限＝R÷上の点＝<b>${f(Rv.lo)}</b>　上限＝R÷下の点＝<b>${f(Rv.hi)}</b>（${Rv.contains1}）</div><div class="mut">F の下側の点は 1÷F(${Rv.d2}, ${Rv.d1}) の上側の点（＝${f(1/fq(0.975,Rv.d2,Rv.d1),4)}）でも求められる。自由度の順に注意。</div>`;}
+LK.register("ratio",{name:"分散の比",
+ init(){["rs1","rn1","rs2","rn2"].forEach(id=>LK.stepper($(id),rRender));rRender();},
+ apply(s){const m={s1:"rs1",n1:"rn1",s2:"rs2",n2:"rn2"};for(const k in m)if(s[k]!==undefined)LK.setRange(m[k],s[k]);rRender();},
+ render:rRender,
+ value(key){const Rv=rVals(),v=Rv[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 相関係数
+function cVals(){const r=+$("cr").value,n=+$("cn").value,z=0.5*Math.log((1+r)/(1-r)),h=1.96/Math.sqrt(n-3);
+ return {r,n,zr:z,zlo:z-h,zhi:z+h,lo:Math.tanh(z-h),hi:Math.tanh(z+h),half:h};}
+function cRender(){const C=cVals();
+ $("cplot").innerHTML=bar(C.lo,C.hi,C.r,`r＝${f(C.r,2)}`,"相関係数の信頼区間",0)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>ρ の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>相関0</span></div>`;
+ $("csum").innerHTML=`<div>z＝0.5 log((1＋r)÷(1−r))＝<b>${f(C.zr)}</b>　±1.96÷√(n−3)＝±${f(C.half)}</div><div>z の区間：${f(C.zlo)}〜${f(C.zhi)} → 元に戻すと <b>${f(C.lo)}〜${f(C.hi)}</b></div><div class="mut">r の左右で区間の長さが違う（±1に近い側が短い）。r＝±1 ではこの変換は使えない。</div>`;}
+LK.register("corr",{name:"相関係数",
+ init(){["cr","cn"].forEach(id=>LK.stepper($(id),cRender));cRender();},
+ apply(s){if(s.r!==undefined)LK.setRange("cr",s.r);if(s.n!==undefined)LK.setRange("cn",s.n);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:f(v)};}});
+
+LK.start("var");
+window.__LAB__={LK,vVals,dVals,pVals,qVals,rVals,cVals,tq,chiq,fq};
+</script>
+</body></html>

@@ -221,3 +221,9 @@
 - id: TERM-conf-level
   name: 信頼係数
   en: confidence level
+- id: TERM-paired-t
+  name: 対応のある t 検定
+  en: paired t-test
+- id: TERM-welch
+  name: ウェルチの t 検定
+  en: Welch's t-test
