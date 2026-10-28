@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>標本平均ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.vals input{font-size:15px;min-height:40px;width:100%;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+</style></head><body>
+<h1>🧪 標本平均ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-se" class="mode">
+ <p class="mut" style="margin:0">1個ずつの値は平均 μ・標準偏差 σ でばらつく。n 個の平均 x̄ は、取り直すたびに μ のまわりで σ÷√n（標準誤差）ほどぶれる。</p>
+ <input type="range" id="sm" min="0" max="1000" step="1" value="50" data-name="平均 μ">
+ <input type="range" id="ss" min="0.5" max="2000" step="0.5" value="12" data-name="1個の σ">
+ <input type="range" id="sn" min="1" max="900" step="1" value="9" data-name="個数 n">
+ <div class="row ctl"><button type="button" class="sub" id="ssim">200回取り直す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+ <div class="res det" id="stab"></div>
+</div>
+
+<div id="m-prop" class="mode">
+ <p class="mut" style="margin:0">「買った＝1・買わない＝0」の平均が比率 p̂。p̂ も平均なので、ぶれは √(p(1−p)÷n)。</p>
+ <input type="range" id="pp" min="0.01" max="0.99" step="0.01" value="0.2" data-name="比率 p">
+ <input type="range" id="pn" min="1" max="3000" step="1" value="100" data-name="人数 n">
+ <input type="range" id="pe" min="0.005" max="0.2" step="0.005" value="0.02" data-name="目標の SE">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="pplot"></div>
+ <div class="card res key" id="psum"></div>
+</div>
+
+<div id="m-unb" class="mode">
+ <p class="mut" style="margin:0">小さな母集団から、戻しながら n 個取る標本を全部並べる。偏差の2乗和を n で割る分散 v は平均すると σ² より小さく、n−1 で割る不偏分散 s² は平均するとちょうど σ²。</p>
+ <div class="row ctl vals"><label style="flex:1">母集団の値 <input id="uv" value="1,3,5" inputmode="decimal" aria-label="母集団の値（カンマ区切り、2〜6個）"></label></div>
+ <input type="range" id="un" min="2" max="4" step="1" value="2" data-name="個数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="uplot"></div>
+ <div class="card res key" id="usum"></div>
+ <div class="res det" id="utab"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const dn=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+const gauss=()=>{const u=rnd()||1e-12,v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+
+// ---- 平均のぶれ
+let sims=null;
+function sVals(){const mu=+$("sm").value,sd=+$("ss").value,n=+$("sn").value,se=sd/Math.sqrt(n);
+ const out={mu,sd,n,se,var:se*se,popvar:sd*sd,sdsum:sd*Math.sqrt(n),varsum:n*sd*sd,ratio:1/Math.sqrt(n),se4:sd/Math.sqrt(4*n),in1:2*Phi(1)-1};
+ if(sims){const m=sims.reduce((a,b)=>a+b,0)/sims.length;out.simsd=Math.sqrt(sims.reduce((a,b)=>a+(b-m)**2,0)/(sims.length-1));out.simmean=m;}
+ return out;}
+function sRender(){const S=sVals(),lo=S.mu-4*S.sd,hi=S.mu+4*S.sd,H=170,L=12,R=W-12,base=H-34,top=18,N=200;
+ const X=x=>L+(x-lo)/(hi-lo)*(R-L),mx=dn(S.mu,S.mu,S.se),Y=y=>base-Math.min(1,y/mx)*(base-top);
+ const path=(s)=>{let p="";for(let i=0;i<=N;i++){const x=lo+(hi-lo)*i/N;p+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(dn(x,S.mu,s)).toFixed(1);}return p;};
+ const pop=dn(S.mu,S.mu,S.sd)/mx; // 母集団の曲線は高さを比べやすいよう縦に拡大して描く
+ const Yp=y=>base-y/dn(S.mu,S.mu,S.sd)*Math.max(0.28,pop)*(base-top);
+ let pp="";for(let i=0;i<=N;i++){const x=lo+(hi-lo)*i/N;pp+=(i?"L":"M")+X(x).toFixed(1)+" "+Yp(dn(x,S.mu,S.sd)).toFixed(1);}
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="1個の分布と平均の分布">`;
+ s+=`<path d="${pp}" fill="var(--mut)" fill-opacity=".12" stroke="var(--mut)" stroke-width="1.5"/>`;
+ if(sims){const bw=(hi-lo)/60,cnt={};sims.forEach(m=>{const k=Math.floor((m-lo)/bw);cnt[k]=(cnt[k]||0)+1;});const cm=Math.max(...Object.values(cnt));
+  Object.entries(cnt).forEach(([k,c])=>{const x0=lo+k*bw;if(x0<lo||x0>hi)return;const h=c/cm*(base-top)*0.9;s+=`<rect x="${X(x0)}" y="${base-h}" width="${Math.max(1,X(x0+bw)-X(x0)-0.5)}" height="${h}" fill="var(--acc2)" fill-opacity=".45"/>`;});}
+ s+=`<path d="${path(S.se)}" fill="none" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [-3,-2,-1,0,1,2,3].forEach(k=>{const x=S.mu+k*S.sd;s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${f(x,2)}</text>`;});
+ s+=`<line x1="${X(S.mu-S.se)}" y1="${base+20}" x2="${X(S.mu+S.se)}" y2="${base+20}" stroke="var(--acc)" stroke-width="3"/><text x="${X(S.mu)}" y="${base+32}" font-size="10" text-anchor="middle" fill="var(--acc)">±SE</text></svg>`;
+ $("splot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--mut);opacity:.3"></i>1個ずつの値（σ）</span><span><i class="sw" style="background:var(--acc)"></i>n 個の平均 x̄</span>${sims?`<span><i class="sw" style="background:var(--acc2);opacity:.5"></i>取り直した x̄</span>`:""}</div>`;
+ $("ssum").innerHTML=`<div>標準誤差 SE＝σ÷√n＝${f(S.sd,2)}÷√${S.n}＝<b>${f(S.se)}</b>　x̄ の分散＝σ²÷n＝<b>${f(S.var)}</b></div><div>x̄ の平均（期待値）＝μ＝${f(S.mu,2)}（n を変えても中心は動かない）</div><div>n 個の合計の標準偏差＝σ×√n＝${f(S.sdsum)}　n を4倍にすると SE は ${f(S.se4)}（半分）</div>${sims?`<div>200回取り直した x̄ の標準偏差＝<b>${f(S.simsd)}</b>（理論の SE ${f(S.se)} に近い）</div>`:""}<div class="mut">1個ずつのばらつき σ は n を増やしても変わらない。小さくなるのは平均のぶれ（SE）だけ。</div>`;
+ $("stab").innerHTML=`<table><tr><th>n</th><th>SE＝σ÷√n</th></tr>${[1,4,9,16,25,36,100,400].map(k=>`<tr><td>${k}</td><td>${f(S.sd/Math.sqrt(k))}</td></tr>`).join("")}</table>`;}
+LK.register("se",{name:"平均のぶれ",
+ init(){["sm","ss","sn"].forEach(id=>LK.stepper($(id),()=>{sims=null;sRender();}));
+  $("ssim").onclick=()=>{const S=sVals();seed=11;sims=[];for(let r=0;r<200;r++){let t=0;for(let i=0;i<S.n;i++)t+=S.mu+S.sd*gauss();sims.push(t/S.n);}sRender();};sRender();},
+ apply(s){if(s.mu!==undefined)LK.setRange("sm",s.mu);if(s.sd!==undefined)LK.setRange("ss",s.sd);if(s.n!==undefined)LK.setRange("sn",s.n);sims=null;sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:f(v)};}});
+
+// ---- 比率のぶれ
+function pVals(){const p=+$("pp").value,n=+$("pn").value,e=+$("pe").value,se=Math.sqrt(p*(1-p)/n);
+ return {p,n,e,se,var:se*se,margin:2*se,lo:p-2*se,hi:p+2*se,nFor:Math.ceil(p*(1-p)/(e*e)-1e-9),nWorst:Math.ceil(0.25/(e*e)-1e-9)};}
+function pRender(){const P=pVals(),H=150,L=14,R=W-14,base=H-30,top=16,N=200,X=x=>L+x*(R-L);
+ const sdx=Math.max(P.se,1e-4),mx=dn(P.p,P.p,sdx),Y=y=>base-Math.min(1,y/mx)*(base-top);
+ let p="";for(let i=0;i<=N;i++){const x=i/N;p+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(dn(x,P.p,sdx)).toFixed(1);}
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="比率のぶれ"><rect x="${X(Math.max(0,P.lo))}" y="${top}" width="${X(Math.min(1,P.hi))-X(Math.max(0,P.lo))}" height="${base-top}" fill="var(--acc2)" fill-opacity=".12"/><path d="${p}" fill="none" stroke="var(--acc)" stroke-width="2"/><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [0,0.2,0.4,0.6,0.8,1].forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x*100}%</text>`);
+ s+=`<line x1="${X(P.p)}" y1="${top-4}" x2="${X(P.p)}" y2="${base}" stroke="var(--fg)" stroke-dasharray="3 3"/></svg>`;
+ $("pplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>p̂ の散らばり</span><span><i class="sw" style="background:var(--acc2);opacity:.3"></i>p±2SE</span></div>`;
+ $("psum").innerHTML=`<div>SE(p̂)＝√(${f(P.p,2)}×${f(1-P.p,2)}÷${P.n})＝<b>${f(P.se)}</b>（${f(P.se*100,2)}ポイント）　分散＝${f(P.var,6)}</div><div>±2SE＝±${f(P.margin)}：p̂ はおよそ ${f(Math.max(0,P.lo)*100,1)}%〜${f(Math.min(1,P.hi)*100,1)}% に入る</div><div>SE を ${f(P.e,3)} 以下にする人数：p(1−p)÷SE²＝<b>${P.nFor}</b> 人（p が分からないときは p＝0.5 で ${P.nWorst} 人）</div><div class="mut">p(1−p) は p＝0.5 で最大。n を4倍にすると SE は半分。</div>`;}
+LK.register("prop",{name:"比率のぶれ",
+ init(){["pp","pn","pe"].forEach(id=>LK.stepper($(id),pRender));pRender();},
+ apply(s){if(s.p!==undefined)LK.setRange("pp",s.p);if(s.n!==undefined)LK.setRange("pn",s.n);if(s.e!==undefined)LK.setRange("pe",s.e);pRender();},
+ render:pRender,
+ value(key){const P=pVals(),v=P[key];return {v,text:key==="nFor"||key==="nWorst"?String(v):f(v)};}});
+
+// ---- 不偏分散
+function uParse(){return $("uv").value.split(/[,、，\s]+/).map(Number).filter(x=>isFinite(x)).slice(0,6);}
+function uVals(){const xs=uParse(),N=xs.length,n=+$("un").value;if(N<2)return {N,n,list:[],sigma2:NaN,meanV:NaN,meanS2:NaN,ratio:NaN,count:0};
+ const mu=xs.reduce((a,b)=>a+b,0)/N,sigma2=xs.reduce((a,b)=>a+(b-mu)**2,0)/N,list=[];
+ const rec=(c)=>{if(c.length===n){const m=c.reduce((a,b)=>a+b,0)/n,q=c.reduce((a,b)=>a+(b-m)**2,0);list.push({c:c.slice(),m,v:q/n,s2:q/(n-1)});return;}for(const x of xs){c.push(x);rec(c);c.pop();}};rec([]);
+ const K=list.length,meanV=list.reduce((a,o)=>a+o.v,0)/K,meanS2=list.reduce((a,o)=>a+o.s2,0)/K,meanM=list.reduce((a,o)=>a+o.m,0)/K;
+ return {N,n,xs,mu,list,count:K,sigma2,meanV,meanS2,meanM,ratio:meanV/sigma2,theory:(n-1)/n*sigma2,varM:list.reduce((a,o)=>a+(o.m-meanM)**2,0)/K};}
+function uRender(){const U=uVals();if(!U.count){$("uplot").innerHTML=`<div class="mut">値を2〜6個、カンマで区切って入れる。</div>`;$("usum").innerHTML="";$("utab").innerHTML="";return;}
+ const H=130,L=60,R=W-14,mx=Math.max(U.sigma2,U.meanS2,U.meanV)*1.15||1,X=v=>L+v/mx*(R-L);
+ const rows=[["σ²（母分散）",U.sigma2,"var(--fg)"],["v の平均（n で割る）",U.meanV,"var(--acc2)"],["s² の平均（n−1 で割る）",U.meanS2,"var(--acc)"]];
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="分散の平均の比較">`;
+ rows.forEach(([lab,v,c],i)=>{const y=14+i*38;s+=`<text x="${L-6}" y="${y+12}" font-size="10" text-anchor="end" fill="var(--fg)">${lab.split("（")[0]}</text><text x="${L-6}" y="${y+24}" font-size="9" text-anchor="end" fill="var(--mut)">${lab.includes("（")?"（"+lab.split("（")[1]:""}</text><rect x="${L}" y="${y}" width="${X(v)-L}" height="22" rx="4" fill="${c}" fill-opacity="${i?.6:.25}"/><text x="${X(v)+4}" y="${y+15}" font-size="11" fill="var(--fg)">${f(v,3)}</text>`;});
+ s+=`<line x1="${X(U.sigma2)}" y1="8" x2="${X(U.sigma2)}" y2="${H-4}" stroke="var(--fg)" stroke-dasharray="3 3"/></svg>`;
+ $("uplot").innerHTML=s;
+ $("usum").innerHTML=`<div>戻しながら ${U.n} 個取る標本は ${U.N}^${U.n}＝${U.count} 通り（どれも同じ確率）</div><div>母分散 σ²＝<b>${f(U.sigma2)}</b>　v（n で割る）の平均＝<b>${f(U.meanV)}</b>＝(n−1)/n×σ²　s²（n−1 で割る）の平均＝<b>${f(U.meanS2)}</b></div><div>x̄ の平均＝${f(U.meanM)}（＝μ）　x̄ の分散＝${f(U.varM)}（＝σ²÷n）</div><div class="mut">標本の中の偏差は x̄ から測るので、μ から測るより小さく出る。その分を n−1 で割って補うと、平均して σ² に当たる（不偏）。</div>`;
+ $("utab").innerHTML=`<table><tr><th>標本</th><th>x̄</th><th>v</th><th>s²</th></tr>${U.list.slice(0,40).map(o=>`<tr><td>${o.c.join("・")}</td><td>${f(o.m,3)}</td><td>${f(o.v,3)}</td><td>${f(o.s2,3)}</td></tr>`).join("")}</table>${U.count>40?`<div class="mut">（${U.count} 通りのうち最初の40通り）</div>`:""}`;}
+LK.register("unb",{name:"不偏分散",
+ init(){LK.stepper($("un"),uRender);$("uv").addEventListener("input",uRender);uRender();},
+ apply(s){if(s.vals!==undefined)$("uv").value=String(s.vals);if(s.n!==undefined)LK.setRange("un",s.n);uRender();},
+ render:uRender,
+ value(key){const U=uVals(),v=U[key];return {v,text:f(v)};}});
+
+LK.start("se");
+window.__LAB__={LK,sVals,pVals,uVals};
+</script>
+</body></html>
