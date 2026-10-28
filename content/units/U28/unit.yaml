@@ -1,0 +1,42 @@
+id: U28
+number: "28"
+title: 共分散・相関係数と散布図
+domain: D7
+reference_section: ⑦ 相関・回帰
+prev: U27
+next: U29
+prereq: [U07, U13]
+used_by: [U29, U30, U32]
+terms: [TERM-scatter, TERM-dev, TERM-cov, TERM-corr, TERM-partial-corr, TERM-spurious]
+labs: [LAB-corr]
+goal: 散布図を平均の十字で4つに分けて偏差の積の符号を読み、共分散と相関係数を計算し、単位・外れ値・層・範囲・共通の原因で r がどう変わるかを、点を動かして確かめながら説明できる。
+stage_goals:
+  S1: 「右上と左下に点が多いと r は正。なぜなら〜」「r＝0 でも関係がないとは言えない。なぜなら〜」を自分の言葉で言えれば完了。
+  S2: 資料を見ずに、共分散と相関係数を計算し、単位を変えたときの変化を言える。間違えた所だけ初学に戻る。
+  S3: 問題文に「擬相関」とは書いていない。**散布図の形を確かめ、r を計算し、外れ値・層・範囲・共通の原因を疑い、因果と書かずに結論を書く**。
+  S4: 広告費と売上・客数と客単価・気温と売上のように、場面が違っても「散布図 → r → 落とし穴を確かめる」形は同じ。
+  S5: 統計検定の枠の外。偏相関の読み方、相関行列、順位の相関から、相関という1つの数で何が消えるかを考える。興味のあるものを1つ選べばよい。
+  S6: 統計検定の枠の外。要因の混ざったデータから自分で問いを立てて動かし、**統計で言えること**と**自分の解釈**を分けて書く。答えは1つではない。
+evidence:
+  S1: 例題の共分散と r を計算し、点を動かして r の変わり方を説明できた
+  S2: 翌日・1週間後・1か月後に見ずに解けた
+  S3: 外れ値・層・範囲・偏相関を判断し、因果と区別して書けた
+  S4: 売場の2つの指標の関係を、散布図と r で報告できた
+  S5: 1つ選んで理解を確かめた（任意）
+  S6: 課題を1つ作り、検証まで行った（任意）
+status: drafted
+version: 1
+checks:
+  # 前提チェック
+  - '10/4 == 2.5 and abs(math.sqrt(2.5) - 1.58) < 0.005'
+  # 例題A
+  - '15/5 == 3 and 25/5 == 5 and (-2)*(-2)+(-1)*0+0*(-1)+1*1+2*2 == 9 and 9/4 == 2.25 and 4+1+0+1+4 == 10 and abs(9/math.sqrt(10*10) - 0.9) < 1e-12'
+  # 実験（5週目の y を 1・4・7・8 に）
+  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,5),(3,4),(4,6),(5,1)]) + 0.25) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,5),(3,4),(4,6),(5,4)]) - 0.42) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,5),(3,4),(4,6),(5,8)]) - 0.90) < 0.005'
+  - '(3+5+4+6+1)/5 == 3.8 and abs(2*(1-3.8) + 5.6) < 1e-9 and abs((-2)*(3-3.8)+(-1)*(5-3.8)+0+1*(6-3.8) - 2.6) < 1e-9 and abs(2.6-5.6 + 3.0) < 1e-9'
+  # 復習の図
+  - '(1-3)*(3-5) == 4 and (4-3)*(6-5) == 1 and (5-3)*(7-5) == 4 and 4+1+4 == 9'
+  # 転用の読み取り
+  - 'abs(-18000/math.sqrt(6800*57000) + 0.91) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,15),(2,8),(3,16),(4,24),(5,17),(6,25),(7,18),(8,26),(9,34),(10,27),(11,35),(12,31)]) - 0.86) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(8,26),(9,34),(10,27),(11,35),(12,31)]) - 0.43) < 0.005'
+  # 発展
+  - 'abs(0.5*math.sqrt(18)/math.sqrt(0.75) - 2.45) < 0.005 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.101,18) - 0.975) < 0.0005'
