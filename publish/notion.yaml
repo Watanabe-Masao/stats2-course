@@ -27,6 +27,7 @@ units:                 # 新しく生成した単元ページ
   U20: 407b7cd539a1811c8b0fcd00ed6a62aa
   U21: 407b7cd539a18106b24add07e5c597cd
   U22: 407b7cd539a181dc8a86f05216658645
+  U23: 407b7cd539a1813888e2da7bd36a139c
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
@@ -90,6 +91,7 @@ refs:
   REF-Q-U20: 402b7cd539a18173bd10e8e6fa647b01
   REF-Q-U21: 402b7cd539a181b7bbc4de3a5dbb8016
   REF-Q-U22: 402b7cd539a181bf8a29c583add7bfff
+  REF-Q-U23: 402b7cd539a1814085e8d6f8de8e0bbb
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -161,6 +163,8 @@ terms:
   TERM-mse: 405b7cd539a1817a9882f45d74873e13
   TERM-ci: 405b7cd539a181c89cedd0d0ad15baac
   TERM-conf-level: 405b7cd539a181c598f9db2023f3fdcc
+  TERM-paired-t: 405b7cd539a1816f9567f57ba1dec92b
+  TERM-welch: 405b7cd539a18155a37fcf9c07655085
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143
