@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>標準化ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+</style></head><body>
+<h1>🧪 標準化ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-z" class="mode">
+ <p class="mut" style="margin:0">平均もばらつきも違う2つの集団の値を、z＝(値−平均)÷標準偏差 で同じ物差しに乗せる。σ＝標準偏差。</p>
+ <input type="range" id="zma" min="0" max="300" step="1" value="50" data-name="Aの平均">
+ <input type="range" id="zsa" min="1" max="60" step="1" value="10" data-name="Aの σ">
+ <input type="range" id="zxa" min="0" max="400" step="1" value="70" data-name="Aの値">
+ <input type="range" id="zmb" min="0" max="300" step="1" value="80" data-name="Bの平均">
+ <input type="range" id="zsb" min="1" max="60" step="1" value="5" data-name="Bの σ">
+ <input type="range" id="zxb" min="0" max="400" step="1" value="90" data-name="Bの値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="zplot"></div>
+ <div class="card res key" id="zsum"></div>
+ <div id="zform"></div>
+</div>
+
+<div id="m-inv" class="mode">
+ <p class="mut" style="margin:0">z得点から元の値に戻す：x＝平均＋z×標準偏差。偏差値は 50＋10×z（平均50・標準偏差10にそろえた値）。</p>
+ <input type="range" id="im" min="0" max="200" step="1" value="30" data-name="平均">
+ <input type="range" id="is" min="1" max="50" step="1" value="6" data-name="標準偏差">
+ <input type="range" id="iz" min="-3" max="3" step="0.1" value="-1.5" data-name="z得点">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="iplot"></div>
+ <div class="card res key" id="isum"></div>
+</div>
+
+<div id="m-skew" class="mode">
+ <p class="mut" style="margin:0">裾の向きを変えると歪度の符号が変わる。標準化（平均0・標準偏差1）しても、目盛りが変わるだけで形は変わらない。</p>
+ <input type="range" id="ksk" min="-10" max="10" step="1" value="6" data-name="裾の向き">
+ <div class="row ctl"><label><input type="checkbox" id="kstd"> 標準化した目盛りで見る</label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="kplot"></div>
+ <div class="card res key" id="ksum"></div>
+</div>
+
+<div id="m-fence" class="mode">
+ <p class="mut" style="margin:0">箱ひげ図の柵：Q₁−1.5×IQR より小さいか、Q₃＋1.5×IQR より大きい値を外れ値候補とする。候補になっても、削除する前に原因を確かめる。</p>
+ <input type="range" id="fq1" min="0" max="100" step="1" value="10" data-name="Q₁">
+ <input type="range" id="fq3" min="0" max="100" step="1" value="14" data-name="Q₃">
+ <input type="range" id="fx" min="0" max="120" step="1" value="21" data-name="調べる値">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="fplot"></div>
+ <div class="card res key" id="fsum"></div>
+</div>
+
+<div id="m-normal" class="mode">
+ <p class="mut" style="margin:0">分布が正規分布に近いとき、z得点から「その値以上・以下になる割合」が分かる（標準正規分布）。</p>
+ <input type="range" id="nz" min="-3.5" max="3.5" step="0.05" value="2" data-name="z">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="nplot"></div>
+ <div class="card res key" id="nsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const W=340;
+const r2=v=>+v.toFixed(2);
+// ---- 標準正規分布（誤差関数の近似。誤差 1.5×10⁻⁷ 以下）
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const pdf=z=>Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+let names={A:"A",B:"B"};
+
+// ---- 2つの集団を比べる
+function zVals(){const mA=+$("zma").value,sA=+$("zsa").value,xA=+$("zxa").value,mB=+$("zmb").value,sB=+$("zsb").value,xB=+$("zxb").value;return {mA,sA,xA,mB,sB,xB,zA:(xA-mA)/sA,zB:(xB-mB)/sB};}
+function line1(m,s,x,y,col,name){const lo=m-3.5*s,hi=m+3.5*s,X=v=>20+(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*(W-40);let s1=`<text x="6" y="${y-16}" font-size="11" fill="var(--mut)">${esc(name)}（元の単位）</text><line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="var(--line)"/>`;
+ for(let k=-3;k<=3;k++){const v=m+k*s;s1+=`<line x1="${X(v)}" y1="${y-4}" x2="${X(v)}" y2="${y+4}" stroke="var(--mut)"/><text x="${X(v)}" y="${y+15}" font-size="9" text-anchor="middle" fill="var(--mut)">${f(r2(v))}</text>`;}
+ s1+=`<circle cx="${X(x)}" cy="${y}" r="6" fill="${col}"/>`;return s1;}
+function zRender(){const Z=zVals(),H=210,X=z=>20+(Math.max(-3.5,Math.min(3.5,z))+3.5)/7*(W-40);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="z得点で比べる">`+line1(Z.mA,Z.sA,Z.xA,34,"var(--acc)",names.A)+line1(Z.mB,Z.sB,Z.xB,94,"var(--acc2)",names.B);
+ s+=`<text x="6" y="140" font-size="11" fill="var(--fg)" font-weight="700">z得点（同じ物差し）</text><line x1="20" y1="166" x2="${W-20}" y2="166" stroke="var(--fg)"/>`;
+ for(let k=-3;k<=3;k++)s+=`<line x1="${X(k)}" y1="162" x2="${X(k)}" y2="170" stroke="var(--fg)"/><text x="${X(k)}" y="184" font-size="10" text-anchor="middle" fill="var(--mut)">${k}</text>`;
+ s+=`<circle cx="${X(Z.zA)}" cy="160" r="6" fill="var(--acc)"/><circle cx="${X(Z.zB)}" cy="172" r="6" fill="var(--acc2)"/>`;
+ $("zplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>${esc(names.A)}</span><span><i class="sw" style="background:var(--acc2)"></i>${esc(names.B)}</span><span>目盛り＝平均±標準偏差の1〜3つ分</span></div>`;
+ const b=zBetter(Z);
+ $("zsum").innerHTML=`<div>${esc(names.A)}：z＝<b>${f(r2(Z.zA))}</b>　${esc(names.B)}：z＝<b>${f(r2(Z.zB))}</b></div><div class="mut">差（値−平均）は ${esc(names.A)} ${f(r2(Z.xA-Z.mA))}、${esc(names.B)} ${f(r2(Z.xB-Z.mB))}。標準偏差で割ると、${b==="同じ"?"集団の中での位置は同じ":`集団の中で上にあるのは ${esc(b)}`}。</div>`;
+ $("zform").innerHTML=LK.formula([`${names.A}：(${Z.xA}−${Z.mA})÷${Z.sA}＝${f(r2(Z.zA))}`,`${names.B}：(${Z.xB}−${Z.mB})÷${Z.sB}＝${f(r2(Z.zB))}`]);}
+function zBetter(Z){return Math.abs(Z.zA-Z.zB)<1e-9?"同じ":Z.zA>Z.zB?names.A:names.B;}
+LK.register("z",{name:"z得点で比べる",
+ init(){["zma","zsa","zxa","zmb","zsb","zxb"].forEach(id=>LK.stepper($(id),zRender));zRender();},
+ apply(s){if(s.nameA)names.A=s.nameA;if(s.nameB)names.B=s.nameB;
+  document.querySelectorAll("#m-z .lk-name").forEach(e=>{e.textContent=e.textContent.replace(/^[AB]の/,m=>(m[0]==="A"?names.A:names.B)+"の");});
+  [["mA","zma"],["sA","zsa"],["xA","zxa"],["mB","zmb"],["sB","zsb"],["xB","zxb"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});zRender();},
+ render:zRender,
+ value(key){const Z=zVals();if(key==="better"){const t=zBetter(Z);return {v:Z.zA-Z.zB,text:t};}
+  if(key==="rare"){const t=Math.abs(Math.abs(Z.zA)-Math.abs(Z.zB))<1e-9?"同じ":Math.abs(Z.zA)>Math.abs(Z.zB)?names.A:names.B;return {v:Math.abs(Z.zA)-Math.abs(Z.zB),text:t};}
+  const v=key==="zB"?Z.zB:Z.zA;return {v,text:f(r2(v))};}});
+
+// ---- z から値へ・偏差値
+function iVals(){const m=+$("im").value,s=+$("is").value,z=+$("iz").value;return {m,s,z,x:m+z*s,dev:50+10*z};}
+function iRender(){const I=iVals(),H=120,X=z=>20+(z+3.5)/7*(W-40);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="z と値"><path d="M${Array.from({length:71},(_,i)=>{const z=-3.5+i*0.1;return `${X(z).toFixed(1)} ${(80-pdf(z)*150).toFixed(1)}`;}).join(" L")}" fill="none" stroke="var(--mut)" stroke-width="1.5"/>`;
+ s+=`<line x1="20" y1="80" x2="${W-20}" y2="80" stroke="var(--line)"/>`;
+ for(let k=-3;k<=3;k++)s+=`<text x="${X(k)}" y="95" font-size="10" text-anchor="middle" fill="var(--mut)">${f(r2(I.m+k*I.s))}</text><text x="${X(k)}" y="110" font-size="9" text-anchor="middle" fill="var(--mut)">z=${k}</text>`;
+ s+=`<line x1="${X(I.z)}" y1="10" x2="${X(I.z)}" y2="80" stroke="var(--acc)" stroke-width="2.5"/><text x="${Math.min(W-30,Math.max(30,X(I.z)))}" y="10" font-size="11" text-anchor="middle" fill="var(--acc)" font-weight="700">${f(r2(I.x))}</text>`;
+ $("iplot").innerHTML=s+"</svg>";
+ $("isum").innerHTML=`<div>x＝${I.m}＋(${f(I.z)})×${I.s}＝<b>${f(r2(I.x))}</b>　偏差値＝50＋10×(${f(I.z)})＝<b>${f(r2(I.dev))}</b></div><div class="mut">z が負なら平均より下。偏差値は z を「平均50・標準偏差10」の目盛りに直したもの。</div>`;}
+LK.register("inv",{name:"z から値へ",
+ init(){["im","is","iz"].forEach(id=>LK.stepper($(id),iRender));iRender();},
+ apply(s){[["m","im"],["s","is"],["z","iz"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});iRender();},
+ render:iRender,
+ value(key){const I=iVals(),v=key==="dev"?I.dev:I.x;return {v,text:f(r2(v))};}});
+
+// ---- 歪度・尖度（0〜20 の目盛りに200人）
+function kCounts(k){const a=4*Math.exp(-0.13*k),b=4*Math.exp(0.13*k),p=Array.from({length:21},(_,i)=>Math.pow((i+0.5)/21,a-1)*Math.pow(1-(i+0.5)/21,b-1)),t=p.reduce((x,y)=>x+y,0);return p.map(x=>Math.round(200*x/t));}
+function moments(c){const n=c.reduce((a,b)=>a+b,0),m=c.reduce((a,x,i)=>a+x*i,0)/n;let m2=0,m3=0,m4=0;c.forEach((x,i)=>{const d=i-m;m2+=x*d*d;m3+=x*d**3;m4+=x*d**4;});m2/=n;m3/=n;m4/=n;return {n,m,sd:Math.sqrt(m2),g1:m3/m2**1.5,g2:m4/m2**2};}
+function kVals(){const k=+$("ksk").value,c=kCounts(k);return {k,c,...moments(c),std:$("kstd").checked};}
+const sgn=g=>Math.abs(g)<0.05?"ほぼ0":g>0?"正":"負";
+function kRender(){const K=kVals(),H=150,mx=Math.max(...K.c),bw=(W-30)/21;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="分布と歪度"><line x1="12" y1="${H-24}" x2="${W-12}" y2="${H-24}" stroke="var(--line)"/>`;
+ K.c.forEach((c,i)=>{const h=c/mx*(H-50);s+=`<rect x="${15+i*bw+1}" y="${H-24-h}" width="${bw-2}" height="${h}" fill="var(--acc)" fill-opacity=".45"/>`;});
+ const X=v=>15+(v+0.5)*bw;
+ s+=`<line x1="${X(K.m)}" y1="10" x2="${X(K.m)}" y2="${H-24}" stroke="var(--acc2)" stroke-width="2"/>`;
+ [0,5,10,15,20].forEach(t=>{const lab=K.std?f(r2((t-K.m)/K.sd)):t;s+=`<text x="${X(t)}" y="${H-8}" font-size="10" text-anchor="middle" fill="var(--mut)">${lab}</text>`;});
+ $("kplot").innerHTML=s+`</svg><div class="mut">${K.std?"目盛り＝z得点（平均0・標準偏差1）。形は同じ。":"目盛り＝元の値（0〜20）。"}縦線＝平均</div>`;
+ $("ksum").innerHTML=`<div>歪度 g₁＝<b>${f(r2(K.g1))}</b>（${sgn(K.g1)}）　尖度 g₂＝<b>${f(r2(K.g2))}</b>（超過尖度 ${f(r2(K.g2-3))}）</div><div class="mut">右に裾が長いと歪度は正、左なら負。標準化しても g₁・g₂ は変わらない（形の数だから）。</div>`;}
+LK.register("skew",{name:"歪度・尖度",
+ init(){LK.stepper($("ksk"),kRender);$("kstd").onchange=kRender;kRender();},
+ apply(s){if(s.skew!==undefined)LK.setRange("ksk",s.skew);if(s.std!==undefined)$("kstd").checked=!!s.std;kRender();},
+ render:kRender,
+ value(key){const K=kVals();if(key==="g1sign")return {v:K.g1,text:sgn(K.g1)};const v=key==="g2"?K.g2:K.g1;return {v,text:f(r2(v))};}});
+
+// ---- 外れ値の柵
+function fVals(){let q1=+$("fq1").value,q3=+$("fq3").value;if(q3<q1)q3=q1;const x=+$("fx").value,iqr=q3-q1,lo=q1-1.5*iqr,hi=q3+1.5*iqr;return {q1,q3,x,iqr,lo,hi,out:x<lo||x>hi};}
+function fRender(){const F=fVals(),lo=Math.min(F.lo,F.x,F.q1)-2,hi=Math.max(F.hi,F.x,F.q3)+2,X=v=>20+(v-lo)/(hi-lo)*(W-40),H=110,y=50;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="外れ値の柵"><line x1="20" y1="${y+30}" x2="${W-20}" y2="${y+30}" stroke="var(--line)"/>`;
+ s+=`<rect x="${X(F.q1)}" y="${y-12}" width="${Math.max(1,X(F.q3)-X(F.q1))}" height="24" fill="var(--acc)" fill-opacity=".18" stroke="var(--acc)" stroke-width="2" rx="3"/>`;
+ [F.lo,F.hi].forEach(v=>{s+=`<line x1="${X(v)}" y1="${y-24}" x2="${X(v)}" y2="${y+24}" stroke="var(--ng)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${X(v)}" y="${y-28}" font-size="10" text-anchor="middle" fill="var(--ng)">柵 ${f(r2(v))}</text>`;});
+ s+=`<circle cx="${X(F.x)}" cy="${y}" r="6" fill="${F.out?"var(--ng)":"var(--fg)"}"/><text x="${X(F.x)}" y="${y+45}" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${F.x}</text>`;
+ [[F.q1,"Q₁"],[F.q3,"Q₃"]].forEach(([v,t])=>{s+=`<text x="${X(v)}" y="${y+45}" font-size="10" text-anchor="middle" fill="var(--mut)">${t} ${v}</text>`;});
+ $("fplot").innerHTML=s+"</svg>";
+ $("fsum").innerHTML=`<div>IQR＝${F.q3}−${F.q1}＝${F.iqr}、柵＝${F.q1}−1.5×${F.iqr}＝<b>${f(r2(F.lo))}</b> と ${F.q3}＋1.5×${F.iqr}＝<b>${f(r2(F.hi))}</b></div><div>${F.x} は <b>${F.out?"外れ値候補":"柵の内側"}</b></div><div class="mut">外れ値候補は「原因を調べる合図」。入力ミス・別の条件・本当にまれな出来事のどれかを確かめてから扱う。</div>`;}
+LK.register("fence",{name:"外れ値の柵",
+ init(){["fq1","fq3","fx"].forEach(id=>LK.stepper($(id),fRender));fRender();},
+ apply(s){[["q1","fq1"],["q3","fq3"],["x","fx"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});fRender();},
+ render:fRender,
+ value(key){const F=fVals();if(key==="isOut")return {v:F.out?1:0,text:F.out?"はい":"いいえ"};const v=key==="lo"?F.lo:F.hi;return {v,text:f(r2(v))};}});
+
+// ---- 正規分布の割合
+function nVals(){const z=+$("nz").value,az=Math.abs(z);return {z,up:(1-Phi(z))*100,down:Phi(z)*100,inn:(2*Phi(az)-1)*100,out:2*(1-Phi(az))*100};}
+function nRender(){const N=nVals(),H=140,X=z=>20+(z+3.8)/7.6*(W-40),Y=p=>H-26-p*250;
+ let area=`M${X(N.z)} ${Y(0)}`;for(let z=N.z;z<=3.8;z+=0.05)area+=` L${X(z).toFixed(1)} ${Y(pdf(z)).toFixed(1)}`;area+=` L${X(3.8)} ${Y(0)} Z`;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="標準正規分布"><path d="${area}" fill="var(--acc2)" fill-opacity=".35"/>`;
+ s+=`<path d="M${Array.from({length:77},(_,i)=>{const z=-3.8+i*0.1;return `${X(z).toFixed(1)} ${Y(pdf(z)).toFixed(1)}`;}).join(" L")}" fill="none" stroke="var(--fg)" stroke-width="1.8"/>`;
+ s+=`<line x1="20" y1="${Y(0)}" x2="${W-20}" y2="${Y(0)}" stroke="var(--line)"/>`;
+ for(let k=-3;k<=3;k++)s+=`<text x="${X(k)}" y="${H-10}" font-size="10" text-anchor="middle" fill="var(--mut)">${k}</text>`;
+ s+=`<line x1="${X(N.z)}" y1="${Y(0.42)}" x2="${X(N.z)}" y2="${Y(0)}" stroke="var(--acc2)" stroke-width="2"/>`;
+ $("nplot").innerHTML=s+`</svg><div class="mut">色の部分＝z 以上になる割合</div>`;
+ const once=N.up>0?Math.round(100/N.up):"—";
+ $("nsum").innerHTML=`<div>z≧${f(N.z)}：<b>${f(+N.up.toFixed(3))}%</b>（約${once}回に1回）　z≦${f(N.z)}：<b>${f(+N.down.toFixed(3))}%</b></div><div>|z|≦${f(Math.abs(N.z))}：<b>${f(+N.inn.toFixed(2))}%</b>　|z|＞${f(Math.abs(N.z))}：<b>${f(+N.out.toFixed(2))}%</b></div><div class="mut">正規分布に近いときだけ使える。歪んだ分布では、同じ z でも割合は違う。</div>`;}
+LK.register("normal",{name:"正規分布の割合",
+ init(){LK.stepper($("nz"),nRender);nRender();},
+ apply(s){if(s.z!==undefined)LK.setRange("nz",s.z);nRender();},
+ render:nRender,
+ value(key){const N=nVals(),v={pUp:N.up,pDown:N.down,pIn:N.inn,pOut:N.out}[key];return {v,text:f(+v.toFixed(3))+"%"};}});
+
+LK.start("z");
+window.__LAB__={LK,Phi,zVals,iVals,kVals,kCounts,moments,fVals,nVals};
+</script>
+</body></html>
