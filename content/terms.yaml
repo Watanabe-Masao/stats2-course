@@ -176,3 +176,6 @@
 - id: TERM-sampdist
   name: 標本分布
   en: sampling distribution
+- id: TERM-se
+  name: 標準誤差
+  en: standard error
