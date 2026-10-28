@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>確率ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.die{display:flex;gap:6px;justify-content:center;margin:8px 0}
+.die div{width:46px;height:46px;border-radius:9px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;background:var(--card);position:relative}
+.die .a{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 22%,var(--card))}
+.die .b{border-color:var(--acc2);background:color-mix(in srgb,var(--acc2) 22%,var(--card))}
+.die .ab{border-color:var(--fg);background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--acc) 35%,var(--card)) 0 6px,color-mix(in srgb,var(--acc2) 35%,var(--card)) 6px 12px)}
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+#m-bayes .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 確率ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-dice" class="mode">
+ <p class="mut" style="margin:0">サイコロ1回。事象 A と B を選ぶと、6つの目のうちどれが入るかが色で出る。「または」は重なりを1回だけ数える。</p>
+ <div class="row ctl"><label>A <select id="da" data-key="a"></select></label><label>B <select id="db" data-key="b"></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+</div>
+
+<div id="m-area" class="mode">
+ <p class="mut" style="margin:0">P(A)・P(B)・P(A∩B) を決めると、全体（100%）が「Aだけ」「両方」「Bだけ」「どちらでもない」に分かれる。</p>
+ <input type="range" id="ra" min="0" max="100" step="1" value="50" data-name="P(A)" data-unit="%">
+ <input type="range" id="rb" min="0" max="100" step="1" value="40" data-name="P(B)" data-unit="%">
+ <input type="range" id="rab" min="0" max="100" step="1" value="20" data-name="P(A∩B)" data-unit="%">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="rplot"></div>
+ <div class="card res key" id="rsum"></div>
+</div>
+
+<div id="m-atleast" class="mode">
+ <p class="mut" style="margin:0">1回で起きる確率 p の試行を n 回くり返す（毎回の結果は互いに影響しない）。「少なくとも1回」は 1−(1回も起きない確率)。</p>
+ <input type="range" id="ta" min="1" max="9" step="1" value="1" data-name="p の分子">
+ <input type="range" id="tb" min="2" max="10" step="1" value="6" data-name="p の分母">
+ <input type="range" id="tn" min="1" max="10" step="1" value="2" data-name="回数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<div id="m-urn" class="mode">
+ <p class="mut" style="margin:0">赤玉と青玉の袋から2回引く。樹形図の枝の確率を掛けると、その道すじの確率。戻さないと2回目の確率が1回目の結果で変わる。</p>
+ <input type="range" id="ur" min="1" max="10" step="1" value="2" data-name="赤玉">
+ <input type="range" id="ub" min="1" max="10" step="1" value="3" data-name="青玉">
+ <div class="row ctl"><label>1回目の玉を <select id="urep" data-key="rep"><option value="なし">戻さない</option><option value="あり">戻す</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="uplot"></div>
+ <div class="card res key" id="usum"></div>
+</div>
+
+<div id="m-table" class="mode">
+ <p class="mut" style="margin:0">2つの見方で人数を数えた表（クロス集計）。「〇〇の中で」の〇〇が分母。条件で割合が変わらなければ独立。</p>
+ <div class="row ctl mut" style="font-size:13px">A＝<b id="tnA" style="color:var(--fg)">A</b>　B＝<b id="tnB" style="color:var(--fg)">B</b>（人数）</div>
+ <input type="range" id="xa" min="0" max="500" step="1" value="12" data-name="両方">
+ <input type="range" id="xb" min="0" max="500" step="1" value="28" data-name="Aだけ">
+ <input type="range" id="xc" min="0" max="500" step="1" value="6" data-name="Bだけ">
+ <input type="range" id="xd" min="0" max="500" step="1" value="54" data-name="どちらも×">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="xplot"></div>
+ <div class="card res key" id="xsum"></div>
+</div>
+
+<div id="m-bayes" class="mode">
+ <p class="mut" style="margin:0">1000個（人）で数える。元の割合・見つかる確率・誤って引っかかる確率から、引っかかったもののうち本当に当てはまる割合（事後確率）を出す。</p>
+ <div class="row ctl mut" style="font-size:13px">原因＝<b id="bn1" style="color:var(--fg)">不良</b>　結果＝<b id="bnE" style="color:var(--fg)">検出</b></div>
+ <input type="range" id="bp" min="0" max="100" step="0.5" value="2" data-name="元の割合" data-unit="%">
+ <input type="range" id="bs" min="0" max="100" step="0.5" value="90" data-name="該当→結果" data-unit="%">
+ <input type="range" id="bf" min="0" max="100" step="0.5" value="5" data-name="非該当→結果" data-unit="%">
+ <div class="row ctl"><label>同じ検査を <select id="bt" data-key="times"><option value="1">1回</option><option value="2">2回（どちらも結果あり）</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const frac=(a,b)=>{if(a===0)return "0";const g=gcd(a,b);return b/g===1?String(a/g):`${a/g}/${b/g}`;};
+const d3=v=>String(+v.toFixed(3)),pc=v=>String(+(v*100).toFixed(1))+"%";
+
+// ---- サイコロで A・B
+const EV={even:["偶数",[2,4,6]],odd:["奇数",[1,3,5]],ge4:["4以上",[4,5,6]],le3:["3以下",[1,2,3]],le2:["2以下",[1,2]],m3:["3の倍数",[3,6]],six:["6の目",[6]],one:["1の目",[1]],ge5:["5以上",[5,6]]};
+function dVals(){const A=EV[$("da").value][1],B=EV[$("db").value][1],inter=A.filter(x=>B.includes(x)),uni=[...new Set([...A,...B])].sort();
+ return {A,B,inter,uni,pa:A.length/6,pb:B.length/6,inter_p:inter.length/6,union:uni.length/6,none:1-uni.length/6,excl:inter.length===0?"はい":"いいえ"};}
+function dRender(){const D=dVals();
+ $("dplot").innerHTML=`<div class="die">${[1,2,3,4,5,6].map(k=>{const a=D.A.includes(k),b=D.B.includes(k);return `<div class="${a&&b?"ab":a?"a":b?"b":""}">${k}</div>`;}).join("")}</div><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>A だけ</span><span><i class="sw" style="background:var(--acc2)"></i>B だけ</span><span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--acc) 0 3px,var(--acc2) 3px 6px)"></i>両方（重なり）</span></div>`;
+ $("dsum").innerHTML=`<div>A＝{${D.A.join(",")}}、B＝{${D.B.join(",")}}、重なり A∩B＝{${D.inter.join(",")||"なし"}}</div><div>P(A∪B)＝${D.A.length}/6＋${D.B.length}/6−${D.inter.length}/6＝<b>${frac(D.uni.length,6)}</b>（≒${d3(D.union)}）</div><div class="mut">${D.inter.length?`重なり ${D.inter.length} 個を2回数えた分を1回引く。`:"重なりがない（排反）ので、そのまま足せる。"} どちらも起きない確率＝1−${frac(D.uni.length,6)}＝${frac(6-D.uni.length,6)}。</div>`;}
+LK.register("dice",{name:"サイコロで A・B",
+ init(){const opts=Object.entries(EV).map(([k,[n,s]])=>`<option value="${k}">${n} {${s.join(",")}}</option>`).join("");$("da").innerHTML=opts;$("db").innerHTML=opts;$("da").value="even";$("db").value="ge4";$("da").onchange=dRender;$("db").onchange=dRender;dRender();},
+ apply(s){if(s.a)$("da").value=s.a;if(s.b)$("db").value=s.b;dRender();},
+ render:dRender,
+ value(key){const D=dVals(),v={union:D.union,inter:D.inter_p,pa:D.pa,pb:D.pb,none:D.none,excl:D.excl}[key];return key==="excl"?{v,text:v}:{v,text:d3(v)};}});
+
+// ---- 確率を面積で
+function rVals(){let a=+$("ra").value,b=+$("rb").value,ab=+$("rab").value;const lo=Math.max(0,a+b-100),hi=Math.min(a,b);ab=Math.min(hi,Math.max(lo,ab));
+ const uni=a+b-ab;return {a,b,ab,lo,hi,union:uni,none:100-uni,aonly:a-ab,bonly:b-ab,one:a+b-2*ab,excl:ab===0?"はい":"いいえ",condBA:a?ab/a*100:NaN,condAB:b?ab/b*100:NaN,indep:Math.abs(ab*100-a*b)<1e-9?"はい":"いいえ"};}
+function rRender(){const R=rVals();if(+$("rab").value!==R.ab)LK.setRange("rab",R.ab);
+ const x=v=>10+v/100*(W-20),H=96;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="確率を面積で表した帯">`;
+ const seg=[[0,R.aonly,"var(--acc)","Aだけ"],[R.aonly,R.ab,"url(#hatch)","両方"],[R.a,R.bonly,"var(--acc2)","Bだけ"],[R.union,R.none,"var(--card)","どちらも×"]];
+ s+=`<defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="8" fill="var(--acc)"/><rect x="4" width="4" height="8" fill="var(--acc2)"/></pattern></defs>`;
+ seg.forEach(([st,w,c,t])=>{if(w<=0)return;s+=`<rect x="${x(st)}" y="14" width="${x(st+w)-x(st)}" height="34" fill="${c}" fill-opacity="${c.startsWith("var(--card")?1:.55}" stroke="var(--line)"/>`;if(w>=9)s+=`<text x="${(x(st)+x(st+w))/2}" y="35" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${w}%</text>`;});
+ s+=`<line x1="${x(0)}" y1="56" x2="${x(R.a)}" y2="56" stroke="var(--acc)" stroke-width="3"/><text x="${x(0)}" y="70" font-size="11" fill="var(--fg)">A ${R.a}%</text>`;
+ s+=`<line x1="${x(R.aonly)}" y1="78" x2="${x(R.aonly+R.b)}" y2="78" stroke="var(--acc2)" stroke-width="3"/><text x="${x(R.aonly)}" y="92" font-size="11" fill="var(--fg)">B ${R.b}%</text></svg>`;
+ $("rplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>Aだけ</span><span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--acc) 0 3px,var(--acc2) 3px 6px)"></i>両方</span><span><i class="sw" style="background:var(--acc2)"></i>Bだけ</span></div>`;
+ $("rsum").innerHTML=`<div>P(A∪B)＝${R.a}＋${R.b}−${R.ab}＝<b>${R.union}%</b>　どちらも起きない＝100−${R.union}＝<b>${R.none}%</b></div><div class="mut">P(A∩B) が取れる範囲は ${R.lo}〜${R.hi}%（両方の部分は A にも B にも入るので、どちらよりも大きくなれない。全体は100%を超えない）。${R.ab===0?"重なり0＝排反。":""}</div><div class="mut">P(B｜A)＝${R.ab}÷${R.a}＝${R.a?String(+(R.ab/R.a*100).toFixed(2))+"%":"—"}。P(A)×P(B)＝${String(+(R.a*R.b/100).toFixed(2))}%${R.indep==="はい"?"＝P(A∩B) なので独立。":"≠P(A∩B) なので独立ではない。"}</div>`;}
+LK.register("area",{name:"確率を面積で",
+ init(){["ra","rb","rab"].forEach(id=>LK.stepper($(id),rRender));rRender();},
+ apply(s){if(s.a!==undefined)LK.setRange("ra",s.a);if(s.b!==undefined)LK.setRange("rb",s.b);if(s.ab!==undefined)LK.setRange("rab",s.ab);rRender();},
+ render:rRender,
+ value(key){const R=rVals(),v=R[key];return key==="excl"||key==="indep"?{v,text:v}:{v,text:String(+(+v).toFixed(2))+"%"};}});
+
+// ---- 少なくとも1回
+function tVals(){let a=+$("ta").value,b=+$("tb").value;if(a>=b)a=b-1;const n=+$("tn").value,p=a/b,none=Math.pow(1-p,n);return {a,b,n,p,none,atleast:1-none,naive:n*p};}
+function tRender(){const T=tVals();if(+$("ta").value!==T.a)LK.setRange("ta",T.a);
+ const H=150,X=k=>34+(k-0.5)*(W-44)/T.n,Y=v=>H-22-Math.min(v,1.2)/1.2*(H-36),bw=Math.min(26,(W-44)/T.n*0.6);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="回数と少なくとも1回の確率"><line x1="30" y1="${Y(0)}" x2="${W-8}" y2="${Y(0)}" stroke="var(--line)"/><line x1="30" y1="${Y(1)}" x2="${W-8}" y2="${Y(1)}" stroke="var(--mut)" stroke-dasharray="4 4"/><text x="26" y="${Y(1)+4}" font-size="10" text-anchor="end" fill="var(--mut)">1</text><text x="26" y="${Y(0)+4}" font-size="10" text-anchor="end" fill="var(--mut)">0</text>`;
+ for(let k=1;k<=T.n;k++){const v=1-Math.pow(1-T.p,k),nv=k*T.p;s+=`<rect x="${X(k)-bw/2}" y="${Y(v)}" width="${bw}" height="${Y(0)-Y(v)}" rx="3" fill="var(--acc)" fill-opacity="${k===T.n?.85:.45}"/><circle cx="${X(k)}" cy="${Y(nv)}" r="3.5" fill="none" stroke="var(--acc2)" stroke-width="2"/><text x="${X(k)}" y="${H-8}" font-size="10" text-anchor="middle" fill="var(--mut)">${k}</text>`;}
+ s+=`</svg>`;
+ $("tplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>少なくとも1回（正しい）</span><span><i class="sw" style="border:2px solid var(--acc2)"></i>p×回数（誤り）</span></div>`;
+ const bn=T.b-T.a,num=Math.pow(T.b,T.n)-Math.pow(bn,T.n),den=Math.pow(T.b,T.n);
+ $("tsum").innerHTML=`<div>1回も起きない＝(${T.b-T.a}/${T.b})^${T.n}＝${frac(Math.pow(bn,T.n),den)}　→　少なくとも1回＝1−${frac(Math.pow(bn,T.n),den)}＝<b>${frac(num,den)}</b>（≒${d3(T.atleast)}）</div><div class="mut">${T.a}/${T.b}×${T.n}＝${d3(T.naive)} とすると、2回以上起きる場合を何度も数えてしまう${T.naive>1?"（1を超えて確率にならない）":""}。</div>`;}
+LK.register("atleast",{name:"少なくとも1回",
+ init(){["ta","tb","tn"].forEach(id=>LK.stepper($(id),tRender));tRender();},
+ apply(s){if(s.b!==undefined)LK.setRange("tb",s.b);if(s.a!==undefined)LK.setRange("ta",s.a);if(s.n!==undefined)LK.setRange("tn",s.n);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key];return {v,text:d3(v)};}});
+
+// ---- 袋から2回（樹形図）
+function uVals(){const r=+$("ur").value,b=+$("ub").value,rep=$("urep").value==="あり",n=r+b;
+ const p1r=r/n,p1b=b/n,prr=rep?r/n:(r-1)/(n-1),prb=1-prr,pbr=rep?r/n:r/(n-1),pbb=1-pbr;
+ const rr=p1r*prr,rb=p1r*prb,br=p1b*pbr,bb=p1b*pbb;
+ return {r,b,n,rep,p1r,prr,pbr,rr,rb,br,bb,cond:prr,both:rr,second:rr+br,indep:Math.abs(prr-pbr)<1e-12?"はい":"いいえ",
+  fr:{p1r:[r,n],p1b:[b,n],prr:rep?[r,n]:[r-1,n-1],prb:rep?[b,n]:[b,n-1],pbr:rep?[r,n]:[r,n-1],pbb:rep?[b,n]:[b-1,n-1]}};}
+function uRender(){const U=uVals(),F=U.fr,fs=a=>frac(a[0],a[1]),mul=(a,c)=>frac(a[0]*c[0],a[1]*c[1]);
+ const H=176,x0=16,x1=118,x2=226;const ys={r:44,b:132},leaf={rr:18,rb:66,br:110,bb:158};
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="樹形図">`;
+ const edge=(xa,ya,xb,yb,t,c,bold)=>`<line x1="${xa}" y1="${ya}" x2="${xb}" y2="${yb}" stroke="${c}" stroke-width="${bold?4:2}"/><text x="${(xa+xb)/2}" y="${(ya+yb)/2-5}" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${t}</text>`;
+ s+=edge(x0,88,x1,ys.r,fs(F.p1r),"var(--acc2)",1)+edge(x0,88,x1,ys.b,fs(F.p1b),"var(--acc)",0);
+ s+=edge(x1,ys.r,x2,leaf.rr,fs(F.prr),"var(--acc2)",1)+edge(x1,ys.r,x2,leaf.rb,fs(F.prb),"var(--acc)",0)+edge(x1,ys.b,x2,leaf.br,fs(F.pbr),"var(--acc2)",0)+edge(x1,ys.b,x2,leaf.bb,fs(F.pbb),"var(--acc)",0);
+ s+=`<circle cx="${x0}" cy="88" r="5" fill="var(--fg)"/><text x="${x1}" y="${ys.r+16}" font-size="11" text-anchor="middle" fill="var(--mut)">1回目赤</text><text x="${x1}" y="${ys.b+16}" font-size="11" text-anchor="middle" fill="var(--mut)">1回目青</text>`;
+ [["rr","赤→赤",mul(F.p1r,F.prr)],["rb","赤→青",mul(F.p1r,F.prb)],["br","青→赤",mul(F.p1b,F.pbr)],["bb","青→青",mul(F.p1b,F.pbb)]].forEach(([k,t,v])=>{s+=`<text x="${x2+6}" y="${leaf[k]+4}" font-size="11" fill="var(--fg)">${t}　${v}</text>`;});
+ $("uplot").innerHTML=s+"</svg>";
+ $("usum").innerHTML=`<div>1回目が赤のとき2回目も赤：<b>${fs(F.prr)}</b>　2回とも赤＝${fs(F.p1r)}×${fs(F.prr)}＝<b>${mul(F.p1r,F.prr)}</b>（≒${d3(U.rr)}）</div><div>条件なしで2回目が赤＝赤→赤＋青→赤＝<b>${(()=>{const n1=F.p1r[0]*F.prr[0],d1=F.p1r[1]*F.prr[1],n2=F.p1b[0]*F.pbr[0],d2=F.p1b[1]*F.pbr[1];return frac(n1*d2+n2*d1,d1*d2);})()}</b>（≒${d3(U.second)}）</div><div class="mut">${U.rep?"戻すので袋の中身は変わらず、2回目の確率は1回目の結果によらない（独立）。":"戻さないので、1回目が赤なら2回目は "+fs(F.prr)+"、青なら "+fs(F.pbr)+" に変わる（独立ではない）。それでも条件なしの2回目が赤の確率は1回目と同じ "+fs(F.p1r)+"。"}</div>`;}
+LK.register("urn",{name:"袋から2回",
+ init(){LK.stepper($("ur"),uRender);LK.stepper($("ub"),uRender);$("urep").onchange=uRender;uRender();},
+ apply(s){if(s.r!==undefined)LK.setRange("ur",s.r);if(s.b!==undefined)LK.setRange("ub",s.b);if(s.rep)$("urep").value=s.rep;uRender();},
+ render:uRender,
+ value(key){const U=uVals(),v=U[key];return key==="indep"?{v,text:v}:{v,text:d3(v)};}});
+
+// ---- クロス集計表
+let TN={A:"A",B:"B"};
+function xVals(){const a=+$("xa").value,b=+$("xb").value,c=+$("xc").value,d=+$("xd").value,N=a+b+c+d,pc=(x,y)=>y?x/y*100:NaN;
+ const condBA=pc(a,a+b),condBnA=pc(c,c+d),pB=pc(a+c,N),condAB=pc(a,a+c),pA=pc(a+b,N);
+ return {a,b,c,d,N,condBA,condBnA,pB,condAB,pA,indep:Math.abs(condBA-condBnA)<1e-9?"はい":"いいえ"};}
+const p1=v=>isNaN(v)?"—":String(+v.toFixed(2))+"%";
+function xRender(){const X=xVals(),A=TN.A,B=TN.B;$("tnA").textContent=A;$("tnB").textContent=B;
+ const H=126,bw=W-110,row=(y,lab,k1,k2,cond)=>{const t=k1+k2||1;return `<text x="4" y="${y+17}" font-size="11" fill="var(--fg)">${lab}</text><rect x="96" y="${y}" width="${bw*k1/t}" height="26" fill="var(--acc)" fill-opacity=".7"/><rect x="${96+bw*k1/t}" y="${y}" width="${bw*k2/t}" height="26" fill="var(--card)" stroke="var(--line)"/><text x="${96+4}" y="${y+17}" font-size="11" fill="var(--fg)" font-weight="700">${k1}/${k1+k2}＝${p1(cond)}</text>`;};
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="条件ごとの割合">`+row(6,A,X.a,X.b,X.condBA)+row(40,`${A}でない`,X.c,X.d,X.condBnA)+row(74,"全体",X.a+X.c,X.b+X.d,X.pB);
+ s+=`<text x="96" y="${H-6}" font-size="10" fill="var(--mut)">色の部分＝${B}（各行を同じ長さにそろえた）</text></svg>`;
+ $("xplot").innerHTML=s+`<table class="t" style="border-collapse:collapse;font-size:13px;margin:6px 0"><tr><th></th><th>${B}</th><th>${B}でない</th><th>計</th></tr><tr><td>${A}</td><td>${X.a}</td><td>${X.b}</td><td>${X.a+X.b}</td></tr><tr><td>${A}でない</td><td>${X.c}</td><td>${X.d}</td><td>${X.c+X.d}</td></tr><tr><td>計</td><td>${X.a+X.c}</td><td>${X.b+X.d}</td><td>${X.N}</td></tr></table>`;
+ $("xsum").innerHTML=`<div>P(${B}｜${A})＝${X.a}÷${X.a+X.b}＝<b>${p1(X.condBA)}</b>　P(${B}｜${A}でない)＝${X.c}÷${X.c+X.d}＝<b>${p1(X.condBnA)}</b>　全体 P(${B})＝<b>${p1(X.pB)}</b></div><div>逆向き P(${A}｜${B})＝${X.a}÷${X.a+X.c}＝<b>${p1(X.condAB)}</b>（分母が「${B}」の人数に変わる）</div><div class="mut">${X.indep==="はい"?`条件で割合が変わらないので、${A} と ${B} は独立。`:`条件で割合が変わるので、${A} と ${B} は独立ではない（標本なら、偶然の差かどうかは検定で調べる）。`}</div>`;}
+LK.register("table",{name:"クロス集計",
+ init(){["xa","xb","xc","xd"].forEach(id=>LK.stepper($(id),xRender));xRender();},
+ apply(s){if(s.nameA)TN.A=s.nameA;if(s.nameB)TN.B=s.nameB;["a","b","c","d"].forEach(k=>{if(s[k]!==undefined)LK.setRange("x"+k,s[k]);});xRender();},
+ render:xRender,
+ value(key){const X=xVals(),v=X[key];return key==="indep"?{v,text:v}:{v,text:p1(v)};}});
+
+// ---- ベイズ（1000で数える）
+let BN={c:"不良",nc:"良品",e:"検出"};
+function bVals(){const p=+$("bp").value/100,se=+$("bs").value/100,fp=+$("bf").value/100,t=+$("bt").value,s2=Math.pow(se,t),f2=Math.pow(fp,t);
+ const tp=1000*p*s2,fpos=1000*(1-p)*f2,tot=tp+fpos,fnn=1000*p*(1-se),tn=1000*(1-p)*(1-fp);
+ return {p,se,fp,t,tp,fpos,total:(p*se+(1-p)*fp)*100,post:tot?tp/tot*100:NaN,postNeg:(fnn+tn)?fnn/(fnn+tn)*100:NaN,tpn:tp,fpn:fpos};}
+const n1=v=>String(+v.toFixed(2));
+function bRender(){const B=bVals();$("bn1").textContent=BN.c;$("bnE").textContent=BN.e;
+ const cols=40,rows=25,cw=7.6,ch=6.4,ox=(W-cols*cw)/2;const nC=Math.round(1000*B.p),nTP=Math.round(1000*B.p*B.se),nFP=Math.round(1000*(1-B.p)*B.fp);
+ let s=`<svg viewBox="0 0 ${W} ${rows*ch+8}" width="${W}" role="img" aria-label="1000個の内訳">`;
+ for(let i=0;i<1000;i++){const x=ox+(i%cols)*cw,y=4+Math.floor(i/cols)*ch;let f="var(--card)",o=1;
+  if(i<nTP){f="var(--acc2)";}else if(i<nC){f="var(--acc2)";o=.3;}else if(i<nC+nFP){f="var(--acc)";}
+  s+=`<rect x="${x}" y="${y}" width="${cw-1.4}" height="${ch-1.4}" rx="1" fill="${f}" fill-opacity="${o}"${f==="var(--card)"?' stroke="var(--line)" stroke-width=".4"':""}/>`;}
+ $("bplot").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>${BN.c}・${BN.e}あり</span><span><i class="sw" style="background:var(--acc2);opacity:.3"></i>${BN.c}・${BN.e}なし</span><span><i class="sw" style="background:var(--acc)"></i>${BN.nc}・${BN.e}あり</span></div>`;
+ const t2=B.t===2?"（2回とも）":"";
+ $("bsum").innerHTML=`<div>1000個のうち ${BN.c} ${n1(1000*B.p)}個 → ${BN.e}あり${t2} ${n1(B.tpn)}個。${BN.nc} ${n1(1000*(1-B.p))}個 → ${BN.e}あり${t2} ${n1(B.fpn)}個。</div><div>${BN.e}あり${t2}の ${n1(B.tpn+B.fpn)}個のうち${BN.c}＝${n1(B.tpn)}÷${n1(B.tpn+B.fpn)}＝<b>${isNaN(B.post)?"—":n1(B.post)+"%"}</b>（事後確率）</div><div class="mut">${BN.e}ありの割合（全確率）＝${n1(B.p*100)}%×${n1(B.se*100)}%＋${n1((1-B.p)*100)}%×${n1(B.fp*100)}%＝${n1(B.total)}%。${BN.e}なしのもののうち${BN.c}は ${n1(B.postNeg)}%。</div>`;}
+LK.register("bayes",{name:"ベイズ",
+ init(){["bp","bs","bf"].forEach(id=>LK.stepper($(id),bRender));$("bt").onchange=bRender;bRender();},
+ apply(s){if(s.name)BN.c=s.name;if(s.other)BN.nc=s.other;if(s.event)BN.e=s.event;if(s.prior!==undefined)LK.setRange("bp",s.prior);if(s.sens!==undefined)LK.setRange("bs",s.sens);if(s.fpr!==undefined)LK.setRange("bf",s.fpr);if(s.times!==undefined)$("bt").value=String(s.times);bRender();},
+ render:bRender,
+ value(key){const B=bVals(),v=B[key];return {v,text:n1(v)+(["tpn","fpn"].includes(key)?"個":"%")};}});
+
+LK.start("dice");
+window.__LAB__={LK,dVals,rVals,tVals,uVals,xVals,bVals};
+</script>
+</body></html>

@@ -1,0 +1,42 @@
+id: U11
+number: "11"
+title: 条件付き確率・独立・乗法則
+domain: D2
+reference_section: ② 確率
+prev: U10
+next: U12
+prereq: [U10]
+used_by: [U12, U13, U14, U27]
+terms: [TERM-cond, TERM-indep, TERM-exclusive, TERM-event]
+labs: [LAB-prob]
+goal: 「〇〇だと分かったうえで」の確率を、**分母が変わることから求められ**、続けて起こる確率を掛け継いで計算し、2つの出来事が独立かどうか判定できる。
+stage_goals:
+  S1: 「1回目が赤なら2回目は1/4。なぜなら〜」「雨の日の購入率と晴れの日の購入率が違うので独立ではない。なぜなら〜」を自分の言葉で言えれば完了。
+  S2: 資料を見ずに、条件付き確率・乗法定理・独立の判定を使い分けて解ける。間違えた所だけ初学に戻る。
+  S3: 問題文に「条件付き確率を求めよ」とは書いていない。**「〇〇の中で」「〇〇のうち」「〇〇だったとき」から分母を自分で決め、P(A｜B) と P(B｜A) を取り違えない**。
+  S4: クロス集計・抽選・検品・販促の効果のように、場面が違っても「条件で分母を変える」「条件で割合が変わるかを見る」は同じ形で使える。
+  S5: 2級には直接出ない。くじ引きの公平さ、独立の対称性、条件付き独立とシンプソンのパラドックス、マルコフ連鎖。興味のあるものを1つ選べばよい。
+  S6: 答えが1つに決まらない課題。**問いを立てる→仮定を置く→方法を組む→小さな例で検証する→限界を書く**の順に進める。
+evidence:
+  S1: 戻さずに2回引く確率を掛け継いで求め、分母が変わる理由を1文で言えた
+  S2: 翌日・1週間後・1か月後に見ずに解けた
+  S3: 分母を自分で決め、P(A｜B) と P(B｜A) を区別できた
+  S4: 売場のクロス集計で、条件ごとの割合と独立を説明できた
+  S5: 1つ選んで理解を確かめた（任意）
+  S6: 課題を1つ作り、検証まで行った（任意）
+status: drafted
+version: 1
+checks:
+  # 例題A：赤2青3を戻さず
+  - 'Fraction(1,4) == Fraction(2-1, 5-1) and Fraction(2,5)*Fraction(1,4) == Fraction(1,10) and Fraction(2,5)*Fraction(2,5) == Fraction(4,25)'
+  # 前提チェック
+  - 'Fraction(12,40) == Fraction(3,10) and Fraction(2,5)*Fraction(1,2) == Fraction(1,5) and Fraction(5,10)+Fraction(4,10)-Fraction(2,10) == Fraction(7,10)'
+  # 実験：晴れの日の購入率、ラボなしで
+  - 'Fraction(6,60) == Fraction(1,10) and Fraction(12,40) == Fraction(3,10) and Fraction(18,60) == Fraction(3,10)'
+  # 応用：条件なしの2回目
+  - 'Fraction(2,5)*Fraction(1,4) + Fraction(3,5)*Fraction(2,4) == Fraction(2,5) and Fraction(2,20) + Fraction(6,20) == Fraction(8,20)'
+  # 転用の読み取り
+  - 'Fraction(16,40) == Fraction(4,10) and Fraction(18,60) == Fraction(3,10) and 16+18 == 34 and abs(16/34*100 - 47) < 0.5 and Fraction(24,60) == Fraction(4,10)'
+  # 発展：くじ・シンプソン・マルコフ
+  - 'Fraction(2,10)*Fraction(1,9) + Fraction(8,10)*Fraction(2,9) == Fraction(2,10)'
+  - 'abs(0.7*0.7 + 0.3*0.4 - 0.61) < 1e-12'

@@ -1,0 +1,305 @@
+# 単元U11の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U11-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    赤3個・青2個の袋から戻さずに2回引く。1回目が赤のとき2回目も赤の確率と、2回とも赤の確率は？
+
+    1回目赤のあと、残りは赤□・青□ → P(2回目赤｜1回目赤)＝□。2回とも赤＝3/5×□＝□
+  answer_title: 答え（埋めてから開く）
+  answer: 残りは赤**2**・青**2**なので **1/2**。2回とも赤＝3/5×**1/2**＝**3/10**。
+  checks:
+    - 'Fraction(3-1, 5-1) == Fraction(1,2) and Fraction(3,5)*Fraction(1,2) == Fraction(3,10)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 3, b: 2, rep: なし}
+    task: 赤3個・青2個の袋から、戻さずに2回引く。2回とも赤の確率は（小数で）？
+    predict: {type: number, key: both, label: "2回とも赤（小数）"}
+    expect: 0.3
+    why: 1回目赤 3/5、残り赤2・青2で2回目赤 1/2。掛けて 3/10。樹形図の「赤→赤」の道すじ。
+
+- id: Q-U11-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: P(A)＝0.4、P(B)＝0.5 とする。P(A∩B)＝0.2 のときと 0.25 のとき、A と B は独立か。
+  answer_title: 答え（解いてから開く）
+  answer: P(A)P(B)＝0.2。P(A∩B)＝0.2 なら**独立**。0.25 なら**独立ではない**（P(A｜B)＝0.25÷0.5＝0.5 で、P(A)＝0.4 より高い。B が起きると A が起きやすい）。
+  checks:
+    - 'Fraction(4,10)*Fraction(5,10) == Fraction(2,10) and Fraction(25,100)/Fraction(5,10) == Fraction(1,2)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 40, b: 50, ab: 25}
+    task: P(A)＝40%、P(B)＝50%、P(A∩B)＝25%。B が起きたときの A の確率 P(A｜B) は何%か。
+    predict: {type: number, key: condAB, label: "P(A｜B)", unit: "%"}
+    expect: 50
+    why: 25÷50＝50%。条件なしの P(A)＝40% より高いので独立ではない。P(A∩B) を20%にすると P(A｜B)＝40% で独立になる。
+
+- id: Q-U11-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 雨の日の客40人のうち12人が傘を買った。P(傘を買う｜雨) は？
+  answer: 12÷40＝**0.3**。分母は全客ではなく「雨の日の客」。
+  checks:
+    - 'Fraction(12,40) == Fraction(3,10)'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 12, b: 28, c: 6, d: 54, nameA: 雨, nameB: 傘を買う}
+    task: 雨の日の客40人のうち12人が傘を買った。P(傘を買う｜雨) は何%か。
+    predict: {type: number, key: condBA, label: "P(傘｜雨)", unit: "%"}
+    expect: 30
+    why: 分母は雨の日の客40人。12÷40＝30%。全客100人で割った12%は、雨の日で傘を買った人の全体での割合（同時確率）。
+
+- id: Q-U11-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 赤2・青3から戻さず2回引く。条件なしで「2回目が赤」の確率は？ 1回目が赤だったときの確率と比べよ。
+  answer: 赤→赤 2/5×1/4＝2/20、青→赤 3/5×2/4＝6/20。合計 8/20＝**2/5**。1回目が赤だったときの **1/4** とは違う。条件なしなら1回目の確率と同じ。
+  checks:
+    - 'Fraction(2,5)*Fraction(1,4) + Fraction(3,5)*Fraction(2,4) == Fraction(2,5)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 2, b: 3, rep: なし}
+    task: 赤2・青3から戻さず2回。条件なしで「2回目が赤」の確率は（小数で）？
+    predict: {type: number, key: second, label: "2回目が赤（小数）"}
+    expect: 0.4
+    why: 赤→赤 1/10 と 青→赤 3/10 を足して 2/5。1回目の結果が分からない段階では、2回目も1回目と同じ 2/5。
+
+- id: Q-U11-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 赤2・青3の袋から2回引く。「毎回戻す」と「戻さない」のどちらで、1回目と2回目の結果が独立になるか。理由も書け。
+  answer: "**毎回戻す**とき独立。袋の中身が変わらないので、1回目が赤でも青でも2回目に赤を引く確率は 2/5 のまま。戻さないと、1回目赤なら 1/4、青なら 2/4 に変わる。"
+  checks:
+    - 'Fraction(2-1,5-1) == Fraction(1,4) and Fraction(2,5-1) == Fraction(2,4)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 2, b: 3, rep: あり}
+    task: 赤2・青3の袋で、1回目の玉を戻してから2回目を引く。1回目と2回目は独立か。
+    predict: {type: choice, key: indep, label: "独立か", options: [はい, いいえ]}
+    expect: はい
+    why: 戻すと、1回目が赤でも青でも2回目の赤は 2/5。樹形図の2段目の枝が同じになる。戻さないと 1/4 と 2/4 に分かれる。
+
+- id: Q-U11-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 赤2・青3の袋から、毎回戻して2回引く。2回とも赤の確率は？ 戻さないときと比べよ。
+  answer: 2/5×2/5＝**4/25**（0.16）。戻さないときは 2/5×1/4＝1/10（0.1）で、戻す方が大きい。
+  checks:
+    - 'Fraction(2,5)**2 == Fraction(4,25) and Fraction(2,5)*Fraction(1,4) == Fraction(1,10)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 2, b: 3, rep: あり}
+    task: 赤2・青3の袋から、毎回戻して2回引く。2回とも赤の確率は（小数で）？
+    predict: {type: number, key: both, label: "2回とも赤（小数）"}
+    expect: 0.16
+    why: 戻すので2回目も 2/5。2/5×2/5＝4/25＝0.16。戻さないと 1/10。
+
+- id: Q-U11-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 当たり3本・はずれ7本のくじを、戻さずに2本続けて引く。2本とも当たる確率は？
+  answer: 3/10×2/9＝6/90＝**1/15**（約0.067）。
+  checks:
+    - 'Fraction(3,10)*Fraction(2,9) == Fraction(1,15) and abs(1/15 - 0.067) < 0.0005'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 3, b: 7, rep: なし}
+    task: 当たり（赤）3本・はずれ（青）7本から、戻さずに2本。2本とも当たる確率は（小数で）？
+    predict: {type: number, key: both, label: "2本とも当たり（小数）"}
+    expect: 0.0667
+    why: 1本目当たり 3/10、残り当たり2・はずれ7で2本目当たり 2/9。掛けて 1/15≒0.067。
+
+- id: Q-U11-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 独立な事象 A・B で P(A)＝0.5、P(B)＝0.4 のとき、P(A∩B) と P(A∪B) は？（{{unit:U10}}）
+  answer: 独立なので P(A∩B)＝0.5×0.4＝**0.2**。P(A∪B)＝0.5＋0.4−0.2＝**0.7**。
+  checks:
+    - 'Fraction(5,10)*Fraction(4,10) == Fraction(2,10) and Fraction(5,10)+Fraction(4,10)-Fraction(2,10) == Fraction(7,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 50, b: 40, ab: 20}
+    task: 独立な A・B で P(A)＝50%、P(B)＝40%（重なりは 50%×40%＝20%）。P(A∪B) は何%か。
+    predict: {type: number, key: union, label: "P(A∪B)", unit: "%"}
+    expect: 70
+    why: 独立なら重なりは掛け算で20%。「または」は重なりを1回引いて 50＋40−20＝70%。くわしくで、P(A)×P(B)＝P(A∩B)（独立）を確かめる。
+
+- id: Q-U11-020
+  stage: S3
+  tag: 逆向きの条件
+  format: written
+  powers: [P1, P3]
+  prompt: 来店客100人のうち、クーポンを持ってきた30人中24人が購入、持ってこなかった70人中28人が購入した。P(購入｜クーポン) と P(クーポン｜購入) をそれぞれ求めよ。
+  answer: P(購入｜クーポン)＝24÷30＝**0.8**。P(クーポン｜購入)＝24÷(24＋28)＝24÷52≒**0.46**。分母が「クーポンを持ってきた人」と「購入した人」で違う。
+  checks:
+    - 'Fraction(24,30) == Fraction(4,5) and 24+28 == 52 and abs(24/52 - 0.46) < 0.005'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 24, b: 6, c: 28, d: 42, nameA: クーポン, nameB: 購入}
+    task: クーポンあり30人中24人、なし70人中28人が購入。購入した人のうちクーポンを持ってきた人の割合 P(クーポン｜購入) は何%か。
+    predict: {type: number, key: condAB, label: "P(クーポン｜購入)", unit: "%"}
+    expect: 46.15
+    why: 分母は購入した人 24＋28＝52人。24÷52≒46%。P(購入｜クーポン)＝80% とは分母が違う。
+
+- id: Q-U11-021
+  stage: S3
+  tag: 独立の判定
+  format: written
+  powers: [P1, P3]
+  prompt: P(A)＝0.3、P(B)＝0.6、P(A∩B)＝0.18 のとき、A と B は独立か。P(A｜B) も求めて確かめよ。
+  answer: P(A)P(B)＝0.3×0.6＝0.18＝P(A∩B) なので**独立**。P(A｜B)＝0.18÷0.6＝0.3＝P(A) で、B が起きても A の確率は変わらない。
+  checks:
+    - 'Fraction(3,10)*Fraction(6,10) == Fraction(18,100) and Fraction(18,100)/Fraction(6,10) == Fraction(3,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 30, b: 60, ab: 18}
+    task: P(A)＝30%、P(B)＝60%、P(A∩B)＝18%。A と B は独立か。
+    predict: {type: choice, key: indep, label: "独立か", options: [はい, いいえ]}
+    expect: はい
+    why: 30%×60%＝18%＝P(A∩B) なので独立。くわしくの P(B｜A)＝18÷30＝60% も P(B) と同じ。
+
+- id: Q-U11-022
+  stage: S3
+  tag: 道すじを選ぶ
+  format: written
+  powers: [P1, P2]
+  prompt: 赤2・青3の袋から戻さずに2回引く。「1回目が青、2回目が赤」の確率と、「赤と青を1個ずつ（順番は問わない）」の確率は？
+  answer: 青→赤＝3/5×2/4＝**3/10**。赤→青＝2/5×3/4＝3/10。1個ずつは2つの道すじを足して **3/5**。
+  checks:
+    - 'Fraction(3,5)*Fraction(2,4) == Fraction(3,10) and Fraction(2,5)*Fraction(3,4) == Fraction(3,10) and Fraction(3,10)+Fraction(3,10) == Fraction(3,5)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 2, b: 3, rep: なし}
+    task: 赤2・青3から戻さず2回。「1回目が青、2回目が赤」の確率は（小数で）？
+    predict: {type: number, key: br, label: "青→赤（小数）"}
+    expect: 0.3
+    why: 1回目青 3/5、残り赤2・青2で2回目赤 2/4。掛けて 3/10。順番を問わない「1個ずつ」は、赤→青の 3/10 も足して 3/5。
+
+- id: Q-U11-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: ある店で、会員の購入率は60%、非会員の購入率は30%だった。この情報から言えることとして、正しいものはどれか。
+  choices:
+    - 購入者の60%は会員である。
+    - 会員であることと購入することは独立である。
+    - 会員であることと購入することは独立ではない。
+    - 会員になると購入率が必ず2倍になる。
+    - 会員と非会員の人数が分からなくても、全体の購入率は45%と決まる。
+  correct: 3
+  answer: P(購入｜会員)＝0.6 と P(購入｜非会員)＝0.3 が違うので、会員かどうかで購入率が変わる＝独立ではない。
+  misconceptions:
+    1: P(購入｜会員) と P(会員｜購入) の取り違え。購入者のうち会員の割合は、会員の人数が分からないと出ない
+    2: 条件で割合が変わるので独立ではない
+    4: 関係があることと、会員になることが原因であることは別（因果は実験で確かめる）
+    5: 全体の購入率は会員と非会員の人数の比で決まる。同じ人数のときだけ45%
+  checks:
+    - '(60+30)/2 == 45'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 30, b: 20, c: 15, d: 35, nameA: 会員, nameB: 購入}
+    task: 会員50人中30人、非会員50人中15人が購入。会員であることと購入は独立か。
+    predict: {type: choice, key: indep, label: "独立か", options: [はい, いいえ]}
+    expect: いいえ
+    why: 会員 60%、非会員 30% で条件によって購入率が変わるので独立ではない。人数を変えると全体の購入率も変わる（ここでは45%）。
+
+- id: Q-U11-030
+  stage: S4
+  tag: クロス集計
+  format: written
+  powers: [P1, P3]
+  prompt: 客100人を「ポイントカード提示の有無」と「デザート購入の有無」で集計した。提示あり40人のうちデザート購入16人、提示なし60人のうち購入18人。提示と購入は独立か。言えないことも書け。
+  answer: P(購入｜提示あり)＝16÷40＝0.40、P(購入｜提示なし)＝18÷60＝0.30、全体 34÷100＝0.34。条件で率が変わるので**独立ではない**。ただしこれは標本の割合なので、偶然の差かどうかはカイ二乗検定（{{unit:U27}}）で調べる。また提示が購入の**原因**とは限らない。
+  checks:
+    - 'Fraction(16,40) == Fraction(40,100) and Fraction(18,60) == Fraction(30,100) and Fraction(16+18,100) == Fraction(34,100)'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 16, b: 24, c: 18, d: 42, nameA: 提示, nameB: デザート}
+    task: 提示あり40人中16人、提示なし60人中18人がデザートを購入。全体の購入率は何%か。
+    predict: {type: number, key: pB, label: "全体の購入率", unit: "%"}
+    expect: 34
+    why: (16＋18)÷100＝34%。提示あり40%・提示なし30% と違うので独立ではない。全体は、人数の多い「提示なし」の30%寄りになる。
+
+- id: Q-U11-031
+  stage: S4
+  tag: 平日と休日
+  format: written
+  powers: [P1, P3]
+  prompt: 平日の客300人のうち60人、休日の客200人のうち70人が新商品を買った。休日の購入率と全体の購入率は？ 休日は狙い目と言えるか。
+  answer: 休日 70÷200＝**0.35**、平日 60÷300＝0.2、全体 130÷500＝**0.26**。休日の方が購入率が高い。ただし休日に来る客層の違いなど、休日そのものが原因とは限らない。
+  checks:
+    - 'Fraction(70,200) == Fraction(35,100) and Fraction(60,300) == Fraction(2,10) and Fraction(130,500) == Fraction(26,100)'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 60, b: 240, c: 70, d: 130, nameA: 平日, nameB: 購入}
+    task: 平日300人中60人、休日200人中70人が購入。休日（平日でない日）の購入率は何%か。
+    predict: {type: number, key: condBnA, label: "P(購入｜休日)", unit: "%"}
+    expect: 35
+    why: 分母は休日の客200人で 70÷200＝35%。平日20%、全体26%。
+
+- id: Q-U11-032
+  stage: S4
+  tag: 抽選の順番
+  format: written
+  powers: [P1, P3]
+  prompt: 限定品の抽選で、10枚の札のうち2枚が当たり。客が順に札を引き（戻さない）、結果はその場では分からない。2番目に引く客が当たる確率は？ 1番目の客と比べて不利か。
+  answer: 1番目が当たり 2/10×1/9、はずれ 8/10×2/9 を足して 2/10＝**0.2**。1番目と同じで、不利ではない。
+  checks:
+    - 'Fraction(2,10)*Fraction(1,9) + Fraction(8,10)*Fraction(2,9) == Fraction(2,10)'
+  lab:
+    id: LAB-prob
+    mode: urn
+    set: {r: 2, b: 8, rep: なし}
+    task: 当たり（赤）2枚・はずれ（青）8枚を戻さずに順に引く。2番目の客が当たる確率は（小数で）？
+    predict: {type: number, key: second, label: "2番目が当たり（小数）"}
+    expect: 0.2
+    why: 赤→赤 2/90 と 青→赤 16/90 を足して 18/90＝1/5。1番目と同じ。前の人の結果を知ったときだけ確率が変わる。
+
+- id: Q-U11-040
+  stage: S5
+  tag: 独立の対称性
+  format: written
+  powers: [P1, P3]
+  prompt: 100人の表で、A かつ B が6人、A で B でないが14人、A でなく B が24人、どちらでもないが56人。P(B｜A) と P(B)、P(A｜B) と P(A) をそれぞれ比べよ。
+  answer: P(B｜A)＝6÷20＝0.3、P(B)＝30÷100＝0.3 で等しい。P(A｜B)＝6÷30＝**0.2**、P(A)＝20÷100＝0.2 で等しい。一方が成り立てばもう一方も成り立つ（独立は対称）。
+  checks:
+    - 'Fraction(6,20) == Fraction(30,100) and Fraction(6,30) == Fraction(20,100)'
+  lab:
+    id: LAB-prob
+    mode: table
+    set: {a: 6, b: 14, c: 24, d: 56}
+    task: A かつ B 6人、A で非B 14人、非A で B 24人、どちらでもない56人。P(A｜B) は何%か。
+    predict: {type: number, key: condAB, label: "P(A｜B)", unit: "%"}
+    expect: 20
+    why: 6÷30＝20%＝P(A)。P(B｜A)＝6÷20＝30%＝P(B) も成り立つ。独立はどちら向きに見ても同じ。

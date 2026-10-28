@@ -1,0 +1,305 @@
+# 単元U10の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U10-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    P(A)＝0.5、P(B)＝0.4、P(A∩B)＝0.2 のとき、P(A∪B) と「AもBも起きない」確率を求めよ。
+
+    P(A∪B)＝□＋□−□＝□、AもBも起きない＝1−□＝□
+  answer_title: 答え（埋めてから開く）
+  answer: P(A∪B)＝**0.5**＋**0.4**−**0.2**＝**0.7**。AもBも起きない＝1−**0.7**＝**0.3**。足すだけだと0.9になり、両方の0.2を2回数えてしまう。
+  checks:
+    - 'Fraction(5,10) + Fraction(4,10) - Fraction(2,10) == Fraction(7,10) and 1 - Fraction(7,10) == Fraction(3,10) and Fraction(5,10)+Fraction(4,10) == Fraction(9,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 50, b: 40, ab: 20}
+    task: P(A)＝50%、P(B)＝40%、P(A∩B)＝20%。P(A∪B) は何%か。
+    predict: {type: number, key: union, label: "P(A∪B)", unit: "%"}
+    expect: 70
+    why: 50＋40−20＝70%。帯では「Aだけ30・両方20・Bだけ20」で合わせて70。どちらでもないのは残りの30%。
+
+- id: Q-U10-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P2]
+  prompt: サイコロ1回で「奇数または3以下」の確率は？
+  answer_title: 答え（解いてから開く）
+  answer: 奇数 {1,3,5}、3以下 {1,2,3}、重なり {1,3}。3/6＋3/6−2/6＝**2/3**。
+  checks:
+    - 'Fraction(3,6) + Fraction(3,6) - Fraction(2,6) == Fraction(2,3) and len({1,3,5} | {1,2,3}) == 4'
+  lab:
+    id: LAB-prob
+    mode: dice
+    set: {a: odd, b: le3}
+    task: サイコロ1回。A＝奇数、B＝3以下。「A または B」の確率は（小数で）？
+    predict: {type: number, key: union, label: "P(A∪B)（小数）"}
+    expect: 0.6667
+    why: 1と3が両方に入る。{1,2,3,5} の4個で 4/6＝2/3。
+
+- id: Q-U10-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 箱に赤玉2個・青玉3個。1個取り出すとき赤の確率は？
+  answer: "**2/5**。「赤か青の2択だから1/2」は誤り。等しく起こりやすいのは「色」ではなく「玉1個1個」。"
+  checks:
+    - 'Fraction(2, 2+3) == Fraction(2,5)'
+  lab:
+    id: LAB-ratio
+    mode: base
+    set: {find: rate, part: 2, base: 5}
+    task: 玉5個（赤2・青3）から1個。赤の確率は「赤の個数÷全部の個数」。何%か。
+    predict: {type: number, key: rate, label: "赤の確率", unit: "%"}
+    expect: 40
+    why: 2÷5＝0.4＝40%。基準量は「色の数」ではなく「玉の数」5個。数えて割るのは、玉1個1個が同じくらい取り出されやすいから。
+
+- id: Q-U10-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: サイコロ1回で「3の倍数または5以上」の確率は？ 足すだけで求めた値と比べよ。
+  answer: 3の倍数 {3,6}、5以上 {5,6}、重なり {6}。2/6＋2/6−1/6＝3/6＝**1/2**。足すだけだと 4/6 で、6の目を2回数えている。
+  checks:
+    - 'Fraction(2,6) + Fraction(2,6) - Fraction(1,6) == Fraction(1,2) and Fraction(4,6) == Fraction(2,3)'
+  lab:
+    id: LAB-prob
+    mode: dice
+    set: {a: m3, b: ge5}
+    task: サイコロ1回。A＝3の倍数、B＝5以上。「A または B」の確率は（小数で）？
+    predict: {type: number, key: union, label: "P(A∪B)（小数）"}
+    expect: 0.5
+    why: 目 {3,5,6} の3個で 3/6＝1/2。6の目は両方に入るので1回引く。
+
+- id: Q-U10-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: サイコロを3回投げて、少なくとも1回6が出る確率は？「1/6×3＝1/2」が誤りである理由も書け。
+  answer: 1−(5/6)³＝1−125/216＝**91/216**（約42.1%）。「1/6×3＝1/2」は、2回以上6が出る場合を何度も数えた誤り。回数を6回にすると1/6×6＝1 になり、「必ず出る」ことになってしまう。
+  checks:
+    - '1 - Fraction(5,6)**3 == Fraction(91,216) and abs(91/216*100 - 42.1) < 0.05 and Fraction(1,6)*3 == Fraction(1,2) and Fraction(1,6)*6 == 1'
+  lab:
+    id: LAB-prob
+    mode: atleast
+    set: {a: 1, b: 6, n: 3}
+    task: 6の目が出る確率 1/6 のサイコロを3回。少なくとも1回6が出る確率は（小数で）？
+    predict: {type: number, key: atleast, label: "少なくとも1回（小数）"}
+    expect: 0.4213
+    why: 3回とも6以外 (5/6)³＝125/216 を1から引いて 91/216≒0.421。図の丸（1/6×回数）は棒より高く、回数を増やすと1を超える。
+
+- id: Q-U10-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 来店客のうち会員が30%、クーポンを使う人が25%、会員でクーポンも使う人が15%。会員かクーポン利用者の少なくとも一方である客と、どちらでもない客の割合は？
+  answer: 30＋25−15＝**40%**。どちらでもない＝100−40＝**60%**。
+  checks:
+    - '30 + 25 - 15 == 40 and 100 - 40 == 60'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 30, b: 25, ab: 15}
+    task: 会員30%、クーポン利用25%、両方15%。どちらでもない客は何%か。
+    predict: {type: number, key: none, label: "どちらでもない", unit: "%"}
+    expect: 60
+    why: 少なくとも一方は 30＋25−15＝40%、どちらでもないのは 100−40＝60%。
+
+- id: Q-U10-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: サイコロを4回投げて、少なくとも1回1の目が出る確率は？ 小数第3位まで。
+  answer: 1−(5/6)⁴＝1−625/1296＝671/1296≒**0.518**。半分を少し超える。
+  checks:
+    - '1 - Fraction(5,6)**4 == Fraction(671,1296) and abs(671/1296 - 0.518) < 0.0005'
+  lab:
+    id: LAB-prob
+    mode: atleast
+    set: {a: 1, b: 6, n: 4}
+    task: 1の目が出る確率 1/6 のサイコロを4回。少なくとも1回1の目が出る確率は（小数で）？
+    predict: {type: number, key: atleast, label: "少なくとも1回（小数）"}
+    expect: 0.5177
+    why: 4回とも1以外 (5/6)⁴＝625/1296≒0.482 を1から引いて約0.518。1/6×4≒0.667 より小さい。
+
+- id: Q-U10-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 5人（A〜E）から無作為に2人を選ぶ。「Aが選ばれる」または「Bが選ばれる」確率は？（{{unit:U09}}）
+  answer: 全部 ₅C₂＝10通り。Aを含む組は ₄C₁＝4通りで P(A)＝0.4、同じく P(B)＝0.4、両方は {A,B} の1通りで0.1。0.4＋0.4−0.1＝**0.7**。反対側から：AもBも選ばれないのは残り3人から2人 ₃C₂＝3通りで0.3、1−0.3＝0.7 で一致。
+  checks:
+    - 'math.comb(5,2) == 10 and math.comb(4,1) == 4 and Fraction(4,10)+Fraction(4,10)-Fraction(1,10) == Fraction(7,10) and math.comb(3,2) == 3 and 1 - Fraction(3,10) == Fraction(7,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 40, b: 40, ab: 10}
+    task: 5人から2人。Aが選ばれる確率40%、Bが選ばれる確率40%、両方10%。A または B が選ばれる確率は何%か。
+    predict: {type: number, key: union, label: "P(A∪B)", unit: "%"}
+    expect: 70
+    why: 40＋40−10＝70%。どちらも選ばれない30%（₃C₂÷₅C₂＝3/10）と足すと100%。
+
+- id: Q-U10-020
+  stage: S3
+  tag: 一方だけ
+  format: written
+  powers: [P1, P3]
+  prompt: P(A)＝0.6、P(B)＝0.5、P(A∩B)＝0.3 のとき、「Aだけ起きる」確率と「ちょうど一方だけ起きる」確率は？
+  answer: Aだけ＝0.6−0.3＝**0.3**、Bだけ＝0.5−0.3＝0.2。ちょうど一方だけ＝0.3＋0.2＝**0.5**（＝P(A∪B)−P(A∩B)＝0.8−0.3）。
+  checks:
+    - 'Fraction(6,10)-Fraction(3,10) == Fraction(3,10) and Fraction(5,10)-Fraction(3,10) == Fraction(2,10) and Fraction(3,10)+Fraction(2,10) == Fraction(5,10) and Fraction(6,10)+Fraction(5,10)-Fraction(3,10) == Fraction(8,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 60, b: 50, ab: 30}
+    task: P(A)＝60%、P(B)＝50%、P(A∩B)＝30%。ちょうど一方だけ起きる確率は何%か。
+    predict: {type: number, key: one, label: "一方だけ", unit: "%"}
+    expect: 50
+    why: 帯の「Aだけ30」と「Bだけ20」を足して50%。P(A∪B)＝80% から両方の30%を引いても同じ。
+
+- id: Q-U10-021
+  stage: S3
+  tag: 重なりの範囲
+  format: written
+  powers: [P1, P3]
+  prompt: P(A)＝0.7、P(B)＝0.6 のとき、P(A∩B) は少なくともいくつか。理由も書け。
+  answer: P(A∪B)≦1 なので、P(A∩B)＝P(A)＋P(B)−P(A∪B)≧0.7＋0.6−1＝**0.3**。2つを合わせると1.3で全体を0.3はみ出すので、少なくとも0.3は重なる。
+  checks:
+    - 'Fraction(7,10) + Fraction(6,10) - 1 == Fraction(3,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 70, b: 60, ab: 30}
+    task: P(A)＝70%、P(B)＝60%。重なり P(A∩B) が取れる最小の値は何%か。
+    predict: {type: number, key: lo, label: "重なりの最小", unit: "%"}
+    expect: 30
+    why: 70＋60＝130% で、全体100%を30%はみ出す。はみ出した分は必ず重なる。重なりを30%より小さくしようとしても、ラボは30%で止まる。
+
+- id: Q-U10-022
+  stage: S3
+  tag: 10回引けば当たる？
+  format: written
+  powers: [P1, P3]
+  prompt: 当たりの確率が1/10のくじを、毎回もとに戻して10回引く。「10回引けば必ず1回は当たる」は正しいか。少なくとも1回当たる確率を小数第3位まで求めよ。
+  answer: 正しくない。1−(9/10)¹⁰≒1−0.349＝**0.651**。1/10×10＝1 は、2回以上当たる場合を何度も数えている。
+  checks:
+    - 'abs(1 - 0.9**10 - 0.651) < 0.0005 and abs(0.9**10 - 0.349) < 0.0005 and Fraction(1,10)*10 == 1'
+  lab:
+    id: LAB-prob
+    mode: atleast
+    set: {a: 1, b: 10, n: 10}
+    task: 当たり 1/10 のくじを戻しながら10回。少なくとも1回当たる確率は（小数で）？
+    predict: {type: number, key: atleast, label: "少なくとも1回（小数）"}
+    expect: 0.6513
+    why: 10回とも外れ (9/10)¹⁰≒0.349 を1から引いて約0.651。図の丸（p×回数）は10回目でちょうど1に届くが、棒（正しい確率）はまだ0.65。
+
+- id: Q-U10-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: サイコロを1回投げる。A＝「1の目」、B＝「6の目」とする。正しい記述はどれか。
+  choices:
+    - AとBは排反であり、独立でもある。
+    - AとBは排反であり、独立ではない。
+    - AとBは排反ではないが、独立である。
+    - P(A∪B)＝1/6×1/6＝1/36 である。
+    - 「AまたはB」と「AかつB」の確率は等しい。
+  correct: 2
+  answer: 1の目と6の目は同時に出ないので排反。P(A∩B)＝0 だが P(A)×P(B)＝1/36 なので独立ではない。P(A∪B)＝1/6＋1/6＝1/3。
+  misconceptions:
+    1: 確率が正の排反事象は独立ではない（片方が起きると他方の確率は0になる）
+    3: 1と6は同時に出ないので排反
+    4: 掛け算は「かつ」で、しかも独立のときだけ。「または」で排反なら足す（1/3）
+    5: 「かつ」は0、「または」は1/3
+  checks:
+    - 'Fraction(1,6)*Fraction(1,6) == Fraction(1,36) and Fraction(1,6) + Fraction(1,6) == Fraction(1,3)'
+  lab:
+    id: LAB-prob
+    mode: dice
+    set: {a: one, b: six}
+    task: サイコロ1回。A＝1の目、B＝6の目。A と B は排反（重なりがない）か。
+    predict: {type: choice, key: excl, label: "排反か", options: [はい, いいえ]}
+    expect: はい
+    why: 重なりの目がないので排反。P(A∪B)＝1/6＋1/6＝1/3。排反でも P(A)×P(B)＝1/36 は0でないので、独立ではない。
+
+- id: Q-U10-030
+  stage: S4
+  tag: 併買
+  format: written
+  powers: [P1, P3]
+  prompt: 来店客のうちパンを買う人が40%、牛乳を買う人が30%、両方買う人が10%。「パンか牛乳の少なくとも一方を買う人」と「どちらも買わない人」の割合は？
+  answer: 0.4＋0.3−0.1＝**0.6（60%）**。どちらも買わない＝1−0.6＝**0.4（40%）**。
+  checks:
+    - 'Fraction(4,10)+Fraction(3,10)-Fraction(1,10) == Fraction(6,10) and 1 - Fraction(6,10) == Fraction(4,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 40, b: 30, ab: 10}
+    task: パン40%、牛乳30%、両方10%。パンか牛乳の少なくとも一方を買う人は何%か。
+    predict: {type: number, key: union, label: "少なくとも一方", unit: "%"}
+    expect: 60
+    why: 40＋30−10＝60%。入口の「70%」は両方の10%を2回数えていた。どちらも買わないのは40%。
+
+- id: Q-U10-031
+  stage: S4
+  tag: 品切れ
+  format: written
+  powers: [P1, P3]
+  prompt: 3店舗それぞれで、ある商品が今日品切れになる確率が10%（店どうしは影響しない）。少なくとも1店で品切れになる確率は？ 小数第3位まで。
+  answer: 3店とも品切れにならない 0.9³＝0.729。少なくとも1店＝1−0.729＝**0.271**。0.1×3＝0.3 より少し小さい。
+  checks:
+    - 'abs(0.9**3 - 0.729) < 1e-12 and abs(1 - 0.729 - 0.271) < 1e-12'
+  lab:
+    id: LAB-prob
+    mode: atleast
+    set: {a: 1, b: 10, n: 3}
+    task: 品切れの確率 1/10 の店が3店（互いに影響しない）。少なくとも1店で品切れになる確率は（小数で）？
+    predict: {type: number, key: atleast, label: "少なくとも1店（小数）"}
+    expect: 0.271
+    why: 3店とも大丈夫 0.9³＝0.729 を1から引いて0.271。p×店数＝0.3 は、2店以上で同時に品切れになる場合を重ねて数えている。
+
+- id: Q-U10-032
+  stage: S4
+  tag: 期間中の来店
+  format: written
+  powers: [P1, P3]
+  prompt: ある客がキャンペーン期間の5日間それぞれに来店する確率が1/5（日ごとに影響しない）。期間中に1回以上来店する確率は？ 小数第3位まで。この見積もりの限界も1つ書け。
+  answer: 1−(4/5)⁵＝1−1024/3125≒**0.672**。限界：来た翌日は来にくいなど、日ごとの来店が影響し合うと、この計算は当てはまらない。
+  checks:
+    - '1 - Fraction(4,5)**5 == Fraction(2101,3125) and abs(2101/3125 - 0.672) < 0.0005'
+  lab:
+    id: LAB-prob
+    mode: atleast
+    set: {a: 1, b: 5, n: 5}
+    task: 1日に来店する確率 1/5 を5日間。1回以上来店する確率は（小数で）？
+    predict: {type: number, key: atleast, label: "1回以上（小数）"}
+    expect: 0.6723
+    why: 5日とも来ない (4/5)⁵≒0.328 を1から引いて約0.672。1/5×5＝1 は「必ず来る」ことになってしまう。
+
+- id: Q-U10-040
+  stage: S5
+  tag: 「または」の範囲
+  format: written
+  powers: [P1, P3]
+  prompt: P(A)＝0.5、P(B)＝0.6 で、重なりが分からない。P(A∪B) の取りうる最小値と最大値は？
+  answer: 重なりは 0.5＋0.6−1＝0.1 以上、小さい方の0.5以下。P(A∪B)＝1.1−P(A∩B) なので、最大 1.1−0.1＝**1**、最小 1.1−0.5＝**0.6**。
+  checks:
+    - 'Fraction(5,10)+Fraction(6,10)-1 == Fraction(1,10) and Fraction(11,10)-Fraction(1,10) == 1 and Fraction(11,10)-Fraction(5,10) == Fraction(6,10)'
+  lab:
+    id: LAB-prob
+    mode: area
+    set: {a: 50, b: 60, ab: 10}
+    task: P(A)＝50%、P(B)＝60%。重なり P(A∩B) が取れる最小の値は何%か（このとき P(A∪B) が最大）。
+    predict: {type: number, key: lo, label: "重なりの最小", unit: "%"}
+    expect: 10
+    why: 50＋60＝110% で10%はみ出すので、重なりは10%以上。重なり10%で P(A∪B)＝100%（最大）、重なりを50%まで増やすと P(A∪B)＝60%（最小）。

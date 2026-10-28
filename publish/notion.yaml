@@ -14,6 +14,9 @@ units:                 # 新しく生成した単元ページ
   U07: 406b7cd539a181d5aa31ef447de733e6
   U08: 407b7cd539a1819d8995c67174c803df
   U09: 406b7cd539a18111807cf1b85390f332
+  U10: 407b7cd539a181d1a367f2fa210da98f
+  U11: 407b7cd539a181288041cc74bcd625b5
+  U12: 407b7cd539a1813998ebdc86e6e71f03
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
@@ -64,6 +67,9 @@ refs:
   REF-Q-U08: 402b7cd539a1815f98bde2f52959e40c
   REF-Q-U01: 402b7cd539a18188a71ef3f61ee84355
   REF-Q-U02: 402b7cd539a181378704c6a4ed5e3c99
+  REF-Q-U10: 402b7cd539a1819ab42cdd2842e922d5
+  REF-Q-U11: 402b7cd539a181979739ca063532aec3
+  REF-Q-U12: 402b7cd539a181ed9d2accc6a79a6488
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -102,6 +108,13 @@ terms:
   TERM-statistic: 405b7cd539a1816aaefffafd39bb617b
   TERM-sample-space: 405b7cd539a181f981cace263f9b23e0
   TERM-event: 405b7cd539a181a0870fe1a8729f5050
+  TERM-complement: 405b7cd539a181eea9c8decbed980e01
+  TERM-exclusive: 405b7cd539a181f29dc8c12cb6cc3f3a
+  TERM-indep: 405b7cd539a181dab9d8c9f4d33e44f4
+  TERM-cond: 405b7cd539a18182a6f8fef93c3ca347
+  TERM-bayes: 405b7cd539a181039e72db0cbe86e9f9
+  TERM-prior: 405b7cd539a181eb91e7d3e57c5cb848
+  TERM-likelihood: 405b7cd539a1812d9978d3504854c8a7
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143

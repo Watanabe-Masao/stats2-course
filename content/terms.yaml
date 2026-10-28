@@ -122,3 +122,24 @@
 - id: TERM-corr
   name: 相関係数
   en: correlation coefficient
+- id: TERM-complement
+  name: 余事象
+  en: complement
+- id: TERM-exclusive
+  name: 排反
+  en: mutually exclusive
+- id: TERM-indep
+  name: 独立
+  en: independence
+- id: TERM-cond
+  name: 条件付き確率
+  en: conditional probability
+- id: TERM-bayes
+  name: ベイズの定理
+  en: Bayes' theorem
+- id: TERM-prior
+  name: 事前確率・事後確率
+  en: prior / posterior probability
+- id: TERM-likelihood
+  name: 尤度
+  en: likelihood

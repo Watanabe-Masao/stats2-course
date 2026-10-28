@@ -1,0 +1,128 @@
+id: LAB-prob
+name: 確率ラボ
+slug: prob                       # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: prob_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 3                       # 2：U11 用に「袋から2回」「クロス集計」、3：U12 用に「ベイズ」を足した
+replaces_legacy: [union.html, cond.html, sim_bayes.html]    # 旧版 教科書10 の「重なりを動かす」を area、教科書11 の条件付き確率を table に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: dice
+    name: サイコロで A・B
+    purpose: サイコロ1回の事象 A・B を選び、どの目が A・B・両方に入るかを色で見る。P(A∪B) は重なりを1回引く
+    set: [a, b]                  # even／odd／ge4／le3／le2／m3／six／one／ge5
+    values: [union, inter, pa, pb, none, excl]   # 小数。excl：はい／いいえ
+  - key: area
+    name: 確率を面積で
+    purpose: P(A)・P(B)・P(A∩B) から、Aだけ・両方・Bだけ・どちらでもない を帯の長さで見る
+    set: [a, b, ab]              # すべて %
+    values: [union, none, aonly, bonly, one, lo, hi, excl, condBA, condAB, indep]   # %。lo・hi＝P(A∩B) が取れる範囲。condBA＝P(B｜A)、condAB＝P(A｜B)、indep：はい／いいえ
+  - key: atleast
+    name: 少なくとも1回
+    purpose: 1回の確率 p＝分子/分母 を n 回くり返すとき、少なくとも1回＝1−(1−p)ⁿ。p×n との違い
+    set: [a, b, n]
+    values: [atleast, none, naive]   # 小数
+  - key: urn
+    name: 袋から2回
+    purpose: 赤玉・青玉の袋から2回引く樹形図。戻す・戻さないで2回目の確率が変わるか（独立か）
+    set: [r, b, rep]             # rep：なし（戻さない）／あり（戻す）
+    values: [cond, both, second, rr, rb, br, bb, indep]   # 小数。cond＝P(2回目赤｜1回目赤)、second＝条件なしの2回目赤
+  - key: table
+    name: クロス集計
+    purpose: 2×2 の人数の表から、条件付きの割合 P(B｜A)・P(B｜Aでない)・逆向きの P(A｜B) を比べ、独立かを見る
+    set: [a, b, c, d, nameA, nameB]   # a＝AかつB、b＝AでBでない、c＝AでなくB、d＝どちらでもない
+    values: [condBA, condBnA, pB, condAB, pA, indep]   # %
+  - key: bayes
+    name: ベイズ
+    purpose: 1000で数える。元の割合（事前）・該当→結果・非該当→結果から、全確率と事後確率。同じ検査を2回くり返したときの更新
+    set: [prior, sens, fpr, times, name, other, event]   # prior・sens・fpr は %。times：1／2
+    values: [total, post, postNeg, tpn, fpn]   # total＝結果が出る割合（全確率）、post＝事後確率、postNeg＝結果なしのときの該当率（すべて %）
+data: スライダーと選択欄で値を決める（データの読み込みなし）
+presets:
+  s1-dice:
+    mode: dice
+    set: {a: even, b: ge4}
+    task: サイコロを1回投げる。A＝偶数、B＝4以上。「A または B」の確率は（小数で）？
+    predict: {type: number, key: union, label: "P(A∪B)（小数）"}
+    expect: 0.6667
+    why: A＝{2,4,6}、B＝{4,5,6}。4と6は両方に入るので、3/6＋3/6−2/6＝4/6＝2/3。足すだけだと 6/6＝1 になり、4と6を2回数えてしまう。
+  s1-area:
+    mode: area
+    set: {a: 30, b: 20, ab: 0}
+    task: P(A)＝30%、P(B)＝20%、重なり P(A∩B)＝0%（排反）のとき、P(A∪B) は何%か。
+    predict: {type: number, key: union, label: "P(A∪B)", unit: "%"}
+    expect: 50
+    why: 重なりがない（排反）ので、そのまま足して 30＋20＝50%。重なりを増やすと、増やした分だけ P(A∪B) が減る。
+  s3-free:
+    mode: area
+    modes: [area, dice]
+    task: 解いてから、「確率を面積で」で P(A)・P(B)・P(A∩B) を問題に合わせ、帯の長さで答えを確かめる。重なりは取れる範囲（くわしく）が決まっていることも見る。
+  s4-area:
+    mode: area
+    modes: [area, atleast]
+    task: 自分の売場の数字（ある商品を買う割合・別の商品を買う割合・両方買う割合）を入れ、「どちらか一方でも買う」「どちらも買わない」を読む。
+  s5-area:
+    mode: area
+    modes: [area, atleast]
+    task: P(A) と P(B) を決めて重なりを最小から最大まで動かし、P(A∪B) がどこまで動くかを見る（発展2）。「少なくとも1回」で回数を増やし、p×回数 が1を超えても正しい確率は1を超えないことを見る。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（サイコロで A・B、確率を面積で、少なくとも1回、袋から2回、クロス集計、ベイズ）。
+  s1-urn:
+    mode: urn
+    set: {r: 2, b: 3, rep: なし}
+    unlock: [rep]
+    task: 赤2個・青3個の袋から、戻さずに2回引く。2回とも赤の確率は（小数で）？
+    predict: {type: number, key: both, label: "2回とも赤（小数）"}
+    expect: 0.1
+    why: 1回目赤 2/5、そのあと残りは赤1・青3なので2回目赤 1/4。掛けて 2/5×1/4＝1/10。「戻す」に切り替えると 2/5×2/5＝4/25 に変わる。
+  s1-table:
+    mode: table
+    set: {a: 12, b: 28, c: 6, d: 54, nameA: 雨, nameB: 傘を買う}
+    task: 雨の日の客40人のうち12人、晴れの日の客60人のうち6人が傘を買った。晴れの日の客が傘を買う割合は何%か。
+    predict: {type: number, key: condBnA, label: "P(傘｜晴れ)", unit: "%"}
+    expect: 10
+    why: 晴れの日の客60人が分母で、6÷60＝10%。雨の日は 12÷40＝30%。条件で割合が変わるので、天気と傘の購入は独立ではない。
+  s3-cond:
+    mode: table
+    modes: [table, urn, area]
+    task: 解いてから、「クロス集計」で人数を問題に合わせ、P(B｜A) と逆向きの P(A｜B) の分母の違いを確かめる。「袋から2回」で戻す・戻さないを切り替える。
+  s4-table:
+    mode: table
+    modes: [table, urn]
+    task: 自分の売場の数字（ある条件の客と、その中で買った客）を入れ、条件ごとの購入率と全体の購入率を比べる。
+  s5-free:
+    mode: urn
+    modes: [urn, table, area]
+    task: 「袋から2回」で、戻さないのに条件なしの2回目の確率が1回目と同じになることを確かめる（発展1）。「クロス集計」で、P(B｜A)＝P(B) なら P(A｜B)＝P(A) にもなることを見る（発展2）。
+  s1-bayes:
+    mode: bayes
+    set: {prior: 2, sens: 90, fpr: 5}
+    task: 不良率2%の商品を、不良品の90%を検出し良品の5%を誤って検出する検品にかける。検出された品が本当に不良である確率は何%か。
+    predict: {type: number, key: post, label: "P(不良｜検出)", unit: "%"}
+    expect: 26.8657
+    why: 1000個なら不良20個から検出18個、良品980個から誤検出49個。18÷67≒27%。検出率90%とは向きが逆で、元の不良率が低いと誤検出が多数を占める。
+  s1-fpr:
+    mode: bayes
+    set: {prior: 2, sens: 90, fpr: 1}
+    task: 例題Aの検品で、誤検出率だけを5%から1%に下げた。検出された品が本当に不良である確率は何%か。
+    predict: {type: number, key: post, label: "P(不良｜検出)", unit: "%"}
+    expect: 64.7482
+    why: 良品の誤検出が49個から9.8個に減り、18÷27.8≒65%。良品の数が多いので、誤検出率を下げる効果が大きい。
+  s3-bayes:
+    mode: bayes
+    modes: [bayes, table]
+    task: 解いてから、「ベイズ」で3つの割合を問題に合わせ、1000で数えた内訳と事後確率を確かめる。「クロス集計」で同じ数を表にし、P(原因｜結果) と P(結果｜原因) の分母の違いを見る。
+  s4-bayes:
+    mode: bayes
+    set: {name: 購入, other: 非購入, event: 開封, prior: 5, sens: 60, fpr: 20}
+    task: 自分の場面の数字（元の割合・該当→結果・非該当→結果）を入れ、結果が出たもののうち本当に当てはまる割合を読む。まずは販促メール（購入5%、購入者の開封60%、非購入者の開封20%）で、元の割合と非該当→結果を動かす。
+  s5-bayes:
+    mode: bayes
+    set: {prior: 2, sens: 90, fpr: 5}
+    task: 「同じ検査を2回」に切り替え、2回とも検出されたときの事後確率を見る（発展1）。次に元の割合を0.5%・2%・10%・50%と変え、同じ検査でも事後確率が大きく変わることを見る（発展3）。
+used_by: [U10, U11, U12]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/prob_lab/check.js         # 本文の値（2/3、11/36、91/216、0.7・0.3、60%・40%、0.651、ベイズ 18÷67・16.2÷18.65）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
