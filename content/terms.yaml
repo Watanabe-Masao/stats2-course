@@ -179,3 +179,12 @@
 - id: TERM-se
   name: 標準誤差
   en: standard error
+- id: TERM-lln
+  name: 大数の法則
+  en: law of large numbers
+- id: TERM-clt
+  name: 中心極限定理
+  en: central limit theorem
+- id: TERM-cc
+  name: 連続修正
+  en: continuity correction

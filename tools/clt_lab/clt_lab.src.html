@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>中心極限定理ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.dim{opacity:.45}
+</style></head><body>
+<h1>🧪 中心極限定理ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-clt" class="mode">
+ <p class="mut" style="margin:0">形が偏った母集団からでも、n 個の平均 x̄ を何度も取り直すと、x̄ の分布は n が大きいほど正規分布 N(μ, σ²/n) に近づく（中心極限定理）。</p>
+ <div class="row ctl"><label>母集団 <select id="cshape" data-key="shape"><option value="expo">待ち時間（右に長い裾）</option><option value="unif">一様（平ら）</option><option value="bimodal">山が2つ</option><option value="bern">0か1（買う・買わない）</option></select></label></div>
+ <input type="range" id="cn" min="1" max="100" step="1" value="1" data-name="個数 n">
+ <input type="range" id="cp" min="0.05" max="0.95" step="0.05" value="0.2" data-name="1の割合 p">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<div id="m-lln" class="mode">
+ <p class="mut" style="margin:0">当たりの確率 p のくじを引き続けると、当たりの割合は p に近づく（大数の法則）。ずれの目安 ±2SE＝±2√(p(1−p)÷N) は √N に反比例して細くなる。</p>
+ <input type="range" id="lp" min="0.05" max="0.95" step="0.05" value="0.3" data-name="確率 p">
+ <input type="range" id="lN" min="10" max="5000" step="10" value="100" data-name="回数 N">
+ <div class="row ctl"><button type="button" class="sub" id="lagain">別の乱数で引き直す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="lplot"></div>
+ <div class="card res key" id="lsum"></div>
+</div>
+
+<div id="m-bin" class="mode">
+ <p class="mut" style="margin:0">二項分布 B(n, p) を、平均 np・標準偏差 √(np(1−p)) の正規分布で近似する。棒の幅の半分（0.5）をずらす連続修正で、近似が正確な値に近づく。</p>
+ <input type="range" id="bn" min="1" max="1000" step="1" value="100" data-name="回数 n">
+ <input type="range" id="bp" min="0.01" max="0.99" step="0.01" value="0.5" data-name="確率 p">
+ <input type="range" id="bk" min="0" max="1000" step="1" value="55" data-name="k 回">
+ <div class="row ctl"><label>求める <select id="bkind" data-key="kind"><option value="le">k 回以下</option><option value="ge">k 回以上</option><option value="eq">ちょうど k 回</option></select></label></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+</div>
+
+<div id="m-cheb" class="mode">
+ <p class="mut" style="margin:0">分布の形が分からなくても、平均から kσ 以上離れる確率は 1÷k² 以下（チェビシェフの不等式）。正規分布なら実際はもっと小さい。</p>
+ <input type="range" id="hk" min="1" max="5" step="0.1" value="2" data-name="k（σ の何倍）">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="hplot"></div>
+ <div class="card res key" id="hsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>z<-9?0:z>9?1:0.5*(1+erf(z/Math.SQRT2));
+const dn=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+function lnC(n,k){if(k<0||k>n)return -Infinity;let s=0;for(let i=1;i<=k;i++)s+=Math.log(n-k+i)-Math.log(i);return s;}
+const binom=(n,p,k)=>k<0||k>n?0:Math.exp(lnC(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));
+
+// ---- 中心極限定理
+const SH={expo:{name:"待ち時間（平均5分）",mu:()=>5,sd:()=>5,g1:()=>2,lo:0,hi:25},
+ unif:{name:"一様（0〜10）",mu:()=>5,sd:()=>10/Math.sqrt(12),g1:()=>0,lo:0,hi:10},
+ bimodal:{name:"山が2つ（2と8）",mu:()=>5,sd:()=>Math.sqrt(10),g1:()=>0,lo:-1,hi:11},
+ bern:{name:"0か1",mu:p=>p,sd:p=>Math.sqrt(p*(1-p)),g1:p=>(1-2*p)/Math.sqrt(p*(1-p)),lo:-0.05,hi:1.05}};
+function draw(shape,p,r){if(shape==="expo")return -5*Math.log(1-r());if(shape==="unif")return 10*r();
+ if(shape==="bimodal"){const c=r()<0.5?2:8,u=r()||1e-12,v=r();return c+Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}return r()<p?1:0;}
+let cCache={};
+function cSim(shape,n,p){const key=shape+n+p;if(cCache.key===key)return cCache.m;const r=rng(17),m=[];for(let t=0;t<2000;t++){let s=0;for(let i=0;i<n;i++)s+=draw(shape,p,r);m.push(s/n);}cCache={key,m};return m;}
+function cVals(){const shape=$("cshape").value,n=+$("cn").value,p=+$("cp").value,S=SH[shape];
+ const mu=S.mu(p),sd=S.sd(p),se=sd/Math.sqrt(n),g1=S.g1(p),gm=g1/Math.sqrt(n),ms=cSim(shape,n,p);
+ const mm=ms.reduce((a,b)=>a+b,0)/ms.length,ss=Math.sqrt(ms.reduce((a,b)=>a+(b-mm)**2,0)/(ms.length-1));
+ return {shape,n,p,mu,sd,se,g1,gmean:gm,skew:Math.abs(gm),shapeLabel:Math.abs(gm)<0.5?"左右対称に近い":gm>0?"右に歪む":"左に歪む",simmean:mm,simsd:ss,within2:ms.filter(x=>Math.abs(x-mu)<=2*se).length/ms.length,ms};}
+function cRender(){const C=cVals(),S=SH[C.shape];$("cp").closest(".lk-step").classList.toggle("dim",C.shape!=="bern");
+ const lo=S.lo,hi=S.hi,H=180,L=12,R=W-12,base=H-30,top=16,X=x=>L+(x-lo)/(hi-lo)*(R-L);
+ const nb=C.shape==="bern"&&C.n<=40?C.n+1:44,bw=C.shape==="bern"&&C.n<=40?1/C.n:(hi-lo)/nb,off=C.shape==="bern"&&C.n<=40?-bw/2:lo;
+ const cnt=new Array(nb+2).fill(0);C.ms.forEach(m=>{const k=Math.floor((m-off)/bw);if(k>=0&&k<cnt.length)cnt[k]++;});
+ const dens=cnt.map(c=>c/C.ms.length/bw),mx=Math.max(...dens,dn(C.mu,C.mu,C.se)*(C.n>1||C.shape==="bern"?1:0.6))*1.08,Y=y=>base-Math.min(1,y/mx)*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="標本平均の分布">`;
+ dens.forEach((d,k)=>{if(!d)return;const x0=off+k*bw;s+=`<rect x="${X(x0)+0.5}" y="${Y(d)}" width="${Math.max(1,X(x0+bw)-X(x0)-1)}" height="${base-Y(d)}" fill="var(--acc)" fill-opacity=".45"/>`;});
+ let pth="";for(let i=0;i<=200;i++){const x=lo+(hi-lo)*i/200;pth+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(dn(x,C.mu,C.se)).toFixed(1);}
+ s+=`<path d="${pth}" fill="none" stroke="var(--acc2)" stroke-width="2"/><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ const tk=C.shape==="bern"?[0,0.25,0.5,0.75,1]:C.shape==="expo"?[0,5,10,15,20,25]:[0,2,4,6,8,10];tk.forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x}</text>`);
+ s+=`<path d="M${X(C.mu)-5} ${base+26} L${X(C.mu)+5} ${base+26} L${X(C.mu)} ${base+18} Z" fill="var(--fg)"/></svg>`;
+ $("cplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc);opacity:.5"></i>2000回取り直した x̄</span><span><i class="sw" style="background:var(--acc2)"></i>正規分布 N(μ, σ²/n)</span><span>▲ μ</span></div>`;
+ $("csum").innerHTML=`<div>母集団：${esc(S.name)}　μ＝${f(C.mu,3)}・σ＝${f(C.sd,3)}・歪度 ${f(C.g1,2)}</div><div>x̄ の分布：中心 ${f(C.simmean,3)}（≒μ）・標準偏差 ${f(C.simsd,3)}（理論の SE＝σ÷√n＝<b>${f(C.se)}</b>）</div><div>x̄ の歪度＝${f(C.g1,2)}÷√${C.n}＝<b>${f(C.gmean,3)}</b>　形：<b>${C.shapeLabel}</b>　μ±2SE に入る割合 ${f(C.within2*100,1)}%</div><div class="mut">歪みは √n で割った分しか減らない。裾の長い母集団ほど、正規に近づくのに大きい n が要る。「n＝30 なら何でも正規」ではない。</div>`;}
+LK.register("clt",{name:"中心極限定理",
+ init(){["cn","cp"].forEach(id=>LK.stepper($(id),cRender));$("cshape").onchange=cRender;cRender();},
+ apply(s){if(s.shape)$("cshape").value=s.shape;if(s.n!==undefined)LK.setRange("cn",s.n);if(s.p!==undefined)LK.setRange("cp",s.p);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 大数の法則
+let lSeed=23;
+function lVals(){const p=+$("lp").value,N=+$("lN").value,r=rng(lSeed),path=[];let h=0;for(let i=1;i<=N;i++){if(r()<p)h++;path.push(h/i);}
+ const se=Math.sqrt(p*(1-p)/N);return {p,N,se,band:2*se,final:path[N-1],dev:Math.abs(path[N-1]-p),hits:h,path,n4:Math.sqrt(p*(1-p)/(4*N))};}
+function lRender(){const Lv=lVals(),H=170,L=34,R=W-10,base=H-26,top=10,X=i=>L+Math.log10(i)/Math.log10(Lv.N)*(R-L),Y=q=>base-q*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="当たりの割合の推移">`;
+ [0,0.25,0.5,0.75,1].forEach(q=>s+=`<line x1="${L}" y1="${Y(q)}" x2="${R}" y2="${Y(q)}" stroke="var(--line)" stroke-dasharray="${q?"2 3":""}"/><text x="${L-4}" y="${Y(q)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${q}</text>`);
+ let up="",dw="";for(let k=0;k<=60;k++){const i=Math.max(1,Math.round(Math.pow(Lv.N,k/60))),b=2*Math.sqrt(Lv.p*(1-Lv.p)/i);up+=(k?"L":"M")+X(i).toFixed(1)+" "+Y(Math.min(1,Lv.p+b)).toFixed(1);dw=" L"+X(i).toFixed(1)+" "+Y(Math.max(0,Lv.p-b)).toFixed(1)+dw;}
+ s+=`<path d="${up}${dw} Z" fill="var(--acc2)" fill-opacity=".12"/><line x1="${L}" y1="${Y(Lv.p)}" x2="${R}" y2="${Y(Lv.p)}" stroke="var(--acc2)" stroke-dasharray="4 3"/>`;
+ let pth="";const step=Math.max(1,Math.floor(Lv.N/400));for(let i=1;i<=Lv.N;i+=step)pth+=(i>1?"L":"M")+X(i).toFixed(1)+" "+Y(Lv.path[i-1]).toFixed(1);
+ s+=`<path d="${pth}" fill="none" stroke="var(--acc)" stroke-width="1.6"/>`;
+ [1,10,100,1000].filter(i=>i<=Lv.N).concat([Lv.N]).forEach(i=>s+=`<text x="${X(i)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${i}</text>`);
+ s+=`</svg>`;
+ $("lplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>当たりの割合</span><span><i class="sw" style="background:var(--acc2);opacity:.3"></i>p±2SE</span><span>横軸：回数（目盛りは10倍ずつ）</span></div>`;
+ $("lsum").innerHTML=`<div>${Lv.N}回で当たり ${Lv.hits}回、割合 <b>${f(Lv.final)}</b>（p＝${f(Lv.p,2)} とのずれ ${f(Lv.dev)}）</div><div>ずれの目安 SE＝√(p(1−p)÷N)＝<b>${f(Lv.se)}</b>、±2SE＝±${f(Lv.band)}。回数を4倍にすると SE は ${f(Lv.n4)}（半分）</div><div class="mut">割合（平均）は p に近づくが、当たりの「回数」と pN の差は小さくならない。外れが続いた後に当たりが出やすくなるわけではない。</div>`;}
+LK.register("lln",{name:"大数の法則",
+ init(){["lp","lN"].forEach(id=>LK.stepper($(id),lRender));$("lagain").onclick=()=>{lSeed=(lSeed*48271)%2147483647;lRender();};lRender();},
+ apply(s){if(s.p!==undefined)LK.setRange("lp",s.p);if(s.N!==undefined)LK.setRange("lN",s.N);lRender();},
+ render:lRender,
+ value(key){const Lv=lVals(),v=Lv[key];return {v,text:f(v)};}});
+
+// ---- 二項の正規近似
+function bFix(){const n=+$("bn").value,e=$("bk");e.max=n;if(+e.value>n)LK.setRange("bk",n);else e._lkUpd&&e._lkUpd();}
+function bVals(){const n=+$("bn").value,p=+$("bp").value,k=Math.min(+$("bk").value,n),kind=$("bkind").value,mean=n*p,sd=Math.sqrt(n*p*(1-p));
+ let le=0;for(let i=0;i<=k;i++)le+=binom(n,p,i);const pk=binom(n,p,k),ge=Math.max(0,1-le+pk);
+ const exact=kind==="le"?Math.min(1,le):kind==="ge"?ge:pk;
+ const zc=kind==="le"?(k+0.5-mean)/sd:kind==="ge"?(k-0.5-mean)/sd:NaN,zn=(k-mean)/sd;
+ const approx=kind==="le"?Phi(zc):kind==="ge"?1-Phi(zc):Phi((k+0.5-mean)/sd)-Phi((k-0.5-mean)/sd);
+ const nocc=kind==="le"?Phi(zn):kind==="ge"?1-Phi(zn):0;
+ return {n,p,k,kind,mean,sd,exact,approx,nocc,z:kind==="eq"?(k-mean)/sd:zc,znocc:zn,np:mean,nq:n*(1-p),ok:mean>=10&&n*(1-p)>=10?"十分":"小さい"};}
+function bRender(){bFix();const B=bVals(),lo=Math.max(0,Math.floor(B.mean-4.5*B.sd)),hi=Math.min(B.n,Math.ceil(B.mean+4.5*B.sd)),H=170,L=12,R=W-12,base=H-30,top=16;
+ const cnt=hi-lo+1,X=x=>L+(x-lo+0.5)/cnt*(R-L),bw=(R-L)/cnt,ps=[];for(let i=lo;i<=hi;i++)ps.push(binom(B.n,B.p,i));
+ const mx=Math.max(...ps,dn(B.mean,B.mean,B.sd))*1.08,Y=y=>base-y/mx*(base-top);
+ const on=i=>B.kind==="le"?i<=B.k:B.kind==="ge"?i>=B.k:i===B.k;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="二項分布と正規近似">`;
+ ps.forEach((q,j)=>{const i=lo+j;s+=`<rect x="${X(i)-bw/2+(cnt<60?0.5:0)}" y="${Y(q)}" width="${Math.max(0.6,bw-(cnt<60?1:0))}" height="${base-Y(q)}" fill="${on(i)?"var(--acc2)":"var(--acc)"}" fill-opacity="${on(i)?.6:.35}"/>`;});
+ let pth="";for(let t=0;t<=200;t++){const x=lo-0.5+(cnt)*t/200;pth+=(t?"L":"M")+(L+(x-lo+0.5)/cnt*(R-L)).toFixed(1)+" "+Y(dn(x,B.mean,B.sd)).toFixed(1);}
+ s+=`<path d="${pth}" fill="none" stroke="var(--fg)" stroke-width="1.6"/><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ const step=Math.max(1,Math.ceil(cnt/8));for(let i=lo;i<=hi;i+=step)s+=`<text x="${X(i)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${i}</text>`;
+ if(B.k>=lo&&B.k<=hi){const cx=B.kind==="le"?X(B.k)+bw/2:B.kind==="ge"?X(B.k)-bw/2:X(B.k);s+=`<line x1="${cx}" y1="${top}" x2="${cx}" y2="${base}" stroke="var(--acc2)" stroke-dasharray="3 2"/>`;}
+ s+=`</svg>`;
+ $("bplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2);opacity:.6"></i>求める範囲の棒</span><span><i class="sw" style="background:var(--fg)"></i>正規曲線</span><span>点線：連続修正の境目</span></div>`;
+ const lab=B.kind==="le"?`P(X≦${B.k})`:B.kind==="ge"?`P(X≧${B.k})`:`P(X＝${B.k})`,cc=B.kind==="le"?`${B.k}＋0.5`:B.kind==="ge"?`${B.k}−0.5`:`${B.k}±0.5`;
+ $("bsum").innerHTML=`<div>平均 np＝${f(B.mean,2)}、標準偏差 √(np(1−p))＝${f(B.sd)}（np＝${f(B.np,1)}・n(1−p)＝${f(B.nq,1)}：${B.ok}）</div><div>${lab}：正確な二項 <b>${f(B.exact)}</b></div><div>連続修正あり（${cc}）：z＝${B.kind==="eq"?"—":f(B.z,3)} → 近似 <b>${f(B.approx)}</b>${B.kind!=="eq"?`　修正なし：z＝${f(B.znocc,3)} → ${f(B.nocc)}`:""}</div><div class="mut">棒は幅1の長方形。「k 以下」は k の棒の右端 k＋0.5 まで、「k 以上」は左端 k−0.5 から面積を取る。np と n(1−p) が小さいと近似がずれる。</div>`;}
+LK.register("bin",{name:"二項の正規近似",
+ init(){["bn","bp","bk"].forEach(id=>LK.stepper($(id),bRender));$("bkind").onchange=bRender;bRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("bn",s.n);bFix();if(s.p!==undefined)LK.setRange("bp",s.p);if(s.k!==undefined)LK.setRange("bk",s.k);if(s.kind)$("bkind").value=s.kind;bRender();},
+ render:bRender,
+ value(key){const B=bVals(),v=B[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- チェビシェフ
+function hVals(){const k=+$("hk").value;return {k,bound:Math.min(1,1/(k*k)),normal:2*(1-Phi(k)),expo:Math.exp(-(1+k))};}
+function hRender(){const Hv=hVals(),H=150,L=34,R=W-10,base=H-26,top=10,X=k=>L+(k-1)/4*(R-L),Y=q=>base-q*(base-top);
+ let b="",nn="";for(let i=0;i<=80;i++){const k=1+4*i/80;b+=(i?"L":"M")+X(k).toFixed(1)+" "+Y(Math.min(1,1/(k*k))).toFixed(1);nn+=(i?"L":"M")+X(k).toFixed(1)+" "+Y(2*(1-Phi(k))).toFixed(1);}
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="チェビシェフの上限と正規分布">`;
+ [0,0.5,1].forEach(q=>s+=`<line x1="${L}" y1="${Y(q)}" x2="${R}" y2="${Y(q)}" stroke="var(--line)" stroke-dasharray="${q?"2 3":""}"/><text x="${L-4}" y="${Y(q)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${q}</text>`);
+ s+=`<path d="${b}" fill="none" stroke="var(--acc2)" stroke-width="2"/><path d="${nn}" fill="none" stroke="var(--acc)" stroke-width="2"/>`;
+ [1,2,3,4,5].forEach(k=>s+=`<text x="${X(k)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${k}σ</text>`);
+ s+=`<line x1="${X(Hv.k)}" y1="${top}" x2="${X(Hv.k)}" y2="${base}" stroke="var(--fg)" stroke-dasharray="3 3"/></svg>`;
+ $("hplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>上限 1÷k²（どんな分布でも）</span><span><i class="sw" style="background:var(--acc)"></i>正規分布の実際</span></div>`;
+ $("hsum").innerHTML=`<div>平均から ${f(Hv.k,1)}σ 以上離れる確率：上限 1÷k²＝<b>${f(Hv.bound)}</b>　正規分布なら <b>${f(Hv.normal)}</b></div><div class="mut">上限は「どんなに悪くてもこれ以下」という保証。実際の割合ではない。分散が有限なら形を問わず使える。</div>`;}
+LK.register("cheb",{name:"チェビシェフ",
+ init(){LK.stepper($("hk"),hRender);hRender();},
+ apply(s){if(s.k!==undefined)LK.setRange("hk",s.k);hRender();},
+ render:hRender,
+ value(key){const Hv=hVals(),v=Hv[key];return {v,text:f(v)};}});
+
+LK.start("clt");
+window.__LAB__={LK,cVals,lVals,bVals,hVals,Phi,binom};
+</script>
+</body></html>
