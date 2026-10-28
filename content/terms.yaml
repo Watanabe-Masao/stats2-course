@@ -122,3 +122,12 @@
 - id: TERM-corr
   name: 相関係数
   en: correlation coefficient
+- id: TERM-complement
+  name: 余事象
+  en: complement
+- id: TERM-exclusive
+  name: 排反
+  en: mutually exclusive
+- id: TERM-indep
+  name: 独立
+  en: independence
