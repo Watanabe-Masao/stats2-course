@@ -1,0 +1,65 @@
+id: LAB-pois
+name: 離散分布ラボ
+slug: poisson                    # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: pois_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_poisson.html, hyper.html]   # 旧版 教科書15 の「λ と時間を動かす」を pois、「戻さず取り出す」を hyper に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: pois
+    name: ポアソン分布
+    purpose: 1単位あたりの平均件数×区間の長さ＝λ。ちょうど k 件・k 件以下・k 件以上の確率。平均＝分散＝λ
+    set: [rate, t, k, kind, unit]   # unit：区間の単位（時間・日 など）。kind：eq／le／ge
+    values: [pk, le, ge, p0, lambda, mean, var]
+  - key: approx
+    name: 二項とポアソン
+    purpose: n が大きく p が小さい二項分布 B(n, p) と、λ＝np のポアソン分布を棒で並べて比べる
+    set: [n, p, k]
+    values: [bin, poi, diff, lambda]
+  - key: geom
+    name: 成功するまで
+    purpose: r 回目の成功が k 回目の試行で起きる確率（r＝1 で幾何分布、2以上で負の二項分布）。平均 r/p・分散 r(1−p)/p²
+    set: [p, r, k]
+    values: [pk, le, gt, mean, var]
+  - key: hyper
+    name: 戻さず取り出す
+    purpose: N 個中 K 個が当たりの箱から戻さず n 個。超幾何分布の確率・平均・分散と、同じ割合の二項分布を比べる
+    set: [N, K, n, k]
+    values: [pk, mean, var, binom, fpc]
+data: スライダーと選択欄で値を決める（データの読み込みなし）
+presets:
+  s1-pois:
+    mode: pois
+    set: {rate: 2, t: 1, k: 3, kind: ge}
+    task: 問い合わせは1時間に平均2件（ポアソン分布）。ある1時間に3件以上来る確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧3)"}
+    expect: 0.3233
+    why: 0件0.135・1件0.271・2件0.271 を1から引いて約0.32。平均2件でも、3時間に1回くらいは3件以上来る。
+  s1-t:
+    mode: pois
+    set: {rate: 2, t: 2, k: 0, kind: eq}
+    task: 1時間に平均2件。2時間続けて1件も来ない確率は（小数で）？
+    predict: {type: number, key: p0, label: "P(X＝0)"}
+    expect: 0.0183
+    why: 2時間なので λ＝4。e⁻⁴≒0.018。1時間0件（e⁻²≒0.135）の2乗とも同じ。時間 t を2倍にすると λ も2倍になる。
+  s3-free:
+    mode: pois
+    modes: [pois, approx, geom, hyper]
+    task: 解いてから、問題が数えているもの（区間の件数・n 回中・成功まで・戻さない）に合うモードで確かめる。
+  s4-free:
+    mode: pois
+    modes: [pois, hyper]
+    task: 自分の売場の数字（1時間あたりの来店や問い合わせ、箱の中の不良の数）を入れ、「k 件以上」「0件」の確率を読む。
+  s5-free:
+    mode: pois
+    modes: [pois, approx, hyper]
+    task: 「ポアソン分布」で k＝0 にし、時間を延ばすと0件の確率（＝待ち時間がそれより長い確率）がどう下がるかを見る（発展1）。「戻さず取り出す」で N を大きくして二項分布に近づくのを見る（発展3）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（ポアソン分布、二項とポアソン、成功するまで、戻さず取り出す）。
+used_by: [U15]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/pois_lab/check.js         # 本文の値（0.135・0.368・0.323、0.199、0.271、0.25、7/15）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
