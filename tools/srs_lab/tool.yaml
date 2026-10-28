@@ -1,0 +1,60 @@
+id: LAB-srs
+name: 抽出ラボ
+slug: sampling                   # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: srs_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [frame.html]    # 旧版 教科書17 の「抽出枠」ラボ（名簿の漏れは n を増やしても消えない）を incl に含む。偏りの大きさを見る版は LAB-sample（U03）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: incl
+    name: 選ばれる確率
+    purpose: 名簿 N 件から n 件の単純無作為抽出。各件の包含確率 n÷N、名簿の外は0、選び方 NCn、特定の2件が両方・どちらか入る確率
+    set: [N, n, m]                # m：名簿の外の件数
+    values: [pi, rate, piMiss, cover, combos, pair, either]
+  - key: enum
+    name: 標本を並べる
+    purpose: 2〜8個の母集団から n 個を選ぶ全標本の x̄ を並べる（標本分布）。全標本の x̄ の平均＝μ、n を増やすと μ の近くに集まる
+    set: [vals, n, c, tol]        # vals：カンマ区切りの値。c：x̄≧c の割合の基準。tol：μ±tol に入る割合の幅
+    values: [count, pEach, mu, meanmean, min, max, sdmean, pge, within]
+  - key: repl
+    name: 戻す・戻さない
+    purpose: 復元抽出で同じ件が重複する確率。ある1件が選ばれる確率（戻す 1−(1−1/N)ⁿ、戻さない n÷N）
+    set: [N, n]
+    values: [pDup, pNoDup, piRepl, piNo]
+data: スライダーと値の入力で決める（データの読み込みなし）。「1回抽選する」は固定の乱数（seed 7）
+presets:
+  s1-incl:
+    mode: incl
+    set: {N: 100, n: 10, m: 5}
+    task: 名簿に載っている100店から10店を単純無作為抽出する。名簿に載っていない新店5店のうち、ある1店が選ばれる確率は？
+    predict: {type: number, key: piMiss, label: "新店が選ばれる確率"}
+    expect: 0
+    why: 名簿の外の店は選ばれようがない。名簿の各店は 10÷100＝0.1 で同じ。n を増やしても新店は0のまま。結論を言えるのは名簿の100店まで。
+  s1-enum:
+    mode: enum
+    set: {vals: "3,5,7,9,11", n: 2, c: 11, tol: 1}
+    task: 5店の値 3・5・7・9・11（平均7）から2店を選ぶ。10通りの標本のうち、x̄ が 6〜8（μ±1）に入る割合は（小数で）？
+    predict: {type: number, key: within, label: "μ±1 に入る割合"}
+    expect: 0.6
+    why: 10通りのうち x̄ が6〜8なのは6通り。n を3・4と増やすと、x̄ は μ＝7 の近くに集まり、n＝5（全数）では x̄＝7 の1通りだけになる。
+  s3-free:
+    mode: incl
+    modes: [incl, enum, repl]
+    task: 解いてから、問題が聞いていること（選ばれる確率か、標本ごとの x̄ の散らばりか、戻すかどうか）に合うモードで確かめる。
+  s4-free:
+    mode: incl
+    modes: [incl, enum, repl]
+    task: 自分の名簿の件数と選ぶ件数、少数の店の実際の値を入れ、選ばれる確率と、選び方で x̄ がどれだけ変わるかを見る。
+  s5-free:
+    mode: enum
+    modes: [enum, repl]
+    task: 「標本を並べる」で n を変え、くわしくの x̄ の標準偏差と σ÷√n×√((N−n)/(N−1)) が一致するのを見る（発展1）。「戻す・戻さない」で N を大きくし、差が消えるのを見る（発展2）。
+  s6-free:
+    task: 自分の抽出の設計を、3つのモードで確かめる（選ばれる確率、標本ごとの x̄ の散らばり、戻すかどうか）。
+used_by: [U17]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/srs_lab/check.js          # 本文の値（0.1、0.00955、10通り・x̄の平均7・0.6、0.2963、x̄ の標準偏差 √3）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null

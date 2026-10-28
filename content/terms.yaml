@@ -173,3 +173,6 @@
 - id: TERM-uniform
   name: 一様分布
   en: uniform distribution
+- id: TERM-sampdist
+  name: 標本分布
+  en: sampling distribution

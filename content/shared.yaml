@@ -11,6 +11,7 @@ domains:
   D1: {name: ① データの記述, icon: "📊", tone: blue}
   D2: {name: ② 確率, icon: "🎲", tone: purple}
   D3: {name: ③ 確率分布, icon: "📈", tone: orange}
+  D4: {name: ④ 標本分布, icon: "🔬", tone: green}
 
 total_units: 32
 
@@ -34,6 +35,7 @@ refs:
   REF-Q-U14: 確認問題（記述式）
   REF-Q-U15: 確認問題（記述式）
   REF-Q-U16: 確認問題（記述式）
+  REF-Q-U17: 確認問題（記述式）
   REF-Q-U05T-1: 確認問題（T1 増減率）
   REF-Q-U05T-2: 確認問題（T2 平均成長率）
   REF-Q-U05T-3: 確認問題（T3 移動平均）
