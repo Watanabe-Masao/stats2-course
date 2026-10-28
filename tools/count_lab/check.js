@@ -7,8 +7,10 @@ const {chromium}=require('playwright');const path=require('path');
   set('mn',3);set('mr',2);const m=L.mVals();set('mn',4);set('mr',6);const m2=L.mVals();
   set('pa',4);set('pb',3);const a=L.aVals();
   set('dn',4);const d=L.dVals();
-  return {l1,l2,l3,p1,p2:{psum:p2.psum,c:p2.c,rowsum:p2.rowsum},p3:p3.c,m,m2:m2.h,a:a.paths,d};});
+  const cv=(k,n,r,m,kk)=>{set('ckind',k);set('cn',n);set('cr',r);set('cm',m);set('ck',kk);return L.cVals2();};
+  const c1=cv('include',6,3,1,0).count,c2=cv('atleast',7,3,4,0).count,c3=cv('adjacent',5,3,1,0),c4=cv('hyper',10,3,2,1);
+  return {l1,l2,l3,p1,p2:{psum:p2.psum,c:p2.c,rowsum:p2.rowsum},p3:p3.c,m,m2:m2.h,a:a.paths,d,c1,c2,c3:c3.count,c3t:c3.total,c4:c4.count,c4p:c4.prob};});
  console.log(JSON.stringify(r));
  const ok=r.l1.perm===20&&r.l1.comb===10&&r.l2.perm===336&&r.l2.comb===56&&r.l3.comb===45&&r.p1.c===35&&r.p1.left===15&&r.p1.right===20
-  &&Math.abs(r.p2.psum-1)<1e-12&&r.p2.c===4&&r.p2.rowsum===16&&r.p3===252&&r.m.pow===9&&r.m.h===6&&r.m2===84&&r.a===35&&r.d.d===9&&r.d.all===24;
+  &&Math.abs(r.p2.psum-1)<1e-12&&r.p2.c===4&&r.p2.rowsum===16&&r.p3===252&&r.m.pow===9&&r.m.h===6&&r.m2===84&&r.a===35&&r.d.d===9&&r.d.all===24&&r.c1===10&&r.c2===34&&r.c3===48&&r.c3t===120&&r.c4===56&&Math.abs(r.c4p-7/15)<1e-12;
  console.log(ok?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok?0:1);})();

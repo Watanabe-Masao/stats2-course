@@ -28,7 +28,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     values: [x]
   - key: margin
     name: 原価率・値入率
-    purpose: 売価と原価から、売価基準の率（原価率・値入率）と原価基準の率（マークアップ率）
+    purpose: 売価と原価から、売価基準の率（原価率・値入率＝値入額÷売価）と原価基準の率（マークアップ率）
     set: [price, cost]
     values: [costRate, margin, markup]   # すべて %
 data: スライダーで値を決める（データの読み込みなし）
@@ -50,7 +50,7 @@ presets:
   s4-margin:
     mode: margin
     modes: [margin, base]
-    task: 売価と原価を動かし、原価率・値入率（売価基準）とマークアップ率（原価基準）がどう違うかを見る。次に「割合と基準量」で、粗利率から必要な売上を逆算する。
+    task: 売価と原価を動かし、原価率・値入率（値入額÷売価）とマークアップ率（値入額÷原価）がどう違うかを見る。次に「割合と基準量」で、粗利率から必要な売上を逆算する。
   s5-chain:
     mode: chain
     modes: [chain, point]

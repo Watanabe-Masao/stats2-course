@@ -3,7 +3,7 @@ name: 数え方ラボ
 slug: count                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 kind: simulator
 src: count_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
-version: 2                       # 2：共通部品に移し、予想→結果の版を作れるようにした（モードと slug は旧版と同じ）
+version: 3                       # 2：共通部品に移した（slug は旧版と同じ）。3：条件付きで数えるモードを足した
 modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
   - key: list
     name: 並べて数える
@@ -30,6 +30,11 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     purpose: 全員が他人の物を受け取る数と確率。1/e に近づく
     set: [n]
     values: [d, all, p]
+  - key: cond
+    name: 条件付き
+    purpose: 特定の1人を含む・少なくとも1人・2人が隣り合う・ちょうど k 個（超幾何）。直接数えるか、反対を引く
+    set: [kind, n, r, m, k]     # kind：include／atleast／adjacent／hyper。m は印（女性・不良など）の数
+    values: [count, total, prob]
 data: スライダーで値を決める（データの読み込みなし）
 presets:
   s1-list:
@@ -56,9 +61,9 @@ presets:
     expect: 35
     why: ₇C₃＝₆C₂＋₆C₃＝15＋20＝35。特定の1人を含む選び方（15）と含まない選び方（20）の和。
   s3-free:
-    mode: list
-    modes: [list, pascal]
-    task: 解いてから、「並べて数える」で n・r・役割を問題に合わせて書き出しと式を比べる。「パスカル」で数をタップすると、特定の1人を含む・含まないに分かれる。
+    mode: cond
+    modes: [cond, list, pascal]
+    task: 解いてから、「条件付き」で条件を問題に合わせ、太枠（条件を満たすもの）の数と式を比べる。「パスカル」で数をタップすると、特定の1人を含む・含まないに分かれる。
   s4-path:
     mode: path
     modes: [path, list]
@@ -72,7 +77,7 @@ presets:
 used_by: [U09]
 tests:
   - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
-  - node tools/count_lab/check.js        # 本文の値（₅P₂＝20・₅C₂＝10、₇C₃＝15＋20、₇C₄＝35、₄C₂ の段、完全順列 9/24）
+  - node tools/count_lab/check.js        # 本文の値（₅P₂＝20・₅C₂＝10、₇C₃＝15＋20、₇C₄＝35、₄C₂ の段、完全順列 9/24、条件付き 10・34・48・7/15）
 checked:
   browser_380px: 2026-10-28
   notion_iphone: null
