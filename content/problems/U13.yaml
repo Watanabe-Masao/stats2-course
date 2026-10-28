@@ -1,0 +1,313 @@
+# 単元U13の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U13-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    X＝0, 1 の確率が 0.7, 0.3 のとき、期待値と分散は？
+
+    E(X)＝0×0.7＋1×0.3＝□、E(X²)＝0²×0.7＋1²×0.3＝□。V(X)＝□−□²＝□
+  answer_title: 答え（埋めてから開く）
+  answer: E(X)＝**0.3**、E(X²)＝**0.3**、V(X)＝0.3−0.09＝**0.21**。期待値は**0.3**（実際には取らない値でもよい）。
+  checks:
+    - 'Fraction(3,10) == 1*Fraction(3,10) and Fraction(3,10)**2 == Fraction(9,100) and Fraction(3,10) - Fraction(9,100) == Fraction(21,100)'
+  lab:
+    id: LAB-expect
+    mode: dist
+    set: {xs: "0,1", p: [70, 30], unit: "", name: X}
+    task: X＝0 の確率0.7、X＝1 の確率0.3。分散 V(X) はいくつか。
+    predict: {type: number, key: var, label: "V(X)"}
+    expect: 0.21
+    why: E(X)＝0.3、E(X²)＝0.3（0と1は2乗しても同じ）。V＝0.3−0.3²＝0.21。期待値0.3は、X が実際にはとらない値。
+
+- id: Q-U13-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 例題Aの X で、1人の支払額 Y＝200X＋50（1個200円、固定分50円）の平均と標準偏差は？
+  answer_title: 答え（解いてから開く）
+  answer: E(Y)＝200×1.1＋50＝**270円**。V(Y)＝200²×0.49＝19,600、標準偏差＝200×0.7＝**140円**。固定分50円はばらつきに効かない。
+  checks:
+    - '200*Fraction(11,10)+50 == 270 and 200**2*Fraction(49,100) == 19600 and 200*Fraction(7,10) == 140'
+  lab:
+    id: LAB-expect
+    mode: lin
+    set: {xs: "0,1,2", p: [20, 50, 30], unit: 個, name: 買う個数, a: 200, b: 50, yunit: 円}
+    task: X は例題A（0個 20%・1個 50%・2個 30%）。支払額 Y＝200X＋50 の標準偏差は何円か。
+    predict: {type: number, key: sdy, label: "Y の標準偏差", unit: "円"}
+    expect: 140
+    why: 標準偏差は |a| 倍で 200×0.7＝140円。固定分の50円は全体をずらすだけで、ばらつきは変えない。b を動かしても140円のまま。
+
+- id: Q-U13-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 例題の X（E＝1.1、V＝0.49）で、2X＋3 の期待値と分散は？
+  answer: E＝2×1.1＋3＝**5.2**、V＝2²×0.49＝**1.96**。
+  checks:
+    - '2*Fraction(11,10)+3 == Fraction(52,10) and 2**2*Fraction(49,100) == Fraction(196,100)'
+  lab:
+    id: LAB-expect
+    mode: lin
+    set: {xs: "0,1,2", p: [20, 50, 30], unit: 個, name: 買う個数, a: 2, b: 3, yunit: ""}
+    task: X は例題A（E＝1.1、V＝0.49）。2X＋3 の分散はいくつか。
+    predict: {type: number, key: vy, label: "V(2X＋3)"}
+    expect: 1.96
+    why: 分散は a² 倍で 4×0.49＝1.96。2倍（0.98）ではない。足した3は分散に効かない。
+
+- id: Q-U13-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: X と Y の分散が4と9、共分散が1のとき、X＋Y と X−Y の分散は？ 独立ならどうなるか。
+  answer: V(X＋Y)＝4＋9＋2×1＝**15**、V(X−Y)＝4＋9−2×1＝**11**。独立なら共分散0で、どちらも**13**。差でも分散は「足す」。
+  checks:
+    - '4+9+2*1 == 15 and 4+9-2*1 == 11 and 4+9 == 13'
+  lab:
+    id: LAB-expect
+    mode: sum
+    set: {vx: 4, vy: 9, cov: 1}
+    task: V(X)＝4、V(Y)＝9、Cov(X,Y)＝1。X−Y の分散はいくつか。
+    predict: {type: number, key: vdiff, label: "V(X−Y)"}
+    expect: 11
+    why: 4＋9−2×1＝11。差でも V(X)＋V(Y) から始まり、共分散の2倍を引く。共分散を0にすると和も差も13。
+
+- id: Q-U13-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 1枚200円のくじで、1等1000円が1%、2等100円が10%、残りははずれ（0円）。当選金の期待値と標準偏差は？ 1枚買うと平均していくら損か。
+  answer: E＝1000×0.01＋100×0.1＝10＋10＝**20円**。E(X²)＝1000000×0.01＋10000×0.1＝11000、V＝11000−400＝10600、標準偏差≒**103円**。平均して1枚あたり 200−20＝**180円**の損。標準偏差が期待値より大きいのは、まれな高額当選があるから。
+  checks:
+    - '1000*Fraction(1,100)+100*Fraction(10,100) == 20 and 1000**2*Fraction(1,100)+100**2*Fraction(10,100) == 11000 and 11000-20**2 == 10600 and abs(math.sqrt(10600) - 103) < 0.5 and 200-20 == 180'
+  lab:
+    id: LAB-expect
+    mode: dist
+    set: {xs: "0,100,1000", p: [89, 10, 1], unit: 円, name: 当選金}
+    task: はずれ0円 89%、2等100円 10%、1等1000円 1%。当選金の期待値は何円か。
+    predict: {type: number, key: mean, label: "E(X)", unit: "円"}
+    expect: 20
+    why: 0×0.89＋100×0.1＋1000×0.01＝20円。くじは200円なので平均180円の損。▲（重心）は、まれな1000円に引っ張られて0円から少し右にある。
+
+- id: Q-U13-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: ある商品の1日の欠品回数 X は、0回 0.5、1回 0.3、2回 0.2。期待値と分散は？
+  answer: E(X)＝0.3＋0.4＝**0.7回**。E(X²)＝0.3＋0.8＝1.1、V(X)＝1.1−0.49＝**0.61**。
+  checks:
+    - '1*Fraction(3,10)+2*Fraction(2,10) == Fraction(7,10) and 1*Fraction(3,10)+4*Fraction(2,10) == Fraction(11,10) and Fraction(11,10)-Fraction(49,100) == Fraction(61,100)'
+  lab:
+    id: LAB-expect
+    mode: dist
+    set: {xs: "0,1,2", p: [50, 30, 20], unit: 回, name: 欠品回数}
+    task: 1日の欠品回数が 0回 50%・1回 30%・2回 20%。分散はいくつか。
+    predict: {type: number, key: var, label: "V(X)"}
+    expect: 0.61
+    why: E(X)＝0.7、E(X²)＝1.1。V＝1.1−0.7²＝0.61。E(X²) と {E(X)}² を取り違えると間違える。
+
+- id: Q-U13-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P3]
+  prompt: 倉庫に入るケース数 X は1か7（確率1/2ずつ）で、E(X)＝4、V(X)＝9。棚は10段あり、1ケースで2段使うので、空き棚の数は Y＝10−2X。Y の期待値と分散、標準偏差は？
+  answer: E(Y)＝10−2×4＝**2段**。V(Y)＝(−2)²×9＝**36**、標準偏差＝|−2|×3＝**6段**。掛ける数が負でも、分散は a² 倍、標準偏差は |a| 倍。
+  checks:
+    - 'Fraction(1+7,2) == 4 and Fraction((1-4)**2+(7-4)**2,2) == 9 and 10-2*4 == 2 and (-2)**2*9 == 36 and abs(-2)*3 == 6'
+  lab:
+    id: LAB-expect
+    mode: lin
+    set: {xs: "1,7", p: [50, 50], unit: ケース, name: 入るケース数, a: -2, b: 10, yunit: 段}
+    task: X は1か7（1/2ずつ）、E(X)＝4、V(X)＝9。Y＝−2X＋10 の分散はいくつか。
+    predict: {type: number, key: vy, label: "V(Y)"}
+    expect: 36
+    why: (−2)²×9＝36。分散は負にならない。−2倍は左右が入れ替わるだけで、ずれの大きさは2倍（標準偏差6）。
+
+- id: Q-U13-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 10人の客が買った個数は 0, 0, 1, 1, 1, 1, 1, 2, 2, 2。このデータの平均と分散（n で割る）を求め、例題Aの期待値・分散と比べよ。（{{unit:U07}}）
+  answer: 平均＝11÷10＝**1.1個**。分散＝2乗の平均−平均の2乗＝(0＋0＋1×5＋4×3)÷10−1.21＝1.7−1.21＝**0.49**。割合 0.2・0.5・0.3 が例題Aの確率と同じなので、期待値・分散と一致する。データの割合を確率と見たものが確率分布。
+  checks:
+    - 'Fraction(0+0+5+6,10) == Fraction(11,10) and Fraction(5+12,10) == Fraction(17,10) and Fraction(17,10)-Fraction(121,100) == Fraction(49,100)'
+  lab:
+    id: LAB-expect
+    mode: dist
+    set: {xs: "0,1,2", p: [20, 50, 30], unit: 個, name: 買う個数}
+    task: 10人のうち0個2人・1個5人・2個3人。割合を確率と見て、分散はいくつか。
+    predict: {type: number, key: var, label: "分散"}
+    expect: 0.49
+    why: 割合 20%・50%・30% は例題Aの確率と同じ。データの分散（n で割る）と分布の分散は同じ計算になる。
+
+- id: Q-U13-020
+  stage: S3
+  tag: 足りない確率を補う
+  format: written
+  powers: [P1, P3]
+  prompt: 1人が買う個数 X が 0個 0.1、1個 0.3、2個 0.4、3個 □ のとき、□ と期待値・標準偏差は？
+  answer: 確率の合計は1なので □＝1−0.8＝**0.2**。E(X)＝0.3＋0.8＋0.6＝**1.7個**。E(X²)＝0.3＋1.6＋1.8＝3.7、V＝3.7−2.89＝0.81、標準偏差＝**0.9個**。
+  checks:
+    - '1-(Fraction(1,10)+Fraction(3,10)+Fraction(4,10)) == Fraction(2,10) and Fraction(3,10)+2*Fraction(4,10)+3*Fraction(2,10) == Fraction(17,10) and Fraction(3,10)+4*Fraction(4,10)+9*Fraction(2,10) == Fraction(37,10) and Fraction(37,10)-Fraction(289,100) == Fraction(81,100) and math.isclose(math.sqrt(0.81), 0.9)'
+  lab:
+    id: LAB-expect
+    mode: dist
+    set: {xs: "0,1,2,3", p: [10, 30, 40, 20], unit: 個, name: 買う個数}
+    task: 0個 10%・1個 30%・2個 40%、3個は残り（合計100%）。期待値は何個か。
+    predict: {type: number, key: mean, label: "E(X)", unit: "個"}
+    expect: 1.7
+    why: 3個の確率は 100−80＝20%。0.3＋0.8＋0.6＝1.7個。確率の合計が1か、計算の前に確かめる。
+
+- id: Q-U13-021
+  stage: S3
+  tag: 差の分散
+  format: written
+  powers: [P1, P3]
+  prompt: ある商品の1日の販売数 X は期待値100・分散16、返品数 Y は期待値10・分散9で、互いに独立とする。正味の販売数 X−Y の期待値と標準偏差は？
+  answer: E(X−Y)＝100−10＝**90個**。独立なので V(X−Y)＝16＋9＝25、標準偏差＝**5個**。差でも分散は足す（16−9＝7 ではない）。
+  checks:
+    - '100-10 == 90 and 16+9 == 25 and math.isclose(math.sqrt(25), 5)'
+  lab:
+    id: LAB-expect
+    mode: sum
+    set: {ex: 100, ey: 10, vx: 16, vy: 9, cov: 0}
+    task: E(X)＝100・V(X)＝16、E(Y)＝10・V(Y)＝9、独立（共分散0）。X−Y の標準偏差はいくつか。
+    predict: {type: number, key: sddiff, label: "X−Y の標準偏差"}
+    expect: 5
+    why: V(X−Y)＝16＋9＝25 で標準偏差5。返品のぶれも正味の販売数のぶれに加わる。
+
+- id: Q-U13-022
+  stage: S3
+  tag: 同時分布と共分散
+  format: written
+  powers: [P1, P3]
+  prompt: |-
+    X＝弁当購入（1/0）、Y＝お茶購入（1/0）の同時確率が次のとき、共分散と独立かどうかを求めよ。
+
+    | (X, Y) | 確率 |
+    | --- | --- |
+    | (0, 0) | 0.4 |
+    | (0, 1) | 0.1 |
+    | (1, 0) | 0.2 |
+    | (1, 1) | 0.3 |
+  answer: 周辺確率：P(X＝1)＝0.2＋0.3＝0.5、P(Y＝1)＝0.1＋0.3＝0.4。E(XY)＝P(1,1)＝0.3。Cov＝0.3−0.5×0.4＝**0.1**（正）。P(1,1)＝0.3 ≠ 0.5×0.4＝0.2 なので**独立ではない**。弁当を買う人はお茶も買いやすい。
+  checks:
+    - 'Fraction(2,10)+Fraction(3,10) == Fraction(5,10) and Fraction(1,10)+Fraction(3,10) == Fraction(4,10) and Fraction(3,10)-Fraction(5,10)*Fraction(4,10) == Fraction(1,10) and Fraction(5,10)*Fraction(4,10) == Fraction(2,10)'
+  lab:
+    id: LAB-expect
+    mode: joint
+    set: {p11: 30, p10: 20, p01: 10, nameX: 弁当, nameY: お茶}
+    task: 両方30%・弁当だけ20%・お茶だけ10%・どちらもなし40%。共分散 Cov(X,Y) はいくつか。
+    predict: {type: number, key: cov, label: "Cov(X,Y)"}
+    expect: 0.1
+    why: E(XY)＝0.3、E(X)E(Y)＝0.5×0.4＝0.2。差の0.1が共分散で、正なので一緒に買われやすい。独立なら P(両方) は20%のはず。
+
+- id: Q-U13-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: 確率変数 X・Y について、正しいものはどれか。
+  choices:
+    - 期待値は、X がとりうる値のどれかに必ず一致する。
+    - V(2X)＝2V(X) である。
+    - X と Y が独立なら、V(X−Y)＝V(X)＋V(Y) である。
+    - Cov(X,Y)＝0 なら、X と Y は必ず独立である。
+    - E(X＋Y)＝E(X)＋E(Y) は、X と Y が独立なときだけ成り立つ。
+  correct: 3
+  answer: 独立なら共分散0で、V(X−Y)＝V(X)＋V(Y)−2×0＝V(X)＋V(Y)。差でも分散は足す。
+  misconceptions:
+    1: 期待値は重み付き平均で、1.1個のように実際にはとらない値でもよい
+    2: 分散は a² 倍なので V(2X)＝4V(X)
+    4: 共分散0は無相関なだけ。直線的でない関係があるときは独立でない（発展3）
+    5: 期待値の和は、独立でなくてもいつでも成り立つ
+  checks:
+    - '2**2 == 4'
+  lab:
+    id: LAB-expect
+    mode: sum
+    set: {vx: 4, vy: 9, cov: 0}
+    task: V(X)＝4、V(Y)＝9 で独立（共分散0）。V(X−Y) はいくつか。
+    predict: {type: number, key: vdiff, label: "V(X−Y)"}
+    expect: 13
+    why: 4＋9＝13。引き算の 4−9 にはならない。共分散を動かすと、和と差の分散が逆向きに変わる。
+
+- id: Q-U13-030
+  stage: S4
+  tag: 売上見込み
+  format: written
+  powers: [P1, P3]
+  prompt: 1日の来店客が300人、1人が買う個数は例題A（期待値1.1個・分散0.49）。客どうしは独立とする。1日の合計個数の期待値と標準偏差は？
+  answer: 期待値＝300×1.1＝**330個**（和の期待値は独立でなくても足せる）。分散＝300×0.49＝147、標準偏差＝√147≒**12.1個**。発注の余裕を考える目安になる。1人の標準偏差0.7を300倍した210個ではない。
+  checks:
+    - '300*Fraction(11,10) == 330 and abs(300*0.49 - 147) < 1e-9 and abs(math.sqrt(147) - 12.1) < 0.05 and abs(300*0.7 - 210) < 1e-9'
+  lab:
+    id: LAB-expect
+    mode: total
+    set: {n: 300, mu: 1.1, var: 0.49, unit: 個}
+    task: 300人、1人あたり期待値1.1個・分散0.49、客どうしは独立。合計個数の標準偏差は何個か。
+    predict: {type: number, key: sdtot, label: "合計の標準偏差", unit: "個"}
+    expect: 12.1244
+    why: 分散が300倍で147、標準偏差は √147≒12.1個。標準偏差を300倍（210個）にするのは誤り。ぶれは打ち消し合う。
+
+- id: Q-U13-031
+  stage: S4
+  tag: 価格を変える
+  format: written
+  powers: [P1, P3]
+  prompt: ある商品の1日の販売数 X は45個か55個（確率1/2ずつ）で、期待値50・標準偏差5。1個200円のとき売上の期待値と標準偏差は？ 1個150円に値下げし、メーカーから1日2000円の協賛金が入る場合は？（販売数の分布は変わらないとする）
+  answer: 200円：期待値 200×50＝**10000円**、標準偏差 200×5＝**1000円**。150円＋2000円：期待値 150×50＋2000＝**9500円**、標準偏差 150×5＝**750円**。協賛金はばらつきを変えず、単価を下げると売上のぶれも小さくなる。
+  checks:
+    - 'Fraction(45+55,2) == 50 and math.isclose(math.sqrt(((45-50)**2+(55-50)**2)/2), 5) and 200*50 == 10000 and 200*5 == 1000 and 150*50+2000 == 9500 and 150*5 == 750'
+  lab:
+    id: LAB-expect
+    mode: lin
+    set: {xs: "45,55", p: [50, 50], unit: 個, name: 販売数, a: 200, b: 0, yunit: 円}
+    task: 販売数は45個か55個（1/2ずつ）。1個200円のとき、売上の標準偏差は何円か。
+    predict: {type: number, key: sdy, label: "売上の標準偏差", unit: "円"}
+    expect: 1000
+    why: 200×5＝1000円。a を150、b を2000にすると、期待値9500円・標準偏差750円になる。
+
+- id: Q-U13-032
+  stage: S4
+  tag: 2商品の合計
+  format: written
+  powers: [P1, P3]
+  prompt: パンの販売数 X（標準偏差10）と牛乳の販売数 Y（標準偏差8）は一緒に売れやすく、共分散は40。合計 X＋Y の標準偏差は？ 共分散が −40（代わりに買われる関係）ならどうか。
+  answer: V(X＋Y)＝100＋64＋2×40＝244、標準偏差≒**15.6個**。共分散 −40 なら 100＋64−80＝84、標準偏差≒**9.2個**。一緒に売れる商品の合計はぶれが大きく、代わりに買われる商品の合計はぶれが小さい。
+  checks:
+    - '10**2+8**2+2*40 == 244 and abs(math.sqrt(244) - 15.6) < 0.05 and 10**2+8**2-2*40 == 84 and abs(math.sqrt(84) - 9.2) < 0.05'
+  lab:
+    id: LAB-expect
+    mode: sum
+    set: {vx: 100, vy: 64, cov: 40}
+    task: V(X)＝100（標準偏差10）、V(Y)＝64（標準偏差8）、Cov＝40。X＋Y の標準偏差はいくつか。
+    predict: {type: number, key: sdsum, label: "X＋Y の標準偏差"}
+    expect: 15.6205
+    why: 100＋64＋80＝244、√244≒15.6。標準偏差をそのまま足した18より小さい。共分散を −40 にすると約9.2。
+
+- id: Q-U13-040
+  stage: S5
+  tag: 0/1 なら無相関＝独立
+  format: written
+  powers: [P1, P3]
+  prompt: X・Y は「する（1）・しない（0）」の量で、P(両方)＝0.2、P(X＝1)＝0.5、P(Y＝1)＝0.4。共分散を求め、独立かどうかを判定せよ。
+  answer: Cov＝E(XY)−E(X)E(Y)＝0.2−0.5×0.4＝**0**。P(両方)＝P(X＝1)P(Y＝1) なので**独立**。0/1 の量では、共分散0と独立は同じ式になる。
+  checks:
+    - 'Fraction(2,10)-Fraction(5,10)*Fraction(4,10) == 0'
+  lab:
+    id: LAB-expect
+    mode: joint
+    set: {p11: 20, p10: 30, p01: 20, nameX: X, nameY: Y}
+    task: 両方20%・Xだけ30%・Yだけ20%・どちらもなし30%。X と Y は独立か。
+    predict: {type: choice, key: indep, label: "独立か", options: [はい, いいえ]}
+    expect: はい
+    why: P(X＝1)＝0.5、P(Y＝1)＝0.4、積0.2＝P(両方)。共分散0で、4つのマスすべてが「独立なら」の値と一致する。

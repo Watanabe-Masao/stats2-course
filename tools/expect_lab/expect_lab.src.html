@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>期待値ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.rest{font-size:13px;margin:2px 0 6px}
+#m-sum .lk-step .lk-name,#m-total .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 期待値ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-dist" class="mode">
+ <p class="mut" style="margin:0">値ごとの確率を決めると、期待値（分布の重心）と、ばらつき（分散・標準偏差）が出る。最後の値の確率は、合計が100%になるように自動で決まる。</p>
+ <div class="row ctl"><label>値 <select id="dxs" data-key="xs"></select></label></div>
+ <div id="dps"></div>
+ <div class="rest mut ctl" id="dlast"></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+ <div class="res det" id="dtab"></div>
+</div>
+
+<div id="m-lin" class="mode">
+ <p class="mut" style="margin:0">X を a 倍して b を足した Y＝aX＋b。形はそのまま、中心は aE(X)＋b に動き、ばらつきは |a| 倍になる。X の分布は「分布と期待値」で決める。</p>
+ <div class="card mut ctl" id="lx"></div>
+ <input type="range" id="la" min="-10" max="300" step="1" value="200" data-name="a（掛ける）">
+ <input type="range" id="lb" min="-100" max="300" step="1" value="50" data-name="b（足す）">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="lplot"></div>
+ <div class="card res key" id="lsum"></div>
+</div>
+
+<div id="m-sum" class="mode">
+ <p class="mut" style="margin:0">2つの量 X・Y の和と差。期待値はいつでも足し引きできる。分散は「足して、共分散の2倍を足す（差なら引く）」。</p>
+ <input type="range" id="sex" min="0" max="300" step="1" value="10" data-name="E(X)">
+ <input type="range" id="sey" min="0" max="300" step="1" value="5" data-name="E(Y)">
+ <input type="range" id="svx" min="0" max="200" step="0.5" value="4" data-name="V(X)">
+ <input type="range" id="svy" min="0" max="200" step="0.5" value="9" data-name="V(Y)">
+ <input type="range" id="scv" min="-100" max="100" step="0.5" value="1" data-name="Cov(X,Y)">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+</div>
+
+<div id="m-total" class="mode">
+ <p class="mut" style="margin:0">1人あたりの量が同じ分布で、n 人分が互いに独立なとき、合計の期待値は n 倍、分散も n 倍、標準偏差は √n 倍にしかならない。</p>
+ <input type="range" id="tn" min="1" max="500" step="1" value="300" data-name="人数 n">
+ <input type="range" id="tmu" min="0" max="10" step="0.1" value="1.1" data-name="1人の期待値">
+ <input type="range" id="tvr" min="0" max="5" step="0.01" value="0.49" data-name="1人の分散">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<div id="m-joint" class="mode">
+ <p class="mut" style="margin:0">2つの「する（1）・しない（0）」の同時確率。共分散＝E(XY)−E(X)E(Y)。P(両方) が P(X＝1)P(Y＝1) と同じなら独立。</p>
+ <div class="row ctl mut" style="font-size:13px">X＝<b id="jnx" style="color:var(--fg)">弁当</b>　Y＝<b id="jny" style="color:var(--fg)">お茶</b></div>
+ <input type="range" id="j11" min="0" max="100" step="1" value="30" data-name="両方" data-unit="%">
+ <input type="range" id="j10" min="0" max="100" step="1" value="20" data-name="Xだけ" data-unit="%">
+ <input type="range" id="j01" min="0" max="100" step="1" value="10" data-name="Yだけ" data-unit="%">
+ <div class="rest mut ctl" id="jlast"></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="jplot"></div>
+ <div class="card res key" id="jsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=v=>{if(!isFinite(v))return "—";const r=+v.toFixed(4);return String(Object.is(r,-0)?0:r);};
+const pc=v=>String(+(v*100).toFixed(2))+"%";
+
+// ---- 分布と期待値
+const XS=["0,1,2","0,1,2,3","0,1","0,2","1,2,3,4,5,6","0,100,1000"];
+let DS={xs:[0,1,2],unit:"個",name:"買う個数"};
+const xsKey=xs=>xs.join(",");
+function dBuild(ps){const box=$("dps");box.innerHTML="";const k=DS.xs.length;
+ for(let i=0;i<k-1;i++){const inp=document.createElement("input");inp.type="range";inp.id="dp"+i;inp.min=0;inp.max=100;inp.step=1;
+  inp.value=ps&&ps[i]!==undefined?ps[i]:Math.floor(100/k);inp.dataset.name=`${DS.xs[i]}${DS.unit}`;inp.dataset.unit="%";box.appendChild(inp);LK.stepper(inp,dRender);}}
+function dSetXs(key){const xs=String(key).split(",").map(Number);if(![...$("dxs").options].some(o=>o.value===String(key))){const o=document.createElement("option");o.value=key;o.textContent=xs.join("・");$("dxs").appendChild(o);}
+ $("dxs").value=String(key);DS.xs=xs;}
+function dClamp(){let acc=0;for(let i=0;i<DS.xs.length-1;i++){const e=$("dp"+i);let v=+e.value;if(acc+v>100){v=100-acc;LK.setRange("dp"+i,v);}acc+=v;}return acc;}
+function dVals(){const k=DS.xs.length;const raw=[];let acc=0;for(let i=0;i<k-1;i++){const v=+$("dp"+i).value;raw.push(v);acc+=v;}raw.push(Math.max(0,100-acc));
+ const p=raw.map(v=>v/100),xs=DS.xs;let mean=0,ex2=0;xs.forEach((x,i)=>{mean+=x*p[i];ex2+=x*x*p[i];});
+ const vr=Math.max(0,ex2-mean*mean);return {xs,p,raw,mean,ex2,var:vr,sd:Math.sqrt(vr)};}
+function distSvg(xs,p,mean,sd,unit,H,label){const lo=Math.min(...xs),hi=Math.max(...xs),k=xs.length;
+ const X=v=>hi===lo?W/2:34+(v-lo)/(hi-lo)*(W-68),base=H-30,top=34,maxp=Math.max(...p,0.01),Y=q=>base-q/maxp*(base-top);
+ const gap=k>1?(W-68)/(k-1):W,bw=Math.max(10,Math.min(30,gap*0.55));
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label||"分布")}">`;
+ if(label)s+=`<text x="6" y="13" font-size="11" fill="var(--mut)">${esc(label)}</text>`;
+ const bl=hi===lo?W/2-40:Math.max(6,X(mean-sd)),br=hi===lo?W/2+40:Math.min(W-6,X(mean+sd));
+ if(sd>0)s+=`<rect x="${bl}" y="${top-6}" width="${Math.max(0,br-bl)}" height="${base-top+6}" fill="var(--acc2)" fill-opacity=".12"/>`;
+ s+=`<line x1="6" y1="${base}" x2="${W-6}" y2="${base}" stroke="var(--line)"/>`;
+ xs.forEach((x,i)=>{const h=base-Y(p[i]);s+=`<rect x="${X(x)-bw/2}" y="${Y(p[i])}" width="${bw}" height="${h}" rx="3" fill="var(--acc)" fill-opacity=".75"/>`;
+  s+=`<text x="${X(x)}" y="${base+13}" font-size="11" text-anchor="middle" fill="var(--fg)">${esc(f(x))}</text>`;
+  if(p[i]>0)s+=`<text x="${X(x)}" y="${Y(p[i])-3}" font-size="10" text-anchor="middle" fill="var(--mut)">${pc(p[i])}</text>`;});
+ const mx=hi===lo?W/2:X(mean);
+ s+=`<line x1="${mx}" y1="${top-14}" x2="${mx}" y2="${base}" stroke="var(--acc2)" stroke-width="2" stroke-dasharray="4 3"/><path d="M${mx-7} ${base+26} L${mx+7} ${base+26} L${mx} ${base+16} Z" fill="var(--acc2)"/>`;
+ if(sd>0&&hi!==lo)s+=`<text x="${br-2}" y="${base+26}" font-size="10" text-anchor="end" fill="var(--acc2)">±${esc(f(sd))}</text>`;
+ s+=`<text x="${Math.min(W-8,Math.max(8,mx))}" y="14" font-size="11" text-anchor="${mx>W*0.7?"end":mx<W*0.3?"start":"middle"}" fill="var(--acc2)">期待値 ${esc(f(mean))}${esc(unit)}</text></svg>`;
+ return s;}
+const legendD=`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>確率</span><span><i class="sw" style="background:var(--acc2)"></i>▲期待値（重心）</span><span><i class="sw" style="background:var(--acc2);opacity:.25"></i>期待値±標準偏差</span></div>`;
+function dRender(){dClamp();const D=dVals(),u=DS.unit;
+ $("dlast").textContent=`${f(DS.xs[DS.xs.length-1])}${u} の確率（残り）＝${D.raw[D.raw.length-1]}%`;
+ $("dplot").innerHTML=distSvg(D.xs,D.p,D.mean,D.sd,u,170,`${DS.name}の分布`)+legendD;
+ const terms=D.xs.map((x,i)=>`${f(x)}×${f(D.p[i])}`).join("＋");
+ $("dsum").innerHTML=`<div>E(X)＝${terms}＝<b>${f(D.mean)}${esc(u)}</b></div><div>V(X)＝E(X²)−{E(X)}²＝${f(D.ex2)}−${f(D.mean)}²＝<b>${f(D.var)}</b>　標準偏差＝√${f(D.var)}＝<b>${f(D.sd)}${esc(u)}</b></div><div class="mut">100回（100人）なら合計はおよそ ${f(100*D.mean)}${esc(u)}。1回ごとには期待値から ±${f(D.sd)}${esc(u)} くらいぶれる。</div>`;
+ $("dtab").innerHTML=`<table><tr><th>x</th><th>確率</th><th>x×確率</th><th>x²×確率</th></tr>${D.xs.map((x,i)=>`<tr><td>${f(x)}</td><td>${f(D.p[i])}</td><td>${f(x*D.p[i])}</td><td>${f(x*x*D.p[i])}</td></tr>`).join("")}<tr><th>合計</th><th>${f(D.p.reduce((a,b)=>a+b,0))}</th><th>${f(D.mean)}</th><th>${f(D.ex2)}</th></tr></table>`;
+ if(LK.mode==="lin")lRender();}
+function dApply(s){if(s.unit!==undefined)DS.unit=s.unit;if(s.name)DS.name=s.name;if(s.xs!==undefined)dSetXs(s.xs);dBuild(s.p);dRender();}
+LK.register("dist",{name:"分布と期待値",
+ init(){$("dxs").innerHTML=XS.map(k=>`<option value="${k}">${k.split(",").join("・")}</option>`).join("");$("dxs").value="0,1,2";
+  $("dxs").onchange=()=>{dSetXs($("dxs").value);dBuild();dRender();};dBuild([20,50,30]);dRender();},
+ apply:dApply,render:dRender,
+ value(key){const D=dVals(),v=D[key],u=["mean","sd"].includes(key)?DS.unit:"";return {v,text:f(v)+u};}});
+
+// ---- 1次変換 Y＝aX＋b
+let YU="";
+function lVals(){const D=dVals(),a=+$("la").value,b=+$("lb").value;return {D,a,b,ex:D.mean,vx:D.var,ey:a*D.mean+b,vy:a*a*D.var,sdy:Math.abs(a)*D.sd};}
+function lRender(){const L=lVals(),D=L.D,u=DS.unit,yu=YU||"";
+ $("lx").innerHTML=`X（${esc(DS.name)}）：${D.xs.map((x,i)=>`${esc(f(x))}${esc(u)} ${D.raw[i]}%`).join("・")}`;
+ const ys=D.xs.map(x=>L.a*x+L.b);
+ $("lplot").innerHTML=distSvg(D.xs,D.p,D.mean,D.sd,u,140,"X")+distSvg(ys,D.p,L.ey,L.sdy,yu,140,`Y＝${L.a}X${L.b<0?"−":"＋"}${Math.abs(L.b)}`)+legendD;
+ $("lsum").innerHTML=`<div>E(Y)＝a×E(X)＋b＝${L.a}×${f(L.ex)}${L.b<0?"−":"＋"}${Math.abs(L.b)}＝<b>${f(L.ey)}${esc(yu)}</b></div><div>V(Y)＝a²×V(X)＝${L.a}²×${f(L.vx)}＝<b>${f(L.vy)}</b>　標準偏差＝|a|×${f(D.sd)}＝<b>${f(L.sdy)}${esc(yu)}</b></div><div class="mut">b を足しても全体がずれるだけで、ばらつきは変わらない。a 倍すると、ずれも a 倍（分散は a² 倍）。</div>`;}
+LK.register("lin",{name:"aX＋b",
+ init(){["la","lb"].forEach(id=>LK.stepper($(id),lRender));},
+ apply(s){if(s.xs!==undefined||s.p!==undefined||s.unit!==undefined||s.name)dApply(s);if(s.yunit!==undefined)YU=s.yunit;if(s.a!==undefined)LK.setRange("la",s.a);if(s.b!==undefined)LK.setRange("lb",s.b);lRender();},
+ render:lRender,
+ value(key){const L=lVals(),v=L[key],u=["ey","sdy"].includes(key)?YU:key==="ex"?DS.unit:"";return {v,text:f(v)+u};}});
+
+// ---- 和と差
+function sVals(){const ex=+$("sex").value,ey=+$("sey").value,vx=+$("svx").value,vy=+$("svy").value;let cv=+$("scv").value;const m=Math.sqrt(vx*vy);
+ if(Math.abs(cv)>m+1e-12){cv=Math.sign(cv)*Math.floor(m*2)/2;LK.setRange("scv",cv);}
+ const vsum=vx+vy+2*cv,vdiff=vx+vy-2*cv;return {ex,ey,vx,vy,cv,vsum,vdiff,sdsum:Math.sqrt(Math.max(0,vsum)),sddiff:Math.sqrt(Math.max(0,vdiff)),esum:ex+ey,ediff:ex-ey,corr:m?cv/m:0};}
+function sRender(){const S=sVals();const rows=[["V(X)",S.vx,"var(--acc)"],["V(Y)",S.vy,"var(--acc)"],["V(X＋Y)",S.vsum,"var(--acc2)"],["V(X−Y)",S.vdiff,"var(--acc2)"]];
+ const mx=Math.max(...rows.map(r=>r[1]),1),L=70,bw=W-L-50,H=rows.length*28+10;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="分散の比較">`;
+ rows.forEach(([t,v,c],i)=>{const y=8+i*28;s+=`<text x="${L-6}" y="${y+14}" font-size="12" text-anchor="end" fill="var(--fg)">${t}</text><rect x="${L}" y="${y}" width="${Math.max(0,v)/mx*bw}" height="18" rx="3" fill="${c}" fill-opacity=".7"/><text x="${L+Math.max(0,v)/mx*bw+4}" y="${y+14}" font-size="11" fill="var(--fg)">${f(v)}</text>`;});
+ $("splot").innerHTML=s+`</svg>`;
+ const c2=f(2*Math.abs(S.cv));
+ $("ssum").innerHTML=`<div>E(X＋Y)＝${f(S.ex)}＋${f(S.ey)}＝<b>${f(S.esum)}</b>　E(X−Y)＝<b>${f(S.ediff)}</b></div><div>V(X＋Y)＝${f(S.vx)}＋${f(S.vy)}${S.cv<0?"−":"＋"}${c2}＝<b>${f(S.vsum)}</b>（標準偏差 ${f(S.sdsum)}）</div><div>V(X−Y)＝${f(S.vx)}＋${f(S.vy)}${S.cv<0?"＋":"−"}${c2}＝<b>${f(S.vdiff)}</b>（標準偏差 ${f(S.sddiff)}）</div><div class="mut">${S.cv===0?"共分散0（独立なときなど）なら、和でも差でも分散は V(X)＋V(Y)。差でも引き算にはならない。":S.cv>0?"一緒に増えやすい（共分散が正）と、和はばらつきが大きく、差は小さくなる。":"一方が増えると他方が減りやすい（共分散が負）と、和はばらつきが小さく、差は大きくなる。"}</div>`;}
+LK.register("sum",{name:"和と差",
+ init(){["sex","sey","svx","svy","scv"].forEach(id=>LK.stepper($(id),sRender));sRender();},
+ apply(s){const m={ex:"sex",ey:"sey",vx:"svx",vy:"svy",cov:"scv"};Object.entries(m).forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});sRender();},
+ render:sRender,
+ value(key){const S=sVals(),v=S[key];return {v,text:f(v)};}});
+
+// ---- n 人の合計
+let TU="個";
+function tVals(){const n=+$("tn").value,mu=+$("tmu").value,vr=+$("tvr").value,sd=Math.sqrt(vr);return {n,mu,vr,sd,etot:n*mu,vtot:n*vr,sdtot:Math.sqrt(n*vr),naive:n*sd,sdmean:sd/Math.sqrt(n)};}
+function tRender(){const T=tVals(),H=170,L=40,R=W-14,base=H-26,top=14,N=Math.max(T.n,2);
+ const X=k=>L+(k-1)/(N-1)*(R-L),ym=Math.max(T.naive,T.sdtot,0.01),Y=v=>base-v/ym*(base-top);
+ let a="",b="";for(let k=1;k<=N;k+=Math.max(1,Math.floor(N/80))){a+=`${X(k)},${Y(Math.sqrt(k)*T.sd)} `;b+=`${X(k)},${Y(k*T.sd)} `;}
+ a+=`${X(N)},${Y(Math.sqrt(N)*T.sd)}`;b+=`${X(N)},${Y(N*T.sd)}`;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="人数と合計のばらつき"><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--line)"/><line x1="${L}" y1="${top}" x2="${L}" y2="${base}" stroke="var(--line)"/>`;
+ s+=`<polyline points="${b}" fill="none" stroke="var(--acc2)" stroke-width="2" stroke-dasharray="5 4"/><polyline points="${a}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
+ s+=`<circle cx="${X(T.n)}" cy="${Y(T.sdtot)}" r="4" fill="var(--acc)"/><text x="${X(T.n)-4}" y="${Y(T.sdtot)-6}" font-size="11" text-anchor="end" fill="var(--acc)">${f(T.sdtot)}</text>`;
+ s+=`<text x="${X(T.n)-4}" y="${Y(T.naive)+12}" font-size="11" text-anchor="end" fill="var(--acc2)">${f(T.naive)}</text>`;
+ s+=`<text x="${L}" y="${H-8}" font-size="11" fill="var(--mut)">1人</text><text x="${R}" y="${H-8}" font-size="11" text-anchor="end" fill="var(--mut)">${T.n}人</text></svg>`;
+ $("tplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>合計の標準偏差（√n 倍）</span><span><i class="sw" style="border:2px dashed var(--acc2)"></i>標準偏差を n 倍（誤り）</span></div>`;
+ $("tsum").innerHTML=`<div>合計の期待値＝${T.n}×${f(T.mu)}＝<b>${f(T.etot)}${esc(TU)}</b></div><div>合計の分散＝${T.n}×${f(T.vr)}＝<b>${f(T.vtot)}</b>　標準偏差＝√${f(T.vtot)}＝<b>${f(T.sdtot)}${esc(TU)}</b></div><div class="mut">1人の標準偏差 ${f(T.sd)} を ${T.n} 倍した ${f(T.naive)} ではない。ぶれは打ち消し合うので √${T.n} 倍にしかならない。1人あたりの平均のぶれは ${f(T.sd)}÷√${T.n}＝${f(T.sdmean)}。</div>`;}
+LK.register("total",{name:"n 人の合計",
+ init(){["tn","tmu","tvr"].forEach(id=>LK.stepper($(id),tRender));tRender();},
+ apply(s){if(s.unit!==undefined)TU=s.unit;if(s.n!==undefined)LK.setRange("tn",s.n);if(s.mu!==undefined)LK.setRange("tmu",s.mu);if(s.var!==undefined)LK.setRange("tvr",s.var);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key],u=["etot","sdtot","naive"].includes(key)?TU:"";return {v,text:f(v)+u};}});
+
+// ---- 同時分布（2×2）
+let JN={x:"弁当",y:"お茶"};
+function jVals(){let p11=+$("j11").value,p10=+$("j10").value,p01=+$("j01").value;
+ if(p11+p10>100){p10=100-p11;LK.setRange("j10",p10);}if(p11+p10+p01>100){p01=100-p11-p10;LK.setRange("j01",p01);}
+ const q11=p11/100,q10=p10/100,q01=p01/100,q00=1-q11-q10-q01,px=q11+q10,py=q11+q01,cov=q11-px*py,den=Math.sqrt(px*(1-px)*py*(1-py));
+ return {p11:q11,p10:q10,p01:q01,p00:q00,px,py,exy:q11,cov,corr:den?cov/den:0,expect11:px*py,indep:Math.abs(cov)<1e-9?"はい":"いいえ"};}
+function jRender(){const J=jVals();$("jnx").textContent=JN.x;$("jny").textContent=JN.y;
+ $("jlast").textContent=`どちらもしない（残り）＝${f(J.p00*100)}%`;
+ const cw=110,ch=46,ox=72,oy=26,H=oy+2*ch+40;const cell=(r,c,q,e)=>{const x=ox+c*cw,y=oy+r*ch;return `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="var(--acc)" fill-opacity="${(0.08+q*0.9).toFixed(3)}" stroke="var(--line)"/><text x="${x+cw/2}" y="${y+19}" font-size="13" text-anchor="middle" fill="var(--fg)" font-weight="700">${pc(q)}</text><text x="${x+cw/2}" y="${y+36}" font-size="10" text-anchor="middle" fill="var(--mut)">独立なら ${pc(e)}</text>`;};
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="同時確率の表">`;
+ s+=`<text x="${ox+cw/2}" y="${oy-8}" font-size="11" text-anchor="middle" fill="var(--fg)">Y＝1（${esc(JN.y)}）</text><text x="${ox+cw*1.5}" y="${oy-8}" font-size="11" text-anchor="middle" fill="var(--fg)">Y＝0</text>`;
+ s+=`<text x="${ox-6}" y="${oy+ch/2+4}" font-size="11" text-anchor="end" fill="var(--fg)">X＝1</text><text x="${ox-6}" y="${oy+ch*1.5+4}" font-size="11" text-anchor="end" fill="var(--fg)">X＝0</text>`;
+ s+=cell(0,0,J.p11,J.px*J.py)+cell(0,1,J.p10,J.px*(1-J.py))+cell(1,0,J.p01,(1-J.px)*J.py)+cell(1,1,J.p00,(1-J.px)*(1-J.py));
+ s+=`<text x="${ox+cw}" y="${oy+2*ch+18}" font-size="11" text-anchor="middle" fill="var(--mut)">P(X＝1)＝${pc(J.px)}　P(Y＝1)＝${pc(J.py)}</text></svg>`;
+ $("jplot").innerHTML=s;
+ $("jsum").innerHTML=`<div>E(X)＝P(X＝1)＝${f(J.px)}、E(Y)＝P(Y＝1)＝${f(J.py)}、E(XY)＝P(両方)＝${f(J.exy)}</div><div>Cov(X,Y)＝E(XY)−E(X)E(Y)＝${f(J.exy)}−${f(J.px)}×${f(J.py)}＝<b>${f(J.cov)}</b>　相関係数 ${f(J.corr)}</div><div class="mut">${J.indep==="はい"?"P(両方)＝P(X＝1)P(Y＝1) なので独立（共分散0）。":J.cov>0?`共分散が正：${esc(JN.x)}をする人は${esc(JN.y)}もしやすい。独立ではない。`:`共分散が負：${esc(JN.x)}をする人は${esc(JN.y)}をしにくい。独立ではない。`}</div>`;}
+LK.register("joint",{name:"同時分布",
+ init(){["j11","j10","j01"].forEach(id=>LK.stepper($(id),jRender));jRender();},
+ apply(s){if(s.nameX)JN.x=s.nameX;if(s.nameY)JN.y=s.nameY;[["p11","j11"],["p10","j10"],["p01","j01"]].forEach(([k,id])=>{if(s[k]!==undefined)LK.setRange(id,s[k]);});jRender();},
+ render:jRender,
+ value(key){const J=jVals(),v=J[key];return key==="indep"?{v,text:v}:{v,text:f(v)};}});
+
+LK.start("dist");
+window.__LAB__={LK,dVals,lVals,sVals,tVals,jVals,dApply};
+</script>
+</body></html>
