@@ -1,0 +1,110 @@
+id: LAB-mreg
+name: 重回帰ラボ
+slug: mreg                       # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: mreg_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [mreg.html, sim_reg.html]   # 旧版 教科書30 の「価格と客数が相関すると単回帰の傾きがずれる」を coef に、「回帰平方和180・残差平方和120・F」を anova に、「係数0.6・SE0.2 の t」を tval に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: coef
+    name: 係数の読み方
+    purpose: 2つの説明変数 x₁・x₂ の重回帰。点（店）をドラッグすると、x₁ だけの単回帰の直線（点線）と、x₂ を平均にそろえた重回帰の直線（実線）が同時に動く。係数・標準誤差・t、R²・調整済み R²、予測値
+    set: [data, names, x1, x2]            # data＝"x₁,x₂,y" を空白区切り。names＝"x₁の名前,x₂の名前,yの名前"。x1・x2＝予測する値
+    values: [b0, b1, b2, t1, t2, bs, r2, adjr2, yhat, signflip]
+  - key: dummy
+    name: ダミー変数
+    purpose: 平日（D＝0）と週末（D＝1）を1つの式に入れる。交互作用なしは平行な2本（D の係数＝同じ x での差）、ありは傾きも群ごと。単純な平均の差と比べる
+    set: [data, inter]                    # data＝"x,D,y"。inter＝交互作用を入れるか
+    values: [bD, mdiff, b1, slope0, slope1, bI]
+  - key: colin
+    name: 多重共線性
+    purpose: x₁ と x₂ の相関を変え、同じ仕組み（本当の係数はどちらも1）から標本を40回取り直した (b₁, b₂) を点で打つ。VIF、係数のぶれ、b₁＋b₂ のぶれ、符号が逆になった回数（固定の乱数）
+    set: [r, n]
+    values: [vif, sef, sd1, sumsd, flip]
+  - key: add
+    name: 変数を足す
+    purpose: 本物の説明変数1つに、でたらめな変数を0〜8個足す（n＝15、固定の乱数）。R² は下がらず、調整済み R² は下がる
+    set: [k]
+    values: [r2, adjr2, r2up, adjup, best]   # r2up：上がる／変わらない、adjup：上がる／下がる
+  - key: anova
+    name: 分散分析表
+    purpose: SSR・SSE・n・k から、R²・調整済み R²・平均平方・F・5%点（3桁）・p 値と判断。平方和の分け方を帯で描く
+    set: [n, k, ssr, sse]
+    values: [r2, adjr2, msr, mse, F, crit, p, decision]
+  - key: tval
+    name: 係数の t
+    purpose: 係数と標準誤差から t（自由度 n−k−1）、両側5%の点（3桁）、p 値、95%信頼区間と0を含むか
+    set: [b, se, n, k]
+    values: [t, crit, lo, hi, p, decision, contains0]
+data: 係数の読み方は8店（売価8〜13、客数3〜7、販売数39〜49。ŷ＝40−x₁＋3x₂ にちょうど合う）。ダミー変数は10日（ŷ＝10＋2x＋6D）。多重共線性と変数を足すは固定の乱数
+presets:
+  s1-coef:
+    mode: coef
+    set: {x1: 10, x2: 4}
+    task: 8店の売価 x₁・客数 x₂・販売数 y で重回帰する。売価の係数 b₁ は（小数で）？
+    predict: {type: number, key: b1, label: "売価の係数 b₁"}
+    expect: -1
+    why: 客数をそろえると、売価が1高い店は販売数が1少ない。ところが売価だけの単回帰の傾きは＋1.38 で、符号が逆。売価の高い店ほど客数も多いから。
+  s1-dummy:
+    mode: dummy
+    set: {inter: false}
+    task: 平日5日・週末5日の客数 x と販売数 y。週末の平均は平日より10多い。ダミー変数 D（週末＝1）の係数は（小数で）？
+    predict: {type: number, key: bD, label: "D の係数"}
+    expect: 6
+    why: 週末は客数も多いので、平均の差10 には客数の違い（傾き2×差2）が混ざる。同じ客数でそろえた週末の差は6。
+  s3-free:
+    mode: coef
+    modes: [coef, dummy, colin, add, anova, tval]
+    task: 解いてから、問題が聞いていること（係数の読み方、ダミー変数、多重共線性、変数を足す、分散分析表、係数の t）に合うモードで確かめる。
+  s3-rule:
+    mode: add
+    steps:
+      - label: でたらめ1個（R²）
+        set: {k: 1}
+        task: 本物の説明変数1つのモデルに、関係のないでたらめな変数を1つ足す。R² はどうなるか。
+        predict: {type: choice, key: r2up, label: "R² は", options: [上がる, 変わらない, 下がる]}
+        expect: 上がる
+        why: ほんのわずかでも上がる（0.7624→0.7625）。最小二乗は、使える変数が増えると残差平方和を下げられるので、R² は下がらない。
+      - label: でたらめ1個（調整済み）
+        set: {k: 1}
+        task: 同じ1個を足したとき、自由度調整済み R² はどうなるか。
+        predict: {type: choice, key: adjup, label: "調整済み R² は", options: [上がる, 下がる]}
+        expect: 下がる
+        why: 0.7442→0.7229。説明が少し増えても、使った自由度のぶんの割引の方が大きい。
+      - label: でたらめ4個
+        set: {k: 4}
+        task: でたらめな変数を4個まで増やす。3個のときと比べて、調整済み R² はどうなるか。
+        predict: {type: choice, key: adjup, label: "調整済み R² は", options: [上がる, 下がる]}
+        expect: 下がる
+        why: R² は0.79 まで上がるが、調整済み R² は0.68 まで下がる。
+      - label: でたらめ8個
+        set: {k: 8}
+        task: でたらめな変数を8個（説明変数は全部で9個、n＝15）にする。どのモデルの調整済み R² がいちばん高かったか（足した数）。
+        predict: {type: number, key: best, label: "足した数"}
+        expect: 0
+        why: R² は0.81 まで上がり続けるが、調整済み R² は0.46 まで下がる。でたらめを足さない0個のモデルがいちばん高い。
+    law:
+      title: 式で説明する
+      lines:
+        - R²＝1−SSE÷SST。変数を足すと SSE は下がるか同じなので、R² は下がらない
+        - 調整済み R²＝1−(SSE÷(n−k−1))÷(SST÷(n−1))＝1−(1−R²)×(n−1)÷(n−k−1)
+        - k が1増えると n−k−1 が1減り、割引が大きくなる。説明の増え方が小さいと下がる
+      text: 変数の数の違うモデルを比べるときは、R² ではなく調整済み R² を使う。n が小さいほど割引は大きい。
+      limit: 調整済み R² が高いモデルが「正しいモデル」とは限らない。別のデータで予測を確かめる・その変数を入れる理由を説明できるかは、この式の外で判断する。
+  s4-free:
+    mode: coef
+    modes: [coef, dummy, anova, tval]
+    task: 自分の売場の数字（説明変数2つと目的の数）を入れ、係数・t・R² を読む。ダミー変数・分散分析表・係数の t でも確かめる。
+  s5-free:
+    mode: dummy
+    modes: [dummy, colin, add]
+    task: 交互作用を入れると「週末の効果」が客数によって変わることを見る。多重共線性で b₁ と b₂ が1つずつではぶれ、和は安定することを見る。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（係数の読み方、ダミー変数、多重共線性、変数を足す、分散分析表、係数の t）。
+used_by: [U30]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/mreg_lab/check.js         # 本文の値（ŷ＝40−x₁＋3x₂、単回帰の傾き1.377、D の係数6、F＝12.75、t＝3、VIF 5.263、調整済み R²）と点のドラッグ
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null

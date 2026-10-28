@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>重回帰ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+:root{--pos:#c2410c;--neg:#0b63c9;--ln:#7c3aed;--g1:#c2410c}
+@media (prefers-color-scheme:dark){:root{--pos:#ff9a5c;--neg:#4c9bff;--ln:#b794f6;--g1:#ff9a5c}}
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.pic svg{touch-action:none;user-select:none;-webkit-user-select:none}
+.pt{cursor:grab}
+.hint{font-size:12px;color:var(--mut);margin:2px 0 0}
+</style></head><body>
+<h1>🧪 重回帰ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-coef" class="mode">
+ <p class="mut" style="margin:0">2つの説明変数 x₁・x₂ で y を説明する（はじめは売価・客数・販売数）。点（店）を指で動かすと、x₁ だけの単回帰の直線（点線）と、x₂ を平均にそろえたときの重回帰の直線（実線）が同時に動く。点の横の数字は x₂。</p>
+ <div class="ctl pic" id="cbox"></div>
+ <p class="hint ctl">点はドラッグで動く（x₁ と y が変わる。x₂ はそのまま）。</p>
+ <div class="row ctl"><button type="button" class="sub" id="creset">元に戻す</button></div>
+ <input type="range" id="cp1" min="0" max="30" step="1" value="10" data-name="予測する x₁">
+ <input type="range" id="cp2" min="0" max="15" step="1" value="5" data-name="予測する x₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="csum"></div>
+ <div class="res det" id="ctab"></div>
+</div>
+
+<div id="m-dummy" class="mode">
+ <p class="mut" style="margin:0">平日（D＝0）と週末（D＝1）を、ダミー変数 D で1つの式に入れる。交互作用を入れないと2本の直線は平行で、D の係数が「同じ客数での週末と平日の差」。交互作用を入れると傾きも群ごとに変わる。</p>
+ <div class="ctl pic" id="dbox"></div>
+ <div class="row ctl"><label><input type="checkbox" id="dint" data-key="inter"> 交互作用（群ごとに傾き）を入れる</label><button type="button" class="sub" id="dreset">元に戻す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="dsum"></div>
+ <div class="res det" id="dtab"></div>
+</div>
+
+<div id="m-colin" class="mode">
+ <p class="mut" style="margin:0">多重共線性：x₁ と x₂ の相関が強いと、どちらの効果かを分けにくい。同じ仕組み（本当の係数はどちらも1）から標本を40回取り直し、推定した (b₁, b₂) を点で打つ。相関を強くすると点が斜めに伸び、1回ごとの係数が大きくぶれる。</p>
+ <div class="ctl pic" id="kbox"></div>
+ <input type="range" id="kr" min="0" max="0.99" step="0.01" value="0" data-name="x₁ と x₂ の相関">
+ <input type="range" id="kn" min="10" max="200" step="10" value="30" data-name="店数 n">
+ <div class="row ctl"><button type="button" class="sub" id="kseed">標本を取り直す</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="ksum"></div>
+</div>
+
+<div id="m-add" class="mode">
+ <p class="mut" style="margin:0">本当は関係のない変数（でたらめな数）を説明変数に1つずつ足していく。R² は下がらない（必ず上がるか同じ）。自由度調整済み R² は、増えた変数のぶんを割り引くので下がることがある。</p>
+ <div class="ctl pic" id="abox"></div>
+ <input type="range" id="ak" min="0" max="8" step="1" value="0" data-name="足した変数の数">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="card res key" id="asum"></div>
+</div>
+
+<div id="m-anova" class="mode">
+ <p class="mut" style="margin:0">回帰の分散分析表：全体の変動 SST を、回帰で説明できた SSR と残った SSE に分け、自由度で割った平均平方を比べる（F）。</p>
+ <input type="range" id="vn" min="5" max="200" step="1" value="20" data-name="データ数 n">
+ <input type="range" id="vk" min="1" max="10" step="1" value="2" data-name="説明変数の数 k">
+ <input type="range" id="vr" min="0" max="2000" step="1" value="180" data-name="回帰 SSR">
+ <input type="range" id="ve" min="1" max="2000" step="1" value="120" data-name="残差 SSE">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="vplot"></div>
+ <div class="card res key" id="vsum"></div>
+ <div class="res det" id="vtab"></div>
+</div>
+
+<div id="m-tval" class="mode">
+ <p class="mut" style="margin:0">係数の t 検定と信頼区間：出力表の「係数」と「標準誤差」から、t＝係数÷標準誤差（自由度 n−k−1）。区間は 係数±t の点×標準誤差。</p>
+ <input type="range" id="tb" min="-10" max="10" step="0.01" value="0.6" data-name="係数 b">
+ <input type="range" id="ts" min="0.01" max="5" step="0.01" value="0.2" data-name="標準誤差">
+ <input type="range" id="tn" min="5" max="200" step="1" value="20" data-name="データ数 n">
+ <input type="range" id="tk" min="1" max="10" step="1" value="3" data-name="説明変数の数 k">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,SPEC={},reg_=(k,s)=>{SPEC[k]=s;LK.register(k,s);};
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+const g3=v=>isFinite(v)?v.toFixed(3):"—";
+const sg=(v,d=3)=>v<0?`−${f(-v,d)}`:`＋${f(v,d)}`;
+
+// ---- 分布の関数（t・F の点と p 値）
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
+const fcdf=(F,d1,d2)=>F<=0?0:ibeta(d1/2,d2/2,d1*F/(d1*F+d2));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const r3=v=>Math.round(v*1000)/1000;   // 数表と同じ3桁の点
+
+// ---- 最小二乗（列の並び X、切片の列を含む）。係数・標準誤差・平方和
+function ols(X,y){const n=y.length,p=X[0].length,A=[];for(let i=0;i<p;i++){A.push([]);for(let j=0;j<p;j++){let s=0;for(let r=0;r<n;r++)s+=X[r][i]*X[r][j];A[i].push(s);}}
+ const M=A.map((row,i)=>row.concat(Array.from({length:p},(_,j)=>i===j?1:0)));
+ for(let c=0;c<p;c++){let pv=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[pv][c]))pv=r;if(Math.abs(M[pv][c])<1e-12)return null;[M[c],M[pv]]=[M[pv],M[c]];const d=M[c][c];for(let j=0;j<2*p;j++)M[c][j]/=d;for(let r=0;r<p;r++)if(r!==c){const m=M[r][c];if(m)for(let j=0;j<2*p;j++)M[r][j]-=m*M[c][j];}}
+ const Ai=M.map(row=>row.slice(p)),Xy=Array.from({length:p},(_,i)=>{let s=0;for(let r=0;r<n;r++)s+=X[r][i]*y[r];return s;}),b=Ai.map(row=>row.reduce((s,v,j)=>s+v*Xy[j],0));
+ const yb=y.reduce((s,v)=>s+v,0)/n,e=y.map((v,r)=>v-X[r].reduce((s,x,j)=>s+x*b[j],0)),sse=e.reduce((s,v)=>s+v*v,0),sst=y.reduce((s,v)=>s+(v-yb)**2,0),k=p-1,df=n-k-1,mse=df>0?sse/df:NaN;
+ return {b,se:Ai.map((row,i)=>Math.sqrt(Math.max(0,row[i]*mse))),e,sse,sst,ssr:sst-sse,r2:sst>0?1-sse/sst:NaN,adj:sst>0&&df>0?1-(sse/df)/(sst/(n-1)):NaN,n,k,df,mse};}
+const corr=(a,b)=>{const n=a.length,ma=a.reduce((s,v)=>s+v,0)/n,mb=b.reduce((s,v)=>s+v,0)/n;let sab=0,saa=0,sbb=0;for(let i=0;i<n;i++){sab+=(a[i]-ma)*(b[i]-mb);saa+=(a[i]-ma)**2;sbb+=(b[i]-mb)**2;}return sab/Math.sqrt(saa*sbb);};
+function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+function gauss(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+// ---- 散布図（reg ラボと同じ形）。opts.drag で点を動かせる
+function niceStep(span){const raw=span/5,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+function domain(xs,ys){let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const px=Math.max((x1-x0)*0.15,1),py=Math.max((y1-y0)*0.15,1);x0-=px;x1+=px;y0-=py;y1+=py;const sx=niceStep(x1-x0),sy=niceStep(y1-y0);
+ return {x0:Math.floor(x0/sx)*sx,x1:Math.ceil(x1/sx)*sx,y0:Math.floor(y0/sy)*sy,y1:Math.ceil(y1/sy)*sy,sx,sy};}
+function plot(box,P,D,opts){opts=opts||{};const H=opts.h||240,L=34,R=W-10,T=10,B=H-24,X=x=>L+(x-D.x0)/(D.x1-D.x0)*(R-L),Y=y=>B-(y-D.y0)/(D.y1-D.y0)*(B-T);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(opts.label||"散布図")}"><defs><clipPath id="${box.id}c"><rect x="${L}" y="${T}" width="${R-L}" height="${B-T}"/></clipPath></defs>`;
+ // 目盛りの数字は5つまで（多いときは1つおき）。線は全部引く
+ const nx=Math.round((D.x1-D.x0)/D.sx),ny=Math.round((D.y1-D.y0)/D.sy),ex=nx>4?2:1,ey=ny>4?2:1;
+ for(let i=0;i<=nx;i++){const x=D.x0+i*D.sx;s+=`<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${B}" stroke="var(--line)" stroke-width=".6"/>`+(i%ex?``:`<text x="${X(x)}" y="${B+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${+x.toFixed(6)}</text>`);}
+ for(let i=0;i<=ny;i++){const y=D.y0+i*D.sy;s+=`<line x1="${L}" y1="${Y(y)}" x2="${R}" y2="${Y(y)}" stroke="var(--line)" stroke-width=".6"/>`+(i%ey?``:`<text x="${L-4}" y="${Y(y)+3}" font-size="10" text-anchor="end" fill="var(--mut)">${+y.toFixed(6)}</text>`);}
+ if(opts.xlab)s+=`<text x="${R}" y="${B-4}" font-size="10" text-anchor="end" fill="var(--mut)">${esc(opts.xlab)}</text>`;
+ if(opts.ylab)s+=`<text x="${L+4}" y="${T+10}" font-size="10" fill="var(--mut)">${esc(opts.ylab)}</text>`;
+ s+=`<g clip-path="url(#${box.id}c)">`;
+ (opts.lines||[]).forEach(l=>{if(!isFinite(l.b))return;s+=`<line x1="${X(D.x0)}" y1="${Y(l.a+l.b*D.x0)}" x2="${X(D.x1)}" y2="${Y(l.a+l.b*D.x1)}" stroke="${l.col}" stroke-width="${l.w||2}" ${l.dash?`stroke-dasharray="${l.dash}"`:""}/>`;});
+ (opts.marks||[]).forEach(m=>{s+=`<circle cx="${X(m[0])}" cy="${Y(m[1])}" r="${m[3]||2.6}" fill="${m[2]}" fill-opacity=".7"/>`;});
+ if(opts.cross)s+=`<line x1="${X(opts.cross[0])}" y1="${T}" x2="${X(opts.cross[0])}" y2="${B}" stroke="var(--fg)" stroke-dasharray="3 3" stroke-width="1"/><line x1="${L}" y1="${Y(opts.cross[1])}" x2="${R}" y2="${Y(opts.cross[1])}" stroke="var(--fg)" stroke-dasharray="3 3" stroke-width="1"/>`;
+ s+=`</g>`;
+ P.forEach((p,i)=>{const cx=X(p[0]),cy=Y(p[1]),c=(opts.colors&&opts.colors[i])||"var(--acc)";s+=`<circle class="pt" data-i="${i}" cx="${cx}" cy="${cy}" r="7" fill="${c}" fill-opacity=".9" stroke="var(--bg)" stroke-width="2"/>`;
+  if(opts.tags)s+=`<text x="${cx+9}" y="${cy-6}" font-size="10" fill="var(--fg)">${esc(opts.tags[i])}</text>`;});
+ box.innerHTML=s+`</svg>`+(opts.legend||"");
+ box._st={P,D,L,R,T,B,snap:opts.snap||1,drag:opts.drag};
+ if(opts.drag&&!box._on){box._on=true;let di=-1;
+  const at=e=>{const st=box._st,svg=box.querySelector("svg"),m=svg.getScreenCTM().inverse(),pt=new DOMPoint(e.clientX,e.clientY).matrixTransform(m),q=st.snap,D=st.D;
+   return [Math.min(D.x1,Math.max(D.x0,Math.round(((pt.x-st.L)/(st.R-st.L)*(D.x1-D.x0)+D.x0)/q)*q)),Math.min(D.y1,Math.max(D.y0,Math.round(((st.B-pt.y)/(st.B-st.T)*(D.y1-D.y0)+D.y0)/q)*q))];};
+  box.addEventListener("pointerdown",e=>{const t=e.target.closest&&e.target.closest(".pt");if(!t)return;di=+t.dataset.i;box.setPointerCapture(e.pointerId);e.preventDefault();});
+  box.addEventListener("pointermove",e=>{if(di<0)return;const st=box._st,v=at(e),o=st.P[di];if(o[0]===v[0]&&o[1]===v[1])return;st.drag(di,v);});
+  const up=()=>{if(di<0)return;di=-1;box.dispatchEvent(new Event("change",{bubbles:true}));};
+  box.addEventListener("pointerup",up);box.addEventListener("pointercancel",up);}}
+const parse=(s,m)=>String(s).trim().split(/\s+/).map(t=>t.split(",").map(Number)).filter(p=>p.length===m&&p.every(isFinite));
+
+// ---- 係数の読み方（売価 x₁・客数 x₂ → 販売数 y）
+const CDEF="8,3,39 9,4,43 10,4,44 10,6,49 11,5,45 12,6,45 12,7,49 13,7,47";
+let cOrig=parse(CDEF,3),cP=cOrig.map(p=>p.slice()),cD=null,cN=["売価","客数","販売数"];
+function cVals(){const X=cP.map(p=>[1,p[0],p[1]]),y=cP.map(p=>p[2]),M=ols(X,y),x1=cP.map(p=>p[0]),x2=cP.map(p=>p[1]),S=ols(cP.map(p=>[1,p[0]]),y),p1=+$("cp1").value,p2=+$("cp2").value;
+ if(!M)return {ok:false};const [b0,b1,b2]=M.b,x2b=x2.reduce((s,v)=>s+v,0)/x2.length;
+ return {ok:true,b0,b1,b2,se1:M.se[1],se2:M.se[2],t1:M.b[1]/M.se[1],t2:M.b[2]/M.se[2],bs:S.b[1],as:S.b[0],r12:corr(x1,x2),r2:M.r2,adjr2:M.adj,sse:M.sse,sst:M.sst,n:M.n,x2bar:x2b,p1,p2,yhat:b0+b1*p1+b2*p2,signflip:(b1<0)!==(S.b[1]<0)?"逆":"同じ"};}
+function cRender(){const C=cVals();if(!cD)cD=domain(cOrig.map(p=>p[0]),cOrig.map(p=>p[2]));
+ if(!C.ok){$("csum").innerHTML="x₁ と x₂ が一直線に並ぶと係数が決まらない。点を少し動かす。";return;}
+ const mx=Math.max(...cP.map(p=>p[1])),mn=Math.min(...cP.map(p=>p[1])),col=cP.map(p=>`hsl(${210-150*(p[1]-mn)/Math.max(1,mx-mn)} 70% 45%)`);
+ plot($("cbox"),cP.map(p=>[p[0],p[2]]),cD,{drag:(i,v)=>{cP[i][0]=v[0];cP[i][2]=v[1];cRender();},colors:col,tags:cP.map(p=>"x₂="+p[1]),xlab:cN[0]+" x₁",ylab:cN[2]+" y",label:cN[0]+"と"+cN[2]+"の散布図",
+  lines:[{a:C.as,b:C.bs,col:"var(--mut)",dash:"6 4",w:2},{a:C.b0+C.b2*C.x2bar,b:C.b1,col:"var(--ln)",w:2.5}],
+  legend:`<div class="legend mut"><span>点線＝x₁ だけの単回帰</span><span><i class="sw" style="background:var(--ln)"></i>重回帰（x₂＝平均 ${f(C.x2bar,2)} にそろえる）</span><span>色：x₂（${esc(cN[1])}）が大きいほど赤</span></div>`});
+ $("csum").innerHTML=`<div>重回帰：ŷ＝${f(C.b0,3)}${sg(C.b1)}x₁${sg(C.b2)}x₂</div><div>${esc(cN[0])}の係数 b₁＝<b>${f(C.b1,3)}</b>（${esc(cN[1])}を一定にしたとき、${esc(cN[0])}1あたりの${esc(cN[2])}の変化）</div><div>x₁ だけの単回帰の傾き＝<b>${f(C.bs,3)}</b>（符号は重回帰と${C.signflip}）　x₁ と x₂ の相関 r＝${f(C.r12,3)}</div><div>R²＝${f(C.r2,4)}　自由度調整済み R²＝${f(C.adjr2,4)}</div><div>x₁＝${f(C.p1,1)}・x₂＝${f(C.p2,1)} の予測 ŷ＝<b>${f(C.yhat,3)}</b></div><div class="mut">x₁ と x₂ が一緒に動くと、x₁ だけの単回帰には x₂ の効果が混ざる。重回帰は「x₂ をそろえたら」と条件を分けて読む。ただし観察データの係数で、x₁ を動かしたときの因果効果とは限らない。</div>`;
+ $("ctab").innerHTML=`<table><tr><th>係数</th><th>推定値（標準誤差）</th><th>t</th></tr><tr><td>切片</td><td>${f(C.b0,3)}</td><td></td></tr><tr><td>${esc(cN[0])} x₁</td><td>${f(C.b1,3)}（${f(C.se1,3)}）</td><td>${f(C.t1,2)}</td></tr><tr><td>${esc(cN[1])} x₂</td><td>${f(C.b2,3)}（${f(C.se2,3)}）</td><td>${f(C.t2,2)}</td></tr></table>`;}
+reg_("coef",{name:"係数の読み方",
+ init(){["cp1","cp2"].forEach(id=>LK.stepper($(id),cRender));$("creset").onclick=()=>{cP=cOrig.map(p=>p.slice());cRender();};cRender();},
+ apply(s){if(s.names)cN=String(s.names).split(",");if(s.data){cOrig=parse(s.data,3);cP=cOrig.map(p=>p.slice());cD=null;}if(s.x1!==undefined)LK.setRange("cp1",s.x1);if(s.x2!==undefined)LK.setRange("cp2",s.x2);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+// ---- ダミー変数と交互作用（客数 x・週末 D → 販売数 y）
+const DDEF="2,0,13 3,0,17 4,0,18 5,0,21 6,0,21 4,1,23 5,1,27 6,1,28 7,1,31 8,1,31";
+let dOrig=parse(DDEF,3),dP=dOrig.map(p=>p.slice()),dD=null;
+function dVals(){const y=dP.map(p=>p[2]),M=ols(dP.map(p=>[1,p[0],p[1]]),y),I=ols(dP.map(p=>[1,p[0],p[1],p[0]*p[1]]),y),S=ols(dP.map(p=>[1,p[0]]),y);
+ const m1=dP.filter(p=>p[1]===1).map(p=>p[2]),m0=dP.filter(p=>p[1]===0).map(p=>p[2]),av=a=>a.reduce((s,v)=>s+v,0)/a.length,inter=$("dint").checked;
+ if(!M||!I)return {ok:false};
+ return {ok:true,inter:inter?"あり":"なし",b0:M.b[0],b1:M.b[1],bD:M.b[2],seD:M.se[2],tD:M.b[2]/M.se[2],bs:S.b[1],mdiff:av(m1)-av(m0),slope0:I.b[1],slope1:I.b[1]+I.b[3],bI:I.b[3],seI:I.se[3],r2:M.r2,r2i:I.r2,adjr2:M.adj,adjr2i:I.adj,I,M};}
+function dRender(){const V=dVals();if(!dD)dD=domain(dOrig.map(p=>p[0]),dOrig.map(p=>p[2]));if(!V.ok){$("dsum").textContent="係数が決まらない。点を少し動かす。";return;}
+ const inter=$("dint").checked,lines=inter?[{a:V.I.b[0],b:V.slope0,col:"var(--neg)",w:2.5},{a:V.I.b[0]+V.I.b[2],b:V.slope1,col:"var(--g1)",w:2.5}]:[{a:V.b0,b:V.b1,col:"var(--neg)",w:2.5},{a:V.b0+V.bD,b:V.b1,col:"var(--g1)",w:2.5}];
+ plot($("dbox"),dP.map(p=>[p[0],p[2]]),dD,{drag:(i,v)=>{dP[i][0]=v[0];dP[i][2]=v[1];dRender();},colors:dP.map(p=>p[1]?"var(--g1)":"var(--neg)"),xlab:"客数 x",ylab:"販売数 y",label:"平日と週末の散布図",lines,
+  legend:`<div class="legend mut"><span><i class="sw" style="background:var(--neg)"></i>平日 D＝0</span><span><i class="sw" style="background:var(--g1)"></i>週末 D＝1</span></div>`});
+ $("dsum").innerHTML=inter?`<div>交互作用あり：平日の傾き <b>${f(V.slope0,3)}</b>、週末の傾き <b>${f(V.slope1,3)}</b>（差 ${f(V.bI,3)}）</div><div>R²＝${f(V.r2i,4)}（交互作用なし ${f(V.r2,4)}）　調整済み ${f(V.adjr2i,4)}（なし ${f(V.adjr2,4)}）</div><div class="mut">傾きが群で違うなら、「週末の効果」は客数によって変わり、1つの数では言えない。差が小さければ、平行（交互作用なし）の式で足りる。</div>`
+  :`<div>ŷ＝${f(V.b0,3)}${sg(V.b1)}x${sg(V.bD)}D</div><div>D の係数＝<b>${f(V.bD,3)}</b>（同じ客数での週末と平日の差）</div><div>単純な平均の差（週末−平日）＝<b>${f(V.mdiff,3)}</b>　客数だけの単回帰の傾き＝${f(V.bs,3)}</div><div>R²＝${f(V.r2,4)}</div><div class="mut">週末は客数も多いので、平均の差には客数の違いが混ざる。D の係数はそれを除いた差。平日と週末の両方のダミーを入れると切片と重なるので、基準（平日）を1つ除く。</div>`;
+ $("dtab").innerHTML=`<table><tr><th>係数</th><th>推定値（標準誤差）</th></tr>${inter?`<tr><td>客数 x</td><td>${f(V.slope0,3)}（${f(V.I.se[1],3)}）</td></tr><tr><td>週末 D</td><td>${f(V.I.b[2],3)}（${f(V.I.se[2],3)}）</td></tr><tr><td>x×D</td><td>${f(V.bI,3)}（${f(V.seI,3)}）</td></tr>`:`<tr><td>客数 x</td><td>${f(V.b1,3)}（${f(V.M.se[1],3)}）</td></tr><tr><td>週末 D</td><td>${f(V.bD,3)}（${f(V.seD,3)}）</td></tr>`}</table>`;}
+reg_("dummy",{name:"ダミー変数",
+ init(){$("dint").onchange=dRender;$("dreset").onclick=()=>{dP=dOrig.map(p=>p.slice());dRender();};dRender();},
+ apply(s){if(s.data){dOrig=parse(s.data,3);dP=dOrig.map(p=>p.slice());dD=null;}if(s.inter!==undefined)$("dint").checked=!!s.inter;dRender();},
+ render:dRender,
+ value(key){const V=dVals(),v=V[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+// ---- 多重共線性：(b₁, b₂) を40回取り直す
+let kSeed=7;
+function kSample(r,n,R){const X=[],y=[];for(let i=0;i<n;i++){const z1=gauss(R),z2=gauss(R),x1=z1,x2=r*z1+Math.sqrt(1-r*r)*z2;X.push([1,x1,x2]);y.push(x1+x2+gauss(R)*1.5);}return ols(X,y);}
+function kVals(){const r=+$("kr").value,n=+$("kn").value,R=rng(kSeed*7919+Math.round(r*100)*31+n),sims=[];for(let t=0;t<40;t++){const M=kSample(r,n,R);if(M)sims.push([M.b[1],M.b[2],M.se[1]]);}
+ const sd=a=>{const m=a.reduce((s,v)=>s+v,0)/a.length;return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));},b1=sims.map(s=>s[0]),b2=sims.map(s=>s[1]),flip=sims.filter(s=>s[0]<0||s[1]<0).length;
+ return {r,n,vif:1/(1-r*r),sef:Math.sqrt(1/(1-r*r)),sims,sd1:sd(b1),sumsd:sd(sims.map(s=>s[0]+s[1])),flip,b1:sims[0][0],b2:sims[0][1]};}
+function kRender(){const K=kVals(),D={x0:-3,x1:5,y0:-3,y1:5,sx:1,sy:1};
+ plot($("kbox"),[],D,{h:250,label:"推定した係数の散らばり",xlab:"b₁",ylab:"b₂",cross:[1,1],marks:K.sims.map((s,i)=>[Math.max(-3,Math.min(5,s[0])),Math.max(-3,Math.min(5,s[1])),i===0?"var(--g1)":"var(--acc)",i===0?5:2.8]),
+  legend:`<div class="legend mut"><span>点＝1回の標本の (b₁, b₂)</span><span>十字＝本当の値 (1, 1)</span><span><i class="sw" style="background:var(--g1)"></i>今の標本</span></div>`});
+ $("ksum").innerHTML=`<div>相関 ${f(K.r,2)} の分散拡大要因 VIF＝1÷(1−r²)＝<b>${f(K.vif,2)}</b>　係数の標準誤差は相関0のときの約 <b>${f(K.sef,2)}</b> 倍</div><div>40回の b₁ の標準偏差＝${f(K.sd1,3)}　b₁＋b₂ の標準偏差＝${f(K.sumsd,3)}</div><div>どちらかの係数が負（本当は正）になった回：${K.flip}／40</div><div class="mut">相関が強いと、b₁ と b₂ は1つずつではぶれるが、和 b₁＋b₂ は安定している。「2つ合わせた効果」は言えても、「どちらの効果か」は言えない。予測はできても係数の解釈は危ない。</div>`;}
+reg_("colin",{name:"多重共線性",
+ init(){["kr","kn"].forEach(id=>LK.stepper($(id),kRender));$("kseed").onclick=()=>{kSeed++;kRender();};kRender();},
+ apply(s){if(s.r!==undefined)LK.setRange("kr",s.r);if(s.n!==undefined)LK.setRange("kn",s.n);kRender();},
+ render:kRender,
+ value(key){const K=kVals(),v=K[key];return {v,text:f(v,3)};}});
+
+// ---- 変数を足す：R² と自由度調整済み R²
+let AN=15,ASEED=20;let aData=null;
+function aMake(){const R=rng(ASEED),x=[],y=[],z=[];for(let i=0;i<AN;i++){const xi=i+1;x.push(xi);y.push(5+0.8*xi+gauss(R)*2.5);z.push(Array.from({length:8},()=>gauss(R)));}aData={x,y,z};}
+function aFit(k){const X=aData.x.map((xi,i)=>[1,xi].concat(aData.z[i].slice(0,k)));return ols(X,aData.y);}
+function aVals(){if(!aData)aMake();const k=+$("ak").value,M=aFit(k),P=k>0?aFit(k-1):null,ser=Array.from({length:9},(_,j)=>{const F=aFit(j);return [F.r2,F.adj];});
+ return {k,r2:M.r2,adjr2:M.adj,df:M.df,ser,r2up:P?(M.r2>P.r2+1e-12?"上がる":"変わらない"):"—",adjup:P?(M.adj>P.adj?"上がる":"下がる"):"—",best:ser.reduce((bi,s,j)=>s[1]>ser[bi][1]?j:bi,0)};}
+function aRender(){const A=aVals(),H=170,L=34,R=W-10,T=10,B=H-24,X=j=>L+j/8*(R-L),Y=v=>B-Math.max(-0.2,v)/1*(B-T)*0.83-0.17*(B-T);
+ const y0=v=>B-(v+0.2)/1.2*(B-T);let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="R² と調整済み R²">`;
+ [0,0.5,1].forEach(v=>{s+=`<line x1="${L}" y1="${y0(v)}" x2="${R}" y2="${y0(v)}" stroke="var(--line)"/><text x="${L-4}" y="${y0(v)+3}" font-size="10" text-anchor="end" fill="var(--mut)">${v}</text>`;});
+ for(let j=0;j<=8;j++)s+=`<text x="${X(j)}" y="${B+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${j}</text>`;
+ const path=i=>A.ser.map((p,j)=>(j?"L":"M")+X(j).toFixed(1)+" "+y0(Math.max(-0.2,p[i])).toFixed(1)).join("");
+ s+=`<path d="${path(0)}" fill="none" stroke="var(--acc)" stroke-width="2.2"/><path d="${path(1)}" fill="none" stroke="var(--g1)" stroke-width="2.2" stroke-dasharray="5 3"/>`;
+ s+=`<line x1="${X(A.k)}" y1="${T}" x2="${X(A.k)}" y2="${B}" stroke="var(--fg)" stroke-dasharray="2 2"/><circle cx="${X(A.k)}" cy="${y0(A.r2)}" r="4" fill="var(--acc)"/><circle cx="${X(A.k)}" cy="${y0(Math.max(-0.2,A.adjr2))}" r="4" fill="var(--g1)"/>`;
+ $("abox").innerHTML=s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>R²</span><span><i class="sw" style="background:var(--g1)"></i>調整済み R²（点線）</span><span>横：足したでたらめな変数の数</span></div>`;
+ $("asum").innerHTML=`<div>本物の説明変数1つ＋でたらめな変数 ${A.k} 個（n＝${AN}、残差の自由度 ${A.df}）</div><div>R²＝<b>${f(A.r2,4)}</b>　調整済み R²＝<b>${f(A.adjr2,4)}</b></div><div>1つ前と比べて：R² は${A.r2up}、調整済み R² は${A.adjup}</div><div class="mut">R² は変数を足すと下がらないので、変数の多いモデルほど良く見える。調整済み R²＝1−(1−R²)×(n−1)÷(n−k−1) は、変数を足した割引を入れる。この例では足さない（0個）ときがいちばん高い。</div>`;}
+reg_("add",{name:"変数を足す",
+ init(){LK.stepper($("ak"),aRender);aRender();},
+ apply(s){if(s.k!==undefined)LK.setRange("ak",s.k);aRender();},
+ render:aRender,
+ value(key){const A=aVals(),v=A[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+// ---- 分散分析表と F 検定
+function vVals(){const n=+$("vn").value,k=+$("vk").value,ssr=+$("vr").value,sse=+$("ve").value,sst=ssr+sse,df2=n-k-1;
+ if(df2<1)return {ok:false,n,k};const msr=ssr/k,mse=sse/df2,F=msr/mse,crit=r3(inv(x=>fcdf(x,k,df2),0.95,0,1000)),p=1-fcdf(F,k,df2);
+ return {ok:true,n,k,ssr,sse,sst,df2,r2:ssr/sst,adjr2:1-(sse/df2)/(sst/(n-1)),msr,mse,F,crit,p,decision:F>crit?"棄却する":"棄却しない"};}
+function vRender(){const V=vVals();if(!V.ok){$("vsum").innerHTML=`<div>n−k−1＝${V.n-V.k-1} が1以上になるよう、n を大きくするか k を小さくする。</div>`;$("vplot").innerHTML="";$("vtab").innerHTML="";return;}
+ const L=16,R=W-16,w=R-L,xr=L+w*V.ssr/V.sst;
+ $("vplot").innerHTML=`<svg viewBox="0 0 ${W} 70" width="${W}" role="img" aria-label="平方和の分け方"><rect x="${L}" y="14" width="${xr-L}" height="26" fill="var(--acc)" fill-opacity=".8"/><rect x="${xr}" y="14" width="${R-xr}" height="26" fill="var(--g1)" fill-opacity=".55"/><text x="${L}" y="10" font-size="11" fill="var(--fg)">全体 SST＝${f(V.sst,2)}</text><text x="${L+4}" y="31" font-size="11" fill="#fff" font-weight="700">${(xr-L)>60?"回帰 "+f(V.ssr,1):""}</text><text x="${R-4}" y="31" font-size="11" text-anchor="end" fill="var(--fg)" font-weight="700">${(R-xr)>60?"残差 "+f(V.sse,1):""}</text><text x="${L}" y="58" font-size="11" fill="var(--mut)">青の割合＝R²＝${f(V.r2,3)}</text></svg>`;
+ $("vsum").innerHTML=`<div>R²＝SSR÷SST＝<b>${f(V.r2,4)}</b>　調整済み R²＝1−(1−R²)×${V.n-1}÷${V.df2}＝<b>${f(V.adjr2,4)}</b></div><div>平均平方：回帰 ${f(V.ssr,2)}÷${V.k}＝${f(V.msr,3)}、残差 ${f(V.sse,2)}÷${V.df2}＝${f(V.mse,3)}</div><div>F＝${f(V.msr,3)}÷${f(V.mse,3)}＝<b>${f(V.F,3)}</b>（自由度 ${V.k}, ${V.df2}）　5%点 ${g3(V.crit)}　p＝${f(V.p,4)}</div><div>→「説明変数の係数はすべて0」を <b>${V.decision}</b></div><div class="mut">F 検定が有意でも、どの係数が効いているかは係数ごとの t で見る。</div>`;
+ $("vtab").innerHTML=`<table><tr><th>変動</th><th>平方和（自由度）</th><th>平均平方</th></tr><tr><td>回帰</td><td>${f(V.ssr,2)}（${V.k}）</td><td>${f(V.msr,3)}</td></tr><tr><td>残差</td><td>${f(V.sse,2)}（${V.df2}）</td><td>${f(V.mse,3)}</td></tr><tr><td>全体</td><td>${f(V.sst,2)}（${V.n-1}）</td><td>—</td></tr></table>`;}
+reg_("anova",{name:"分散分析表",
+ init(){["vn","vk","vr","ve"].forEach(id=>LK.stepper($(id),vRender));vRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("vn",s.n);if(s.k!==undefined)LK.setRange("vk",s.k);if(s.ssr!==undefined)LK.setRange("vr",s.ssr);if(s.sse!==undefined)LK.setRange("ve",s.sse);vRender();},
+ render:vRender,
+ value(key){const V=vVals(),v=V[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+// ---- 係数の t 検定と区間
+function tVals(){const b=+$("tb").value,se=+$("ts").value,n=+$("tn").value,k=+$("tk").value,df=n-k-1;if(df<1)return {ok:false,n,k};
+ const t=b/se,crit=r3(inv(x=>tcdf(x,df),0.975,0,100)),p=2*(1-tcdf(Math.abs(t),df));return {ok:true,b,se,n,k,df,t,crit,lo:b-crit*se,hi:b+crit*se,p,decision:Math.abs(t)>crit?"棄却する":"棄却しない",contains0:b-crit*se<=0&&b+crit*se>=0?"0を含む":"0を含まない"};}
+function tRender(){const V=tVals();if(!V.ok){$("tsum").textContent="n−k−1 が1以上になるようにする。";$("tplot").innerHTML="";return;}
+ const lo=Math.min(V.lo,0,V.b)-Math.abs(V.se),hi=Math.max(V.hi,0,V.b)+Math.abs(V.se),L=16,R=W-16,X=v=>L+(v-lo)/(hi-lo)*(R-L);
+ $("tplot").innerHTML=`<svg viewBox="0 0 ${W} 64" width="${W}" role="img" aria-label="係数の95%信頼区間"><line x1="${L}" y1="40" x2="${R}" y2="40" stroke="var(--line)"/><line x1="${X(0)}" y1="16" x2="${X(0)}" y2="52" stroke="var(--fg)" stroke-dasharray="3 3"/><text x="${X(0)}" y="62" font-size="10" text-anchor="middle" fill="var(--fg)">0</text><line x1="${X(V.lo)}" y1="32" x2="${X(V.hi)}" y2="32" stroke="var(--ln)" stroke-width="4"/><circle cx="${X(V.b)}" cy="32" r="5" fill="var(--ln)"/><text x="${X(V.lo)}" y="22" font-size="10" text-anchor="middle" fill="var(--ln)">${f(V.lo,3)}</text><text x="${X(V.hi)}" y="22" font-size="10" text-anchor="middle" fill="var(--ln)">${f(V.hi,3)}</text></svg>`;
+ $("tsum").innerHTML=`<div>t＝${f(V.b,3)}÷${f(V.se,3)}＝<b>${f(V.t,3)}</b>（自由度 ${V.n}−${V.k}−1＝${V.df}）　両側5%の点 ${g3(V.crit)}</div><div>p＝<b>${f(V.p,4)}</b> →「係数＝0」を <b>${V.decision}</b></div><div>95%信頼区間 ${f(V.b,3)}±${g3(V.crit)}×${f(V.se,3)}＝<b>${f(V.lo,3)}〜${f(V.hi,3)}</b>（${V.contains0}）</div><div class="mut">区間が0を含まないことと、両側5%で棄却することは同じ。有意でも、係数の大きさが実務で意味のある大きさかは別に考える。</div>`;}
+reg_("tval",{name:"係数の t",
+ init(){["tb","ts","tn","tk"].forEach(id=>LK.stepper($(id),tRender));tRender();},
+ apply(s){if(s.b!==undefined)LK.setRange("tb",s.b);if(s.se!==undefined)LK.setRange("ts",s.se);if(s.n!==undefined)LK.setRange("tn",s.n);if(s.k!==undefined)LK.setRange("tk",s.k);tRender();},
+ render:tRender,
+ value(key){const V=tVals(),v=V[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+LK.start("coef");
+window.__LAB__={LK,cVals,dVals,kVals,aVals,vVals,tVals,ols,apply:(k,s)=>{LK.show(k);SPEC[k].apply(s);}};
+</script>
+</body></html>
