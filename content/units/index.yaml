@@ -32,4 +32,4 @@
 - {id: U29, number: "29", migrated: true}
 - {id: U30, number: "30", migrated: true}
 - {id: U31, number: "31", migrated: true}
-- {id: U32, number: "32", migrated: false}
+- {id: U32, number: "32", migrated: true}

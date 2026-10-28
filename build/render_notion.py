@@ -245,9 +245,10 @@ class NotionRenderer:
             if uid in new:
                 lines += [child(new[uid], f"{meta['number']}｜{self.c.units[uid]['title']}"), ""]
         rows = [f"| {m['number']} | {self.unit_ref(uid)} |" for uid, m in self.c.index.items() if uid not in new]
-        lines += ["## まだ旧版の単元", "", "| 番号 | 単元 |", "| --- | --- |", *rows,
-                  "", '<span color="gray">新しい形に移すと、上の一覧に移る。</span>']
-        return "\n".join(lines) + "\n"
+        if rows:   # 全部移したら、旧版の一覧は出さない
+            lines += ["## まだ旧版の単元", "", "| 番号 | 単元 |", "| --- | --- |", *rows,
+                      "", '<span color="gray">新しい形に移すと、上の一覧に移る。</span>']
+        return "\n".join(lines).rstrip("\n") + "\n"
 
     def guide_page(self) -> str:
         src = (ROOT / "content" / "guide.md").read_text(encoding="utf-8")

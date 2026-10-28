@@ -36,6 +36,7 @@ units:                 # 新しく生成した単元ページ
   U29: 407b7cd539a181d0a56dd2a7f54875b0
   U30: 407b7cd539a181548861e8308deda690
   U31: 407b7cd539a181a88ab6c893703ac6ff
+  U32: 407b7cd539a1813db83be3c966e4afb2
 
 # 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
@@ -108,6 +109,7 @@ refs:
   REF-Q-U29: 402b7cd539a181a993e6c05493b4ec61
   REF-Q-U30: 404b7cd539a181e5bdf6e870c5715b80
   REF-Q-U31: 402b7cd539a181bb87b9e9618bb86e8c
+  REF-Q-U32: 404b7cd539a18172851de744700b91ec
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -215,6 +217,10 @@ terms:
   TERM-multistage-sampling: 405b7cd539a181aba5cdd75e9d59c9e8
   TERM-sampling-error: 405b7cd539a181718510f55fc9b50f67
   TERM-nonsampling-error: 405b7cd539a1811c9ecef47373fad7ef
+  TERM-randomize: 405b7cd539a181c0881efdf0bc86e595
+  TERM-confound: 405b7cd539a1818cbb6ac0bdc77e7f71
+  TERM-anova: 405b7cd539a181d19b2ade599b065fa4
+  TERM-multcomp: 405b7cd539a181a98598c21320405004
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143
