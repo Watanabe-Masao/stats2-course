@@ -257,3 +257,6 @@
 - id: TERM-power
   name: 検出力
   en: power
+- id: TERM-pool
+  name: プールした比率
+  en: pooled proportion

@@ -1,0 +1,72 @@
+id: LAB-ptest
+name: 比率・分散の検定ラボ
+slug: proptest                   # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: ptest_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_test.html, prop.html]   # 旧版 教科書26 の「比率の検定（SE は p₀）」を p1・p2 に、「母分散の χ²・分散比の F」を var・ratio に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: p1
+    name: 1つの比率
+    purpose: H₀：p＝p₀ の z＝(p̂−p₀)÷√(p₀(1−p₀)÷n) と p 値。np₀・n(1−p₀) が5以上かの目安、二項分布で直接計算した p 値、区間推定の SE（p̂ で作る）も並べる
+    set: [side, alpha, x, n, p0]          # side：two／upper／lower
+    values: [phat, se, z, p, crit, decision, np0, pexact]
+  - key: p2
+    name: 2つの比率
+    purpose: H₀：p₁＝p₂ の z。SE は合わせた比率 p̄ で作る。区間推定の SE（各群の p̂）と z²（2×2 の表の χ²）も並べる
+    set: [side, alpha, x1, n1, x2, n2]
+    values: [p1, p2, diff, pool, se, z, p, decision, chi2]
+  - key: var
+    name: 母分散
+    purpose: H₀：σ²＝σ₀² の χ²＝(n−1)s²÷σ₀²（自由度 n−1）。両側・右片側・左片側の境目（3桁）と p 値。χ² の曲線に棄却域を塗る
+    set: [side, alpha, n, s2, v0]
+    values: [df, q, lo, hi, p, decision]
+  - key: ratio
+    name: 分散の比
+    purpose: H₀：σ₁²＝σ₂² の F＝s₁²÷s₂²（自由度 n₁−1, n₂−1）。両側（上側と下側の点）・右片側の境目（3桁）と p 値
+    set: [side, alpha, n1, s1, n2, s2]    # s1・s2 は不偏分散
+    values: [F, lo, hi, p, decision]
+data: スライダーと選択欄で決める（データの読み込みなし）。z の境目は2級の数表の値。χ²・F の点は数値計算を3桁に丸めた値（数表と同じ）
+presets:
+  s1-p1:
+    mode: p1
+    set: {side: two, alpha: 0.05, x: 30, n: 100, p0: 0.2}
+    task: 例年の購入率20%。今年は100人中30人が購入。両側の p 値は（小数で）？
+    predict: {type: number, key: p, label: "p 値"}
+    expect: 0.0124
+    why: SE は p₀ から √(0.2×0.8÷100)＝0.04、z＝0.1÷0.04＝2.5、p≒0.012。5%で棄却する。
+  s1-var:
+    mode: var
+    set: {side: two, alpha: 0.05, n: 10, s2: 16, v0: 9}
+    task: 基準の分散9。10回測った不偏分散は16。両側5%で H₀（σ²＝9）をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
+    why: χ²＝9×16÷9＝16。χ²(9) の境目2.700と19.023の間にあるので棄却しない。s² が基準の約1.8倍でも、10回では偶然の範囲。
+  s1-p2:
+    mode: p2
+    set: {side: two, alpha: 0.05, x1: 20, n1: 100, x2: 30, n2: 100}
+    task: A店は100人中20人、B店は100人中30人が購入。両側5%で「差がない」をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
+    why: p̄＝0.25、SE≒0.0612、z≒−1.63。各200人（40人と60人）にすると z≒−2.31 で棄却する。
+  s3-free:
+    mode: p1
+    modes: [p1, p2, var, ratio]
+    task: 解いてから、何の検定か（1つの比率・2つの比率・母分散・分散の比）に合うモードで確かめる。
+  s4-free:
+    mode: p2
+    modes: [p1, p2, var, ratio]
+    task: 自分の売場の数字（購入数と人数、日々のばらつき）を入れ、z・χ²・F と p 値を読む。
+  s5-free:
+    mode: p1
+    modes: [p1, p2]
+    task: 「1つの比率」で np₀ が5未満になる n にして、正規近似と二項分布の p 値を比べる（発展1）。「2つの比率」で z² を見る（発展2）。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（1つの比率、2つの比率、母分散、分散の比）。
+used_by: [U26]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/ptest_lab/check.js        # 本文の値（z＝2.5、z≒−1.63、χ²＝16、F＝4、χ²(9)・F の点）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
