@@ -296,3 +296,18 @@
 - id: TERM-extrap
   name: 外挿
   en: extrapolation
+- id: TERM-mreg
+  name: 重回帰分析
+  en: multiple regression analysis
+- id: TERM-dummy
+  name: ダミー変数
+  en: dummy variable
+- id: TERM-adjr2
+  name: 自由度調整済み決定係数
+  en: adjusted coefficient of determination
+- id: TERM-ms
+  name: 平均平方
+  en: mean square
+- id: TERM-multicol
+  name: 多重共線性
+  en: multicollinearity
