@@ -1,0 +1,305 @@
+# 単元U14の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U14-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    公平なコインを3回投げて、ちょうど2回表が出る確率は？
+
+    並び1つの確率＝0.5²×0.5＝□。表が出る2回の選び方＝₃C₂＝□通り。ちょうど2回＝□×□＝□
+  answer_title: 答え（埋めてから開く）
+  answer: 並び1つは **0.125**、選び方は **3** 通り。₃C₂×0.5²×0.5＝3×0.125＝**0.375**。
+  checks:
+    - 'comb(3,2) == 3 and Fraction(1,2)**3 == Fraction(1,8) and 3*Fraction(1,8) == Fraction(375,1000)'
+  lab:
+    id: LAB-binom
+    mode: path
+    set: {n: 3, p: 0.5, k: 2}
+    task: コインを3回投げ、ちょうど2回表（🛒を表とする）。確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝2)"}
+    expect: 0.375
+    why: 表表裏・表裏表・裏表表の3通り、どれも 0.5³＝0.125。3×0.125＝0.375。
+
+- id: Q-U14-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P2]
+  prompt: n＝5、p＝0.2 のとき、ちょうど2回成功する確率と、期待値・分散を求めよ。
+  answer_title: 答え（解いてから開く）
+  answer: ₅C₂×0.2²×0.8³＝10×0.04×0.512＝**0.2048**。期待値 5×0.2＝**1**、分散 5×0.2×0.8＝**0.8**。
+  checks:
+    - 'comb(5,2) == 10 and math.isclose(0.2**2, 0.04) and math.isclose(0.8**3, 0.512) and math.isclose(10*0.04*0.512, 0.2048) and math.isclose(5*0.2, 1) and math.isclose(5*0.2*0.8, 0.8)'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 5, p: 0.2, k: 2, kind: eq}
+    task: n＝5、p＝0.2。ちょうど2回成功する確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝2)"}
+    expect: 0.2048
+    why: 10×0.04×0.512＝0.2048。平均は1回なので、いちばん起きやすいのは1回で、2回はその次。
+
+- id: Q-U14-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: 例題（n＝4、p＝0.25）で少なくとも1人買う確率は？
+  answer: 1−0.75⁴＝1−0.3164＝**0.6836**（約68%）。
+  checks:
+    - 'abs(0.75**4 - 0.3164) < 0.00005 and abs(1-0.75**4 - 0.6836) < 0.00005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 4, p: 0.25, k: 1, kind: ge}
+    task: n＝4、p＝0.25。少なくとも1人（1人以上）が買う確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧1)"}
+    expect: 0.6836
+    why: 1人以上は「0人ではない」。1−0.75⁴＝0.6836。1〜4人の4本を足しても同じになる。
+
+- id: Q-U14-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 例題（n＝4、p＝0.25）で、少なくとも2人が買う確率は？
+  answer: P(0人)＝0.75⁴＝0.3164、P(1人)＝0.4219。1−0.3164−0.4219＝**0.2617**（約26%）。
+  checks:
+    - 'abs(0.75**4 - 0.3164) < 0.00005 and abs(4*0.25*0.75**3 - 0.4219) < 0.00005 and abs(1-0.75**4-4*0.25*0.75**3 - 0.2617) < 0.00005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 4, p: 0.25, k: 2, kind: ge}
+    task: n＝4、p＝0.25。少なくとも2人（2人以上）が買う確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧2)"}
+    expect: 0.2617
+    why: 2人以上＝1−(0人＋1人)＝1−0.3164−0.4219＝0.2617。0人を引き忘れると0.5781になる。
+
+- id: Q-U14-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 不良率5%の製品から20個を抜き取り、不良が2個以下なら合格とする。合格する確率は？（各製品の不良は独立とする）
+  answer: P(0)＝0.95²⁰≒0.3585、P(1)＝20×0.05×0.95¹⁹≒0.3774、P(2)＝190×0.05²×0.95¹⁸≒0.1887。合計≒**0.9245**（約92%）。平均は1個なので、2個以下はかなり起きやすい。
+  checks:
+    - 'abs(0.95**20 - 0.3585) < 0.00005 and abs(20*0.05*0.95**19 - 0.3774) < 0.00005 and comb(20,2) == 190 and abs(190*0.05**2*0.95**18 - 0.1887) < 0.00005 and abs(sum(comb(20,k)*0.05**k*0.95**(20-k) for k in range(3)) - 0.9245) < 0.00005 and math.isclose(20*0.05, 1) and abs(sum(comb(20,k)*0.1**k*0.9**(20-k) for k in range(3)) - 0.68) < 0.005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 20, p: 0.05, k: 2, kind: le}
+    task: 不良率5%、20個抜き取り。不良が2個以下になる確率は（小数で）？
+    predict: {type: number, key: le, label: "P(X≦2)"}
+    expect: 0.9245
+    why: 0個・1個・2個の3本を足して約0.92。p を0.1にすると合格の確率は約0.68に下がる。
+
+- id: Q-U14-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 来店客の30%が会員カードを提示する。6人来たとき、ちょうど2人が提示する確率は？
+  answer: ₆C₂×0.3²×0.7⁴＝15×0.09×0.2401≒**0.324**。
+  checks:
+    - 'comb(6,2) == 15 and math.isclose(0.3**2, 0.09) and abs(0.7**4 - 0.2401) < 1e-12 and abs(15*0.09*0.2401 - 0.324) < 0.0005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 6, p: 0.3, k: 2, kind: eq}
+    task: n＝6、p＝0.3。ちょうど2人が提示する確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝2)"}
+    expect: 0.3241
+    why: 15×0.09×0.2401≒0.324。平均 1.8人に近い2人がいちばん起きやすい。
+
+- id: Q-U14-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1]
+  prompt: 試食した客の10%が購入する。50人が試食したとき、購入する人数の平均と標準偏差は？
+  answer: 平均 np＝50×0.1＝**5人**。分散 np(1−p)＝50×0.1×0.9＝4.5、標準偏差＝√4.5≒**2.12人**。
+  checks:
+    - 'math.isclose(50*0.1, 5) and math.isclose(50*0.1*0.9, 4.5) and abs(math.sqrt(4.5) - 2.12) < 0.005'
+  lab:
+    id: LAB-binom
+    mode: bern
+    set: {p: 0.1, n: 50}
+    task: p＝0.1、n＝50。購入する人数の標準偏差は（小数で）？
+    predict: {type: number, key: sd, label: "標準偏差", unit: "人"}
+    expect: 2.1213
+    why: 分散 50×0.1×0.9＝4.5、√4.5≒2.12人。1人の分散0.09を50倍して平方根。
+
+- id: Q-U14-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P3]
+  prompt: 1人が買う（1）・買わない（0）を X₁, X₂, X₃, X₄ とし、どれも購入率0.25で独立とする。合計 X＝X₁＋X₂＋X₃＋X₄ の期待値と分散を、{{unit:U13}} の「期待値の和」「独立なら分散の和」から求めよ。
+  answer: 1人分の期待値は0.25、分散は 0.25×0.75＝0.1875。4人分を足して、期待値 4×0.25＝**1**、分散 4×0.1875＝**0.75**。二項分布の np・np(1−p) と一致する。
+  checks:
+    - 'math.isclose(0.25*0.75, 0.1875) and math.isclose(4*0.25, 1) and math.isclose(4*0.1875, 0.75)'
+  lab:
+    id: LAB-binom
+    mode: bern
+    set: {p: 0.25, n: 4}
+    task: 1人の購入（1/0）は p＝0.25。独立な4人分の合計の分散は（小数で）？
+    predict: {type: number, key: var, label: "合計の分散"}
+    expect: 0.75
+    why: 1人の分散 p(1−p)＝0.1875 を4人分足して0.75。二項分布の分散 np(1−p) はこの足し算から出てくる。
+
+- id: Q-U14-020
+  stage: S3
+  tag: 以上は反対側から
+  format: written
+  powers: [P1, P3]
+  prompt: クーポンの利用率が10%のとき、20人に配って3人以上が使う確率を求めたい。二項分布で計算するときの n, p と、確かめるべき前提は？ 確率も求めよ。
+  answer: n＝20、p＝0.1。P(3人以上)＝1−P(0)−P(1)−P(2)＝1−0.1216−0.2702−0.2852≒**0.323**。前提として、1人1人の利用が独立で、利用率が全員同じ10%であることを確かめる（家族で1枚を共有する、常連だけ使いやすい、などがあると崩れる）。
+  checks:
+    - 'abs(0.9**20 - 0.1216) < 0.00005 and abs(20*0.1*0.9**19 - 0.2702) < 0.00005 and abs(190*0.01*0.9**18 - 0.2852) < 0.00005 and abs(1-sum(comb(20,k)*0.1**k*0.9**(20-k) for k in range(3)) - 0.323) < 0.0005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 20, p: 0.1, k: 3, kind: ge}
+    task: n＝20、p＝0.1。3人以上が使う確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧3)"}
+    expect: 0.3231
+    why: 3〜20人を足す代わりに、1−(0人＋1人＋2人)。平均2人なので、3人以上は3回に1回くらい。
+
+- id: Q-U14-021
+  stage: S3
+  tag: n を決める
+  format: written
+  powers: [P1, P3]
+  prompt: 購入率25%の売場で「少なくとも1人が買う」確率を90%以上にしたい。何人以上の来店が必要か。
+  answer: 1−0.75ⁿ≧0.9、つまり 0.75ⁿ≦0.1。0.75⁸≒0.1001 でわずかに足りず、0.75⁹≒0.0751。**9人**以上。
+  checks:
+    - 'abs(0.75**8 - 0.1001) < 0.00005 and abs(0.75**9 - 0.0751) < 0.00005 and 0.75**8 > 0.1 and 0.75**9 < 0.1'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 9, p: 0.25, k: 1, kind: ge}
+    task: n＝9、p＝0.25。少なくとも1人が買う確率は（小数で）？ 0.9を超えているか。
+    predict: {type: number, key: atleast1, label: "P(X≧1)"}
+    expect: 0.9249
+    why: 1−0.75⁹≒0.925 で0.9を超える。n を8にすると0.8999で、わずかに届かない。
+
+- id: Q-U14-022
+  stage: S3
+  tag: 平均と分散から n・p
+  format: written
+  powers: [P1, P3]
+  prompt: 二項分布 B(n, p) で、平均が6、分散が4.2だった。n と p は？
+  answer: 分散÷平均＝np(1−p)÷np＝1−p＝4.2÷6＝0.7 なので **p＝0.3**。n＝6÷0.3＝**20**。
+  checks:
+    - 'math.isclose(4.2/6, 0.7) and math.isclose(1-0.7, 0.3) and math.isclose(6/0.3, 20) and math.isclose(20*0.3*0.7, 4.2)'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 20, p: 0.3, k: 6, kind: eq}
+    task: B(20, 0.3) の分散は（小数で）？ 平均6・分散4.2 になっているか確かめる。
+    predict: {type: number, key: var, label: "分散 np(1−p)"}
+    expect: 4.2
+    why: 20×0.3×0.7＝4.2。分散を平均で割ると 1−p が出る。分散は平均より必ず小さい（1−p＜1）。
+
+- id: Q-U14-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: 次の確率変数のうち、二項分布に従うと考えてよいものはどれか。
+  choices:
+    - ある店の1日の来店客数
+    - 赤3個・青2個の袋から、戻さずに3回引いたときの赤の数
+    - 公平なコインを10回投げたときの表の回数
+    - 5人家族のうち、新商品を買う人数（家族で相談して決める）
+    - 初めて当たりが出るまでにくじを引いた回数
+  correct: 3
+  answer: 回数が10回に決まり、表・裏の2通りで、毎回0.5、各回は独立。4つの条件がそろうので B(10, 0.5)。
+  misconceptions:
+    1: 回数（人数の上限）が決まっていない。ポアソン分布などを考える
+    2: 戻さずに引くと毎回の確率が変わる（超幾何分布）
+    4: 家族で相談するので互いに独立でない
+    5: 回数が決まっておらず、数えているのは「何回目で当たるか」（幾何分布）
+  checks:
+    - 'abs(comb(10,5)*0.5**10 - 0.2461) < 0.00005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 10, p: 0.5, k: 5, kind: eq}
+    task: コインを10回投げる。表がちょうど5回の確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝5)"}
+    expect: 0.2461
+    why: ₁₀C₅×0.5¹⁰＝252÷1024≒0.246。平均5回でも、ちょうど5回は4回に1回くらい。
+
+- id: Q-U14-030
+  stage: S4
+  tag: クーポンが0人
+  format: written
+  powers: [P1, P3]
+  prompt: 入口の問い。利用率10%のクーポンを20人に配ったら、1人も使わなかった。利用率が10%のままでも、0人になる確率は？ 「効果が落ちた」と言えるか。
+  answer: 0.9²⁰≒**0.12**（約12%）。8回に1回くらいは利用率10%のままでも0人になるので、この1回だけで効果が落ちたとは言えない。続けて0人が出るか、もっと多くの人数で確かめる。
+  checks:
+    - 'abs(0.9**20 - 0.12) < 0.005 and abs(1/0.9**20 - 8) < 0.5'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 20, p: 0.1, k: 0, kind: eq}
+    task: n＝20、p＝0.1。ちょうど0人が使う確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝0)"}
+    expect: 0.1216
+    why: 0.9²⁰≒0.12。平均2人でも、0人は珍しくない。偶然かどうかの判断は検定の単元で正式に扱う。
+
+- id: Q-U14-031
+  stage: S4
+  tag: 抜き取り検査
+  format: written
+  powers: [P1, P3]
+  prompt: 不良率2%のロットから50個を抜き取り、不良が1個でも見つかったら出荷を止める。止まる確率は？ 不良品が混ざっているのに見逃す確率は？
+  answer: 止まる確率＝1−0.98⁵⁰≒**0.64**。見逃す確率＝0.98⁵⁰≒**0.36**。平均は1個（50×0.02）でも、3回に1回以上は1個も見つからない。
+  checks:
+    - 'abs(1-0.98**50 - 0.64) < 0.005 and abs(0.98**50 - 0.36) < 0.005 and math.isclose(50*0.02, 1) and abs(1-0.98**100 - 0.87) < 0.005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 50, p: 0.02, k: 1, kind: ge}
+    task: n＝50、p＝0.02。不良が1個以上見つかる確率は（小数で）？
+    predict: {type: number, key: atleast1, label: "P(X≧1)"}
+    expect: 0.6358
+    why: 1−0.98⁵⁰≒0.64。n を100にすると約0.87まで上がる。抜き取る数を増やすほど見逃しは減る。
+
+- id: Q-U14-032
+  stage: S4
+  tag: 予約の受けすぎ
+  format: written
+  powers: [P1, P3]
+  prompt: 席が20の店で22人の予約を受けた。予約客の来店率は0.9で、互いに独立とする。来店が席を超える（21人以上）確率は？ 来店人数の平均は？
+  answer: P(21)＝22×0.9²¹×0.1≒0.2407、P(22)＝0.9²²≒0.0985。合計≒**0.339**（約34%）。平均は 22×0.9＝**19.8人**。平均では席に収まるが、3回に1回は席が足りない。
+  checks:
+    - 'abs(22*0.9**21*0.1 - 0.2407) < 0.00005 and abs(0.9**22 - 0.0985) < 0.00005 and abs(22*0.9**21*0.1 + 0.9**22 - 0.339) < 0.0005 and math.isclose(22*0.9, 19.8) and abs(0.9**21 - 0.11) < 0.005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 22, p: 0.9, k: 21, kind: ge}
+    task: 予約22人、来店率0.9。21人以上来る確率は（小数で）？
+    predict: {type: number, key: ge, label: "P(X≧21)"}
+    expect: 0.3392
+    why: 21人と22人の2本を足して約0.34。n を21にすると約0.11まで下がる。
+
+- id: Q-U14-040
+  stage: S5
+  tag: 正規分布で近似
+  format: written
+  powers: [P1, P3]
+  prompt: B(100, 0.5) で X≧60 となる確率を、正規分布で近似して求めよ（連続修正を使う）。正確な値は約0.0284。
+  answer: 平均 50、標準偏差 √(100×0.5×0.5)＝5。連続修正で 59.5 を境にして、z＝(59.5−50)÷5＝1.9。P(Z≧1.9)≒**0.0287**。正確な値0.0284にかなり近い。
+  checks:
+    - 'math.isclose(math.sqrt(100*0.25), 5) and math.isclose((59.5-50)/5, 1.9) and abs(0.5*math.erfc(1.9/math.sqrt(2)) - 0.0287) < 0.00005 and abs(1-sum(comb(100,k)*0.5**100 for k in range(60)) - 0.0284) < 0.00005'
+  lab:
+    id: LAB-binom
+    mode: pmf
+    set: {n: 100, p: 0.5, k: 60, kind: ge, norm: "yes"}
+    task: B(100, 0.5)。X≧60 の正確な確率は（小数で）？ 重ねた正規分布の曲線と比べる。
+    predict: {type: number, key: ge, label: "P(X≧60)"}
+    expect: 0.0284
+    why: 二項分布の正確な値は約0.0284。正規近似（連続修正あり）は約0.0287。n が大きいと棒の形が曲線にほぼ重なる。

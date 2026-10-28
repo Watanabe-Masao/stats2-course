@@ -152,3 +152,6 @@
 - id: TERM-cov
   name: 共分散
   en: covariance
+- id: TERM-binom
+  name: 二項分布
+  en: binomial distribution

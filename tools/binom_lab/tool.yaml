@@ -1,0 +1,62 @@
+id: LAB-binom
+name: 二項分布ラボ
+slug: binom                      # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: binom_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_binom.html]   # 旧版 教科書14 の「n と p を動かす」を pmf モードに含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: pmf
+    name: 二項分布 B(n, p)
+    purpose: B(n, p) の棒グラフ。ちょうど k 回・k 回以下・k 回以上の確率、平均 np・分散 np(1−p)。正規分布を重ねられる
+    set: [n, p, k, kind, norm]      # kind：eq／le／ge、norm：no／yes
+    values: [pk, le, ge, mean, var, sd, p0, atleast1, mode]
+  - key: path
+    name: 並びを書き出す
+    purpose: n 回中ちょうど k 回成功する並びを全部書き出し、並び1つの確率×並びの数（ₙCₖ）を見る（n は6まで）
+    set: [n, p, k]
+    values: [pk, path, ncr]
+  - key: bern
+    name: ベルヌーイと np
+    purpose: 1回の試行（ベルヌーイ）の平均 p・分散 p(1−p)。n 回分の合計で平均 np・分散 np(1−p)
+    set: [p, n]
+    values: [bmean, bvar, mean, var, sd]
+data: スライダーと選択欄で値を決める（データの読み込みなし）
+presets:
+  s1-path:
+    mode: path
+    set: {n: 4, p: 0.25, k: 1}
+    task: 購入率25%の売場に客が4人。ちょうど1人が買う確率は（小数で）？
+    predict: {type: number, key: pk, label: "P(X＝1)"}
+    expect: 0.4219
+    why: 誰が買うかの並びは4通り（₄C₁）、どれも 0.25×0.75³≒0.105。4×0.105≒0.422。0.25 だけ、0.105 だけだと並び方を数え忘れている。
+  s1-n:
+    mode: pmf
+    set: {n: 20, p: 0.25, k: 5, kind: eq}
+    unlock: [kind]
+    task: 購入率25%の売場に客が20人。いちばん起きやすい「買う人数」は何人か。
+    predict: {type: number, key: mode, label: "いちばん起きやすい人数", unit: "人"}
+    expect: 5
+    why: 平均 np＝20×0.25＝5人の近くが山になる。n を増やすと山は右へ動き、左右対称に近づく。
+  s3-free:
+    mode: pmf
+    modes: [pmf, path, bern]
+    task: 解いてから、「二項分布 B(n, p)」で n・p・k と「求める」を問題に合わせて確かめる。式の ₙCₖ の意味は「並びを書き出す」、平均・分散は「ベルヌーイと np」で見る。
+  s4-free:
+    mode: pmf
+    modes: [pmf, bern]
+    task: 自分の売場の数字（人数 n と購入率・利用率 p）を入れ、「k 人以上」「1人もいない」の確率を読む。平均 np のまわりにどれくらい散らばるかも見る。
+  s5-norm:
+    mode: pmf
+    modes: [pmf, bern]
+    set: {n: 60, p: 0.3, k: 18, kind: eq, norm: "yes"}
+    task: 「重ねる」を正規分布にしたまま n を小さく・大きくし、正規分布で近似できるのはどんなときかを見る。p を0.05のように小さくすると形がどう崩れるかも見る。
+  s6-free:
+    task: 自分の課題の数字で、モードを切り替えて確かめる（二項分布 B(n, p)、並びを書き出す、ベルヌーイと np）。
+used_by: [U14]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/binom_lab/check.js        # 本文の値（0.421875・0.3164・0.6836・0.2617、0.375、0.2048、平均1・分散0.75）
+checked:
+  browser_380px: 2026-10-28
+  notion_iphone: null
