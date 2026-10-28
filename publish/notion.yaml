@@ -4,6 +4,7 @@ root_page: 406b7cd539a181009c17d5cf82af377c   # 📚 教材 v2
 guide_page: 406b7cd539a181df985edc50a2b248af  # 学び方ガイド（生成）
 personal_root: 406b7cd539a181719cfdfd53a2501d4a  # 個人用の学習記録（配布しない。配布先の設定では空にする）
 units:                 # 新しく生成した単元ページ
+  U01: 407b7cd539a181eab4e2e2b432162d65
   U03: 406b7cd539a18162b230fddc4cad9937
   U04: 406b7cd539a181ad89c5ebb1427a5ec5
   U05: 406b7cd539a181c6b10ceb390917d414
@@ -19,7 +20,7 @@ site_base_url: https://watanabe-masao.github.io/stats2-labs
 
 legacy_reference: 405b7cd539a1818f9198f683d487c86d   # 公式・用語リファレンス
 legacy_units:
-  U01: 407b7cd539a181eab4e2e2b432162d65
+  U01: 404b7cd539a181f7bceaca01b3d7d30d
   U02: 404b7cd539a1818e9a7fc14c561e2fff
   U03: 404b7cd539a181c8b401eff8ea64a114
   U04: 404b7cd539a181ae9f2cf8dd36aaedab
@@ -61,6 +62,7 @@ refs:
   REF-Q-U07: 402b7cd539a181eda58df84bc3ba1ca2
   REF-Q-U08: 402b7cd539a1815f98bde2f52959e40c
   REF-Q-U01: 402b7cd539a18188a71ef3f61ee84355
+  REF-Q-U02: 402b7cd539a181378704c6a4ed5e3c99
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -92,6 +94,7 @@ terms:
   TERM-perm: 405b7cd539a181f2b3b4f04db076d2f0
   TERM-comb: 405b7cd539a181298d8fd17c7d3bd440
   TERM-fact: 405b7cd539a1817ea350f448da86a476
+  TERM-sigma: 405b7cd539a181bfb74acaf7897ba407
   TERM-population: 405b7cd539a181a1af22c1469b5048bf
   TERM-sample: 405b7cd539a181c89c78dd03e0aff365
   TERM-parameter: 405b7cd539a181dbac4ffc0e5eb81d7c

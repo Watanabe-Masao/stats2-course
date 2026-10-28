@@ -1,0 +1,305 @@
+# 単元U02の問題。id は変えない（個人の解答記録がこの id を指す）。
+- id: Q-U02-001
+  stage: S1
+  label: 例題B（穴埋め）
+  format: fill
+  powers: [P1, P2]
+  prompt: |-
+    x＝1, 3, 5 について Σx、Σx²、偏差平方和を求めよ。
+
+    Σx＝1＋3＋5＝□、Σx²＝1＋□＋□＝□、平均□ なので 偏差平方和＝□＋0＋□＝□
+  answer_title: 答え（埋めてから開く）
+  answer: Σx＝**9**、Σx²＝1＋**9**＋**25**＝**35**。平均 **3** なので偏差平方和＝**4**＋0＋**4**＝**8**。(Σx)²＝81 とは違う。
+  checks:
+    - 'sum([1,3,5]) == 9 and sum(x*x for x in [1,3,5]) == 35 and Fraction(9,3) == 3 and sum((x-3)**2 for x in [1,3,5]) == 8 and 9**2 == 81'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [1, 3, 5]}
+    task: 1, 3, 5 の Σx²（2乗してから足す）はいくつか。
+    predict: {type: number, key: sumsq, label: "Σx²"}
+    expect: 35
+    why: 1＋9＋25＝35。足してから2乗すると 9²＝81。正方形の全体81のうち、色の3つが35。
+
+- id: Q-U02-002
+  stage: S1
+  label: 例題C（自力）
+  format: written
+  powers: [P1, P3]
+  prompt: 4!、0!、₅C₂＝5!÷(2!×3!) を求めよ。
+  answer_title: 答え（解いてから開く）
+  answer: 4!＝4×3×2×1＝**24**、0!＝**1**（定義）、₅C₂＝120÷(2×6)＝**10**。なぜ 2! で割るかは {{unit:U09}} で学ぶ。
+  checks:
+    - 'math.factorial(4) == 24 and math.factorial(0) == 1 and math.factorial(5) == 120 and Fraction(120, 2*6) == 10 and math.factorial(3) == 6'
+  lab:
+    id: LAB-sigma
+    mode: fact
+    set: {n: 5, r: 2}
+    task: 5個から2個を選ぶ組合せ ₅C₂ はいくつか。
+    predict: {type: number, key: comb, label: "₅C₂"}
+    expect: 10
+    why: 順に並べると 5×4＝20 通り。同じ2個の組は並べ方 2!＝2 通りずつ重なっているので、20÷2＝10。
+
+- id: Q-U02-003
+  stage: S1
+  difficulty: 1
+  format: written
+  powers: [P1]
+  prompt: f(x)＝2x＋1 のとき f(3) はいくつか。
+  answer: 2×3＋1＝**7**。f(3) は「x に3を入れた結果」で、f×3 ではない。
+  checks:
+    - '2*3 + 1 == 7'
+  lab:
+    id: LAB-sigma
+    mode: func
+    set: {a: 2, b: 1, x: 3}
+    task: f(x)＝2x＋1 のとき、f(3) はいくつか。
+    predict: {type: number, key: fx, label: "f(3)"}
+    expect: 7
+    why: x に3を入れて 2×3＋1＝7。グラフでは x＝3 の真上の点の高さ。
+
+- id: Q-U02-004
+  stage: S1
+  difficulty: 2
+  format: written
+  powers: [P1, P2]
+  prompt: 1, 2, 3, 6 について、Σx、平均、Σx²、(Σx)² を求めよ。
+  answer: Σx＝**12**、平均 12÷4＝**3**、Σx²＝1＋4＋9＋36＝**50**、(Σx)²＝12²＝**144**。
+  checks:
+    - 'sum([1,2,3,6]) == 12 and Fraction(12,4) == 3 and sum(x*x for x in [1,2,3,6]) == 50 and 12**2 == 144'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [1, 2, 3, 6]}
+    task: 1, 2, 3, 6 の Σx² はいくつか。
+    predict: {type: number, key: sumsq, label: "Σx²"}
+    expect: 50
+    why: 1＋4＋9＋36＝50。(Σx)²＝144 との差94は、正方形の灰色の部分（異なる値どうしの積）。
+
+- id: Q-U02-005
+  stage: S1
+  difficulty: 3
+  format: written
+  powers: [P1, P3]
+  prompt: 2, 5, 8 について、偏差の合計 Σ(xᵢ−x̄) と偏差平方和 Σ(xᵢ−x̄)² を求めよ。散らばりを表すのに、偏差の合計ではなく偏差平方和を使う理由を言え。
+  answer: 平均5、偏差 −3, 0, 3。偏差の合計＝**0**、偏差平方和＝9＋0＋9＝**18**。偏差の合計はどんなデータでも0になり、散らばりの大きさを表せない。2乗するとマイナスが消えるので、平均から離れているほど大きくなる。
+  checks:
+    - 'Fraction(2+5+8,3) == 5 and [x-5 for x in [2,5,8]] == [-3,0,3] and sum(x-5 for x in [2,5,8]) == 0 and sum((x-5)**2 for x in [2,5,8]) == 18'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [2, 5, 8]}
+    task: 2, 5, 8 の偏差平方和 Σ(x−x̄)² はいくつか。
+    predict: {type: number, key: ss, label: "偏差平方和"}
+    expect: 18
+    why: 平均5、偏差 −3, 0, 3 を2乗して 9＋0＋9＝18。偏差の合計はくわしくの表のとおり0。
+
+- id: Q-U02-010
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1]
+  prompt: 5! はいくつか。
+  answer: 5×4×3×2×1＝**120**。
+  checks:
+    - 'math.factorial(5) == 120'
+  lab:
+    id: LAB-sigma
+    mode: fact
+    set: {n: 5, r: 5}
+    task: 5! はいくつか。
+    predict: {type: number, key: fact, label: "5!"}
+    expect: 120
+    why: 5×4×3×2×1＝120。5個を全部並べる並べ方の数と同じ（1つ目5通り、2つ目4通り…）。
+
+- id: Q-U02-011
+  stage: S2
+  label: 約1週間後の問
+  format: written
+  powers: [P1, P2]
+  prompt: x＝1, 2, 3, 4 のとき Σ(2xᵢ＋3) を求めよ。書き下す方法と、Σの計算ルールを使う方法の両方で。
+  answer: 書き下すと 5＋7＋9＋11＝**32**。ルールでは 2×Σx＋4×3＝2×10＋12＝**32**。3 は4回足されるので4×3。
+  checks:
+    - 'sum(2*x+3 for x in [1,2,3,4]) == 32 and [2*x+3 for x in [1,2,3,4]] == [5,7,9,11] and 2*10 + 4*3 == 32 and sum([1,2,3,4]) == 10'
+  lab:
+    id: LAB-sigma
+    mode: rule
+    set: {data: [1, 2, 3, 4], a: 2, c: 3}
+    task: x＝1, 2, 3, 4 のとき、Σ(2x＋3) はいくつか。
+    predict: {type: number, key: lhs, label: "Σ(2x＋3)"}
+    expect: 32
+    why: 5＋7＋9＋11＝32。2×Σx＋n×3＝2×10＋4×3＝32 と同じ。
+
+- id: Q-U02-012
+  stage: S2
+  label: 約1か月後の問
+  format: written
+  powers: [P1, P2]
+  prompt: 2, 4, 6 の偏差平方和を求め、それを n＝3 で割った分散と、n−1＝2 で割った不偏分散を求めよ（{{unit:U07}}）。
+  answer: 偏差平方和＝4＋0＋4＝**8**。分散＝8÷3≒**2.67**、不偏分散＝8÷2＝**4**。分子の Σ(x−x̄)² は同じで、割る数だけが違う。
+  checks:
+    - 'sum((x-4)**2 for x in [2,4,6]) == 8 and abs(8/3 - 2.67) < 0.005 and Fraction(8,2) == 4'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [2, 4, 6]}
+    task: 2, 4, 6 の偏差平方和はいくつか（分散・不偏分散の分子）。
+    predict: {type: number, key: ss, label: "偏差平方和"}
+    expect: 8
+    why: 4＋0＋4＝8。これを3で割ると分散、2で割ると不偏分散。
+
+- id: Q-U02-020
+  stage: S3
+  tag: 計算の近道
+  format: written
+  powers: [P1, P2]
+  prompt: 3, 4, 5, 8 の偏差平方和を、Σx²−n x̄² で求めよ。
+  answer: Σx＝20、平均5、Σx²＝9＋16＋25＋64＝114、n x̄²＝4×25＝100。偏差平方和＝114−100＝**14**。偏差（−2, −1, 0, 3）を2乗して足しても 4＋1＋0＋9＝14。
+  checks:
+    - 'sum([3,4,5,8]) == 20 and Fraction(20,4) == 5 and sum(x*x for x in [3,4,5,8]) == 114 and 4*25 == 100 and 114 - 100 == 14 and sum((x-5)**2 for x in [3,4,5,8]) == 14'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [3, 4, 5, 8]}
+    task: 3, 4, 5, 8 の偏差平方和はいくつか。
+    predict: {type: number, key: ss, label: "偏差平方和"}
+    expect: 14
+    why: Σx²＝114、n×x̄²＝4×5²＝100、差が14。偏差を2乗して足した値と一致する。
+
+- id: Q-U02-021
+  stage: S3
+  tag: 定数を外に出す
+  format: written
+  powers: [P1, P3]
+  prompt: 2, 4, 6 について Σ3xᵢ と Σ(xᵢ＋1) を、Σの計算ルールを使って求めよ。
+  answer: Σ3xᵢ＝3×Σxᵢ＝3×12＝**36**。Σ(xᵢ＋1)＝Σxᵢ＋3×1＝**15**。書き下すと 6＋12＋18＝36、3＋5＋7＝15。
+  checks:
+    - '3*12 == 36 and 12 + 3 == 15 and 6+12+18 == 36 and 3+5+7 == 15'
+  lab:
+    id: LAB-sigma
+    mode: rule
+    set: {data: [2, 4, 6], a: 3, c: 0}
+    task: 2, 4, 6 について、Σ3x はいくつか。
+    predict: {type: number, key: lhs, label: "Σ3x"}
+    expect: 36
+    why: 3×Σx＝3×12＝36。全部に掛かる3は Σ の外に出せる。c を1にすると Σ(3x＋1)＝36＋3＝39。
+
+- id: Q-U02-022
+  stage: S3
+  tag: 順列と組合せ
+  format: written
+  powers: [P1, P3]
+  prompt: 6人から3人を選んで1列に並べる並べ方と、3人を選ぶだけの選び方は、それぞれ何通りか。2つの数はどういう関係か。
+  answer: 並べ方 6×5×4＝**120通り**。選ぶだけなら 120÷3!＝120÷6＝**20通り**。同じ3人の組には並べ方が 3!＝6 通りあるので、選ぶだけの数は並べ方の数の 1/6。
+  checks:
+    - '6*5*4 == 120 and Fraction(120, math.factorial(3)) == 20 and math.comb(6,3) == 20 and math.factorial(3) == 6'
+  lab:
+    id: LAB-sigma
+    mode: fact
+    set: {n: 6, r: 3}
+    task: 6人から3人を選ぶだけの選び方は何通りか。
+    predict: {type: number, key: comb, label: "₆C₃"}
+    expect: 20
+    why: 並べ方 6×5×4＝120 を、同じ組の並べ方 3!＝6 で割って20。
+
+- id: Q-U02-023
+  stage: S3
+  tag: 本番形式
+  format: choice
+  powers: [P3]
+  prompt: データ 2, 4, 6 について、正しい記述はどれか。
+  choices:
+    - Σxᵢ² と (Σxᵢ)² はどちらも 144 である。
+    - Σ(xᵢ−x̄) は散らばりが大きいほど大きくなる。
+    - Σ(xᵢ＋1) は Σxᵢ＋1＝13 である。
+    - Σxᵢ²−3x̄² は偏差平方和 8 に等しい。
+    - x₂ は x を2倍した値で、8 である。
+  correct: 4
+  answer: Σxᵢ²＝56、3x̄²＝3×16＝48 で、56−48＝8 は偏差平方和に等しい。
+  misconceptions:
+    1: Σxᵢ²＝56、(Σxᵢ)²＝144。2乗と足し算の順番が違う
+    2: 偏差の合計はどんなデータでも0
+    3: 1 は3回足されるので Σxᵢ＋3＝15
+    5: x₂ は2番目の値で4。添字は掛け算ではない
+  checks:
+    - 'sum(x*x for x in [2,4,6]) == 56 and 3*16 == 48 and 56 - 48 == 8 and 12 + 1 == 13 and 12 + 3 == 15 and 2*4 == 8'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [2, 4, 6]}
+    task: 2, 4, 6 の (Σx)²（足してから2乗）はいくつか。Σx² と比べる。
+    predict: {type: number, key: sqsum, label: "(Σx)²"}
+    expect: 144
+    why: 12²＝144。Σx²＝56 とは違う。Σx²−3×4²＝8 が偏差平方和。
+
+- id: Q-U02-030
+  stage: S4
+  tag: 表計算の関数
+  format: written
+  powers: [P1, P3]
+  prompt: 表計算で B2:B5 に 1, 2, 3, 4 が入っている。SUMSQ(B2:B5) と SUM(B2:B5)^2 はそれぞれいくつか。Σ を使って書け。
+  answer: SUMSQ は Σxᵢ²＝1＋4＋9＋16＝**30**。SUM(…)^2 は (Σxᵢ)²＝10²＝**100**。分散の近道の式で使うのは SUMSQ の方。
+  checks:
+    - 'sum(x*x for x in [1,2,3,4]) == 30 and sum([1,2,3,4])**2 == 100'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [1, 2, 3, 4]}
+    task: 1, 2, 3, 4 の SUMSQ（Σx²）はいくつか。
+    predict: {type: number, key: sumsq, label: "Σx²"}
+    expect: 30
+    why: 1＋4＋9＋16＝30。SUM(…)^2 は 10²＝100 で、正方形の全体。
+
+- id: Q-U02-031
+  stage: S4
+  tag: 当番の選び方
+  format: written
+  powers: [P1, P3]
+  prompt: 8人の売場担当から、今週の当番2人を選ぶ（役割の区別なし）。選び方は何通りか。表計算の COMBIN(8,2) と同じ値になることも確かめよ。
+  answer: ₈C₂＝8×7÷2!＝**28通り**。COMBIN(8,2) も28。役割（リーダーと補助）を区別するなら 8×7＝56通り。
+  checks:
+    - 'Fraction(8*7, 2) == 28 and math.comb(8,2) == 28 and 8*7 == 56'
+  lab:
+    id: LAB-sigma
+    mode: fact
+    set: {n: 8, r: 2}
+    task: 8人から当番2人を選ぶ（役割の区別なし）選び方は何通りか。
+    predict: {type: number, key: comb, label: "₈C₂"}
+    expect: 28
+    why: 8×7＝56 通りの並べ方を、2人の並べ方 2!＝2 で割って28。
+
+- id: Q-U02-032
+  stage: S4
+  tag: 送料の関数
+  format: written
+  powers: [P1]
+  prompt: 送料（百円）が重さ x kg に対して f(x)＝2x＋5 で決まる。4kg の荷物の送料 f(4) はいくらか。x が1kg増えると送料はいくら増えるか。
+  answer: f(4)＝2×4＋5＝**13**（1,300円）。x が1増えると f(x) は **2**（200円）増える。
+  checks:
+    - '2*4 + 5 == 13 and (2*5+5) - (2*4+5) == 2'
+  lab:
+    id: LAB-sigma
+    mode: func
+    set: {a: 2, b: 5, x: 4}
+    task: f(x)＝2x＋5 のとき、f(4) はいくつか。
+    predict: {type: number, key: fx, label: "f(4)"}
+    expect: 13
+    why: 2×4＋5＝13。x を1増やすと点は2上がる（a＝2）。
+
+- id: Q-U02-040
+  stage: S5
+  tag: 1から n までの和
+  format: written
+  powers: [P1, P2]
+  prompt: Σ_{i=1}^{5} i を書き下して求め、n(n＋1)÷2 の公式と一致することを確かめよ。
+  answer: 1＋2＋3＋4＋5＝**15**。公式 5×6÷2＝**15** と一致する。
+  checks:
+    - 'sum(range(1,6)) == 15 and Fraction(5*6, 2) == 15'
+  lab:
+    id: LAB-sigma
+    mode: sum
+    set: {data: [1, 2, 3, 4, 5]}
+    task: 1, 2, 3, 4, 5 の合計 Σx はいくつか。
+    predict: {type: number, key: sum, label: "Σx"}
+    expect: 15
+    why: 1＋2＋3＋4＋5＝15＝5×6÷2。平均3（真ん中の値）×個数5 とも同じ。

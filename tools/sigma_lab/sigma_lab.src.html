@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Σ・階乗ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+table.t{border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 10px;text-align:right}
+table.t tr.sum td{font-weight:700;border-top:2px solid var(--fg)}
+.boxes{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.boxes span{display:inline-block;min-width:34px;padding:6px 4px;text-align:center;border:1px solid var(--line);border-radius:6px;background:var(--card);font-weight:700;font-size:13px}
+</style></head><body>
+<h1>🧪 Σ・階乗ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-sum" class="mode">
+ <p class="mut" style="margin:0">Σ は「全部足す」。Σx² は2乗してから足し、(Σx)² は足してから2乗する。順番で答えが変わる。</p>
+ <input type="range" id="sn" min="2" max="5" step="1" value="3" data-name="個数 n">
+ <div id="sxs">
+  <input type="range" id="sx1" min="0" max="10" step="1" value="2" data-name="x₁">
+  <input type="range" id="sx2" min="0" max="10" step="1" value="4" data-name="x₂">
+  <input type="range" id="sx3" min="0" max="10" step="1" value="6" data-name="x₃">
+  <input type="range" id="sx4" min="0" max="10" step="1" value="5" data-name="x₄">
+  <input type="range" id="sx5" min="0" max="10" step="1" value="3" data-name="x₅">
+ </div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="splot"></div>
+ <div class="card res key" id="ssum"></div>
+ <div class="res det" id="stab"></div>
+</div>
+
+<div id="m-rule" class="mode">
+ <p class="mut" style="margin:0">Σ(a×x＋c) は、各値を a 倍して c を足してから全部足す。書き下すと aΣx＋n×c に分けられる。</p>
+ <input type="range" id="ra" min="-3" max="5" step="1" value="3" data-name="a">
+ <input type="range" id="rc" min="-5" max="10" step="1" value="1" data-name="c">
+ <p class="mut" style="margin:4px 0 0">データ：<span id="rdata"></span>（「Σを書き下す」の値を使う）</p>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="rplot"></div>
+ <div class="card res key" id="rsum"></div>
+</div>
+
+<div id="m-fact" class="mode">
+ <p class="mut" style="margin:0">n! は n から1まで全部掛ける。n 個から r 個を順に並べる数は n×(n−1)×…（r 個）、選ぶだけなら並べ方 r! で割る。</p>
+ <input type="range" id="fn" min="0" max="10" step="1" value="5" data-name="n">
+ <input type="range" id="fr" min="0" max="10" step="1" value="2" data-name="r">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="fplot"></div>
+ <div class="card res key" id="fsum"></div>
+</div>
+
+<div id="m-func" class="mode">
+ <p class="mut" style="margin:0">f(x)＝a×x＋b は「x を入れると値が1つ出る」決まり。f(3) は x に3を入れた結果で、f×3 ではない。</p>
+ <input type="range" id="ga" min="-3" max="5" step="0.5" value="2" data-name="a">
+ <input type="range" id="gb" min="-5" max="10" step="1" value="1" data-name="b">
+ <input type="range" id="gx" min="0" max="10" step="1" value="3" data-name="x">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="gplot"></div>
+ <div class="card res key" id="gsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc,f=LK.fmtNum;
+const W=340,SUB=["₁","₂","₃","₄","₅"];
+const r3=v=>+v.toFixed(3);
+
+// ---- Σ を書き下す
+function data(){const n=+$("sn").value;return [1,2,3,4,5].slice(0,n).map(i=>+$("sx"+i).value);}
+function sVals(){const x=data(),n=x.length,sum=x.reduce((a,b)=>a+b,0),mean=sum/n,sumsq=x.reduce((a,b)=>a+b*b,0),ss=x.reduce((a,b)=>a+(b-mean)**2,0),devsum=x.reduce((a,b)=>a+(b-mean),0);
+ return {x,n,sum,mean,sumsq,sqsum:sum*sum,ss,devsum:Math.abs(devsum)<1e-9?0:devsum,cross:sum*sum-sumsq};}
+function sRender(){const S=sVals();
+ [1,2,3,4,5].forEach(i=>{const w=$("sx"+i).closest(".lk-step");if(w)w.style.display=i<=S.n?"":"none";});
+ // (Σx)² の正方形を x ごとに区切る：対角の色つき＝Σx²、灰色＝それ以外（交差の項）
+ const H=200,side=Math.max(S.sum,1),k=(H-20)/side,ox=(W-side*k)/2,oy=10;
+ let s=`<svg viewBox="0 0 ${W} ${H+18}" width="${W}" role="img" aria-label="(Σx)² の正方形と Σx²">`;
+ s+=`<rect x="${ox}" y="${oy}" width="${side*k}" height="${side*k}" fill="var(--line)" fill-opacity=".35" stroke="var(--line)"/>`;
+ let px=0;S.x.forEach((xi,i)=>{let py=0;S.x.forEach((xj,j)=>{if(i===j&&xi>0)s+=`<rect x="${ox+px*k}" y="${oy+py*k}" width="${xi*k}" height="${xi*k}" fill="var(--acc)" fill-opacity=".75" stroke="var(--bg)" stroke-width="2"/>`+(xi*k>22?`<text x="${ox+(px+xi/2)*k}" y="${oy+(py+xi/2)*k+4}" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${xi*xi}</text>`:"");py+=xj;});px+=xi;});
+ s+=`<text x="${W/2}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--mut)">全体＝(Σx)²＝${S.sqsum}、色の正方形の合計＝Σx²＝${S.sumsq}</text></svg>`;
+ $("splot").innerHTML=s;
+ $("ssum").innerHTML=`<div>Σx＝${S.x.join("＋")}＝<b>${S.sum}</b>　平均＝${S.sum}÷${S.n}＝<b>${f(r3(S.mean))}</b></div><div>Σx²＝${S.x.map(v=>v*v).join("＋")}＝<b>${S.sumsq}</b>　(Σx)²＝${S.sum}²＝<b>${S.sqsum}</b></div><div>偏差平方和 Σ(x−x̄)²＝<b>${f(r3(S.ss))}</b>　偏差の合計 Σ(x−x̄)＝<b>${f(r3(S.devsum))}</b></div><div class="mut">灰色の部分（${S.cross}）が (Σx)² と Σx² の差。Σx²−n×x̄²＝${S.sumsq}−${S.n}×${f(r3(S.mean))}²＝${f(r3(S.sumsq-S.n*S.mean*S.mean))} は偏差平方和と同じ。</div>`;
+ $("stab").innerHTML=`<table class="t"><tr><th>xᵢ</th><th>xᵢ²</th><th>(xᵢ−x̄)²</th></tr>${S.x.map(v=>`<tr><td>${v}</td><td>${v*v}</td><td>${f(r3((v-S.mean)**2))}</td></tr>`).join("")}<tr class="sum"><td>${S.sum}</td><td>${S.sumsq}</td><td>${f(r3(S.ss))}</td></tr></table>`;
+}
+LK.register("sum",{name:"Σを書き下す",
+ init(){LK.stepper($("sn"),sRender);[1,2,3,4,5].forEach(i=>LK.stepper($("sx"+i),sRender));sRender();},
+ apply(s){if(s.data){LK.setRange("sn",s.data.length);s.data.forEach((v,i)=>LK.setRange("sx"+(i+1),v));}sRender();},
+ render:sRender,
+ value(key){const S=sVals();return {v:S[key],text:f(r3(S[key]))};}});
+
+// ---- Σ の計算ルール
+function rVals(){const x=data(),n=x.length,a=+$("ra").value,c=+$("rc").value,sum=x.reduce((p,q)=>p+q,0),lhs=x.reduce((p,q)=>p+a*q+c,0);return {x,n,a,c,sum,lhs,rhs:a*sum+n*c};}
+function rRender(){const R=rVals();$("rdata").textContent=R.x.join(", ");
+ $("rplot").innerHTML=`<table class="t"><tr><th>xᵢ</th><th>${R.a}×xᵢ＋${R.c}</th></tr>${R.x.map(v=>`<tr><td>${v}</td><td>${R.a*v+R.c}</td></tr>`).join("")}<tr class="sum"><td>${R.sum}</td><td>${R.lhs}</td></tr></table>`;
+ $("rsum").innerHTML=`<div>Σ(${R.a}x＋${R.c})＝<b>${R.lhs}</b>　＝ ${R.a}×Σx＋${R.n}×${R.c}＝${R.a}×${R.sum}＋${R.n*R.c}＝<b>${R.rhs}</b></div><div class="mut">定数 c は n 回足されるので n×c。a は全部に掛かるので Σ の外に出せる（Σ(a×x)＝a×Σx、Σc＝n×c）。</div>`;}
+LK.register("rule",{name:"Σの計算ルール",
+ init(){LK.stepper($("ra"),rRender);LK.stepper($("rc"),rRender);rRender();},
+ apply(s){if(s.data){LK.setRange("sn",s.data.length);s.data.forEach((v,i)=>LK.setRange("sx"+(i+1),v));}if(s.a!==undefined)LK.setRange("ra",s.a);if(s.c!==undefined)LK.setRange("rc",s.c);rRender();},
+ render:rRender,
+ value(){const R=rVals();return {v:R.lhs,text:String(R.lhs)};}});
+
+// ---- 階乗・順列・組合せ
+const fac=n=>{let p=1;for(let i=2;i<=n;i++)p*=i;return p;};
+function fVals(){const n=+$("fn").value,r=Math.min(+$("fr").value,n),perm=fac(n)/fac(n-r);return {n,r,fact:fac(n),perm,comb:perm/fac(r),rfact:fac(r)};}
+function fRender(){const F=fVals();
+ const seq=F.n===0?"0!＝1（決まり）":`${F.n}!＝${Array.from({length:F.n},(_,i)=>F.n-i).join("×")}＝${F.fact.toLocaleString("ja-JP")}`;
+ $("fplot").innerHTML=`<div class="mut">${F.r} 個を順に並べる：1つ目は ${F.n} 通り、2つ目は残りから…</div><div class="boxes">${Array.from({length:F.r},(_,i)=>`<span>${F.n-i}通り</span>`).join("")||"<span>1通り</span>"}</div>`;
+ $("fsum").innerHTML=`<div>${seq}</div><div>順列 ${F.n}P${F.r}＝${F.r?Array.from({length:F.r},(_,i)=>F.n-i).join("×"):"1"}＝<b>${F.perm.toLocaleString("ja-JP")}</b></div><div>組合せ ${F.n}C${F.r}＝${F.perm.toLocaleString("ja-JP")}÷${F.r}!＝${F.perm.toLocaleString("ja-JP")}÷${F.rfact}＝<b>${F.comb.toLocaleString("ja-JP")}</b></div><div class="mut">選ぶだけのときは、同じ組の並べ方 r! 通りを1つと数えるので r! で割る。</div>`;}
+LK.register("fact",{name:"階乗・組合せ",
+ init(){LK.stepper($("fn"),fRender);LK.stepper($("fr"),fRender);fRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("fn",s.n);if(s.r!==undefined)LK.setRange("fr",s.r);fRender();},
+ render:fRender,
+ value(key){const F=fVals();return {v:F[key],text:F[key].toLocaleString("ja-JP")};}});
+
+// ---- 関数 f(x)
+function gVals(){const a=+$("ga").value,b=+$("gb").value,x=+$("gx").value;return {a,b,x,fx:a*x+b};}
+function gRender(){const G=gVals(),H=170,xs=[0,10],ys=xs.map(x=>G.a*x+G.b),lo=Math.min(0,...ys),hi=Math.max(1,...ys),X=x=>30+x*(W-50)/10,Y=y=>H-20-(y-lo)/(hi-lo)*(H-40);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="f(x) のグラフ"><line x1="30" y1="${Y(0)}" x2="${W-20}" y2="${Y(0)}" stroke="var(--line)"/><line x1="30" y1="10" x2="30" y2="${H-20}" stroke="var(--line)"/>`;
+ for(let x=0;x<=10;x+=2)s+=`<text x="${X(x)}" y="${H-6}" font-size="10" text-anchor="middle" fill="var(--mut)">${x}</text>`;
+ s+=`<line x1="${X(0)}" y1="${Y(ys[0])}" x2="${X(10)}" y2="${Y(ys[1])}" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${X(G.x)}" y1="${Y(0)}" x2="${X(G.x)}" y2="${Y(G.fx)}" stroke="var(--mut)" stroke-dasharray="3 3"/><circle cx="${X(G.x)}" cy="${Y(G.fx)}" r="5" fill="var(--acc)" stroke="var(--bg)" stroke-width="2"/><text x="${X(G.x)+8}" y="${Y(G.fx)-8}" font-size="12" fill="var(--fg)" font-weight="700">f(${G.x})＝${f(G.fx)}</text></svg>`;
+ $("gplot").innerHTML=s;
+ $("gsum").innerHTML=`<div>f(${G.x})＝${f(G.a)}×${G.x}＋${f(G.b)}＝<b>${f(G.fx)}</b></div><div class="mut">括弧の中は「入れる値」。x を1増やすと f(x) は a（${f(G.a)}）だけ増える。</div>`;}
+LK.register("func",{name:"関数 f(x)",
+ init(){["ga","gb","gx"].forEach(id=>LK.stepper($(id),gRender));gRender();},
+ apply(s){if(s.a!==undefined)LK.setRange("ga",s.a);if(s.b!==undefined)LK.setRange("gb",s.b);if(s.x!==undefined)LK.setRange("gx",s.x);gRender();},
+ render:gRender,
+ value(){const G=gVals();return {v:G.fx,text:f(G.fx)};}});
+
+LK.start("sum");
+window.__LAB__={LK,sVals,rVals,fVals,gVals};
+</script>
+</body></html>

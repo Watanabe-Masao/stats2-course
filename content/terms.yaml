@@ -5,6 +5,9 @@
 - id: TERM-comb
   name: 組合せ
   en: combination
+- id: TERM-sigma
+  name: 総和記号（Σ）
+  en: summation
 - id: TERM-fact
   name: 階乗
   en: factorial
