@@ -19,7 +19,7 @@ site_base_url: https://watanabe-masao.github.io/stats2-labs
 
 legacy_reference: 405b7cd539a1818f9198f683d487c86d   # 公式・用語リファレンス
 legacy_units:
-  U01: 404b7cd539a181f7bceaca01b3d7d30d
+  U01: 407b7cd539a181eab4e2e2b432162d65
   U02: 404b7cd539a1818e9a7fc14c561e2fff
   U03: 404b7cd539a181c8b401eff8ea64a114
   U04: 404b7cd539a181ae9f2cf8dd36aaedab
