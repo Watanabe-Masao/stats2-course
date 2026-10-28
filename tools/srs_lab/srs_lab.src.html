@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>抽出ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+.vals input{font-size:15px;min-height:40px;width:100%;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+td.on{color:var(--acc2);font-weight:700}
+</style></head><body>
+<h1>🧪 抽出ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-incl" class="mode">
+ <p class="mut" style="margin:0">名簿（抽出枠）N 件から n 件を単純無作為抽出すると、名簿の各件が選ばれる確率はどれも n÷N。名簿に載っていない件は選ばれない。</p>
+ <input type="range" id="iN" min="2" max="2000" step="1" value="100" data-name="名簿 N">
+ <input type="range" id="in" min="1" max="100" step="1" value="10" data-name="選ぶ n">
+ <input type="range" id="im" min="0" max="100" step="1" value="5" data-name="名簿の外">
+ <div class="row ctl"><button type="button" class="sub" id="idraw">1回抽選する</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="iplot"></div>
+ <div class="card res key" id="isum"></div>
+</div>
+
+<div id="m-enum" class="mode">
+ <p class="mut" style="margin:0">小さな母集団から n 個を選ぶ組み合わせを全部並べ、それぞれの標本平均 x̄ を出す。x̄ の散らばり方が標本分布。</p>
+ <div class="row ctl vals"><label style="flex:1">母集団の値 <input id="ev" value="3,5,7,9,11" inputmode="decimal" aria-label="母集団の値（カンマ区切り、2〜8個）"></label></div>
+ <input type="range" id="en" min="1" max="7" step="1" value="2" data-name="選ぶ n">
+ <input type="range" id="ec" min="0" max="20" step="0.5" value="8" data-name="基準 c">
+ <input type="range" id="et" min="0" max="10" step="0.5" value="1" data-name="μ±幅">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="eplot"></div>
+ <div class="card res key" id="esum"></div>
+ <div class="res det" id="etab"></div>
+</div>
+
+<div id="m-repl" class="mode">
+ <p class="mut" style="margin:0">戻して選ぶ（復元抽出）と、同じ件が2回以上選ばれることがある。戻さず選ぶ（非復元抽出）と重複はない。N が大きいと2つの差は小さい。</p>
+ <input type="range" id="rN" min="2" max="1000" step="1" value="30" data-name="名簿 N">
+ <input type="range" id="rn" min="1" max="60" step="1" value="5" data-name="選ぶ n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="rplot"></div>
+ <div class="card res key" id="rsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const SUP={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":""};
+const f=(v,d=4)=>{if(!isFinite(v))return "—";if(Math.abs(v)>=1e7){const [m,e]=v.toExponential(2).split("e");return `${+m}×10${String(+e).split("").map(c=>SUP[c]).join("")}`;}if(v!==0&&Math.abs(v)<Math.pow(10,-d)){const [m,e]=v.toExponential(2).split("e");return `${+m}×10${String(+e).split("").map(c=>SUP[c]).join("")}`;}const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function lnC(n,k){if(k<0||k>n)return -Infinity;let s=0;for(let i=1;i<=k;i++)s+=Math.log(n-k+i)-Math.log(i);return s;}
+const C=(n,k)=>Math.exp(lnC(n,k));
+// 固定の乱数（抽選ボタン用）
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+
+// ---- 包含確率
+let picked=[];
+function iFix(){const N=+$("iN").value,e=$("in");e.max=Math.min(N,100);if(+e.value>+e.max)LK.setRange("in",+e.max);else e._lkUpd&&e._lkUpd();}
+function iVals(){const N=+$("iN").value,n=Math.min(+$("in").value,N),m=+$("im").value;
+ const pi=n/N,pair=N>1?n*(n-1)/(N*(N-1)):0,either=1-Math.exp(lnC(N-2,n)-lnC(N,n));
+ return {N,n,m,pi,rate:pi,piMiss:0,cover:N/(N+m),combos:C(N,n),pair,either:N>=2?either:1};}
+function iRender(){iFix();const V=iVals(),T=V.N+V.m;
+ if(picked.length&&(picked.length!==V.n||Math.max(...picked)>=V.N))picked=[];
+ let s="";
+ if(T<=300){const cols=20,cell=W/cols,rows=Math.ceil(T/cols),H=rows*cell+4;const on=new Set(picked);
+  s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="名簿と名簿の外">`;
+  for(let i=0;i<T;i++){const x=(i%cols)*cell,y=Math.floor(i/cols)*cell+2,inF=i<V.N;
+   s+=`<rect x="${x+1.5}" y="${y+1.5}" width="${cell-3}" height="${cell-3}" rx="3" fill="${on.has(i)?"var(--acc2)":inF?"var(--acc)":"none"}" fill-opacity="${on.has(i)?.9:inF?.25:1}" stroke="${inF?"none":"var(--mut)"}" stroke-dasharray="3 2"/>`;}
+  s+=`</svg>`;}
+ else{const w1=V.N/T*(W-2);s=`<svg viewBox="0 0 ${W} 40" width="${W}" role="img" aria-label="名簿の割合"><rect x="1" y="8" width="${w1}" height="22" rx="4" fill="var(--acc)" fill-opacity=".35"/><rect x="${1+w1}" y="8" width="${W-2-w1}" height="22" rx="4" fill="none" stroke="var(--mut)" stroke-dasharray="3 2"/></svg>`;}
+ $("iplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc);opacity:.4"></i>名簿 ${V.N}</span><span><i class="sw" style="border:1.5px dashed var(--mut)"></i>名簿の外 ${V.m}</span>${picked.length?`<span><i class="sw" style="background:var(--acc2)"></i>選ばれた ${picked.length}</span>`:""}</div>`;
+ $("isum").innerHTML=`<div>名簿の各件が選ばれる確率＝n÷N＝${V.n}÷${V.N}＝<b>${f(V.pi)}</b>（抽出率）</div><div>名簿の外の件が選ばれる確率＝<b>0</b>　名簿が全体を覆う割合＝${V.N}÷${T}＝<b>${f(V.cover)}</b></div><div>選び方は ${V.N}C${V.n}＝${f(V.combos,0)} 通りで、どれも同じ確率。特定の2件がどちらも入る＝${f(V.pair)}、どちらか一方でも入る＝${f(V.either)}</div><div class="mut">n を増やしても、名簿の外の件は選ばれない。結論を言えるのは名簿の範囲まで。</div>`;}
+LK.register("incl",{name:"選ばれる確率",
+ init(){["iN","in","im"].forEach(id=>LK.stepper($(id),()=>{picked=[];iRender();}));
+  $("idraw").onclick=()=>{const V=iVals(),a=[...Array(V.N).keys()];for(let i=0;i<V.n;i++){const j=i+Math.floor(rnd()*(V.N-i));[a[i],a[j]]=[a[j],a[i]];}picked=a.slice(0,V.n);iRender();};iRender();},
+ apply(s){if(s.N!==undefined)LK.setRange("iN",s.N);iFix();if(s.n!==undefined)LK.setRange("in",s.n);if(s.m!==undefined)LK.setRange("im",s.m);iRender();},
+ render:iRender,
+ value(key){const V=iVals(),v=V[key];return {v,text:f(v,key==="combos"?0:4)};}});
+
+// ---- 標本を全部並べる
+function eParse(){const xs=$("ev").value.split(/[,、，\s]+/).map(Number).filter(x=>isFinite(x)&&String(x)!=="");return xs.slice(0,8);}
+function combos(N,n){const out=[],cur=[];(function rec(st){if(cur.length===n){out.push(cur.slice());return;}for(let i=st;i<N;i++){cur.push(i);rec(i+1);cur.pop();}})(0);return out;}
+function eFix(){const xs=eParse(),N=xs.length,e=$("en");e.max=Math.max(1,N);if(+e.value>N)LK.setRange("en",Math.max(1,N));else e._lkUpd&&e._lkUpd();
+ if(N){const lo=Math.min(...xs),hi=Math.max(...xs);["ec"].forEach(id=>{const c=$(id);c.min=Math.floor(lo);c.max=Math.ceil(hi);if(+c.value<+c.min||+c.value>+c.max)c.value=Math.round((lo+hi)/2);c._lkUpd&&c._lkUpd();});const t=$("et");t.max=Math.max(1,Math.ceil(hi-lo));t._lkUpd&&t._lkUpd();}}
+function eVals(){const xs=eParse(),N=xs.length,n=Math.min(+$("en").value,N),c=+$("ec").value,tol=+$("et").value;
+ if(N<2||n<1)return {N,n,xs,list:[],count:0,mu:NaN,meanmean:NaN,min:NaN,max:NaN,sdmean:NaN,pge:NaN,within:NaN,pEach:NaN,sdpop:NaN,formula:NaN,c,tol};
+ const mu=xs.reduce((a,b)=>a+b,0)/N,sdpop=Math.sqrt(xs.reduce((a,b)=>a+(b-mu)**2,0)/N);
+ const list=combos(N,n).map(ix=>({ix,m:ix.reduce((a,i)=>a+xs[i],0)/n}));const ms=list.map(o=>o.m),K=ms.length;
+ const mm=ms.reduce((a,b)=>a+b,0)/K,sdm=Math.sqrt(ms.reduce((a,b)=>a+(b-mm)**2,0)/K),eps=1e-9;
+ return {N,n,xs,list,count:K,mu,meanmean:mm,min:Math.min(...ms),max:Math.max(...ms),sdmean:sdm,sdpop,formula:N>1?sdpop/Math.sqrt(n)*Math.sqrt((N-n)/(N-1)):0,
+  pge:ms.filter(m=>m>=c-eps).length/K,within:ms.filter(m=>Math.abs(m-mu)<=tol+eps).length/K,pEach:1/K,c,tol};}
+function eRender(){eFix();const E=eVals();if(!E.count){$("eplot").innerHTML=`<div class="mut">値を2〜8個、カンマで区切って入れる。</div>`;$("esum").innerHTML="";$("etab").innerHTML="";return;}
+ // x̄ の点グラフ（同じ値は積み上げ）
+ const lo=Math.min(...E.xs),hi=Math.max(...E.xs),L=16,R=W-16,X=x=>hi===lo?W/2:L+(x-lo)/(hi-lo)*(R-L);
+ const key=m=>Math.round(m*1000)/1000,cnt={};E.list.forEach(o=>{o.k=key(o.m);cnt[o.k]=(cnt[o.k]||0)+1;});
+ const top=Math.max(...Object.values(cnt)),r=Math.max(2.5,Math.min(7,90/top/2.2)),base=118,H=base+44,seen={};
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="標本平均の散らばり">`;
+ s+=`<rect x="${X(Math.max(lo,E.mu-E.tol))}" y="10" width="${Math.max(1,X(Math.min(hi,E.mu+E.tol))-X(Math.max(lo,E.mu-E.tol)))}" height="${base-10}" fill="var(--acc)" fill-opacity=".08"/>`;
+ E.list.forEach(o=>{const i=seen[o.k]=(seen[o.k]||0)+1,on=o.m>=E.c-1e-9;s+=`<circle cx="${X(o.m)}" cy="${base-r-(i-1)*(2*r+1)}" r="${r}" fill="${on?"var(--acc2)":"var(--acc)"}" fill-opacity="${on?.85:.55}"/>`;});
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ E.xs.forEach(x=>{s+=`<path d="M${X(x)-4} ${base+16} L${X(x)+4} ${base+16} L${X(x)} ${base+9} Z" fill="var(--mut)"/>`;});
+ [lo,hi].forEach(x=>s+=`<text x="${X(x)}" y="${base+29}" font-size="10" text-anchor="middle" fill="var(--fg)">${f(x,2)}</text>`);
+ s+=`<line x1="${X(E.mu)}" y1="6" x2="${X(E.mu)}" y2="${base}" stroke="var(--fg)" stroke-dasharray="3 3"/><text x="${X(E.mu)}" y="${base+41}" font-size="10.5" text-anchor="middle" fill="var(--fg)">μ＝${f(E.mu,3)}</text>`;
+ s+=`<line x1="${X(E.c)}" y1="6" x2="${X(E.c)}" y2="${base}" stroke="var(--acc2)" stroke-width="1.2"/></svg>`;
+ $("eplot").innerHTML=s+`<div class="legend mut"><span>● 標本1つの x̄</span><span><i class="sw" style="background:var(--acc2)"></i>x̄≧c</span><span>▲ 母集団の値</span><span><i class="sw" style="background:var(--acc);opacity:.2"></i>μ±幅</span></div>`;
+ $("esum").innerHTML=`<div>選び方 ${E.N}C${E.n}＝<b>${E.count}</b> 通り（どれも確率 ${f(E.pEach)}）</div><div>x̄ の最小 <b>${f(E.min,3)}</b>・最大 <b>${f(E.max,3)}</b>　全標本の x̄ の平均＝<b>${f(E.meanmean,3)}</b>（μ＝${f(E.mu,3)}）</div><div>x̄≧${f(E.c,2)} の割合＝<b>${f(E.pge)}</b>　μ±${f(E.tol,2)} に入る割合＝<b>${f(E.within)}</b></div><div class="mut">${E.n===E.N?"n＝N は全数調査：標本は1通りで、x̄ はいつも μ。":"x̄ は選び方で変わるが、全部の平均は μ に一致する。n を増やすと x̄ は μ の近くに集まる。"}</div>`;
+ $("etab").innerHTML=`<div class="mut">x̄ の標準偏差＝${f(E.sdmean)}（σ÷√n×√((N−n)/(N−1))＝${f(E.formula)}、σ＝${f(E.sdpop)}）</div><table><tr><th>標本</th><th>x̄</th></tr>${E.list.slice(0,70).map(o=>`<tr><td>${o.ix.map(i=>E.xs[i]).join("・")}</td><td class="${o.m>=E.c-1e-9?"on":""}">${f(o.m,3)}</td></tr>`).join("")}</table>`;}
+LK.register("enum",{name:"標本を並べる",
+ init(){["en","ec","et"].forEach(id=>LK.stepper($(id),eRender));$("ev").addEventListener("input",eRender);eRender();},
+ apply(s){if(s.vals!==undefined)$("ev").value=String(s.vals);eFix();if(s.n!==undefined)LK.setRange("en",s.n);if(s.c!==undefined)LK.setRange("ec",s.c);if(s.tol!==undefined)LK.setRange("et",s.tol);eRender();},
+ render:eRender,
+ value(key){const E=eVals(),v=E[key];return {v,text:f(v,key==="count"?0:4)};}});
+
+// ---- 戻すか戻さないか
+function rFix(){const N=+$("rN").value;const e=$("rn");e.max=Math.min(60,Math.max(1,N));e._lkUpd&&e._lkUpd();}
+function rVals(){const N=+$("rN").value,n=+$("rn").value;let q=1;for(let i=0;i<n;i++)q*=1-i/N;
+ return {N,n,pDup:1-q,pNoDup:q,piRepl:1-Math.pow(1-1/N,n),piNo:Math.min(1,n/N),ordRepl:Math.pow(N,n),ordNo:n>N?0:Math.exp(lnC(N,n))*Math.exp(Array.from({length:n},(_,i)=>Math.log(i+1)).reduce((a,b)=>a+b,0))};}
+function rRender(){rFix();const R=rVals(),Ns=[10,30,100,300,1000],H=150,L=34,Rx=W-12,base=H-28,top=16;
+ const Y=p=>base-p*(base-top),X=i=>L+(i+0.5)/Ns.length*(Rx-L);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="重複の確率"><line x1="${L}" y1="${base}" x2="${Rx}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [0,0.5,1].forEach(p=>s+=`<text x="${L-4}" y="${Y(p)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${p}</text><line x1="${L}" y1="${Y(p)}" x2="${Rx}" y2="${Y(p)}" stroke="var(--line)" stroke-dasharray="2 3"/>`);
+ Ns.forEach((N,i)=>{let q=1;for(let k=0;k<R.n;k++)q*=1-k/N;const p=R.n>N?1:1-q;s+=`<rect x="${X(i)-14}" y="${Y(p)}" width="28" height="${base-Y(p)}" rx="3" fill="var(--acc)" fill-opacity=".5"/><text x="${X(i)}" y="${base+13}" font-size="10" text-anchor="middle" fill="var(--fg)">N＝${N}</text>`;});
+ s+=`<text x="${Rx}" y="12" font-size="10" text-anchor="end" fill="var(--mut)">n＝${R.n} で戻して選ぶとき、重複が起きる確率</text></svg>`;
+ $("rplot").innerHTML=s;
+ $("rsum").innerHTML=`<div>N＝${R.N}・n＝${R.n} を<b>戻して</b>選ぶ：同じ件が2回以上出る確率＝1−(${R.N}×${R.N-1}×…)÷${R.N}^${R.n}＝<b>${f(R.pDup)}</b></div><div>ある1件が少なくとも1回選ばれる確率：戻す ${f(R.piRepl)}　戻さない n÷N＝${f(R.piNo)}</div><div class="mut">調査では普通、戻さずに選ぶ（同じ人に2回聞かない）。N が n より十分大きければ、戻す・戻さないの差は小さい（二項分布と超幾何分布の関係と同じ）。</div>`;}
+LK.register("repl",{name:"戻す・戻さない",
+ init(){["rN","rn"].forEach(id=>LK.stepper($(id),rRender));rRender();},
+ apply(s){if(s.N!==undefined)LK.setRange("rN",s.N);rFix();if(s.n!==undefined)LK.setRange("rn",s.n);rRender();},
+ render:rRender,
+ value(key){const R=rVals(),v=R[key];return {v,text:f(v)};}});
+
+LK.start("incl");
+window.__LAB__={LK,iVals,eVals,rVals};
+</script>
+</body></html>
