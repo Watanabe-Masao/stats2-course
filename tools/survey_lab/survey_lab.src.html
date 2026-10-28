@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>標本調査ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.glab{font-size:12px;font-weight:700;color:var(--mut);margin:6px 0 0}
+.mode .lk-step .lk-name{max-width:6.8em}
+</style></head><body>
+<h1>🧪 標本調査ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-strat" class="mode">
+ <p class="mut" style="margin:0">2つの層（例：大規模店と小規模店）から同じ数ずつ調べた。全体の平均は、層の平均を<b>母集団での層の割合</b>で重み付けして足す。帯の幅が割合、高さが層の平均。</p>
+ <input type="range" id="tw" min="0.05" max="0.95" step="0.05" value="0.2" data-name="層1の割合">
+ <input type="range" id="tb" min="0" max="300" step="5" value="200" data-name="層1の平均">
+ <input type="range" id="ts" min="0" max="300" step="5" value="50" data-name="層2の平均">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="tplot"></div>
+ <div class="card res key" id="tsum"></div>
+</div>
+
+<div id="m-design" class="mode">
+ <p class="mut" style="margin:0">10地域×10店＝100店の売上指数。ここから10店を4つの方法で選び、全店の平均を推定する。何度も選び直したときの推定値のばらつき（標準誤差）を比べる。</p>
+ <input type="range" id="dd" min="0" max="3" step="0.5" value="1" data-name="地域の差">
+ <input type="range" id="dp" min="0" max="3" step="0.5" value="0" data-name="並び順の差">
+ <input type="range" id="ds" min="0" max="3" step="0.5" value="1" data-name="店ごとの差">
+ <div class="row ctl"><label>格子に描く方法 <select id="dshow" data-key="show"><option value="srs">単純無作為</option><option value="strat">層化（地域ごとに1店）</option><option value="clus">集落（1地域を全部）</option><option value="sys">系統（10店おき）</option></select></label><button type="button" class="act" id="ddraw">もう1回選ぶ</button></div>
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+ <div class="res det" id="dtab"></div>
+</div>
+
+<div id="m-bias" class="mode">
+ <p class="mut" style="margin:0">賛成の人と反対の人で、答えてくれる割合（回答率）が違うと、集まった答えの賛成率は本当の値からずれる。人数を増やすと幅は狭くなるが、ずれは残る。</p>
+ <input type="range" id="bp" min="0.1" max="0.9" step="0.05" value="0.5" data-name="本当の賛成率">
+ <input type="range" id="b1" min="0.05" max="1" step="0.05" value="0.6" data-name="賛成者の回答率">
+ <input type="range" id="b0" min="0.05" max="1" step="0.05" value="0.3" data-name="反対者の回答率">
+ <input type="range" id="bn" min="100" max="10000" step="100" value="400" data-name="回答数 n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+</div>
+
+<div id="m-alloc" class="mode">
+ <p class="mut" style="margin:0">2つの層に n 人を振り分ける。<b>比例配分</b>は層の大きさに比例、<b>ネイマン配分</b>は「層の大きさ×層の標準偏差」に比例。ばらつきの大きい層に多く配ると、全体の標準誤差が小さくなる。</p>
+ <input type="range" id="aw" min="0.05" max="0.95" step="0.05" value="0.2" data-name="層1の割合">
+ <input type="range" id="a1" min="1" max="100" step="1" value="30" data-name="層1の標準偏差">
+ <input type="range" id="a2" min="1" max="100" step="1" value="5" data-name="層2の標準偏差">
+ <input type="range" id="am" min="0" max="100" step="5" value="40" data-name="層の平均の差">
+ <input type="range" id="an" min="20" max="400" step="10" value="100" data-name="全体の n">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="aplot"></div>
+ <div class="card res key" id="asum"></div>
+</div>
+
+<div id="m-multi" class="mode">
+ <p class="mut" style="margin:0">地域 → 店 → 客と、段を重ねて選ぶ（多段抽出）。1人の客が選ばれる確率は、各段の確率の掛け算。その逆数が、集計で1人が代表する人数（重み）。</p>
+ <input type="range" id="mA" min="1" max="50" step="1" value="10" data-name="地域の数">
+ <input type="range" id="ma" min="1" max="50" step="1" value="2" data-name="選ぶ地域">
+ <input type="range" id="mB" min="1" max="50" step="1" value="15" data-name="1地域の店">
+ <input type="range" id="mb" min="1" max="50" step="1" value="3" data-name="選ぶ店">
+ <input type="range" id="mC" min="10" max="500" step="10" value="200" data-name="1店の客">
+ <input type="range" id="mc" min="1" max="500" step="1" value="20" data-name="選ぶ客">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="mplot"></div>
+ <div class="card res key" id="msum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(typeof v!=="number"||!isFinite(v))return String(v);const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+const sum=a=>a.reduce((s,x)=>s+x,0);
+// 2つのラベルが近いときは上下にずらす
+function vlines(lines,X,top,base){let s="";const placed=[];lines.forEach(t=>{const lx=X(t.x),near=placed.some(p=>Math.abs(p-lx)<44),ly=near?top-15:top-3;placed.push(lx);
+ s+=`<line x1="${lx}" y1="${top}" x2="${lx}" y2="${base}" stroke="${t.col}" stroke-dasharray="${t.dash||"4 3"}" stroke-width="1.6"/><text x="${lx}" y="${ly}" font-size="10.5" text-anchor="${lx>W*0.75?"end":lx<W*0.25?"start":"middle"}" fill="${t.col}">${esc(t.label)}</text>`;});return s;}
+
+// ---- 層化と重み
+function tVals(){const w=+$("tw").value,b=+$("tb").value,sm=+$("ts").value,weighted=w*b+(1-w)*sm,naive=(b+sm)/2;return {w,b,s:sm,weighted,naive,gap:naive-weighted};}
+function tRender(){const T=tVals(),H=150,top=28,L=16,R=W-16,mx=Math.max(T.b,T.s,1)*1.1,Y=v=>H-v/mx*(H-top),x0=L,x1=L+T.w*(R-L);
+ let s=`<svg viewBox="0 0 ${W} ${H+34}" width="${W}" role="img" aria-label="層の割合と平均">`;
+ s+=`<rect x="${x0}" y="${Y(T.b)}" width="${x1-x0}" height="${H-Y(T.b)}" fill="var(--acc2)" fill-opacity=".55"/><rect x="${x1}" y="${Y(T.s)}" width="${R-x1}" height="${H-Y(T.s)}" fill="var(--acc)" fill-opacity=".55"/>`;
+ s+=`<text x="${(x0+x1)/2}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--fg)">層1 ${Math.round(T.w*100)}%</text><text x="${(x1+R)/2}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--fg)">層2 ${Math.round((1-T.w)*100)}%</text>`;
+ const hl=(v,col,dash,label,yoff)=>`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="${col}" stroke-width="2" ${dash?`stroke-dasharray="${dash}"`:""}/><text x="${R}" y="${Y(v)+yoff}" font-size="11" text-anchor="end" fill="${col}">${esc(label)}</text>`;
+ const close=Math.abs(Y(T.weighted)-Y(T.naive))<14,up=Y(T.naive)<Y(T.weighted);
+ s+=hl(T.weighted,"var(--fg)","","重み付き "+f(T.weighted,1),close&&up?14:-4)+hl(T.naive,"var(--ng)","5 4","そのまま平均 "+f(T.naive,1),close&&!up?14:-4);
+ s+=`<line x1="${L}" y1="${H}" x2="${R}" y2="${H}" stroke="var(--line)"/></svg><div class="legend mut"><span>面積の合計を横幅でならした高さ＝重み付きの平均</span></div>`;
+ $("tplot").innerHTML=s;
+ $("tsum").innerHTML=`<div>重み付きの平均＝${f(T.w,2)}×${f(T.b,1)}＋${f(1-T.w,2)}×${f(T.s,1)}＝<b>${f(T.weighted,2)}</b></div><div>調べた値をそのまま平均＝(${f(T.b,1)}＋${f(T.s,1)})÷2＝${f(T.naive,2)}（ずれ ${f(T.gap,2)}）</div><div class="mut">各層から同じ数を選んだときは、層の大きさの割合で重みを付け直す。層1の割合が0.5 のときだけ、2つは一致する。</div>`;}
+LK.register("strat",{name:"層化と重み",
+ init(){["tw","tb","ts"].forEach(id=>LK.stepper($(id),tRender));tRender();},
+ apply(s){if(s.w!==undefined)LK.setRange("tw",s.w);if(s.m1!==undefined)LK.setRange("tb",s.m1);if(s.m2!==undefined)LK.setRange("ts",s.m2);tRender();},
+ render:tRender,
+ value(key){const T=tVals(),v=T[key];return {v,text:f(v,2)};}});
+
+// ---- 抽出法を比べる（10地域×10店）
+const AREA=[3,-7,9,-1,-9,5,1,-5,7,-3];
+const NOISE=(j,k)=>((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5;   // 店ごとの差のもと（固定の並び）
+const MNAME={srs:"単純無作為",strat:"層化",clus:"集落",sys:"系統"};
+function popY(d,p,s){const Y=[];for(let j=0;j<10;j++){const r=[];for(let k=0;k<10;k++)r.push(50+d*AREA[j]+p*(k-4.5)+s*NOISE(j,k));Y.push(r);}return Y;}
+function dVals(){const d=+$("dd").value,p=+$("dp").value,s=+$("ds").value,Y=popY(d,p,s),all=Y.flat(),M=sum(all)/100;
+ const S2=sum(all.map(v=>(v-M)**2))/99,srs=Math.sqrt(0.9*S2/10);
+ const Sh=Y.map(r=>{const m=sum(r)/10;return sum(r.map(v=>(v-m)**2))/9;}),strat=Math.sqrt(sum(Sh.map(x=>0.01*0.9*x)));
+ const am=Y.map(r=>sum(r)/10),clus=Math.sqrt(0.9*sum(am.map(a=>(a-M)**2))/9);
+ const mk=[...Array(10).keys()].map(k=>sum(Y.map(r=>r[k]))/10),sys=Math.sqrt(sum(mk.map(m=>(m-M)**2))/10);
+ const se={srs,strat,clus,sys},best=Object.keys(se).reduce((a,b)=>se[b]<se[a]-1e-9?b:a,"srs");
+ return {d,p,s,Y,M,am,mk,srs,strat,clus,sys,best:MNAME[best],rClus:clus/srs,rSys:sys/srs,rStrat:strat/srs};}
+let dPick=null,dSeed=31;
+function dSample(D,how,r){const pick=[];if(how==="srs"){const idx=[...Array(100).keys()];for(let i=0;i<10;i++){const t=i+Math.floor(r()*(100-i));[idx[i],idx[t]]=[idx[t],idx[i]];pick.push(idx[i]);}}
+ else if(how==="strat"){for(let j=0;j<10;j++)pick.push(j*10+Math.floor(r()*10));}
+ else if(how==="clus"){const j=Math.floor(r()*10);for(let k=0;k<10;k++)pick.push(j*10+k);}
+ else{const k=Math.floor(r()*10);for(let j=0;j<10;j++)pick.push(j*10+k);}
+ return pick;}
+function dRender(){const D=dVals(),how=$("dshow").value,r=rng(dSeed);dPick=dSample(D,how,r);
+ const all=D.Y.flat(),mn=Math.min(...all),mx=Math.max(...all),cs=22,gx=(W-10*cs)/2;
+ let s=`<div class="glab">100店（行＝地域、列＝名簿の並び）。色が濃いほど売上が高い</div><svg viewBox="0 0 ${W} ${10*cs+6}" width="${W}" role="img" aria-label="100店の格子">`;
+ for(let j=0;j<10;j++)for(let k=0;k<10;k++){const v=D.Y[j][k],t=mx>mn?(v-mn)/(mx-mn):0.5,on=dPick.includes(j*10+k);
+  s+=`<rect x="${gx+k*cs+1}" y="${j*cs+1}" width="${cs-2}" height="${cs-2}" rx="3" fill="var(--acc)" fill-opacity="${(0.12+0.8*t).toFixed(2)}" ${on?'stroke="var(--acc2)" stroke-width="3"':""}/>`;}
+ s+=`</svg>`;
+ const est=sum(dPick.map(i=>D.Y[Math.floor(i/10)][i%10]))/10;
+ // 4つの方法の推定値の分布（単純無作為・層化は400回、集落・系統は10通りすべて）
+ const R2=rng(53),dist={srs:[],strat:[],clus:D.am,sys:D.mk};for(let t=0;t<400;t++){for(const h of ["srs","strat"]){const pk=dSample(D,h,R2);dist[h].push(sum(pk.map(i=>D.Y[Math.floor(i/10)][i%10]))/10);}}
+ const lo=Math.floor(Math.min(D.M-12,...dist.clus,...dist.sys)),hi=Math.ceil(Math.max(D.M+12,...dist.clus,...dist.sys)),X=v=>40+(v-lo)/(hi-lo)*(W-52),nb=34,bw=(hi-lo)/nb;
+ s+=`<div class="glab">推定値のばらつき（中央の線＝本当の平均 ${f(D.M,2)}）</div><svg viewBox="0 0 ${W} ${4*40+20}" width="${W}" role="img" aria-label="4つの方法の推定値の分布">`;
+ ["srs","strat","clus","sys"].forEach((h,i)=>{const y0=i*40+36,c=new Array(nb).fill(0);dist[h].forEach(v=>{c[Math.max(0,Math.min(nb-1,Math.floor((v-lo)/bw)))]++;});const m=Math.max(...c);
+  s+=`<text x="2" y="${y0-14}" font-size="11" fill="var(--fg)" font-weight="${h===how?700:400}">${MNAME[h]}</text>`;
+  c.forEach((n,b)=>{if(!n)return;const hh=n/m*28;s+=`<rect x="${X(lo+b*bw)}" y="${y0-hh}" width="${Math.max(1,X(lo+(b+1)*bw)-X(lo+b*bw)-1)}" height="${hh}" fill="${h===how?"var(--acc2)":"var(--acc)"}" fill-opacity=".7"/>`;});
+  s+=`<line x1="40" y1="${y0}" x2="${W-12}" y2="${y0}" stroke="var(--line)"/>`;});
+ s+=`<line x1="${X(D.M)}" y1="8" x2="${X(D.M)}" y2="${4*40+38}" stroke="var(--fg)" stroke-dasharray="3 3"/>`;
+ for(let t=Math.ceil(lo/10)*10;t<=hi;t+=10)s+=`<text x="${X(t)}" y="${4*40+18}" font-size="10" text-anchor="middle" fill="var(--mut)">${t}</text>`;
+ s+=`</svg>`;
+ $("dplot").innerHTML=s;
+ $("dsum").innerHTML=`<div>今回選んだ10店（${MNAME[how]}）の平均：<b>${f(est,2)}</b>（本当の平均 ${f(D.M,2)}）</div><div>標準誤差：単純無作為 <b>${f(D.srs,3)}</b>・層化 <b>${f(D.strat,3)}</b>・集落 <b>${f(D.clus,3)}</b>・系統 <b>${f(D.sys,3)}</b></div><div>いちばんばらつきが小さい方法：<b>${D.best}</b></div><div class="mut">地域の差が大きいと、地域ごとに選ぶ層化は強く、1地域だけ調べる集落は弱い。名簿の並びに周期があると、10店おきの系統抽出は同じ位置ばかり選んでしまう。</div>`;
+ $("dtab").innerHTML=`<table><tr><th>方法</th><th>標準誤差（単純無作為との比）</th></tr>${["srs","strat","clus","sys"].map(h=>`<tr><td>${MNAME[h]}</td><td>${f(D[h],3)}（${f(D[h]/D.srs,2)}倍）</td></tr>`).join("")}</table>`;}
+LK.register("design",{name:"抽出法を比べる",
+ init(){["dd","dp","ds"].forEach(id=>LK.stepper($(id),dRender));$("dshow").onchange=dRender;$("ddraw").onclick=()=>{dSeed=(dSeed*48271)%2147483647;dRender();};dRender();},
+ apply(s){if(s.d!==undefined)LK.setRange("dd",s.d);if(s.p!==undefined)LK.setRange("dp",s.p);if(s.s!==undefined)LK.setRange("ds",s.s);if(s.show)$("dshow").value=s.show;dRender();},
+ render:dRender,
+ value(key){const D=dVals(),v=D[key];return {v,text:typeof v==="string"?v:f(v,3)};}});
+
+// ---- n を増やしても消えない偏り
+function bVals(){const p=+$("bp").value,r1=+$("b1").value,r0=+$("b0").value,n=+$("bn").value,est=p*r1/(p*r1+(1-p)*r0),se=Math.sqrt(est*(1-est)/n),lo=est-1.96*se,hi=est+1.96*se;
+ return {p,r1,r0,n,est,bias:est-p,se,rmse:Math.sqrt((est-p)**2+se*se),lo,hi,covers:(p>=lo&&p<=hi)?"含む":"含まない",resp:p*r1+(1-p)*r0};}
+function bRender(){const B=bVals(),H=160,top=24,L=40,R=W-14,X=n=>L+(Math.log10(n)-2)/2*(R-L),vmin=Math.max(0,Math.min(B.p,B.est)-0.2),vmax=Math.min(1,Math.max(B.p,B.est)+0.2),Y=v=>H-(v-vmin)/(vmax-vmin)*(H-top);
+ let s=`<svg viewBox="0 0 ${W} ${H+30}" width="${W}" role="img" aria-label="回答数と推定の幅">`;
+ let up="",dn="";for(let i=0;i<=40;i++){const n=Math.pow(10,2+2*i/40),se=Math.sqrt(B.est*(1-B.est)/n);up+=(i?"L":"M")+X(n).toFixed(1)+" "+Y(Math.min(vmax,B.est+1.96*se)).toFixed(1);dn=`L${X(n).toFixed(1)} ${Y(Math.max(vmin,B.est-1.96*se)).toFixed(1)}`+dn;}
+ s+=`<path d="${up}${dn.replace(/^L/," L")} Z" fill="var(--acc)" fill-opacity=".18"/>`;
+ s+=`<line x1="${L}" y1="${Y(B.est)}" x2="${R}" y2="${Y(B.est)}" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${L}" y1="${Y(B.p)}" x2="${R}" y2="${Y(B.p)}" stroke="var(--fg)" stroke-width="2" stroke-dasharray="5 4"/>`;
+ const gap=Math.abs(Y(B.p)-Y(B.est))<14,estUp=Y(B.est)<Y(B.p);
+ s+=`<text x="${R}" y="${Y(B.est)+(gap&&!estUp?14:-4)}" font-size="11" text-anchor="end" fill="var(--acc)">集まった答え ${f(B.est,3)}</text><text x="${R}" y="${Y(B.p)+(gap&&estUp?14:-4)}" font-size="11" text-anchor="end" fill="var(--fg)">本当 ${f(B.p,2)}</text>`;
+ s+=`<line x1="${X(B.n)}" y1="${Y(B.hi)}" x2="${X(B.n)}" y2="${Y(B.lo)}" stroke="var(--acc2)" stroke-width="4"/><circle cx="${X(B.n)}" cy="${Y(B.est)}" r="4.5" fill="var(--acc2)"/>`;
+ [100,1000,10000].forEach(n=>s+=`<text x="${X(n)}" y="${H+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${n}</text>`);
+ s+=`<text x="${(L+R)/2}" y="${H+27}" font-size="10" text-anchor="middle" fill="var(--mut)">回答数 n（目盛りは10倍ごと）</text><line x1="${L}" y1="${H}" x2="${R}" y2="${H}" stroke="var(--line)"/></svg>`;
+ $("bplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc);opacity:.4"></i>95%区間の幅</span><span><i class="sw" style="background:var(--acc2)"></i>今の n</span></div>`;
+ $("bsum").innerHTML=`<div>集まった答えの賛成率＝${f(B.p,2)}×${f(B.r1,2)}÷(${f(B.p,2)}×${f(B.r1,2)}＋${f(1-B.p,2)}×${f(B.r0,2)})＝<b>${f(B.est,4)}</b></div><div>偏り（ずれ）<b>${f(B.bias,4)}</b>　標準誤差 ${f(B.se,4)}　総合誤差 √(偏り²＋標準誤差²)＝<b>${f(B.rmse,4)}</b></div><div>95%区間 ${f(B.lo,3)}〜${f(B.hi,3)} は本当の値を <b>${B.covers}</b></div><div class="mut">n を増やすと標準誤差（区間の幅）は小さくなるが、偏りは変わらない。人数を増やすほど「自信を持って間違える」。偏りは回答率の差（調べ方）から来る。</div>`;}
+LK.register("bias",{name:"消えない偏り",
+ init(){["bp","b1","b0","bn"].forEach(id=>LK.stepper($(id),bRender));bRender();},
+ apply(s){if(s.p!==undefined)LK.setRange("bp",s.p);if(s.r1!==undefined)LK.setRange("b1",s.r1);if(s.r0!==undefined)LK.setRange("b0",s.r0);if(s.n!==undefined)LK.setRange("bn",s.n);bRender();},
+ render:bRender,
+ value(key){const B=bVals(),v=B[key];return {v,text:typeof v==="string"?v:f(v,4)};}});
+
+// ---- 比例配分とネイマン配分
+function aVals(){const w1=+$("aw").value,w2=1-w1,s1=+$("a1").value,s2=+$("a2").value,dm=+$("am").value,n=+$("an").value;
+ const n1p=Math.max(1,Math.min(n-1,Math.round(n*w1))),n1n=Math.max(1,Math.min(n-1,Math.round(n*w1*s1/(w1*s1+w2*s2))));
+ const se=n1=>Math.sqrt(w1*w1*s1*s1/n1+w2*w2*s2*s2/(n-n1)),seS=Math.sqrt((w1*s1*s1+w2*s2*s2+w1*w2*dm*dm)/n);
+ return {w1,s1,s2,dm,n,n1p,n2p:n-n1p,n1n,n2n:n-n1n,seP:se(n1p),seN:se(n1n),seS};}
+function aRender(){const A=aVals(),L=86,R=W-14,bx=v=>L+v/A.n*(R-L);
+ let s=`<div class="glab">n＝${A.n} 人の振り分け</div><svg viewBox="0 0 ${W} 84" width="${W}" role="img" aria-label="振り分け">`;
+ [["比例配分",A.n1p],["ネイマン配分",A.n1n]].forEach(([nm,n1],i)=>{const y=8+i*36;s+=`<text x="2" y="${y+17}" font-size="11" fill="var(--fg)">${nm}</text><rect x="${L}" y="${y}" width="${bx(n1)-L}" height="24" fill="var(--acc2)" fill-opacity=".6"/><rect x="${bx(n1)}" y="${y}" width="${R-bx(n1)}" height="24" fill="var(--acc)" fill-opacity=".45"/>`;
+  if(bx(n1)-L>26)s+=`<text x="${(L+bx(n1))/2}" y="${y+16}" font-size="11" text-anchor="middle" fill="var(--fg)">${n1}</text>`;if(R-bx(n1)>26)s+=`<text x="${(bx(n1)+R)/2}" y="${y+16}" font-size="11" text-anchor="middle" fill="var(--fg)">${A.n-n1}</text>`;});
+ s+=`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2);opacity:.6"></i>層1</span><span><i class="sw" style="background:var(--acc);opacity:.45"></i>層2</span></div>`;
+ const mx=Math.max(A.seS,A.seP,A.seN)*1.15;s+=`<div class="glab">標準誤差（短いほどよい）</div><svg viewBox="0 0 ${W} 100" width="${W}" role="img" aria-label="標準誤差の比較">`;
+ [["単純無作為",A.seS,"var(--mut)"],["比例配分",A.seP,"var(--acc)"],["ネイマン配分",A.seN,"var(--acc2)"]].forEach(([nm,v,c],i)=>{const y=6+i*31,w=v/mx*(R-L);s+=`<text x="2" y="${y+16}" font-size="11" fill="var(--fg)">${nm}</text><rect x="${L}" y="${y}" width="${w}" height="22" rx="3" fill="${c}" fill-opacity=".7"/><text x="${L+w+4}" y="${y+16}" font-size="11" fill="var(--fg)">${f(v,3)}</text>`;});
+ $("aplot").innerHTML=s+`</svg>`;
+ $("asum").innerHTML=`<div>比例配分：層1に <b>${A.n1p}</b> 人・層2に ${A.n2p} 人　ネイマン配分：層1に <b>${A.n1n}</b> 人・層2に ${A.n2n} 人</div><div>標準誤差：単純無作為 ${f(A.seS,3)}・比例配分 <b>${f(A.seP,3)}</b>・ネイマン配分 <b>${f(A.seN,3)}</b></div><div class="mut">層化は「層の平均の違い」をばらつきから取り除くので、比例配分でも単純無作為より小さくなる。さらにばらつきの大きい層に多く配ると（ネイマン）もっと小さくなる。母集団が十分大きいとして計算。</div>`;}
+LK.register("alloc",{name:"配分の仕方",
+ init(){["aw","a1","a2","am","an"].forEach(id=>LK.stepper($(id),aRender));aRender();},
+ apply(s){if(s.w1!==undefined)LK.setRange("aw",s.w1);if(s.s1!==undefined)LK.setRange("a1",s.s1);if(s.s2!==undefined)LK.setRange("a2",s.s2);if(s.dm!==undefined)LK.setRange("am",s.dm);if(s.n!==undefined)LK.setRange("an",s.n);aRender();},
+ render:aRender,
+ value(key){const A=aVals(),v=A[key];return {v,text:f(v,key.startsWith("se")?3:0)};}});
+
+// ---- 多段抽出の確率と重み
+function mVals(){const g=id=>+$(id).value,A=g("mA"),a=Math.min(g("ma"),A),B=g("mB"),b=Math.min(g("mb"),B),C=g("mC"),c=Math.min(g("mc"),C);const p1=a/A,p2=b/B,p3=c/C,prob=p1*p2*p3;return {A,a,B,b,C,c,p1,p2,p3,prob,weight:1/prob,total:a*b*c,N:A*B*C};}
+function mRender(){const M=mVals(),L=16,R=W-16,H=150;let s=`<svg viewBox="0 0 ${W} ${H+30}" width="${W}" role="img" aria-label="段ごとに選ぶ割合">`;
+ const fw=R-L;s+=`<rect x="${L}" y="4" width="${fw}" height="${H}" fill="var(--line)" fill-opacity=".5"/>`;
+ const w1=fw*M.p1;s+=`<rect x="${L}" y="4" width="${w1}" height="${H}" fill="var(--acc)" fill-opacity=".25"/>`;
+ const h2=H*M.p2;s+=`<rect x="${L}" y="${4+H-h2}" width="${w1}" height="${h2}" fill="var(--acc)" fill-opacity=".45"/>`;
+ const w3=w1*Math.sqrt(M.p3),h3=h2*Math.sqrt(M.p3);s+=`<rect x="${L}" y="${4+H-h3}" width="${Math.max(1,w3)}" height="${Math.max(1,h3)}" fill="var(--acc2)" fill-opacity=".85"/>`;
+ s+=`<text x="${L}" y="${H+20}" font-size="11" fill="var(--mut)">全体の面積＝全員。濃い所ほど後の段（地域→店→客）</text></svg>`;
+ $("mplot").innerHTML=s;
+ $("msum").innerHTML=`<div>選ばれる確率＝${M.a}/${M.A}×${M.b}/${M.B}×${M.c}/${M.C}＝<b>${f(M.prob,5)}</b></div><div>重み（1人が代表する人数）＝1÷確率＝<b>${f(M.weight,1)}</b>　調べる人数＝${M.total}（全体 ${M.N} 人）</div><div class="mut">各段で同じ割合ずつ選べば、どの客も選ばれる確率は同じ。店ごとに客の数が違うのに同じ人数を選ぶと確率が変わるので、集計で重みを付ける。</div>`;}
+LK.register("multi",{name:"多段抽出",
+ init(){["mA","ma","mB","mb","mC","mc"].forEach(id=>LK.stepper($(id),mRender));mRender();},
+ apply(s){const m={A:"mA",a:"ma",B:"mB",b:"mb",C:"mC",c:"mc"};Object.keys(m).forEach(k=>{if(s[k]!==undefined)LK.setRange(m[k],s[k]);});mRender();},
+ render:mRender,
+ value(key){const M=mVals(),v=M[key];return {v,text:f(v,key==="prob"?5:1)};}});
+
+LK.start("strat");
+window.__LAB__={LK,tVals,dVals,bVals,aVals,mVals,popY};
+</script>
+</body></html>

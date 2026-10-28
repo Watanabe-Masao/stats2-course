@@ -1,0 +1,105 @@
+id: LAB-survey
+name: 標本調査ラボ
+slug: survey                     # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
+kind: simulator
+src: survey_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
+version: 1
+replaces_legacy: [sim_strat.html, frame.html]   # 旧版 教科書31 の「層の割合と重み付き平均」を strat に、「抽出枠の漏れは n を増やしても残る」を bias（回答率の違い）に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+  - key: strat
+    name: 層化と重み
+    purpose: 2つの層から同じ数ずつ調べたとき、層の平均を母集団での割合で重み付けした平均と、そのまま平均した値を、帯（幅＝割合・高さ＝平均）で比べる
+    set: [w, m1, m2]                    # w＝層1の割合、m1・m2＝層の平均
+    values: [weighted, naive, gap]
+  - key: design
+    name: 抽出法を比べる
+    purpose: 10地域×10店の格子（色の濃さ＝売上指数）から10店を単純無作為・層化（地域ごとに1店）・集落（1地域を全部）・系統（名簿の同じ位置）で選ぶ。地域の差・並び順の差・店ごとの差を動かすと、4つの方法の推定値のばらつき（ヒストグラム）と標準誤差がいっしょに変わる。固定の乱数（seed 31・53）
+    set: [d, p, s, show]                # d＝地域の差、p＝並び順の差、s＝店ごとの差、show＝格子に描く方法
+    values: [srs, strat, clus, sys, best, rClus, rSys, rStrat]
+  - key: bias
+    name: 消えない偏り
+    purpose: 賛成・反対で回答率が違うと、集まった答えの割合が本当の値からずれる。回答数 n を10倍ずつ増やすと区間の幅は狭くなるが、ずれは残る。偏り・標準誤差・総合誤差 √(偏り²＋標準誤差²)
+    set: [p, r1, r0, n]
+    values: [est, bias, se, rmse, covers, lo, hi]
+  - key: alloc
+    name: 配分の仕方
+    purpose: 2つの層への振り分けを、比例配分（層の大きさ）とネイマン配分（大きさ×標準偏差）で比べ、単純無作為・比例・ネイマンの標準誤差を棒で並べる
+    set: [w1, s1, s2, dm, n]
+    values: [n1p, n1n, seP, seN, seS]
+  - key: multi
+    name: 多段抽出
+    purpose: 地域→店→客と段を重ねて選ぶ。選ばれる確率は各段の確率の掛け算、重みはその逆数
+    set: [A, a, B, b, C, c]
+    values: [prob, weight, total]
+data: 10地域×10店の売上指数＝50＋地域の差×（地域ごとの固定の値）＋並び順の差×（名簿の位置−4.5）＋店ごとの差×（固定の並び）。乱数は固定（seed 31・53）。ほかはスライダーで決める
+presets:
+  s1-strat:
+    mode: strat
+    set: {w: 0.2, m1: 200, m2: 50}
+    task: 全100店のうち大規模店20店・小規模店80店。各層10店ずつ調べると平均売上は大規模200万円・小規模50万円。全店の平均売上の推定は（万円）？
+    predict: {type: number, key: weighted, label: "全店の平均", unit: "万円"}
+    expect: 80
+    why: 0.2×200＋0.8×50＝80。調べた20店をそのまま平均すると125 で、数の少ない大規模店を重く見すぎる。
+  s1-design:
+    mode: design
+    set: {d: 1, p: 0, s: 1, show: strat}
+    task: 地域によって売上がかなり違う（地域の差1）。4つの方法で10店を選ぶとき、推定値のばらつきがいちばん小さいのは？
+    predict: {type: choice, key: best, label: "いちばん小さい", options: [単純無作為, 層化, 集落, 系統]}
+    expect: 層化
+    why: 地域ごとに1店ずつ選ぶと、地域の違いが推定値のばらつきに入らない。1地域だけ全部調べる集落は、どの地域を引くかで大きくぶれる。
+  s3-rule:
+    mode: design
+    steps:
+      - label: 地域の差0
+        set: {d: 0, p: 0, s: 1, show: clus}
+        task: 地域による違いがないとき、集落抽出（1地域を全部）の標準誤差は単純無作為の何倍か（小数で）？
+        predict: {type: number, key: rClus, label: "集落÷単純無作為", unit: "倍"}
+        expect: 0.6252
+        why: 地域の中にいろいろな店が混ざっていれば、1地域でも全体の縮図になる。
+      - label: 地域の差1
+        set: {d: 1}
+        task: 地域の差を1にする。集落の標準誤差は単純無作為の何倍か？
+        predict: {type: number, key: rClus, label: "集落÷単純無作為", unit: "倍"}
+        expect: 2.8547
+        why: 地域の中の店が似てくると、1地域を全部調べても情報は1店分に近くなる。
+      - label: 地域の差2
+        set: {d: 2}
+        task: 地域の差を2にする。集落の標準誤差は単純無作為の何倍か？
+        predict: {type: number, key: rClus, label: "集落÷単純無作為", unit: "倍"}
+        expect: 3.1827
+        why: 差がさらに大きくなっても、倍率の上がり方はゆるやか。単純無作為も地域の差でばらつくから。
+      - label: 地域の差2・層化
+        set: {show: strat}
+        task: 同じ地域の差2で、層化（地域ごとに1店）の標準誤差は単純無作為の何倍か？
+        predict: {type: number, key: rStrat, label: "層化÷単純無作為", unit: "倍"}
+        expect: 0.295
+        why: 層化は地域の違いをばらつきから取り除く。集落と正反対に、地域の差が大きいほど得をする。
+    law:
+      title: 式で説明する
+      lines:
+        - 集落抽出の推定値のばらつき ＝ 集落ごとの平均がどれだけ違うか（集落の間のばらつき）
+        - 層化抽出の推定値のばらつき ＝ 層の中のばらつきだけ（層の間の違いは入らない）
+        - 集落の中が似ている（＝集落の間が違う）ほど集落は損、層化は得
+      text: 同じ「地域で分ける」でも、全部の地域から少しずつ取る（層化）か、いくつかの地域を丸ごと取る（集落）かで、地域の違いが誤差に入るかどうかが逆になる。
+      limit: 集落抽出は、調べる場所が少なくて安く済む。同じ費用でより多くの店を調べられるなら、ばらつきが大きくても集落を選ぶことがある。費用と精度のどちらを取るかは統計の外の判断。
+  s3-free:
+    mode: design
+    modes: [strat, design, bias, alloc, multi]
+    task: 解いてから、問題が聞いていること（重み・抽出法の比べ方・偏り・配分・多段の確率）に合うモードで確かめる。
+  s4-free:
+    mode: strat
+    modes: [strat, design, bias, alloc, multi]
+    task: 自分の店のアンケートや売場調査の数字（層の大きさ・平均・回答率など）を入れて、推定の仕方と誤差を確かめる。
+  s5-free:
+    mode: bias
+    modes: [bias, alloc, design]
+    task: 「消えない偏り」で n を10倍ずつ増やし、区間の幅と偏りの動きを比べる（発展1）。「配分の仕方」で層の標準偏差を変える（発展2）。
+  s6-free:
+    task: 自分の調査の設計を、5つのモードで確かめる（重み・抽出法・偏り・配分・多段の確率）。
+used_by: [U31]
+tests:
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/survey_lab/check.js       # 本文の値（80・125、58、層化がいちばん小さい、偏り0.167、ネイマン60人、確率0.004）
+checked:
+  browser_380px: 2026-10-29
+  notion_iphone: null

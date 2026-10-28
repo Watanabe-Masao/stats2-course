@@ -311,3 +311,21 @@
 - id: TERM-multicol
   name: 多重共線性
   en: multicollinearity
+- id: TERM-strat-sampling
+  name: 層化抽出
+  en: stratified sampling
+- id: TERM-cluster-sampling
+  name: 集落抽出
+  en: cluster sampling
+- id: TERM-systematic-sampling
+  name: 系統抽出
+  en: systematic sampling
+- id: TERM-multistage-sampling
+  name: 多段抽出
+  en: multistage sampling
+- id: TERM-sampling-error
+  name: 標本誤差
+  en: sampling error
+- id: TERM-nonsampling-error
+  name: 非標本誤差
+  en: non-sampling error

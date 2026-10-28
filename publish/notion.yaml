@@ -106,6 +106,7 @@ refs:
   REF-Q-U28: 402b7cd539a181e0a3e1ced2c94f1683
   REF-Q-U29: 402b7cd539a181a993e6c05493b4ec61
   REF-Q-U30: 404b7cd539a181e5bdf6e870c5715b80
+  REF-Q-U31: 402b7cd539a181bb87b9e9618bb86e8c
   REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
   REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
   REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
@@ -207,6 +208,12 @@ terms:
   TERM-adjr2: 405b7cd539a1814ca4e3ee4d72f4cec0
   TERM-ms: 405b7cd539a1814694ddc5337b55686c
   TERM-multicol: 405b7cd539a181db8e03e5f3560ca098
+  TERM-strat-sampling: 405b7cd539a1816b87bce6dcbb70db80
+  TERM-cluster-sampling: 405b7cd539a1816fa484c7534b746076
+  TERM-systematic-sampling: 405b7cd539a181d4821ae99839bc6922
+  TERM-multistage-sampling: 405b7cd539a181aba5cdd75e9d59c9e8
+  TERM-sampling-error: 405b7cd539a181718510f55fc9b50f67
+  TERM-nonsampling-error: 405b7cd539a1811c9ecef47373fad7ef
   TERM-frame: 405b7cd539a181c18d95e313c68fa19b
   TERM-random-sampling: 405b7cd539a181af8213ef46cd17db7d
   TERM-bias: 405b7cd539a1810da989ddfb79840143
