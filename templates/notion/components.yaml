@@ -18,6 +18,7 @@ tones:   # 段階や領域の tone → Notion の色
   pink: pink_bg
   red: red_bg
   brown: brown_bg
+  gray: gray_bg
 
 icons:   # 本文中の {{icon:名前}}
   fig: "🖼️"
