@@ -143,3 +143,12 @@
 - id: TERM-likelihood
   name: 尤度
   en: likelihood
+- id: TERM-rv
+  name: 確率変数
+  en: random variable
+- id: TERM-dist
+  name: 確率分布
+  en: probability distribution
+- id: TERM-cov
+  name: 共分散
+  en: covariance
