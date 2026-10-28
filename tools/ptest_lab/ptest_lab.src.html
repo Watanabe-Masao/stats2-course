@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>比率・分散の検定ラボ</title>
+<style>
+/*@LABKIT_CSS@*/
+.legend span{margin-right:10px;font-size:12px;white-space:nowrap}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.card{overflow-wrap:anywhere}
+.mode .lk-step .lk-name{max-width:6.4em}
+</style></head><body>
+<h1>🧪 比率・分散の検定ラボ</h1>
+<div id="lk-task"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="m-p1" class="mode">
+ <p class="mut" style="margin:0">H₀：p＝p₀ のもとで、p̂ を z＝(p̂−p₀)÷√(p₀(1−p₀)÷n) に直す。SE には観測した p̂ ではなく <b>H₀ の p₀</b> を使う。</p>
+ <div class="row ctl"><label>対立仮説 <select id="aside" data-key="side"><option value="two">p≠p₀（両側）</option><option value="upper">p＞p₀（右片側）</option><option value="lower">p＜p₀（左片側）</option></select></label><label>α <select id="aalpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="ax" min="0" max="5000" step="1" value="30" data-name="当てはまる数 x">
+ <input type="range" id="an" min="1" max="5000" step="1" value="100" data-name="人数 n">
+ <input type="range" id="ap" min="0.01" max="0.99" step="0.01" value="0.2" data-name="基準 p₀">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="aplot"></div>
+ <div class="card res key" id="asum"></div>
+ <div class="res det" id="adet"></div>
+</div>
+
+<div id="m-p2" class="mode">
+ <p class="mut" style="margin:0">H₀：p₁＝p₂（差がない）のもとでは、2群を合わせた比率 p̄＝(x₁＋x₂)÷(n₁＋n₂) で SE を作る。区間推定（各群の p̂ で SE）とは違う。</p>
+ <div class="row ctl"><label>対立仮説 <select id="bside" data-key="side"><option value="two">p₁≠p₂（両側）</option><option value="upper">p₁＞p₂（右片側）</option><option value="lower">p₁＜p₂（左片側）</option></select></label><label>α <select id="balpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="bx1" min="0" max="5000" step="1" value="20" data-name="群1の数 x₁">
+ <input type="range" id="bn1" min="1" max="5000" step="1" value="100" data-name="群1の人数 n₁">
+ <input type="range" id="bx2" min="0" max="5000" step="1" value="30" data-name="群2の数 x₂">
+ <input type="range" id="bn2" min="1" max="5000" step="1" value="100" data-name="群2の人数 n₂">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="bplot"></div>
+ <div class="card res key" id="bsum"></div>
+ <div class="res det" id="bdet"></div>
+</div>
+
+<div id="m-var" class="mode">
+ <p class="mut" style="margin:0">H₀：σ²＝σ₀² のもとで、χ²＝(n−1)s²÷σ₀² は自由度 n−1 の χ² 分布に従う（母集団が正規分布のとき）。左右対称でないので、両側では左右の点を別々に引く。</p>
+ <div class="row ctl"><label>対立仮説 <select id="cside" data-key="side"><option value="two">σ²≠σ₀²（両側）</option><option value="upper">σ²＞σ₀²（右片側）</option><option value="lower">σ²＜σ₀²（左片側）</option></select></label><label>α <select id="calpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="cn" min="2" max="200" step="1" value="10" data-name="個数 n">
+ <input type="range" id="cs" min="0.01" max="1000" step="0.01" value="16" data-name="不偏分散 s²">
+ <input type="range" id="cv" min="0.01" max="1000" step="0.01" value="9" data-name="基準 σ₀²">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="cplot"></div>
+ <div class="card res key" id="csum"></div>
+</div>
+
+<div id="m-ratio" class="mode">
+ <p class="mut" style="margin:0">H₀：σ₁²＝σ₂² のもとで、F＝s₁²÷s₂² は F(n₁−1, n₂−1) に従う（独立な正規2群のとき）。両側では、上側の点と下側の点（＝1÷F(n₂−1, n₁−1) の上側の点）の両方と比べる。</p>
+ <div class="row ctl"><label>対立仮説 <select id="dside" data-key="side"><option value="two">σ₁²≠σ₂²（両側）</option><option value="upper">σ₁²＞σ₂²（右片側）</option></select></label><label>α <select id="dalpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
+ <input type="range" id="dn1" min="2" max="200" step="1" value="11" data-name="群1の個数 n₁">
+ <input type="range" id="ds1" min="0.01" max="5000" step="0.01" value="16" data-name="群1の s₁²">
+ <input type="range" id="dn2" min="2" max="200" step="1" value="11" data-name="群2の個数 n₂">
+ <input type="range" id="ds2" min="0.01" max="5000" step="0.01" value="4" data-name="群2の s₂²">
+ <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="res key" id="dplot"></div>
+ <div class="card res key" id="dsum"></div>
+</div>
+
+<script>
+/*@LABCFG@*/
+/*@LABKIT_JS@*/
+const $=LK.$,esc=LK.esc;
+const W=340;
+const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.5*x);const y=t*Math.exp(-x*x-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return s*(1-y);}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const dn=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+const ZQ={two:{"0.1":1.645,"0.05":1.96,"0.01":2.576},one:{"0.1":1.282,"0.05":1.645,"0.01":2.326}};   // 2級の数表の値
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+0.5)*Math.log(t);let s=1.000000000190015;for(const ci of c)s+=ci/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return h;}
+function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgam(a+b)-lgam(a)-lgam(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,s=1/a,d=s;for(let n=0;n<1000;n++){ap++;d*=x/ap;s+=d;if(Math.abs(d)<Math.abs(s)*3e-15)break;}return s*Math.exp(-x+a*Math.log(x)-lgam(a));}
+ let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-15)break;}return 1-Math.exp(-x+a*Math.log(x)-lgam(a))*h;}
+const chiCdf=(q,k)=>gammp(k/2,q/2);
+const fCdf=(x,a,b)=>x<=0?0:ibeta(a/2,b/2,a*x/(a*x+b));
+function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+const r3=v=>Math.round(v*1000)/1000,g3=v=>v.toFixed(3);   // 数表と同じ3桁の点
+function binomSf(k,n,p){let s=0;for(let i=Math.max(0,k);i<=n;i++)s+=Math.exp(lgam(n+1)-lgam(i+1)-lgam(n-i+1)+i*Math.log(p)+(n-i)*Math.log(1-p));return Math.min(1,s);}
+function binomCdf(k,n,p){return k<0?0:1-binomSf(k+1,n,p);}
+
+// 標準正規の曲線と塗り
+function zcurve(z,side,crit){const H=150,L=12,R=W-12,base=H-26,top=26,x0=-4.5,x1=4.5,X=x=>L+(x-x0)/(x1-x0)*(R-L),mx=dn(0)*1.1,Y=y=>base-y/mx*(base-top);
+ const sh=side==="two"?[[-9,-Math.abs(z)],[Math.abs(z),9]]:side==="upper"?[[z,9]]:[[-9,z]];
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="H0 のもとでの z の分布">`;
+ sh.forEach(([a,b])=>{const lo=Math.max(a,x0),hi=Math.min(b,x1);if(hi<=lo)return;let p=`M${X(lo).toFixed(1)} ${base}`;for(let i=0;i<=60;i++){const x=lo+(hi-lo)*i/60;p+=` L${X(x).toFixed(1)} ${Y(dn(x)).toFixed(1)}`;}s+=`<path d="${p} L${X(hi).toFixed(1)} ${base} Z" fill="var(--acc2)" fill-opacity=".45"/>`;});
+ let d="";for(let i=0;i<=200;i++){const x=x0+(x1-x0)*i/200;d+=(i?"L":"M")+X(x).toFixed(1)+" "+Y(dn(x)).toFixed(1);}s+=`<path d="${d}" fill="none" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ [-4,-2,0,2,4].forEach(x=>s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x}</text>`);
+ const lines=[{x:z,label:`z＝${f(z,2)}`,col:"var(--fg)",dash:"2 2"}];if(side!=="lower")lines.push({x:crit,label:f(crit,3),col:"var(--acc)"});if(side!=="upper")lines.push({x:-crit,label:f(-crit,3),col:"var(--acc)"});
+ s+=vlines(lines,X,x0,x1,top,base);
+ return s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>p 値（今回以上に極端）</span><span><i class="sw" style="background:var(--acc)"></i>棄却域の境目</span></div>`;}
+function vlines(lines,X,x0,x1,top,base){let s="";const placed=[];lines.forEach(t=>{const x=Math.max(x0,Math.min(x1,t.x)),lx=X(x),near=t.label&&placed.some(p=>Math.abs(p-lx)<36),ly=near?top-15:top-3;if(t.label&&!near)placed.push(lx);s+=`<line x1="${lx}" y1="${top}" x2="${lx}" y2="${base}" stroke="${t.col}" stroke-dasharray="${t.dash||"4 3"}" stroke-width="1.5"/><text x="${lx}" y="${ly}" font-size="10.5" text-anchor="${lx>W*0.75?"end":lx<W*0.25?"start":"middle"}" fill="${t.col}">${esc(t.label)}</text>`;});return s;}
+// 右に長い分布（χ²・F）の曲線と棄却域
+function skew(pdf,xmax,stat,lo,hi,label){const H=150,L=12,R=W-12,base=H-26,top=26,X=x=>L+x/xmax*(R-L);let mx=0;const pts=[];for(let i=1;i<=200;i++){const x=xmax*i/200,y=pdf(x);pts.push([x,y]);if(isFinite(y)&&y>mx)mx=y;}mx*=1.1;const Y=y=>base-Math.min(y,mx)/mx*(base-top);
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label)}">`;
+ const shade=(a,b)=>{if(b<=a)return;let p=`M${X(a).toFixed(1)} ${base}`;for(let i=0;i<=60;i++){const x=a+(b-a)*i/60;p+=` L${X(x).toFixed(1)} ${Y(pdf(Math.max(x,1e-6))).toFixed(1)}`;}s+=`<path d="${p} L${X(b).toFixed(1)} ${base} Z" fill="var(--acc2)" fill-opacity=".45"/>`;};
+ if(lo!==null)shade(0,Math.min(lo,xmax));if(hi!==null)shade(Math.min(hi,xmax),xmax);
+ s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("")}" fill="none" stroke="var(--acc)" stroke-width="2"/>`;
+ s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;
+ const step=xmax>40?20:xmax>16?5:xmax>6?2:1;for(let x=0;x<=xmax+1e-9;x+=step)s+=`<text x="${X(x)}" y="${base+14}" font-size="10" text-anchor="middle" fill="var(--fg)">${x}</text>`;
+ const lines=[{x:stat,label:`${label.startsWith("F")?"F":"χ²"}＝${f(stat,2)}`,col:"var(--fg)",dash:"2 2"}];if(lo!==null)lines.push({x:lo,label:g3(lo),col:"var(--acc)"});if(hi!==null)lines.push({x:hi,label:g3(hi),col:"var(--acc)"});
+ s+=vlines(lines,X,0,xmax,top,base);
+ return s+`</svg><div class="legend mut"><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>棄却域</span><span><i class="sw" style="background:var(--acc)"></i>境目（数表の点）</span></div>`;}
+
+// ---- 1つの比率
+function aVals(){const side=$("aside").value,a=$("aalpha").value,n=+$("an").value,x=Math.min(+$("ax").value,n),p0=+$("ap").value,ph=x/n,se=Math.sqrt(p0*(1-p0)/n),z=(ph-p0)/se;
+ const p=side==="two"?2*(1-Phi(Math.abs(z))):side==="upper"?1-Phi(z):Phi(z),crit=side==="two"?ZQ.two[a]:ZQ.one[a],rej=side==="two"?Math.abs(z)>crit:side==="upper"?z>crit:z<-crit;
+ const mean=n*p0,up=binomSf(x,n,p0),dw=binomCdf(x,n,p0),pex=side==="upper"?up:side==="lower"?dw:Math.min(1,2*Math.min(up,dw));
+ return {side,alpha:+a,x,n,p0,phat:ph,se,sehat:Math.sqrt(ph*(1-ph)/n),z,p,crit,decision:rej?"棄却する":"棄却しない",np0:mean,nq0:n*(1-p0),pexact:pex};}
+function aRender(){const A=aVals();$("aplot").innerHTML=zcurve(A.z,A.side,A.crit);
+ const ok=A.np0>=5&&A.nq0>=5;
+ $("asum").innerHTML=`<div>p̂＝${A.x}÷${A.n}＝${f(A.phat)}　SE＝√(${f(A.p0,3)}×${f(1-A.p0,3)}÷${A.n})＝${f(A.se)}</div><div>z＝(${f(A.phat)}−${f(A.p0,3)})÷${f(A.se)}＝<b>${f(A.z,3)}</b>　p 値＝<b>${f(A.p)}</b>　α＝${A.alpha}</div><div>${A.side==="two"?"|z|":"z"} と境目 ${A.side==="lower"?"−":""}${f(A.crit,3)} を比べて → H₀ を <b>${A.decision}</b></div><div class="${ok?"mut":""}">np₀＝${f(A.np0,2)}、n(1−p₀)＝${f(A.nq0,2)}：${ok?"どちらも5以上なので正規近似を使ってよい目安":"<b>5未満がある。正規近似は粗いので、二項分布で直接計算する</b>"}</div>`;
+ $("adet").innerHTML=`<table><tr><th>項目</th><th>値</th></tr><tr><td>二項分布で直接計算した p 値</td><td>${f(A.pexact)}</td></tr><tr><td>区間推定の SE（p̂ で作る）</td><td>${f(A.sehat)}</td></tr></table><p class="mut">検定の SE は H₀ の p₀ で作る。区間推定の SE は p̂ で作る。</p>`;}
+LK.register("p1",{name:"1つの比率",
+ init(){["ax","an","ap"].forEach(id=>LK.stepper($(id),aRender));["aside","aalpha"].forEach(id=>$(id).onchange=aRender);aRender();},
+ apply(s){if(s.side)$("aside").value=s.side;if(s.alpha!==undefined)$("aalpha").value=String(s.alpha);if(s.n!==undefined)LK.setRange("an",s.n);if(s.x!==undefined)LK.setRange("ax",s.x);if(s.p0!==undefined)LK.setRange("ap",s.p0);aRender();},
+ render:aRender,
+ value(key){const A=aVals(),v=A[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 2つの比率
+function bVals(){const side=$("bside").value,a=$("balpha").value,n1=+$("bn1").value,n2=+$("bn2").value,x1=Math.min(+$("bx1").value,n1),x2=Math.min(+$("bx2").value,n2),p1=x1/n1,p2=x2/n2,pool=(x1+x2)/(n1+n2),se=Math.sqrt(pool*(1-pool)*(1/n1+1/n2)),z=(p1-p2)/se;
+ const p=side==="two"?2*(1-Phi(Math.abs(z))):side==="upper"?1-Phi(z):Phi(z),crit=side==="two"?ZQ.two[a]:ZQ.one[a],rej=side==="two"?Math.abs(z)>crit:side==="upper"?z>crit:z<-crit;
+ return {side,alpha:+a,x1,n1,x2,n2,p1,p2,diff:p1-p2,pool,se,seci:Math.sqrt(p1*(1-p1)/n1+p2*(1-p2)/n2),z,p,crit,decision:rej?"棄却する":"棄却しない",chi2:z*z};}
+function bRender(){const B=bVals();$("bplot").innerHTML=zcurve(B.z,B.side,B.crit);
+ $("bsum").innerHTML=`<div>p̂₁＝${f(B.p1)}、p̂₂＝${f(B.p2)}、差＝${f(B.diff)}</div><div>合わせた比率 p̄＝(${B.x1}＋${B.x2})÷(${B.n1}＋${B.n2})＝${f(B.pool)}　SE＝√(p̄(1−p̄)(1÷${B.n1}＋1÷${B.n2}))＝${f(B.se)}</div><div>z＝${f(B.diff)}÷${f(B.se)}＝<b>${f(B.z,3)}</b>　p 値＝<b>${f(B.p)}</b>　→ H₀ を <b>${B.decision}</b></div><div class="mut">棄却しないときは「差がない」ではなく「この人数では差があるとは言えない」。同じ比率でも人数を増やすと SE が小さくなる。</div>`;
+ $("bdet").innerHTML=`<table><tr><th>項目</th><th>値</th></tr><tr><td>区間推定の SE（各群の p̂）</td><td>${f(B.seci)}</td></tr><tr><td>z²（2×2 の表の χ² と同じ）</td><td>${f(B.chi2,3)}</td></tr></table>`;}
+LK.register("p2",{name:"2つの比率",
+ init(){["bx1","bn1","bx2","bn2"].forEach(id=>LK.stepper($(id),bRender));["bside","balpha"].forEach(id=>$(id).onchange=bRender);bRender();},
+ apply(s){if(s.side)$("bside").value=s.side;if(s.alpha!==undefined)$("balpha").value=String(s.alpha);if(s.n1!==undefined)LK.setRange("bn1",s.n1);if(s.n2!==undefined)LK.setRange("bn2",s.n2);if(s.x1!==undefined)LK.setRange("bx1",s.x1);if(s.x2!==undefined)LK.setRange("bx2",s.x2);bRender();},
+ render:bRender,
+ value(key){const B=bVals(),v=B[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 母分散
+function cVals(){const side=$("cside").value,a=+$("calpha").value,n=+$("cn").value,s2=+$("cs").value,v0=+$("cv").value,k=n-1,q=k*s2/v0,cdf=x=>chiCdf(x,k),hiq=x=>inv(cdf,x,0,k+60*Math.sqrt(2*k)+60);
+ const lo=side==="upper"?null:r3(hiq(side==="two"?a/2:a)),hi=side==="lower"?null:r3(hiq(side==="two"?1-a/2:1-a)),F=cdf(q),p=side==="two"?Math.min(1,2*Math.min(F,1-F)):side==="upper"?1-F:F;
+ const rej=(lo!==null&&q<lo)||(hi!==null&&q>hi);
+ return {side,alpha:a,n,s2,v0,df:k,q,lo,hi,p,decision:rej?"棄却する":"棄却しない"};}
+function cRender(){const C=cVals(),k=C.df,pdf=x=>Math.exp((k/2-1)*Math.log(x)-x/2-k/2*Math.log(2)-lgam(k/2)),xmax=Math.max(10,Math.ceil(Math.max(C.hi||0,C.q,k+4*Math.sqrt(2*k))*1.05));
+ $("cplot").innerHTML=skew(pdf,xmax,C.q,C.lo,C.hi,`χ²(${k}) の分布`);
+ $("csum").innerHTML=`<div>χ²＝(n−1)s²÷σ₀²＝${k}×${f(C.s2,2)}÷${f(C.v0,2)}＝<b>${f(C.q,3)}</b>（自由度 ${k}）</div><div>境目：${C.lo!==null?`下側 ${g3(C.lo)}`:""}${C.lo!==null&&C.hi!==null?"・":""}${C.hi!==null?`上側 ${g3(C.hi)}`:""}　p 値＝<b>${f(C.p)}</b></div><div>→ H₀ を <b>${C.decision}</b></div><div class="mut">χ² は右に長いので、両側の境目は真ん中から左右同じ距離ではない。母集団が正規分布から外れると、この検定は当てにならない。</div>`;}
+LK.register("var",{name:"母分散",
+ init(){["cn","cs","cv"].forEach(id=>LK.stepper($(id),cRender));["cside","calpha"].forEach(id=>$(id).onchange=cRender);cRender();},
+ apply(s){if(s.side)$("cside").value=s.side;if(s.alpha!==undefined)$("calpha").value=String(s.alpha);if(s.n!==undefined)LK.setRange("cn",s.n);if(s.s2!==undefined)LK.setRange("cs",s.s2);if(s.v0!==undefined)LK.setRange("cv",s.v0);cRender();},
+ render:cRender,
+ value(key){const C=cVals(),v=C[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+// ---- 分散の比
+function dVals(){const side=$("dside").value,a=+$("dalpha").value,n1=+$("dn1").value,n2=+$("dn2").value,s1=+$("ds1").value,s2=+$("ds2").value,k1=n1-1,k2=n2-1,F=s1/s2,cdf=x=>fCdf(x,k1,k2);
+ const hi=r3(inv(cdf,side==="two"?1-a/2:1-a,0,2000)),lo=side==="two"?r3(1/inv(x=>fCdf(x,k2,k1),1-a/2,0,2000)):null,c=cdf(F),p=side==="two"?Math.min(1,2*Math.min(c,1-c)):1-c;
+ const rej=F>hi||(lo!==null&&F<lo);
+ return {side,alpha:a,n1,n2,s1,s2,df1:k1,df2:k2,F,lo,hi,p,decision:rej?"棄却する":"棄却しない"};}
+function dRender(){const D=dVals(),a=D.df1,b=D.df2,pdf=x=>Math.exp(0.5*(a*Math.log(a*x)+b*Math.log(b)-(a+b)*Math.log(a*x+b))-Math.log(x)-lgam(a/2)-lgam(b/2)+lgam((a+b)/2)),xmax=Math.max(4,Math.ceil(Math.max(D.hi,D.F)*1.15));
+ $("dplot").innerHTML=skew(pdf,xmax,D.F,D.lo,D.hi,`F(${a}, ${b}) の分布`);
+ $("dsum").innerHTML=`<div>F＝s₁²÷s₂²＝${f(D.s1,2)}÷${f(D.s2,2)}＝<b>${f(D.F,3)}</b>（自由度 ${a}, ${b}）</div><div>境目：${D.lo!==null?`下側 ${g3(D.lo)}・`:""}上側 ${g3(D.hi)}　p 値＝<b>${f(D.p)}</b></div><div>→ H₀ を <b>${D.decision}</b></div><div class="mut">ふつうは大きい方の s² を分子に置き、上側の点と比べる（両側なら α÷2 の点）。分子と分母の自由度の順を取り違えない。</div>`;}
+LK.register("ratio",{name:"分散の比",
+ init(){["dn1","ds1","dn2","ds2"].forEach(id=>LK.stepper($(id),dRender));["dside","dalpha"].forEach(id=>$(id).onchange=dRender);dRender();},
+ apply(s){if(s.side)$("dside").value=s.side;if(s.alpha!==undefined)$("dalpha").value=String(s.alpha);if(s.n1!==undefined)LK.setRange("dn1",s.n1);if(s.n2!==undefined)LK.setRange("dn2",s.n2);if(s.s1!==undefined)LK.setRange("ds1",s.s1);if(s.s2!==undefined)LK.setRange("ds2",s.s2);dRender();},
+ render:dRender,
+ value(key){const D=dVals(),v=D[key];return {v,text:typeof v==="string"?v:f(v)};}});
+
+LK.start("p1");
+window.__LAB__={LK,aVals,bVals,cVals,dVals,Phi,chiCdf,fCdf};
+</script>
+</body></html>
