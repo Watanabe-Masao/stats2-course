@@ -549,7 +549,8 @@ def _pmf(sp: dict):
         return list(zip(sp["values"], sp["probs"]))
     if f == "binom":
         n, p = sp["n"], sp["p"]
-        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k)) for k in range(n + 1)]
+        top = min(n, sp["kmax"]) if sp.get("kmax") is not None else n   # kmax：棒を出す範囲（解説付き再生でラボと共有）
+        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k)) for k in range(top + 1)]
     if f == "poisson":
         lam = sp["lam"]
         return [(k, math.exp(-lam) * lam ** k / math.factorial(k)) for k in range(sp["kmax"] + 1)]
@@ -591,10 +592,11 @@ def dist(sp: dict) -> str:
             sd = math.sqrt(sum(x * x * p for x, p in pmf) - mean ** 2)
         lo, hi = pmf[0][0] - 0.5, pmf[-1][0] + 0.5
         X = lambda v: left + (v - lo) / (hi - lo) * (right - left)  # noqa: E731
-        pmax = max(p for _, p in pmf)
+        ov = dict(_pmf({**sp["overlay"], "kmax": pmf[-1][0]})) if sp.get("overlay") else None   # 重ねる分布（同じ範囲）
+        pmax = max([p for _, p in pmf] + (list(ov.values()) if ov else []))
         scale = (base - top - 18) / pmax
         slot = (right - left) / len(pmf)
-        bw = min(40, slot * 0.62)
+        bw = min(40, slot * (0.36 if ov else 0.62))
         dec = sp.get("decimals", 2)
         hl = set(sp.get("highlight") or [])
     else:
@@ -613,10 +615,15 @@ def dist(sp: dict) -> str:
     c.line(left, base, right, base, INK2, 1)
     if discrete:
         for x, p in pmf:
-            cx = X(x)
+            cx = X(x) - (bw / 2 + 1 if ov else 0)
             col = ORANGE if x in hl else "#8fb3e3"
             c.rect(cx - bw / 2, base - p * scale, bw, p * scale, col, rx=3)
-            if p * scale > 1.5 or x in hl:
+            if ov:   # 重ねる分布は点線の枠（ラボと同じ見せ方）
+                q = ov.get(x, 0.0)
+                c.add(f'<rect x="{cx + bw / 2 + 2:.1f}" y="{base - q * scale:.1f}" width="{bw:.1f}" height="{q * scale:.1f}" rx="2" '
+                      f'fill="none" stroke="{INK}" stroke-width="1.2" stroke-dasharray="3 2"/>')
+                cx = X(x)
+            if (p * scale > 1.5 and not ov) or x in hl:
                 c.add(f'<text x="{cx:.1f}" y="{base - p * scale - 5:.1f}" font-size="11.5" fill="{INK}" text-anchor="middle" '
                       f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(f"{p:.{dec}f}")}</text>')
             c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
@@ -650,6 +657,15 @@ def dist(sp: dict) -> str:
         c.add(f'<path d="M{mx:.1f},{base + 20} l-7,12 h14 z" fill="{ORANGE}"/>')
         c.text(mx, base + 46, f"{'期待値' if discrete else '平均'} {_num(round(mean, 2))}{unit}", 12, ORANGE, "middle", "bold")
     y = base + 58
+    if sp.get("overlay"):   # 凡例と差の最大
+        c.rect(8, y + 2, 12, 12, "#8fb3e3", rx=2)
+        c.text(24, y + 12, sp.get("label", "棒"), 12, INK2)
+        c.add(f'<rect x="190" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
+        c.text(206, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
+        y += 20
+        if sp.get("maxdiff") is not None:
+            c.text(8, y + 12, f"棒どうしの差の最大 {sp['maxdiff']:.{sp.get('decimals', 3)}f}", 12.5, INK, weight="bold")
+            y += 20
     if sp.get("note"):
         y = c.para(8, y + 10, sp["note"], 344, 12.5, INK2)
     return c.done(y + 6)
@@ -674,6 +690,8 @@ def specs(course: Course) -> dict[str, dict]:
                 src = " ".join([q.get("prompt", ""), q.get("answer", ""), " ".join(map(str, q.get("choices") or [])), body])
                 out[f"FIG-{qid}"] = {"spec": f, "caption": f.get("caption", ""), "where": qid, "source": src,
                                      "used_by": [uid]}
+    from tour import figure_specs   # 解説付き再生の段ごとの静止図（数は段階データから計算する）
+    out.update(figure_specs(course))
     return out
 
 
@@ -705,7 +723,7 @@ def validate_figures(course: Course) -> list[str]:
             err.append(f"{f['where']}: 図の caption（説明文）がない")
         if fid in course.figures and not course.figures[fid].get("generated"):
             err.append(f"{f['where']}: 図ID {fid} が assets.yaml の図と重なる")
-        extra = {x for s in _strings(sp) for x in numbers(s)} - numbers(f["source"]) - {"0", "1"}
+        extra = set() if f["source"] is None else {x for s in _strings(sp) for x in numbers(s)} - numbers(f["source"]) - {"0", "1"}
         if extra:
             err.append(f"{f['where']}: 図に、問題文・答えにない数 {sorted(extra, key=float)} がある")
         try:

@@ -30,7 +30,7 @@
  <input type="range" id="ap" min="0.001" max="0.3" step="0.001" value="0.002" data-name="確率 p">
  <input type="range" id="ak" min="0" max="30" step="1" value="2" data-name="k 回">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
- <div class="res key" id="aplot"></div>
+ <div class="res key" id="aplot" data-tour-anchor></div>
  <div class="card res key" id="asum"></div>
 </div>
 
@@ -94,13 +94,17 @@ LK.register("pois",{name:"ポアソン分布",
  value(key){const P=pVals(),v=P[key];return {v,text:f(v)};}});
 
 // ---- 二項とポアソン
-function aVals(){const n=+$("an").value,p=+$("ap").value,k=+$("ak").value,l=n*p,b=binom(n,p,k),q=pois(l,k);return {n,p,k,lambda:l,bin:b,poi:q,diff:q-b,bmean:l,bvar:l*(1-p)};}
-function aRender(){const A=aVals(),top=Math.max(A.k+2,Math.ceil(A.lambda+4*Math.sqrt(A.lambda))+1,8),b=[],q=[];for(let i=0;i<=top;i++){b.push(binom(A.n,A.p,i));q.push(pois(A.lambda,i));}
- $("aplot").innerHTML=bars(b,{on:i=>i===A.k,ps2:q,mean:A.lambda,kmark:A.k,label:"二項分布とポアソン分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>二項 B(n, p)</span><span><i class="sw" style="border:2px dashed var(--fg)"></i>ポアソン λ＝np</span></div>`;
- $("asum").innerHTML=`<div>λ＝np＝${A.n}×${f(A.p)}＝<b>${f(A.lambda)}</b></div><div>P(X＝${A.k})：二項 <b>${f(A.bin)}</b>　ポアソン <b>${f(A.poi)}</b>（差 ${f(A.diff)}）</div><div class="mut">二項の分散 np(1−p)＝${f(A.bvar)} と、ポアソンの分散 λ＝${f(A.lambda)} は、p が小さいほど近い。p を大きくすると近似がずれる。</div>`;}
+// 解説付き再生（tour）では、棒の範囲 kmax をラボと静止図で共有する。λ を保つときは p＝λ÷n（AL）で計算する
+const TK=LK.cfg.tour&&LK.cfg.tour.kmax;let AL=null;
+function aTop(A){return TK!=null?TK:Math.max(A.k+2,Math.ceil(A.lambda+4*Math.sqrt(A.lambda))+1,8);}
+function aVals(){const n=+$("an").value,p=AL!=null?AL/n:+$("ap").value,k=+$("ak").value,l=n*p,b=binom(n,p,k),q=pois(l,k);
+ const A={n,p,k,lambda:l,bin:b,poi:q,diff:q-b,bmean:l,bvar:l*(1-p)};let md=0;for(let i=0;i<=aTop(A);i++)md=Math.max(md,Math.abs(binom(n,p,i)-pois(l,i)));A.maxdiff=md;return A;}
+function aRender(){const A=aVals(),top=aTop(A),b=[],q=[];for(let i=0;i<=top;i++){b.push(binom(A.n,A.p,i));q.push(pois(A.lambda,i));}
+ $("aplot").innerHTML=`<div data-focus="bars">`+bars(b,{on:i=>i===A.k,ps2:q,mean:A.lambda,kmark:A.k,label:"二項分布とポアソン分布",H:LK.embed&&LK.cfg.tour?100:170})+`</div><div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>二項<span class="lk-long"> B(n, p)</span></span><span><i class="sw" style="border:2px dashed var(--fg)"></i>ポアソン<span class="lk-long"> λ＝np</span></span></div>`+(LK.cfg.tour?`<div class="mut lk-tline"><span data-focus="np">n×p＝${A.n}×${f(A.p)}＝<b>${f(A.lambda)}</b></span>　<span data-focus="diff">差の最大 <b>${A.maxdiff.toFixed(LK.cfg.tour.decimals??3)}</b></span></div>`:"")+``;
+ $("asum").innerHTML=`<div>λ＝np＝${A.n}×${f(A.p)}＝<b>${f(A.lambda)}</b></div><div>P(X＝${A.k})：二項 <b>${f(A.bin)}</b>　ポアソン <b>${f(A.poi)}</b>（差 ${f(A.diff)}）</div><div>棒どうしの差の最大（0〜${top}）：<b>${A.maxdiff.toFixed((LK.cfg.tour&&LK.cfg.tour.decimals!=null?LK.cfg.tour.decimals:4))}</b></div><div class="mut">二項の分散 np(1−p)＝${f(A.bvar)} と、ポアソンの分散 λ＝${f(A.lambda)} は、p が小さいほど近い。p を大きくすると近似がずれる。</div>`;}
 LK.register("approx",{name:"二項とポアソン",
- init(){["an","ap","ak"].forEach(id=>LK.stepper($(id),aRender));aRender();},
- apply(s){if(s.n!==undefined)LK.setRange("an",s.n);if(s.p!==undefined)LK.setRange("ap",s.p);if(s.k!==undefined)LK.setRange("ak",s.k);aRender();},
+ init(){["an","ap","ak"].forEach(id=>LK.stepper($(id),()=>{if(id!=="ak")AL=null;aRender();}));aRender();},
+ apply(s){if(s.n!==undefined)LK.setRange("an",s.n);if(s.lam!==undefined){AL=s.lam;LK.setRange("ap",AL/+$("an").value);}else if(s.p!==undefined){AL=null;LK.setRange("ap",s.p);}if(s.k!==undefined)LK.setRange("ak",s.k);aRender();},
  render:aRender,
  value(key){const A=aVals(),v=A[key];return {v,text:f(v)};}});
 

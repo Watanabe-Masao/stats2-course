@@ -66,6 +66,27 @@ const ROOT=path.resolve(__dirname,'..');
   for(const m of modes){if(modes.length>1)await p.click(`#tabs button[data-m="${m}"]`);
    for(const btn of await p.$$(`#m-${m} button.act, #m-${m} .lk-step button`)){if(await btn.isVisible()&&await btn.isEnabled())await btn.click();}
    if(await sw()>380)bad(`${tag}/${m}: 横にはみ出し`);}
+  // 解説付き再生（tour）：段・frame ごとにラボの値と静止図の数（build が計算）が一致／再生は今の段だけ／自由操作から戻る
+  if(v.cfg.tour&&scheme==='light'){const TE=v.tour_expect;
+   if(!TE)bad(`${tag}: tour の照合する数がない（build/tour.py の MODES）`);
+   else for(let i=0;i<TE.length;i++){for(let j=0;j<TE[i].length;j++){
+     const got=await p.evaluate(([i,j,keys])=>{LK.tour.go(i);if(j>0)LK.tour.frame(j-1);return Object.fromEntries(keys.map(k=>[k,LK.value(k).v]));},[i,j,Object.keys(TE[i][j])]);
+     for(const [k,e] of Object.entries(TE[i][j]))if(!(Math.abs(got[k]-e)<=Math.max(1e-9,Math.abs(e)*1e-9)))bad(`${tag}: 段${i+1}・frame${j}：${k} がラボ ${got[k]}、静止図 ${e}`);}}
+   const N=v.cfg.tour.steps.length,fi=v.cfg.tour.steps.findIndex(s=>(s.frames||[]).length);
+   if(fi>=0){await p.evaluate(i=>LK.tour.go(i),fi);await p.click('#lk-play');
+    await p.waitForFunction(()=>!LK.tour.state.playing,null,{timeout:20000});
+    const st=await p.evaluate(()=>LK.tour.state);
+    if(st.i!==fi||st.f!==v.cfg.tour.steps[fi].frames.length-1)bad(`${tag}: 再生が段${fi+1}の終わりで止まらない（${JSON.stringify(st)}）`);
+    await p.evaluate(i=>LK.tour.frame(0),fi);const want=await p.evaluate(()=>({say:document.getElementById('lk-say').textContent,hl:document.querySelectorAll('.lk-hl').length}));
+    await p.click('#lk-free');
+    if(!(await p.evaluate(()=>[...document.querySelectorAll('.mode .ctl')].some(e=>e.offsetParent!==null))))bad(`${tag}: 自分で動かすで操作が出ない`);
+    const btn=await p.$(`#m-${v.cfg.mode} .lk-step button:last-of-type`);if(btn)await btn.click();else bad(`${tag}: 自分で動かす操作が見つからない`);
+    await p.click('#lk-back');
+    const back=await p.evaluate(()=>({st:LK.tour.state,say:document.getElementById('lk-say').textContent,hl:document.querySelectorAll('.lk-hl').length}));
+    if(back.st.i!==fi||back.st.f!==0||back.st.free)bad(`${tag}: 解説に戻ると段${fi+1}の frame に戻らない（${JSON.stringify(back.st)}）`);
+    if(back.say!==want.say||back.hl!==want.hl)bad(`${tag}: 解説に戻ると説明・強調が戻らない`);
+    const e=TE[fi][1];for(const [k,x] of Object.entries(e)){const g=await p.evaluate(k=>LK.value(k).v,k);if(Math.abs(g-x)>Math.max(1e-9,Math.abs(x)*1e-9))bad(`${tag}: 解説に戻ったあと ${k} が ${g}（段の値 ${x}）`);}}
+   if(N<2)bad(`${tag}: tour が2段未満`);}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
   // Notion の埋め込み（高さ約320px）：予想の前は枠に収まる。結果のあとは「くわしく」で表・式が開く
@@ -85,6 +106,10 @@ const ROOT=path.resolve(__dirname,'..');
    await p.click('#lk-more');
    if(!(await p.evaluate(()=>[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).every(e=>e.offsetParent!==null))))bad(`${tag}: くわしくで結果が開かない`);
   }
+  if(v.cfg.tour){   // 解説付き再生：どの段でも、図・説明・前へ／再生／次へ・自分で動かすが枠に収まる
+   for(let i=0;i<v.cfg.tour.steps.length;i++){await p.evaluate(i=>LK.tour.go(i),i);
+    if(await h()>320)bad(`${tag}: 解説の段${i+1}が枠（320px）に収まらない（${await h()}px）`);
+    for(const id of ['lk-say','lk-prev','lk-play','lk-tnext','lk-free'])if(!(await p.evaluate(id=>{const e=document.getElementById(id);if(!e||e.offsetParent===null)return false;const r=e.getBoundingClientRect();return r.bottom<=320&&r.right<=360;},id)))bad(`${tag}: 段${i+1}で ${id} が枠の中に見えない`);}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
  await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();
