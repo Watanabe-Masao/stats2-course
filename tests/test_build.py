@@ -237,6 +237,14 @@ class TestVisuals(unittest.TestCase):
         f["spec"]["mu"] = 105                     # 本文にない数
         self.assertTrue(any("FIG-U16-concept" in e and "ない数" in e for e in figures.validate_figures(c)))
 
+    def test_term_links_to_network(self):
+        r = NotionRenderer(course(), TARGET)
+        self.assertEqual(r.term_ref("TERM-expect"), f"[期待値 🕸]({TARGET['network_url']}?c=stats2:TERM-expect)")
+        stub = next(t for t, v in r.c.terms.items() if not v.get("definition") and t in (TARGET.get("terms") or {}))
+        self.assertIn("mention", r.term_ref(stub))       # まだ説明のない用語は旧版の用語ページ
+        t2 = dict(TARGET, network_url="")
+        self.assertNotIn("🕸", NotionRenderer(course(), t2).term_ref("TERM-expect"))   # 配布先（画面がない）
+
     def test_no_checkbox_in_pages(self):
         r = NotionRenderer(course(), TARGET)
         md = r.unit_page("U03")

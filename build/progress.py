@@ -47,7 +47,7 @@ def unit_row(c, uid: str, target: dict) -> dict:
         "model": model,
         "hatten": "complex_pattern" in s5 and not pred56,
         "sozo": "解釈" in s6 and bool(re.search(r"\|\s*解釈\s*\|", s6)),
-        "legacy_terms": sum(1 for t in terms if t in legacy_terms),
+        "legacy_terms": sum(1 for t in terms if t in legacy_terms and not c.terms.get(t, {}).get("definition")),
     }
 
 
