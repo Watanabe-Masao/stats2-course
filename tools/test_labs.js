@@ -106,10 +106,15 @@ const ROOT=path.resolve(__dirname,'..');
    await p.click('#lk-more');
    if(!(await p.evaluate(()=>[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).every(e=>e.offsetParent!==null))))bad(`${tag}: くわしくで結果が開かない`);
   }
-  if(v.cfg.tour){   // 解説付き再生：どの段でも、図・説明・前へ／再生／次へ・自分で動かすが枠に収まる
-   for(let i=0;i<v.cfg.tour.steps.length;i++){await p.evaluate(i=>LK.tour.go(i),i);
-    if(await h()>320)bad(`${tag}: 解説の段${i+1}が枠（320px）に収まらない（${await h()}px）`);
-    for(const id of ['lk-say','lk-prev','lk-play','lk-tnext','lk-free'])if(!(await p.evaluate(id=>{const e=document.getElementById(id);if(!e||e.offsetParent===null)return false;const r=e.getBoundingClientRect();return r.bottom<=320&&r.right<=360;},id)))bad(`${tag}: 段${i+1}で ${id} が枠の中に見えない`);}}
+  if(v.cfg.tour){   // 解説付き再生：どの段・frame でも、図・説明・前へ／再生／次へ・自分で動かすが枠に収まる（iPhone の Notion は幅が約320px）
+   for(const W of [360,320]){await p.setViewportSize({width:W,height:320});
+    for(let i=0;i<v.cfg.tour.steps.length;i++){const nf=(v.cfg.tour.steps[i].frames||[]).length;
+     for(let j=-1;j<nf;j++){await p.evaluate(([i,j])=>{LK.tour.go(i);if(j>=0)LK.tour.frame(j);},[i,j]);
+      const where=`幅${W}・段${i+1}${j>=0?`・frame${j}`:""}`;
+      if(await h()>320)bad(`${tag}: ${where}が枠（320px）に収まらない（${await h()}px）`);
+      if(await p.evaluate(()=>document.documentElement.scrollWidth)>W)bad(`${tag}: ${where}で横にはみ出し`);
+      for(const id of ['lk-say','lk-prev','lk-play','lk-tnext','lk-free'])if(!(await p.evaluate(([id,W])=>{const e=document.getElementById(id);if(!e||e.offsetParent===null)return false;const r=e.getBoundingClientRect();return r.bottom<=320&&r.right<=W;},[id,W])))bad(`${tag}: ${where}で ${id} が枠の中に見えない`);
+      if(!(await p.evaluate(()=>[...document.querySelectorAll('.seqs > div')].every(d=>d.getBoundingClientRect().height<30))))bad(`${tag}: ${where}で並びが折り返している`);}}}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
  await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();
