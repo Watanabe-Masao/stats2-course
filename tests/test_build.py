@@ -191,6 +191,32 @@ class TestLabs(unittest.TestCase):
         self.assertNotIn("@@ASSET", page)   # 公開サイトがあれば、ラボも図もアップロード不要
         self.assertIn('<image source="https://x.github.io/labs/fig/FIG-U04-scale.svg">', page)
 
+    def test_tour_states_and_expect(self):
+        import tour
+        p = COURSE.labs["LAB-pois"]["presets"]["rel-approx-tour"]
+        st = tour.states(p["tour"])
+        self.assertEqual(st[1]["start"]["n"], 10)          # 段2の始め＝段1の終わり
+        self.assertEqual([f["n"] for f in st[2]["frames"]], [50, 75, 100])
+        self.assertEqual(st[3]["start"], st[2]["end"])    # 動きのない段は前の段の終わりのまま
+        ex = tour.expect("LAB-pois", p)
+        self.assertTrue(all(abs(x["lambda"] - 3) < 1e-12 for step in ex for x in step))   # 途中も np＝λ
+        self.assertGreater(ex[0][0]["maxdiff"], ex[2][-1]["maxdiff"])   # n を大きくすると差が縮む
+        figs = tour.figure_specs(COURSE)
+        self.assertEqual(sorted(figs), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
+        self.assertIn("差の最大 0.003", figs["FIG-LAB-pois-rel-approx-tour-3"]["caption"])
+
+    def test_tour_validation(self):
+        from labs import _check_spec
+        tool = COURSE.labs["LAB-pois"]
+        bad = {"mode": "approx", "task": "x", "tour": {"kmax": 10, "steps": [
+            {"text": "**閉じない", "set": {"n": 10, "lam": 3, "zz": 1}},
+            {"text": "ok", "frames": [{"n": 12.5}], "color": "red"}]}}
+        err = _check_spec("T", bad, tool)
+        for want in ("predict・steps・task を書かない", "** が閉じていない", "['zz'] はモード approx の set にない",
+                     "n は整数で書く", "使えない項目 ['color']"):
+            self.assertTrue(any(want in e for e in err), want)
+        self.assertTrue(any("2段以上" in e for e in _check_spec("T", {"mode": "approx", "tour": {"steps": [{"text": "a"}]}}, tool)))
+
     def test_squeeze_keeps_urls_and_code(self):
         src = "  <a href='https://x'>\n  // コメント\n  const a=1; // 行末\n\n"
         self.assertEqual(squeeze(src), "<a href='https://x'>\nconst a=1; // 行末\n")

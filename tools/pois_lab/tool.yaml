@@ -14,8 +14,8 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
   - key: approx
     name: 二項とポアソン
     purpose: n が大きく p が小さい二項分布 B(n, p) と、λ＝np のポアソン分布を棒で並べて比べる
-    set: [n, p, k]
-    values: [bin, poi, diff, lambda]
+    set: [n, p, k, lam]             # lam：n と一緒に渡すと p＝lam÷n にする（np＝λ を保つ。解説付き再生で使う）
+    values: [bin, poi, diff, lambda, maxdiff]   # maxdiff：棒の範囲（0〜kmax）で二項とポアソンの確率の差の最大
   - key: geom
     name: 成功するまで
     purpose: r 回目の成功が k 回目の試行で起きる確率（r＝1 で幾何分布、2以上で負の二項分布）。平均 r/p・分散 r(1−p)/p²
@@ -50,6 +50,27 @@ presets:
     mode: hyper
     set: {N: 20, K: 6, n: 5, k: 1}
     task: 当たりの割合（K÷N＝0.3）を保ったまま N を大きくすると、戻さず取り出す確率が、戻して取り出す二項分布の確率に近づく。補正（fpc）が1に近づくのを見る。
+  rel-approx-tour:   # 解説付き再生（#90）。関係「二項分布 → ポアソン分布（極限）」から開く。段ごとの静止図は build が同じ段階データから作る
+    mode: approx
+    tour:
+      kmax: 10        # 棒を出す範囲 0〜kmax（ラボと静止図で共有）
+      decimals: 3     # 差の丸め（ラボと静止図で共有）
+      steps:
+        - title: λ を決める
+          text: 二項分布で **n×p＝λ** を一定に保つ。λ＝3、まず n＝10・p＝0.3。
+          set: {n: 10, lam: 3, k: 3}
+          focus: np
+        - title: n を大きく・p を小さく
+          text: '**n を大きく**すると **p＝λ÷n** は小さくなる。n×p は3のまま。'
+          frames: [{n: 15}, {n: 20}, {n: 30}]
+          focus: np
+        - title: さらに大きく
+          text: n＝100（p＝0.03）まで進めて、**棒の形**を見る。
+          frames: [{n: 50}, {n: 75}, {n: 100}]
+          focus: bars
+        - title: ポアソン分布に近づく
+          text: 棒が点線の**ポアソン分布（λ＝3）**に重なり、**差の最大**が縮んだ。
+          focus: diff
   s3-free:
     mode: pois
     modes: [pois, approx, geom, hyper]

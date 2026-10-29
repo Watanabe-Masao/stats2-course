@@ -23,7 +23,7 @@ from pathlib import Path
 from model import ROOT, TOOLS, Course
 
 OUT = ROOT / "out" / "labs"
-CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why", "steps", "law")
+CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why", "steps", "law", "tour")
 STEP_KEYS = ("label", "task", "set", "predict", "why")
 
 
@@ -40,6 +40,17 @@ def expect_of(spec: dict):
     if spec.get("steps"):
         return [s.get("expect") for s in spec["steps"]]
     return spec.get("expect")
+
+
+def tour_expect(aid: str, spec: dict):
+    """解説付き再生の照合する数（段・frame ごと）。tour がなければ None。"""
+    if not spec.get("tour"):
+        return None
+    import tour
+    try:
+        return tour.expect(aid.split("@")[0], spec)
+    except KeyError:
+        return None
 
 
 def safe(aid: str) -> str:
@@ -144,7 +155,7 @@ def build_site(course: Course) -> list[dict]:
         for name, cfg in presets.items():
             spec = variants(course)[f"{lid}@{name}"]
             entries.append({"asset": f"{lid}@{name}", "file": rel, "query": f"?p={name}", "cfg": cfg,
-                            "expect": expect_of(spec), "modes": modes})
+                            "expect": expect_of(spec), "modes": modes, "tour_expect": tour_expect(f"{lid}@{name}", spec)})
         links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a>（場面 {len(presets)}）</li>')
     figdir = SITE / "fig"   # 図も公開サイトから出す（アップロード不要）
     figdir.mkdir(exist_ok=True)
@@ -172,7 +183,7 @@ def build_labs(course: Course) -> list[dict]:
         f = OUT / f"{safe(aid)}.html"
         f.write_text(_assemble(t, "window.__LABCFG__=" + json.dumps(cfg, ensure_ascii=False) + ";"), encoding="utf-8")
         manifest.append({"asset": aid, "file": str(f.relative_to(ROOT)), "cfg": cfg, "expect": expect_of(spec),
-                         "modes": [m["key"] for m in t.get("modes", []) if isinstance(m, dict)]})
+                         "modes": [m["key"] for m in t.get("modes", []) if isinstance(m, dict)], "tour_expect": tour_expect(aid, spec)})
     (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     return manifest
 
@@ -230,6 +241,9 @@ def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
         err.append(f"{where}: mode は modes に含める")
     if not mode and (p.get("set") or p.get("predict")):
         err.append(f"{where}: set や predict を使うときは mode を書く")
+    if p.get("tour") is not None:
+        import tour
+        err += tour.validate(where, p, mode, (tool or {}).get("id", ""))
     steps = p.get("steps")
     if steps is not None:
         if not isinstance(steps, list) or len(steps) < 2:

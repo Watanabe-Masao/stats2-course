@@ -101,6 +101,30 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
     law: {title: 式で説明する, lines: [式…], text: 説明, limit: この式で言えないこと}
 ```
 
+解説付き再生（tour。#90、試作は LAB-pois@rel-approx-tour）：同じ段階データから「図で解説」（段ごとの静止図）・「アニメで解説」（ラボの再生）・「自分で触る」を作る。関係（変換・対比・導出）の説明に使う。予想は置かない。
+
+```yaml
+  rel-approx-tour:
+    mode: approx
+    tour:
+      kmax: 10          # 棒を出す範囲。ラボと静止図で共有する
+      decimals: 3       # 丸め。ラボと静止図で共有する
+      steps:            # 2段以上
+        - title: λ を決める
+          text: 二項分布で **n×p＝λ** を一定に保つ。   # **…** を強調。埋め込み（360×320）に収まる長さ（2行まで）
+          set: {n: 10, lam: 3, k: 3}                     # 段の始め＝前の段の終わり＋set
+          focus: np                                      # 囲む場所（ラボの data-focus）
+        - title: n を大きく
+          text: '**n を大きく**すると p＝λ÷n は小さくなる。'
+          frames: [{n: 15}, {n: 20}, {n: 30}]            # 再生で順に渡す値。補間しない（整数は整数で書く）
+          ms: 900                                        # 1つの frame の時間（省略 900）
+```
+
+- 再生は今の段だけ動かして止まる（自動で次へ進めない）。操作は「前へ／再生／次へ」。「自分で動かす」で解説を止め、「解説に戻る」で値・説明・強調を止めた frame に戻す。
+- 静止図は build が set か frames のある段ごとに作る（図ID `FIG-<ラボ>-<版>-<段>`）。関係の `figures:` に書くとネットワークに出る。
+- 状態から静止図と照合する数を作る計算は build/tour.py の MODES に、ラボのモードごとに書く（今は LAB-pois の approx だけ）。テスト（test_labs.js）が段と frame ごとにラボの値と照合し、再生・戻る・埋め込みの収まりを確かめる。
+- build が止めるもの：tour と predict・steps・task の同居、2段未満、text がない・`**` が閉じない、モードの set にない値、整数の値を小数で書く、MODES にないモード。
+
 ## 概念・関係・導出（知識ネットワークのデータ）
 
 型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。関係の種類の定義は relation-types.yaml。

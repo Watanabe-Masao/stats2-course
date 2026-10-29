@@ -9,6 +9,10 @@
      why    結果のあとに出す一言
      steps  法則を見つける：[{label, task, set, predict, why}, …]。条件を変えて予想→観察を何段か重ね、最後に law（決まり）を式で見せる
      law    {title, lines:[式…], text, limit}  最後に「式で説明する」で開く。limit は式の外にあること（前提が崩れる条件など）
+     tour   解説付き再生（#90）：{kmax, decimals, steps:[{title, text, set, frames, focus, ms}, …]}
+            段の状態＝前の段の終わり＋set、frames を順に重ねる（値は補間しない）。text の **…** を強調し、
+            focus と同じ data-focus を持つ要素を囲む。前へ／再生／次へ。再生は今の段だけ動かして止まる（自動で次へ進めない）。
+            「自分で動かす」で解説を止め、「解説に戻る」で値・説明・強調をその段（止めた frame）に戻す。
    予想のある版では、set で決めた選択欄（data-key の select）を文字に置き換え、問題と関係のない選択をさせない。
    Notion の埋め込み（iframe。高さ約320pxで変えられない）では「小さい表示」にする：
      見出し・説明文を省き、予想の前は課題カードだけ、結果のあとは要点と操作だけを出す。
@@ -104,6 +108,46 @@ const LK=(()=>{
  function showLaw(){const L=cfg.law,box=$("lk-lawbox");if(!L||!box)return;
   box.innerHTML=`<div class="lk-law">${histTable()}<div class="lk-tt">📐 ${esc(L.title||"式で説明する")}</div>${(L.lines||[]).map(l=>`<div class="l">${esc(l)}</div>`).join("")}${L.text?`<div class="lk-why">${esc(L.text)}</div>`:""}${L.limit?`<div class="lk-limit"><b>この式で言えないこと</b>　${esc(L.limit)}</div>`:""}</div>`;
   const b=$("lk-law");if(b)b.closest(".lk-lawask").remove();const top=document.querySelector(".lk-task > .lk-hist");if(top)top.remove();}
+ // 解説付き再生
+ const TOUR=cfg.tour&&Array.isArray(cfg.tour.steps)&&cfg.tour.steps.length?cfg.tour:null;
+ const T={i:0,f:-1,timer:null,free:false,states:[]};
+ function tourStates(){let c={};return TOUR.steps.map(s=>{const start={...c,...(s.set||{})};let st=start;const fr=(s.frames||[]).map(x=>(st={...st,...x}));c=fr.length?fr[fr.length-1]:start;return {start,frames:fr,end:c};});}
+ const say=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<mark>$1</mark>");
+ function tState(){const S=T.states[T.i];return T.f<0?S.start:S.frames[T.f];}
+ function tApply(){modes[cur].apply&&modes[cur].apply(tState());if(modes[cur].render)modes[cur].render();tFocus();}
+ function tFocus(){const fo=T.free?null:TOUR.steps[T.i].focus;
+  document.querySelectorAll(`#m-${cur} [data-focus]`).forEach(e=>e.classList.toggle("lk-hl",!!fo&&e.dataset.focus.split(" ").includes(fo)));}
+ function tStop(){if(T.timer){clearTimeout(T.timer);T.timer=null;}}
+ function tGo(i){tStop();T.i=Math.max(0,Math.min(TOUR.steps.length-1,i));T.f=-1;T.free=false;tApply();tDraw();}
+ function tFrame(j){T.f=j;tApply();tDraw();}
+ function tPlay(){const S=T.states[T.i],n=S.frames.length;if(!n)return;
+  if(T.timer){tStop();tDraw();return;}               // 一時停止
+  if(T.f>=n-1)T.f=-1,tApply();                        // 終わっていたら、段の始めからもう一度
+  const ms=TOUR.steps[T.i].ms||900;
+  const tick=()=>{T.f++;tApply();if(T.f>=n-1){T.timer=null;tDraw();return;}tDraw();T.timer=setTimeout(tick,ms);};
+  T.timer=setTimeout(tick,T.f<0?300:ms);tDraw();}
+ function tFree(){tStop();T.free=true;document.body.classList.add("lk-free");tFocus();tDraw();}
+ function tBack(){T.free=false;document.body.classList.remove("lk-free");tApply();tDraw();}
+ function tDraw(){const box=$("lk-tour");if(!box)return;const N=TOUR.steps.length,s=TOUR.steps[T.i],S=T.states[T.i],n=S.frames.length;
+  if(T.free){box.innerHTML=`<div class="lk-tfree"><span>✋ 自分で動かしている（解説 ${T.i+1}／${N} で止めた）</span><button type="button" class="act" id="lk-back">↩ 解説に戻る</button></div>`;
+   $("lk-back").onclick=tBack;return;}
+  const playing=!!T.timer,done=n&&T.f>=n-1;
+  const big=EMBED&&web?`<a class="lk-link" href="${esc(location.href.replace(/[?&]embed=1\b/,""))}" target="_blank" rel="noopener">大きく開く ↗</a>`:"";
+  box.innerHTML=`<div class="lk-tt">📖 解説 ${T.i+1}／${N}　${esc(s.title||"")}</div>
+   <div class="lk-say" id="lk-say"><span class="lk-tno">${T.i+1}／${N}　</span>${say(s.text)}</div>
+   <div class="lk-tctl"><button type="button" class="sub" id="lk-prev" ${T.i?"":"disabled"}>◀ 前へ</button><button type="button" class="act" id="lk-play" ${n?"":"disabled"} aria-label="${playing?"一時停止":"再生"}">${!n?"動きなし":playing?"⏸ 一時停止":done?"↺ もう一度":"▶ 再生"}</button><button type="button" class="sub" id="lk-tnext" ${T.i<N-1?"":"disabled"}>次へ ▶</button></div>
+   <div class="lk-tsub"><button type="button" class="lk-link" id="lk-free">✋ <span class="lk-long">自分で</span>動かす</button><button type="button" class="lk-link" id="lk-all" aria-expanded="false">全文 ▾</button>${big}</div>
+   <ol class="lk-tlist" id="lk-tlist" hidden>${TOUR.steps.map((x,k)=>`<li class="${k===T.i?"on":""}"><button type="button" data-i="${k}">${say(x.text)}</button></li>`).join("")}</ol>`;
+  $("lk-prev").onclick=()=>tGo(T.i-1);$("lk-tnext").onclick=()=>tGo(T.i+1);$("lk-play").onclick=tPlay;$("lk-free").onclick=tFree;
+  const all=$("lk-all");all.onclick=()=>{const l=$("lk-tlist"),on=l.hidden;l.hidden=!on;all.setAttribute("aria-expanded",on);all.textContent=on?"全文 ▴":"全文 ▾";};
+  box.querySelectorAll("#lk-tlist button").forEach(b=>b.onclick=()=>tGo(+b.dataset.i));}
+ function tourStart(){T.states=tourStates();document.body.classList.add("lk-touring");const t=$("lk-task");if(t)t.remove();
+  const m=$("m-"+cur),anchor=m.querySelector("[data-tour-anchor]")||m.querySelector(".res.key")||m.lastElementChild;
+  const box=document.createElement("div");box.id="lk-tour";box.className="lk-tour";anchor.after(box);
+  // 自由に動かした値は、解説の外の操作として扱う（解説に戻ると段の値を渡し直す）
+  m.addEventListener("input",()=>{if(!T.free)tFree();});
+  tGo(0);$("lk-bar").hidden=true;}
+
  function start(def){const tabs=$("tabs");
   const m=cfg.mode&&modes[cfg.mode]?cfg.mode:def;
   const shown=(cfg.modes||(cfg.mode?[cfg.mode]:order)).filter(k=>modes[k]);
@@ -114,8 +158,9 @@ const LK=(()=>{
   order.forEach(k=>modes[k].init&&modes[k].init());
   if(cfg.set&&modes[m].apply)modes[m].apply(cfg.set);
   if(STEPS&&STEPS[0].set&&modes[m].apply)modes[m].apply(STEPS[0].set);
-  show(m);fixPicks();taskCard();if(cfg.predict)lock(true);
+  show(m);if(TOUR){tourStart();return;}fixPicks();taskCard();if(cfg.predict)lock(true);
   if(!cfg.predict){const t=$("lk-task");if(t&&EMBED)t.after($("lk-bar"));bar();}else $("lk-bar").hidden=true;
   ["input","change","click"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest(".mode"))moved=true;setTimeout(live,0);}));}
- return {cfg,$,esc,get step(){return si;},register,show,start,stepper,setRange,formula,fmtNum,embed:EMBED,focus:FOCUS,get last(){return last;},get locked(){return locked;},value:k=>modes[cur].value(k),get mode(){return cur;}};
+ return {cfg,$,esc,get step(){return si;},register,show,start,stepper,setRange,formula,fmtNum,embed:EMBED,focus:FOCUS,get last(){return last;},get locked(){return locked;},value:k=>modes[cur].value(k),get mode(){return cur;},
+  tour:TOUR?{go:tGo,frame:tFrame,play:tPlay,free:tFree,back:tBack,get state(){return {i:T.i,f:T.f,free:T.free,playing:!!T.timer};}}:null};
 })();
