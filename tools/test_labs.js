@@ -8,7 +8,10 @@
 const {chromium}=require('playwright');const path=require('path');const fs=require('fs');
 const ROOT=path.resolve(__dirname,'..');
 (async()=>{const read=f=>fs.existsSync(path.join(ROOT,f))?JSON.parse(fs.readFileSync(path.join(ROOT,f),'utf8')):[];
- const man=[...read('out/labs/manifest.json'),...read('out/site_manifest.json').map(v=>({...v,site:true}))].filter(v=>!process.env.ONLY||v.asset.includes(process.env.ONLY));  // ONLY=LAB-sigma で絞れる
+ const man=[...read('out/labs/manifest.json'),...read('out/site_manifest.json').map(v=>({...v,site:true}))].filter(v=>{const O=process.env.ONLY,A=process.env.ASSETS;  // ONLY=LAB-sigma,LAB-z（そのラボの全部の版）・ASSETS=LAB-prob@s6-free,…（その版だけ）で絞れる
+   if(!O&&!A)return true;
+   return (O&&O.split(',').some(o=>v.asset===o||v.asset.startsWith(o+'@')))||(A&&A.split(',').includes(v.asset));});
+ if(!man.length){console.log('❌ 絞り込みに合う版がない');process.exit(1);}
  const shots=process.argv[2];const b=await chromium.launch();let fail=0;const embedH=[];
  const bad=(m)=>{console.log('❌ '+m);fail++;};
  for(const v of man){for(const scheme of ['light','dark']){

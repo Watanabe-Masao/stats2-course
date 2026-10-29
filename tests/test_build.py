@@ -235,3 +235,40 @@ class TestVisuals(unittest.TestCase):
         r = NotionRenderer(course(), TARGET)
         out = r.problem(COURSE.units["U04"]["problems"]["Q-U04-011"], [0])
         self.assertIn("図で確かめる", out[out.index("<toggle>"):])
+
+
+class TestCheckChanged(unittest.TestCase):
+    """変えたファイルから確かめる範囲を選ぶ。範囲が狭すぎる間違いを見逃さない。"""
+
+    def test_classify(self):
+        from check_changed import classify
+        docs, units, labs, common = classify([
+            "CLAUDE.md", "docs/a.md", "content/units/U10/S5.md", "content/problems/U05T.yaml",
+            "migration/waivers/U24.yaml", "tools/prob_lab/prob_lab.src.html"])
+        self.assertEqual((len(docs), units, labs, common), (2, {"U10", "U05T", "U24"}, {"prob_lab"}, []))
+
+    def test_shared_parts_are_common(self):
+        from check_changed import classify
+        for f in ["build/model.py", "tests/test_build.py", "tools/labkit/labkit.js", "tools/test_labs.js",
+                  "templates/notion/components.yaml", "content/stages.yaml", "content/shared.yaml",
+                  "content/units/index.yaml", "publish/notion.yaml"]:
+            self.assertEqual(classify([f])[3], [f], f)
+
+    def test_unit_assets_exist(self):
+        import json
+        from check_changed import unit_assets
+        man = Path(__file__).resolve().parent.parent / "out" / "site_manifest.json"
+        if not man.exists():
+            self.skipTest("build の前")
+        have = {v["asset"] for v in json.loads(man.read_text(encoding="utf-8"))}
+        for u in ["U05", "U10", "U24", "U31"]:
+            a = unit_assets(u)
+            self.assertTrue(a, u)
+            self.assertEqual([x for x in a if x not in have], [], u)
+
+
+class TestUnitLinks(unittest.TestCase):
+    def test_prereq_needs_used_by(self):
+        c = course()
+        c.units["U01"]["used_by"] = [x for x in c.units["U01"]["used_by"] if x != "U03"]
+        self.assertTrue(any("U03: 前提の U01 の used_by に U03 がない" in e for e in validate(c)))

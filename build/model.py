@@ -231,6 +231,10 @@ def _validate_unit(c: Course, uid: str, u: dict, texts: list) -> list[str]:
         for ref in u.get(key, []):
             if ref not in c.index:
                 err.append(f"{uid}: {key} の {ref} が一覧にない")
+    # 前提に書いた単元からは、使われる先としてこちらへ戻れるようにする（used_by は直接の前提より広くてよい）
+    for ref in u.get("prereq", []):
+        if ref in c.units and uid not in c.units[ref].get("used_by", []):
+            err.append(f"{uid}: 前提の {ref} の used_by に {uid} がない")
     for t in u.get("terms", []):
         if t not in c.terms:
             err.append(f"{uid}: 用語 {t} が terms.yaml にない")
