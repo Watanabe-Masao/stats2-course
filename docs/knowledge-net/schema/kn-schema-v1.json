@@ -143,6 +143,31 @@
           }
         }
       ]
+    },
+    "figures": {
+      "type": "array",
+      "description": "図への参照（概念・関係で共通の形）。図は教材の build が設定から作り、公開サイトに置く。url は教材の build が作る（stats2-course #88）",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "url"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FIG-[A-Za-z0-9-]+$"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "caption": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -388,6 +413,9 @@
           "counterexample_labs": {
             "$ref": "#/$defs/labs",
             "description": "反例を数で確かめるラボの場面"
+          },
+          "figures": {
+            "$ref": "#/$defs/figures"
           }
         },
         "if": {
@@ -478,6 +506,9 @@
           },
           "labs": {
             "$ref": "#/$defs/labs"
+          },
+          "figures": {
+            "$ref": "#/$defs/figures"
           }
         },
         "allOf": [
@@ -637,5 +668,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 3
+  "x-revision": 4
 }
