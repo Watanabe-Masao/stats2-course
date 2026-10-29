@@ -118,7 +118,7 @@ def figure_specs(course) -> dict[str, dict]:
                 if not (s.get("set") or s.get("frames")):
                     continue
                 spec = m["figure"](numbers(lid, p["mode"], st["end"], tour), st["end"], tour)
-                cap = f"{s.get('title', '')}：{plain(s['text'])}"   # 数は図の中にある（説明文に重ねて書かない）
+                cap = plain(s["text"])   # 説明文だけ（題は本文と重なりやすい。数は図の中にある）
                 out[f"FIG-{lid}-{name}-{i}"] = {"spec": spec, "caption": cap, "where": f"{lid}@{name} の段{i}",
                                                  "source": None, "used_by": [f"{lid}@{name}"]}
     return out

@@ -206,6 +206,7 @@ class TestLabs(unittest.TestCase):
         figs = tour.figure_specs(COURSE)
         self.assertEqual(sorted(f for f in figs if "approx-tour" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
         self.assertEqual(figs["FIG-LAB-pois-rel-contrast-tour-2"]["spec"]["vars"], [1.2, 3])   # 対比：上限5回なら分散1.2
+        self.assertTrue(figs["FIG-LAB-binom-def-tour-2"]["caption"].startswith("n 回くり返すと"))   # 題を重ねない
 
     def test_tour_definition_binom(self):
         import tour
