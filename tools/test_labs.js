@@ -11,6 +11,9 @@ const ROOT=path.resolve(__dirname,'..');
  const man=[...read('out/labs/manifest.json'),...read('out/site_manifest.json').map(v=>({...v,site:true}))].filter(v=>{const O=process.env.ONLY,A=process.env.ASSETS;  // ONLY=LAB-sigma,LAB-z（そのラボの全部の版）・ASSETS=LAB-prob@s6-free,…（その版だけ）で絞れる
    if(!O&&!A)return true;
    return (O&&O.split(',').some(o=>v.asset===o||v.asset.startsWith(o+'@')))||(A&&A.split(',').includes(v.asset));});
+ // SHARD=k/n：版を n 組に分けて k 組目だけ（GitHub で別々の機械に分けて並行に走らせる。1台の中では同時に2つ走らせない）
+ if(process.env.SHARD){const [k,n]=process.env.SHARD.split('/').map(Number);if(!(n>=1&&k>=1&&k<=n)){console.log('❌ SHARD は k/n（1≤k≤n）');process.exit(1);}
+   const all=man.length;man.splice(0,all,...man.filter((_,i)=>i%n===k-1));console.log(`組 ${k}/${n}：${man.length}/${all} 版`);}
  if(!man.length){console.log('❌ 絞り込みに合う版がない');process.exit(1);}
  const shots=process.argv[2];const b=await chromium.launch();let fail=0;const embedH=[];
  const bad=(m)=>{console.log('❌ '+m);fail++;};

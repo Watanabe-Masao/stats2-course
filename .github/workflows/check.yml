@@ -1,12 +1,13 @@
 name: check
-# 全部の確認（約30分）は PR と main への取り込みでだけ走らせる。ブランチの途中は build/check_changed.py で範囲だけ確かめる。
+# 全部の確認は PR と main への取り込みでだけ走らせる。ブランチの途中は build/check_changed.py で範囲だけ確かめる。
+# 時間のほとんどはラボの版のブラウザテストなので、6台に分けて並行に走らせる（1台の中では同時に2つ走らせない）。
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
 jobs:
-  check:
+  base:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,3 +19,21 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: build/check_all.sh
+        env: {PART: base}
+  labs:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v4
+        with: {node-version: "20"}
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: build/check_all.sh
+        env: {PART: labs, SHARD: "${{ matrix.shard }}/6"}

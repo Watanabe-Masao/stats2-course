@@ -152,7 +152,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 作業は必ずブランチを切って行い、全部の確認はマージの前に1回だけかける。
 
 - **ブランチの途中のコミット**：`python3 build/check_changed.py` で、変えたものに合わせた範囲だけ確かめる（origin/main からの差分を見て、下の表のとおりに選ぶ）。
-- **マージの前（PR を「マージしてよい」と伝える前）**：PR を作ると GitHub が全部（`build/check_all.sh`、約30分）を走らせる（.github/workflows/check.yml。PR と main への取り込みでだけ走る）。その結果が成功であることを `gh api repos/{owner}/{repo}/actions/runs` で確かめてから伝える。手元で全部を走らせるのは、GitHub で落ちた原因を調べるときだけ。
+- **マージの前（PR を「マージしてよい」と伝える前）**：PR を作ると GitHub が全部（`build/check_all.sh` を base と labs の6組に分けて並行）を走らせる（.github/workflows/check.yml。PR と main への取り込みでだけ走る）。その結果が成功であることを `gh api repos/{owner}/{repo}/actions/runs` で確かめてから伝える。手元で全部を走らせるのは、GitHub で落ちた原因を調べるときだけ。
 - **公開**：公開サイトの更新（deploy_site.sh）と Notion への公開は、全部が通った main から行う。
 
 | 変えたもの | ブランチの途中で確かめること |
