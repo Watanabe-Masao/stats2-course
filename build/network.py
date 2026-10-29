@@ -245,7 +245,9 @@ def export_network(c: Course, target: dict) -> dict:
             if not base:
                 continue   # 公開先がない配布先では、ラボへの参照を出さない
             aid = lab["id"] + (f"@{lab['preset']}" if lab.get("preset") else "")
-            e = {"id": lab["id"], "url": lab_url(base, c, aid), "title": c.labs[lab["id"]].get("name", lab["id"])}
+            pre = (c.labs[lab["id"]].get("presets") or {}).get(lab.get("preset") or "", {})
+            e = {"id": lab["id"], "url": lab_url(base, c, aid), "title": c.labs[lab["id"]].get("name", lab["id"]),
+                 "kind": "tour" if pre.get("tour") else "check"}   # ラボで解説／ラボで確かめる（版から判定。#90）
             for k in ("preset", "purpose"):
                 if lab.get(k):
                     e[k] = lab[k]

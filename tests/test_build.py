@@ -203,7 +203,8 @@ class TestLabs(unittest.TestCase):
         self.assertGreater(ex[0][0]["maxdiff"], ex[2][-1]["maxdiff"])   # n を大きくすると差が縮む
         figs = tour.figure_specs(COURSE)
         self.assertEqual(sorted(figs), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
-        self.assertIn("差の最大 0.003", figs["FIG-LAB-pois-rel-approx-tour-3"]["caption"])
+        self.assertTrue(figs["FIG-LAB-pois-rel-approx-tour-3"]["caption"].startswith("さらに大きく："))
+        self.assertEqual(figs["FIG-LAB-pois-rel-approx-tour-3"]["spec"]["maxdiff"], 0.003)
 
     def test_tour_validation(self):
         from labs import _check_spec
@@ -445,6 +446,8 @@ class TestNetwork(unittest.TestCase):
         binom = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
         self.assertEqual(binom["figures"][0]["url"], "https://example.com/labs/fig/FIG-U14-concept.svg")
         self.assertIn("B(4, 0.25)", binom["figures"][0]["caption"])
+        rel = next(x for x in d["relations"] if x["id"] == "stats2:REL-binom-poisson")
+        self.assertEqual([lab["kind"] for lab in rel["labs"]], ["tour", "check"])   # ラボで解説／ラボで確かめる
         d = export_network(course(), {"site_base_url": ""})   # 公開先のない配布先では出さない
         self.assertFalse(any(x.get("figures") for x in d["concepts"]))
 

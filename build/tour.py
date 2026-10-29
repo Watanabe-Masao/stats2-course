@@ -85,7 +85,7 @@ def figure_specs(course) -> dict[str, dict]:
                         "overlay": {"family": "poisson", "lam": state_lam(st["end"]), "label": f"ポアソン λ＝{_n(state_lam(st['end']))}"},
                         "label": f"二項 n＝{x['n']}、p＝{_n(x['p'])}",
                         "maxdiff": round(x["maxdiff"], dec)}
-                cap = f"{i}／{len(steps)} {s.get('title', '')}：{plain(s['text'])}（n＝{x['n']}、p＝{_n(x['p'])}、np＝{_n(x['lambda'])}。差の最大 {x['maxdiff']:.{dec}f}）"
+                cap = f"{s.get('title', '')}：{plain(s['text'])}"   # 数は図の中にある（説明文に重ねて書かない）
                 out[f"FIG-{lid}-{name}-{i}"] = {"spec": spec, "caption": cap, "where": f"{lid}@{name} の段{i}",
                                                  "source": None, "used_by": [f"{lid}@{name}"]}
     return out
