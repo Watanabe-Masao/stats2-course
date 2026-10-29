@@ -144,6 +144,16 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 概念（terms.yaml）と関係（relations.yaml）に書ける。書けるのは id・preset・purpose だけ。URL は build が `site_base_url` から作る（配布先で空なら出さない）。
 - build が止めるもの：ないラボ、そのラボにない場面の版（tool.yaml の presets）、id・preset・purpose 以外の項目。
 
+### 概念・関係に図を出す（`figures:`）
+
+```yaml
+  figures: [FIG-U14-concept]
+```
+
+- 概念と関係に書ける。書けるのは図の id だけ（unit.yaml の figures か content/assets.yaml にある図）。説明と URL は build が図の定義と `site_base_url` から作る（配布先で空なら出さない）。
+- ネットワークの概念の詳細・関係の説明に出る（#88）。図の要らない線（前提など）には書かない。
+- build が止めるもの：ない図、id 以外の書き方。
+
 ### 式の分解の木（`formulas[].tree`）
 
 式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。

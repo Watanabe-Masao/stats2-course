@@ -280,6 +280,7 @@
   en: normal distribution
   definition: 確率密度が f(x) の式で表される連続分布 N(μ, σ²)。平均 μ を中心に左右対称な釣鐘の形になる。
   version: 2
+  figures: [FIG-U16-concept]
   labs:
   - {id: LAB-cont, preset: s1-norm, purpose: 平均と標準偏差から、区間の確率を面積で読む}
   principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
@@ -340,6 +341,7 @@
   en: expected value
   definition: 確率変数がとる値を、その確率で重み付けした平均。
   version: 1
+  figures: [FIG-U13-concept]
   labs:
   - {id: LAB-expect, preset: s1-dist, purpose: 期待値が分布の重心になることを、予想してから確かめる}
   principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
@@ -536,6 +538,7 @@
   en: probability distribution
   definition: 確率変数がとる値と、それぞれの値をとる確率（連続なら確率密度）の対応。
   version: 1
+  figures: [FIG-U13-concept]
   labs:
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を変えると、期待値（重心）がどう動くかを見る}
   principle: 起こりうる値を全部挙げ、確率を割り振ったもの。確率は0以上で、合計（連続なら面積）が1。期待値や分散は、分布を1つの数に要約したもの。
@@ -647,6 +650,7 @@
   en: binomial distribution
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
   version: 1
+  figures: [FIG-U14-concept]
   labs:
   - {id: LAB-binom, preset: s1-path, purpose: 並び方の数×1つの並びの確率を、予想してから確かめる}
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
@@ -748,6 +752,7 @@
   en: Poisson distribution
   definition: 一定の時間や範囲で、まれな出来事が平均 λ 回起きるときの、起きた回数の分布。
   version: 1
+  figures: [FIG-U15-concept]
   labs:
   - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。

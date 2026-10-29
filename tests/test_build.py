@@ -405,6 +405,23 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("場面の版 s9-none がない" in e for e in err))
         self.assertTrue(any("URL は build が作る" in e for e in err))
 
+    def test_figure_refs(self):
+        c = course()
+        c.terms["TERM-expect"]["figures"] = ["FIG-nothing", {"id": "FIG-U13-concept"}]
+        err = self._validate(c)
+        self.assertTrue(any("TERM-expect: figures の FIG-nothing がない" in e for e in err))
+        self.assertTrue(any("図の id だけ" in e for e in err))
+
+    def test_figure_refs_export(self):
+        from network import export_network
+        c = course()
+        d = export_network(c, {"site_base_url": "https://example.com/labs"})
+        binom = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
+        self.assertEqual(binom["figures"][0]["url"], "https://example.com/labs/fig/FIG-U14-concept.svg")
+        self.assertIn("B(4, 0.25)", binom["figures"][0]["caption"])
+        d = export_network(course(), {"site_base_url": ""})   # 公開先のない配布先では出さない
+        self.assertFalse(any(x.get("figures") for x in d["concepts"]))
+
     def test_transform_needs_conditions(self):
         bad = copy.deepcopy(self.rels)
         r = next(x for x in bad if x["type"] == "変換")

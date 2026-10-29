@@ -173,6 +173,14 @@ def validate_network(c: Course) -> list[str]:
         for u in (d.get("basis") or {}).get("units", []):
             if u not in c.index:
                 err.append(f"{did}: basis の単元 {u} がない")
+    # 図への参照（概念・関係の figures:）。図の id だけを書く。説明と URL は build が図の定義から作る
+    def check_figs(owner: str, figs) -> None:
+        for fid in figs or []:
+            if not isinstance(fid, str):
+                err.append(f"{owner}: figures に書けるのは図の id だけ（説明・URL は build が作る）")
+            elif fid not in c.figures:
+                err.append(f"{owner}: figures の {fid} がない（unit.yaml の figures か content/assets.yaml）")
+
     # ラボへの参照（概念・関係の labs:）。ラボと場面の版がある。値・学習目標はラボの側（tool.yaml）
     def check_labs(owner: str, labs) -> None:
         for lab in labs or []:
@@ -185,8 +193,10 @@ def validate_network(c: Course) -> list[str]:
                 err.append(f"{owner}: labs に書けるのは id・preset・purpose だけ（URL は build が作る）")
     for tid, t in c.terms.items():
         check_labs(tid, t.get("labs"))
+        check_figs(tid, t.get("figures"))
     for r in rels:
         check_labs(r.get("id", "?"), r.get("labs"))
+        check_figs(r.get("id", "?"), r.get("figures"))
     # 問題 → 確かめる概念・関係（concepts:）。説明のある概念か、ある関係だけを指せる。
     # unit.yaml に concepts_linked: true がある単元は、retired 以外の全問に concepts: を書く。
     for uid, u in c.units.items():
@@ -242,6 +252,13 @@ def export_network(c: Course, target: dict) -> dict:
             out.append(e)
         return out
 
+    def figs(ids) -> list[dict]:
+        from labs import fig_url
+        if not base:
+            return []   # 公開先がない配布先では、図への参照を出さない
+        return [{"id": f, "url": fig_url(base, f), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
+                for f in ids or []]
+
     units_of: dict[str, list[str]] = {}
     for uid, u in c.units.items():
         for tid in u.get("terms", []):
@@ -269,6 +286,8 @@ def export_network(c: Course, target: dict) -> dict:
                                                        for s in f["symbols"]]} if f.get("symbols") else {})} for f in t["formulas"]]
             if labs(t.get("labs")):
                 e["labs"] = labs(t.get("labs"))
+            if figs(t.get("figures")):
+                e["figures"] = figs(t.get("figures"))
             if t.get("sources"):
                 url = {s["name"]: s.get("url") for s in c.shared.get("sources", [])}
                 e["sources"] = [{"title": s["source"], **({"locator": s["locator"]} if s.get("locator") else {}),
@@ -292,6 +311,8 @@ def export_network(c: Course, target: dict) -> dict:
             e["derivation"] = g(r["basis"]["derivation"])
         if labs(r.get("labs")):
             e["labs"] = labs(r.get("labs"))
+        if figs(r.get("figures")):
+            e["figures"] = figs(r.get("figures"))
         relations.append(e)
     derivations = [{"id": g(d["id"]), "version": d["version"], "premises": [g(p) for p in d["premises"]], "conclusion": g(d["conclusion"]),
                     "statement": d["statement"], "steps": d["steps"], "conditions": d["conditions"],
