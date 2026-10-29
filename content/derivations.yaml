@@ -3,6 +3,7 @@
 # conditions は必ず書く（どの前提がどこで要るか）。
 derivations:
   - id: DER-binom-moments
+    version: 1
     premises: [TERM-expect, TERM-var, TERM-indep]
     conclusion: TERM-binom
     statement: 二項分布 B(n, p) の期待値は np、分散は np(1−p)。
@@ -14,6 +15,7 @@ derivations:
     conditions: [各回の成功確率が同じ, 分散を和に分けるには各回が独立であること（期待値を和に分けるのに独立は要らない）]
     basis: {units: [U14]}
   - id: DER-std-moments
+    version: 1
     premises: [TERM-expect, TERM-var]
     conclusion: TERM-std
     statement: 標準化した Z＝(X−μ)÷σ は、期待値0・分散1 になる。

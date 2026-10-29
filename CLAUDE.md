@@ -103,12 +103,22 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 概念・関係・導出（知識ネットワークのデータ）
 
-- 概念＝用語（content/terms.yaml）。`definition` を書いた用語が概念になり、`principle`・`conditions`（並び）・`example`・`counterexample` も必須、`formula`（KaTeX）は任意。説明に数があれば `checks`。
-- 関係は content/relations.yaml（REL-…）。type は 前提・導出・一般化・特殊化・変換・対比・統合・応用。導出・変換には成立条件を必ず書く。似ているだけのもの（類似）と同値を混ぜない。
-- 導出は content/derivations.yaml（DER-…）。前提（概念・関係）→ 結論。手順と、どの前提がどこで要るか（conditions）を書く。
+型 v1（2026-10-29 決定）：docs/knowledge-net/schema/kn-schema-v1.json。関係の種類の定義は同じフォルダの relation-types.yaml。
+
+- 概念＝用語（content/terms.yaml）。`definition` を書いた用語が概念になる。
+  - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。
+  - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
+  - 任意：`formulas`（式ごとに `tex` と `symbols`：記号・意味・値の範囲）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
+  - 説明に数があれば `checks`。
+- 関係は content/relations.yaml（REL-…、`version` 必須）。8種類（前提・導出・一般化・特殊化・変換・対比・統合・応用）。登録の前に relation-types.yaml の定義・矢印の読み方・該当例・該当しない例を確かめる。
+  - 前提には `premise`（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）。
+  - 変換には `mode`（exact：厳密／approximation：近似／limit：極限）と成立条件。「近い」と「等しい」を混ぜない。
+  - 導出には成立条件。前提が2つ以上なら関係ではなく導出の点にする。
+  - 一般化と特殊化は同じ組を両方向に書かない（原則は一般化）。
+- 導出は content/derivations.yaml（DER-…、`version` 必須）。前提（概念・関係）→ 結論。手順と、どの前提がどこで要るか（conditions）を書く。
 - 自分の教材の id は教材名を付けずに書く。別の教材の概念は `math:CON-…` のように教材名を付ける（ネットワークでは自分の id も `stats2:TERM-…` になる）。
 - 説明のある概念は、どれかの関係か導出につながっていること（孤立させない）。build が止める。
-- build が docs/knowledge-net/schema/kn-schema-v1.json（型。knowledge-net を作るまではこれが元）で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。
+- build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。
 
 ## 例題・問題にはラボか図を付ける（build が止める）
 

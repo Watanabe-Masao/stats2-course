@@ -84,12 +84,40 @@
   name: 分散
   en: variance
   definition: 確率変数が期待値からどれだけ散らばるかを、ずれの2乗の期待値で表した量。
+  version: 1
   principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
-  formula: V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2,\quad V(aX+b)=a^2V(X)
+  formulas:
+  - tex: V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2
+    symbols:
+    - symbol: V(X)
+      meaning: X の分散
+      range: 0以上
+    - symbol: μ
+      meaning: X の期待値 E(X)
+    - symbol: (X−μ)²
+      meaning: 期待値からのずれの2乗
+  - tex: V(aX+b)=a^2V(X)
+    label: 1次式の分散
+    symbols:
+    - symbol: a
+      meaning: 掛ける定数（2乗で効く）
+    - symbol: b
+      meaning: 足す定数（散らばりは変えない）
   conditions:
-  - 期待値と2乗の期待値が有限
+    math:
+    - 期待値と、2乗の期待値が有限
+    data:
+    - 外れ値が1つあると大きく変わる（2乗で効く）ので、分布の形も一緒に見る
   example: さいころの目の分散は 91÷6−3.5²＝35/12≒2.92。
   counterexample: X＋Y の分散は、独立（または共分散が0）でなければ V(X)＋V(Y) にならない。
+  misconceptions:
+  - misconception: 分散は「平均からのずれの平均」
+    correction: ずれをそのまま平均すると0になる。2乗してから平均する
+  - misconception: 分散と標準偏差は同じ単位
+    correction: 分散は元の単位の2乗。元の単位で言うなら平方根の標準偏差
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - Fraction(sum(i*i for i in range(1,7)),6)-Fraction(7,2)**2==Fraction(35,12)
   - abs(35/12-2.92)<0.005
@@ -110,12 +138,32 @@
   name: 標準化
   en: standardization
   definition: 値から平均を引き、標準偏差で割って、平均0・標準偏差1 の尺度に直すこと。
+  version: 1
   principle: 1次の変換なので分布の形は変わらない。単位や大きさの違う値を「平均から標準偏差いくつ分か」で比べられる。正規分布なら標準正規分布 N(0, 1) になり、1つの表で確率が読める。
-  formula: Z=\dfrac{X-\mu}{\sigma},\quad E(Z)=0,\ V(Z)=1
+  formulas:
+  - tex: Z=\dfrac{X-\mu}{\sigma}
+    symbols:
+    - symbol: Z
+      meaning: 標準化した値（平均から標準偏差いくつ分か）
+    - symbol: μ
+      meaning: 平均
+    - symbol: σ
+      meaning: 標準偏差
+      range: 0より大きい
+  - tex: E(Z)=0,\quad V(Z)=1
   conditions:
-  - 標準偏差が0でない
+    math:
+    - 標準偏差が0でない
+    data:
+    - 平均と標準偏差を、比べたい集団から出しているか（別の集団の値で割らない）
   example: 平均60点・標準偏差10点のテストで、80点は z＝2。
   counterexample: 標準化しても分布の形は変わらない。右に裾の長いデータを標準化しても、正規分布にはならない。
+  misconceptions:
+  - misconception: 標準化すると正規分布になる
+    correction: 位置と広がりをそろえるだけで、形は元のまま
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - (80-60)/10==2
 - id: TERM-skew
@@ -127,13 +175,35 @@
 - id: TERM-normal
   name: 正規分布
   en: normal distribution
-  definition: 平均 μ を中心に左右対称な、釣鐘の形をした連続分布 N(μ, σ²)。
+  definition: 確率密度が f(x) の式で表される連続分布 N(μ, σ²)。平均 μ を中心に左右対称な釣鐘の形になる。
+  version: 1
   principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
-  formula: f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)
+  formulas:
+  - tex: f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)
+    symbols:
+    - symbol: μ
+      meaning: 平均（山の中心）
+    - symbol: σ
+      meaning: 標準偏差（山の広がり）
+      range: 0より大きい
+    - symbol: f(x)
+      meaning: 確率密度（高さ。面積が確率）
   conditions:
-  - 値が連続で、左右対称な山が1つ（データに当てはめるときは、形を確かめてから使う）
+    math:
+    - 確率密度が f(x) の式で表される（μ と σ で決まる）
+    data:
+    - ヒストグラムが左右対称で山が1つなのは手掛かりにすぎず、それだけでは正規分布と言えない（裾の重さなども見る）
+    - 正規分布を前提にする方法は、ずれがあると結論が揺れる
   example: 二項分布 B(100, 0.5) は、平均50・標準偏差5 の正規分布で近似できる。
   counterexample: 売上や所得のように右に裾が長いデータでは、平均±2σ に95%が入るとは限らない。
+  misconceptions:
+  - misconception: 左右対称で山が1つなら正規分布
+    correction: 左右対称な山1つの分布はほかにもある（裾の重い分布など）。形の手掛かりと、正規分布であることは別
+  - misconception: データはふつう正規分布になる
+    correction: 正規分布に近づくのは、独立な要因が足し合わさるときなど。売上・所得など右に裾の長いデータは多い
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - abs(math.erf(1/math.sqrt(2))-0.68)<0.005
   - abs(math.erf(2/math.sqrt(2))-0.95)<0.005
@@ -142,12 +212,38 @@
   name: 期待値
   en: expected value
   definition: 確率変数がとる値を、その確率で重み付けした平均。
+  version: 1
   principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
-  formula: E(X)=\sum_x x\,p(x),\quad E(aX+b)=aE(X)+b
+  formulas:
+  - tex: E(X)=\sum_x x\,p(x)
+    symbols:
+    - symbol: E(X)
+      meaning: X の期待値（平均の行き着く先）
+    - symbol: x
+      meaning: X がとりうる値
+    - symbol: p(x)
+      meaning: X が x になる確率（重み）
+      range: 0以上1以下・合計1
+  - tex: E(aX+b)=aE(X)+b
+    label: 線形性
+    symbols:
+    - symbol: a, b
+      meaning: 定数（単位の換算や、一律の上乗せ）
   conditions:
-  - 和（連続なら積分）が有限の値になる
+    math:
+    - 和（連続なら積分）が有限の値になる
+    data:
+    - くり返しの平均として読むには、同じ条件の試行がくり返せること
   example: さいころの目の期待値は (1＋2＋…＋6)÷6＝3.5。
   counterexample: 期待値 3.5 の目は実際には出ない。期待値は「よく出る値」（最頻値）でも「真ん中の値」（中央値）でもない。
+  misconceptions:
+  - misconception: 期待値は実際に出る値
+    correction: 何度もくり返したときの平均の行き着く先で、1回の結果としては出ないこともある
+  - misconception: 期待値がいちばん出やすい値
+    correction: いちばん出やすい値は最頻値。右に裾が長い分布では、期待値は最頻値より大きくなる
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - sum(range(1,7))/6==3.5
 - id: TERM-geomean
@@ -172,12 +268,28 @@
   name: 独立
   en: independence
   definition: 一方が起きたかどうかで、もう一方の起こりやすさが変わらないこと。
+  version: 1
   principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
-  formula: P(A\cap B)=P(A)\,P(B)
+  formulas:
+  - tex: P(A\cap B)=P(A)\,P(B)
+    symbols:
+    - symbol: A, B
+      meaning: 2つの事象
+    - symbol: P(A∩B)
+      meaning: A と B が両方起きる確率
   conditions:
-  - 確率が決まった2つの事象（または確率変数）について言う
+    math:
+    - 確率が決まった2つの事象（または確率変数）について言う
+    data:
+    - データで「独立」と言うには、仕組み（別々のさいころ・別々の客）から言えるか、検定などで確かめる。相関が0でも独立とは限らない
   example: さいころを2回投げると、1回目と2回目の目は独立。両方6になる確率は 1/6×1/6＝1/36。
   counterexample: 排反（同時に起きない）は独立ではない。P(A) と P(B) が0でなければ、排反なら P(A∩B)＝0 で P(A)P(B) と等しくない。
+  misconceptions:
+  - misconception: 排反なら独立
+    correction: 排反は「同時に起きない」。一方が起きたらもう一方は起きないので、むしろ強く関係している
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - Fraction(1,6)*Fraction(1,6)==Fraction(1,36)
 - id: TERM-cond
@@ -196,13 +308,32 @@
   name: 確率変数
   en: random variable
   definition: 試行の結果に応じて値が決まり、どの値が出るかが確率で表される量。
+  version: 1
   principle: 起こりうる値と、その確率の組（確率分布）で性質が決まる。1つの記録された値ではなく、記録する前の「値の出方」を扱う。
-  formula: P(X=x)=p(x),\quad \sum_x p(x)=1
+  formulas:
+  - tex: P(X=x)=p(x),\quad \sum_x p(x)=1
+    symbols:
+    - symbol: X
+      meaning: 確率変数（値の出方を表すもの）
+    - symbol: x
+      meaning: X がとりうる1つの値
+    - symbol: p(x)
+      meaning: X が x になる確率
+      range: 0以上1以下
   conditions:
-  - 起こりうる値が決まっている
-  - 各値の確率が0以上で、合計が1
+    math:
+    - 起こりうる値の範囲が決まっている
+    - 各値の確率が0以上で、合計が1
+    data:
+    - 「記録する前の値の出方」として扱えるか（同じ仕組みでくり返し起きるか）を確かめる
   example: さいころの目 X は、1〜6 の値をそれぞれ確率 1/6 でとる。
   counterexample: 「今日の売上 120万円」という1つの記録は確率変数ではなく、実現した1つの値。
+  misconceptions:
+  - misconception: 確率変数は「でたらめな数」のこと
+    correction: 値の出方に決まった確率（分布）がある量。でたらめさの中に規則がある
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - 6*Fraction(1,6)==1
 - id: TERM-dist
@@ -215,29 +346,79 @@
   name: 二項分布
   en: binomial distribution
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
+  version: 1
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
-  formula: P(X=k)={}_nC_k\,p^k(1-p)^{n-k},\quad E(X)=np,\ V(X)=np(1-p)
+  formulas:
+  - tex: P(X=k)={}_nC_k\,p^k(1-p)^{n-k}
+    symbols:
+    - symbol: n
+      meaning: 試行の回数
+      range: 1以上の整数
+    - symbol: k
+      meaning: 成功した回数
+      range: 0以上 n 以下の整数
+    - symbol: p
+      meaning: 1回あたりの成功確率
+      range: 0以上1以下
+    - symbol: ₙCₖ
+      meaning: n 回のうちどの k 回が成功かの選び方の数
+  - tex: E(X)=np,\quad V(X)=np(1-p)
+    label: 期待値と分散
+    symbols:
+    - symbol: np
+      meaning: 成功回数の期待値
+    - symbol: np(1−p)
+      meaning: 成功回数の分散
   conditions:
-  - 回数 n が決まっている
-  - 結果が成功・失敗の2つ
-  - 各回の成功確率 p が同じ
-  - 各回が独立
+    math:
+    - 回数 n が決まっている
+    - 結果が成功・失敗の2つ
+    - 各回の成功確率 p が同じ
+    - 各回が独立
+    data:
+    - 客ごとの購入のように、互いに影響しない（口コミや連れ立ちがない）か、p が客や時間でほぼ同じかを確かめる
   example: 来店客10人がそれぞれ確率 0.3 で買う（互いに独立）なら、買う人数は B(10, 0.3)。期待値は3人、分散は2.1。
   counterexample: 箱から戻さずに取り出すと、各回の確率が変わり独立でもないので二項分布ではない（超幾何分布）。
+  misconceptions:
+  - misconception: ちょうど期待値 np 回になる確率が高い
+    correction: np 回はいちばん起きやすい付近だが、その確率自体は小さいことが多い（n が大きいほど小さい）
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - abs(10*0.3-3)<1e-12 and abs(10*0.3*0.7-2.1)<1e-12
 - id: TERM-poisson
   name: ポアソン分布
   en: Poisson distribution
   definition: 一定の時間や範囲で、まれな出来事が平均 λ 回起きるときの、起きた回数の分布。
+  version: 1
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
-  formula: P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!},\quad E(X)=V(X)=\lambda
+  formulas:
+  - tex: P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!}
+    symbols:
+    - symbol: λ
+      meaning: 決めた時間・範囲で起きる平均の回数
+      range: 0より大きい
+    - symbol: k
+      meaning: 起きた回数
+      range: 0以上の整数（上限なし）
+  - tex: E(X)=V(X)=\lambda
+    label: 期待値と分散
   conditions:
-  - 出来事が互いに独立に起きる
-  - 同時に2つは起きない
-  - 起きる平均の割合が一定
+    math:
+    - 出来事が互いに独立に起きる
+    - 同時に2つは起きない
+    - 起きる平均の割合が一定
+    data:
+    - 時間帯や曜日で割合が変わらないか、分散が平均とほぼ同じかを確かめる（分散が大きければ当てはまっていない）
   example: 1時間に平均2件の問い合わせがあるとき、ある1時間に1件もない確率は e⁻²≒0.135。
   counterexample: 昼に集中する来店のように時間帯で割合が変わるなら、1日をまとめて1つのポアソン分布にしてはいけない。
+  misconceptions:
+  - misconception: まれな出来事なら何でもポアソン分布
+    correction: 起きる割合が一定で、互いに独立に起きることが要る。連鎖して起きる出来事（クレームが続くなど）は当てはまらない
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - abs(math.exp(-2)-0.135)<0.0005
 - id: TERM-geom

@@ -353,7 +353,34 @@ class TestNetwork(unittest.TestCase):
         bad = copy.deepcopy(self.rels)
         r = next(x for x in bad if x["type"] == "変換")
         r.pop("conditions")
-        self.assertTrue(any("成立条件" in e for e in self._validate(rels=bad)))
+        r.pop("mode")
+        err = self._validate(rels=bad)
+        self.assertTrue(any("conditions を必ず書く" in e for e in err))
+        self.assertTrue(any("mode を必ず書く" in e for e in err))
+
+    def test_premise_kind_and_mode_place(self):
+        bad = copy.deepcopy(self.rels)
+        p = next(x for x in bad if x["type"] == "前提")
+        p.pop("premise")
+        q = next(x for x in bad if x["type"] == "対比")
+        q["mode"] = "exact"
+        err = self._validate(rels=bad)
+        self.assertTrue(any("premise を必ず書く" in e for e in err))
+        self.assertTrue(any("mode は変換だけ" in e for e in err))
+
+    def test_generalization_one_direction(self):
+        rels = copy.deepcopy(self.rels) + [
+            {"id": "REL-x1", "from": "TERM-binom", "to": "TERM-normal", "type": "一般化", "description": "x", "basis": {"units": ["U14"]}},
+            {"id": "REL-x2", "from": "TERM-normal", "to": "TERM-binom", "type": "特殊化", "description": "x", "basis": {"units": ["U14"]}}]
+        self.assertTrue(any("両方向" in e for e in self._validate(rels=rels)))
+
+    def test_conditions_split_and_sources(self):
+        c = course()
+        c.terms["TERM-binom"]["conditions"] = ["回数が決まっている"]
+        c.terms["TERM-std"]["sources"] = [{"source": "どこにもない本"}]
+        err = self._validate(c=c)
+        self.assertTrue(any("TERM-binom: conditions は math" in e for e in err))
+        self.assertTrue(any("TERM-std: 出典" in e for e in err))
 
     def test_other_course_allowed_own_prefix_not(self):
         rels = copy.deepcopy(self.rels)
@@ -381,9 +408,10 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(all(x["id"].startswith("stats2:") for x in data["concepts"]))
         bad = copy.deepcopy(data)
         bad["relations"][0]["type"] = "似ている"
+        bad["relations"].append({**data["relations"][0], "id": "stats2:REL-y", "type": "変換"})   # mode がない
         bad["concepts"][0].pop("definition", None)
         bad["concepts"][0]["status"] = "filled"
-        self.assertGreaterEqual(len(self.n.schema_errors(bad)), 2)
+        self.assertGreaterEqual(len(self.n.schema_errors(bad)), 3)
 
     def test_concept_checks_pass(self):
         from model import run_check
@@ -402,3 +430,11 @@ class TestProgress(unittest.TestCase):
         md = notion_page(course(), TARGET)
         self.assertNotIn("| ", md)   # スマホ前提：表を使わない
         self.assertIn("U32：", md)
+
+
+class TestVersions(unittest.TestCase):
+    def test_version_required(self):
+        import network
+        c = course()
+        c.terms["TERM-binom"].pop("version")
+        self.assertTrue(any("TERM-binom: 説明のある概念には version" in e for e in network.validate_network(c)))
