@@ -114,7 +114,9 @@ const ROOT=path.resolve(__dirname,'..');
       if(await h()>320)bad(`${tag}: ${where}が枠（320px）に収まらない（${await h()}px）`);
       if(await p.evaluate(()=>document.documentElement.scrollWidth)>W)bad(`${tag}: ${where}で横にはみ出し`);
       for(const id of ['lk-say','lk-prev','lk-play','lk-tnext','lk-free'])if(!(await p.evaluate(([id,W])=>{const e=document.getElementById(id);if(!e||e.offsetParent===null)return false;const r=e.getBoundingClientRect();return r.bottom<=320&&r.right<=W;},[id,W])))bad(`${tag}: ${where}で ${id} が枠の中に見えない`);
-      if(!(await p.evaluate(()=>[...document.querySelectorAll('.seqs > div')].every(d=>d.getBoundingClientRect().height<30))))bad(`${tag}: ${where}で並びが折り返している`);}}}}
+      if(!(await p.evaluate(()=>[...document.querySelectorAll('.seqs > div')].every(d=>d.getBoundingClientRect().height<30))))bad(`${tag}: ${where}で並びが折り返している`);
+      const fo=v.cfg.tour.steps[i].focus;   // 注目する場所（強調で囲む所）が、埋め込みでも枠の中に見える
+      if(fo&&!(await p.evaluate(([fo,W])=>{const es=[...document.querySelectorAll('.lk-hl')];return es.length>0&&es.every(e=>{const r=e.getBoundingClientRect();return e.offsetParent!==null&&r.height>0&&r.bottom<=320&&r.right<=W+4;});},[fo,W])))bad(`${tag}: ${where}で注目する場所（${fo}）が見えない`);}}}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
  await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();

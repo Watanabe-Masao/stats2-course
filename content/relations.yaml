@@ -37,12 +37,13 @@ relations:
     to: TERM-poisson
     version: 1
     labs:
-      - {id: LAB-pois, preset: rel-approx-tour, purpose: np＝3 を保って n を 10→100 にし、二項分布がポアソン分布に重なるのを段ごとに見る}
+      - {id: LAB-pois, preset: rel-approx-tour, purpose: 平均3を保って n を 10→1000 にし、二項分布がポアソン分布に重なるまでを段ごとに見る}
       - {id: LAB-pois, preset: rel-approx, purpose: np を保って n を大きくすると、二項分布がポアソン分布に重なる}
     figures: [FIG-LAB-pois-rel-approx-tour-1, FIG-LAB-pois-rel-approx-tour-2, FIG-LAB-pois-rel-approx-tour-3]
     type: 変換
     mode: limit
     description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。
+    gist: めったに起きない事をたくさんの機会で数えると、回数の上限が効かなくなる。平均 λ だけで確率が出せる。   # つまり（#95）
     conditions: [n が大きい, p が小さい, np＝λ を一定に保つ]
     basis: {units: [U15]}
   - id: REL-binom-normal
@@ -54,6 +55,7 @@ relations:
     type: 変換
     mode: approximation
     description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
+    gist: 回数が多いと、成功の数はなめらかな山の形になる。平均と標準偏差だけで、範囲の確率が出せる。   # つまり（#95）
     conditions: [np と n(1−p) がどちらも十分大きい（目安は5以上）, 整数の棒を曲線で近似するので、境目を0.5ずらす（連続修正）]
     basis: {units: [U14, U16]}
   - id: REL-binom-poisson-contrast
@@ -62,6 +64,11 @@ relations:
     version: 1
     type: 対比
     description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
+    gist: 回数に上限がある数え方（二項）は、上限のない数え方（ポアソン）より散らばりが小さい。平均が同じでも外れ方が違う。   # つまり（#95）
+    labs:
+      - {id: LAB-pois, preset: rel-contrast-tour, purpose: 平均は同じ3のまま、回数の上限と分散の違いを段ごとに見る}
+      - {id: LAB-pois, preset: rel-contrast, purpose: n・p を自分で動かし、二項とポアソンの棒の切れ方と広がりを比べる}
+    figures: [FIG-LAB-pois-rel-contrast-tour-1, FIG-LAB-pois-rel-contrast-tour-2]
     basis: {units: [U15]}
   - id: REL-var-std
     from: TERM-var
@@ -127,6 +134,7 @@ relations:
     version: 1
     type: 一般化
     description: 分散は1つの変数のずれの2乗の期待値。2つの変数のずれの積に広げると共分散になる（Cov(X, X)＝V(X)）。
+    gist: 分散は「1つの量が平均からどれだけずれるか」。共分散は「2つの量が一緒にずれるか」。同じものどうしの共分散が分散。   # つまり（#95）
     basis: {units: [U13]}
   - id: REL-indep-cov
     from: TERM-indep
@@ -136,6 +144,7 @@ relations:
       - {id: LAB-expect, preset: s5-free, purpose: 独立なら共分散が0。0でも独立とは限らないことも確かめる}
     type: 導出
     description: 独立なら E(XY)＝E(X)E(Y) なので、共分散は0になる。逆（共分散0なら独立）は成り立たない。
+    gist: お互いに影響しない2つの量は、一緒にずれる傾向がないので共分散は0。ただし共分散が0でも、影響し合っていることはある。   # つまり（#95）
     conditions: [X と Y が独立, 期待値が有限]
     basis: {units: [U13]}
   - id: REL-indep-geom
@@ -152,6 +161,7 @@ relations:
     version: 1
     type: 対比
     description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
+    gist: 二項は「回数を決めて、当たりの数を数える」。幾何は「当たり1回を決めて、そこまでの回数を数える」。決める物と数える物が逆。   # つまり（#95）
     basis: {units: [U15]}
   - id: REL-hyper-binom
     from: TERM-hyper
@@ -162,6 +172,7 @@ relations:
     type: 変換
     mode: limit
     description: 集団 N を大きくして当たりの割合 M/N を保つと、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。
+    gist: 箱がとても大きければ、取り出して戻さなくても中身の割合はほとんど変わらない。戻しても戻さなくても同じとみなせる。   # つまり（#95）
     conditions: [N が取り出す数 n に比べて十分大きい, 当たりの割合 M/N を一定に保つ]
     basis: {units: [U15]}
   - id: REL-binom-hyper-contrast
@@ -170,6 +181,7 @@ relations:
     version: 1
     type: 対比
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が二項分布の (N−n)/(N−1) 倍になる（小さくなる）。
+    gist: 戻さずに取り出すと、取るたびに残りの割合が変わり、結果のぶれが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
     basis: {units: [U15]}
   - id: REL-poisson-expo
     from: TERM-poisson
@@ -179,6 +191,7 @@ relations:
       - {id: LAB-pois, preset: s5-free, purpose: 0件の確率を時間を延ばして見ると、待ち時間の確率になる}
     type: 導出
     description: 一定の割合 λ で独立に起きる出来事では、一定時間の件数がポアソン分布、次に起きるまでの待ち時間が指数分布になる。
+    gist: 同じ出来事を「一定時間に何件来るか」で見るとポアソン、「次の1件まで何分待つか」で見ると指数分布。見方が違うだけ。   # つまり（#95）
     conditions: [出来事が一定の割合 λ で起きる, 重ならない時間の件数が互いに独立]
     basis: {units: [U15, U16]}
   - id: REL-dist-pdf
@@ -227,4 +240,5 @@ relations:
     version: 1
     type: 一般化
     description: 幾何分布は「1回目の成功」まで待つ。待つ成功を r 回に広げると負の二項分布（r＝1 が幾何分布）。
+    gist: 幾何は「最初の当たりまで」待つ。負の二項は「r 回目の当たりまで」待つ。r＝1 にすると幾何に戻る。   # つまり（#95）
     basis: {units: [U15]}

@@ -49,6 +49,10 @@ def main(argv: list[str]) -> int:
     pending = [uid for uid, u in course.units.items() if u.get("visuals_pending")]
     if pending:
         print(f"⚠ 例題・問題のラボか図がまだの単元：{', '.join(pending)}（unit.yaml の visuals_pending）")
+    from network import relations_without_figures
+    nofig = relations_without_figures()
+    if nofig:
+        print(f"⚠ 図のない関係（変換・対比・導出・一般化）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
     if "--check" in argv:
         return 0
 
