@@ -116,10 +116,22 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 確かめる
 
-`build/check_all.sh`（単体テスト → 検証・検算・生成・生成物の検査 → 旧版との突き合わせ → ラボの全部の版のテスト）。公開とコミットの前に必ず通す。
+作業は必ずブランチを切って行い、全部の確認はマージの前に1回だけかける。
 
-- 終了コードをログに残して判定する：`bash build/check_all.sh > ログ 2>&1; echo "EXIT=$?" >> ログ`。「✅ 全部 OK」と `EXIT=0` の両方を見てから次へ進む（`tail` などの終了コードで判定しない）。
-- 同時に2つ走らせない（ブラウザが落ちて誤った結果になる）。全部の版を回すので時間がかかる（約1時間）。途中の確認は `python3 -m unittest discover -s tests`・`python3 build/build.py`・`ONLY=LAB-x node tools/test_labs.js` で個別に行う。
+- **ブランチの途中のコミット**：`python3 build/check_changed.py` で、変えたものに合わせた範囲だけ確かめる（origin/main からの差分を見て、下の表のとおりに選ぶ）。
+- **マージの前（PR を「マージしてよい」と伝える前）**：PR を作ると GitHub が全部（`build/check_all.sh`、約30分）を走らせる（.github/workflows/check.yml。PR と main への取り込みでだけ走る）。その結果が成功であることを `gh api repos/{owner}/{repo}/actions/runs` で確かめてから伝える。手元で全部を走らせるのは、GitHub で落ちた原因を調べるときだけ。
+- **公開**：公開サイトの更新（deploy_site.sh）と Notion への公開は、全部が通った main から行う。
+
+| 変えたもの | ブランチの途中で確かめること |
+| --- | --- |
+| CLAUDE.md・README・docs/ だけ | なし |
+| 単元（content/units/UXX・problems/UXX・migration の UXX） | 単体テスト・build・その単元の旧版との突き合わせ・その単元のラボの版（1単元で数分） |
+| 1つのラボ（tools/xx_lab/） | 上に加えて、そのラボの全部の版と check.js |
+| 共通部分（build/・tests/・labkit・test_labs.js・templates/・content/*.yaml など） | 単体テスト・build・全単元の旧版との突き合わせ（ラボの版はマージ前の全部で） |
+
+- 終了コードをログに残して判定する：`… > ログ 2>&1; echo "EXIT=$?" >> ログ`。「✅ 範囲内 OK」または「✅ 全部 OK」と `EXIT=0` の両方を見てから次へ進む（`tail` などの終了コードで判定しない）。
+- ラボのテストを同時に2つ走らせない（ブラウザが落ちて誤った結果になる）。
+- 個別には `ONLY=LAB-x,LAB-y node tools/test_labs.js`（そのラボの全部の版）、`ASSETS=LAB-prob@s6-free,… node tools/test_labs.js`（その版だけ）。
 
 ## 公開サイト（ラボと図）
 
@@ -141,7 +153,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 `site_base_url` が空の配布先では、`python3 build/publish_prep.py <ID>` で素材を一覧してアップロードし（返った content_length が一覧のバイト数と一致することを確かめる）、`python3 build/publish_prep.py <ID> <json>` で作る `out/notion/<ID>.publish.md` を使う。
 
-旧版のページ（publish/notion.yaml の legacy_units）は、REF（旧版の問題ページへのリンク）が残っている間は消さない。
+旧版（Notion）の残りは `publish/legacy.yaml` で管理する。build が各項目を「まだ参照あり／削除してよい／削除済み」で出す。「削除してよい」になったら、その生成物を Notion に公開してから旧版を削除し、`deleted:` に日付を書く。削除済みの ID が原本や生成物に戻ると build が止まる。旧版を新しく参照しない（refs に足さない）。
 
 入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。新しい単元ページを作ると入口の末尾に子ページが付くので、root.md の並びに合わせて動かす。
 

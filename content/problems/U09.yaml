@@ -336,7 +336,7 @@
     why: ₁₀C₅＝252。パスカルの10段目のまん中（一番大きい数）。どの選び方も同じ確率で選ぶのが無作為化。
 
 - id: Q-U09-040
-  stage: S5
+  stage: S3
   label: 確かめ問題
   format: written
   powers: [P2]

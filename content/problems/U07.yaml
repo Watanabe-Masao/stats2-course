@@ -295,7 +295,7 @@
     note: 平均だけで発注すると、ばらつきの大きい売場ほど欠品しやすい。
 
 - id: Q-U07-040
-  stage: S5
+  stage: S3
   label: 確かめ問題
   format: written
   powers: [P1, P2]

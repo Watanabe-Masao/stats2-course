@@ -44,8 +44,8 @@
   key: hatten
   name: 発展
   icon: "🔭"
-  aim: 試験の外へ広げる
-  state: 1級・数学・他の学問とつなげられる
+  aim: 統計を理解する
+  state: なぜその形か・何が消えるか・前提が崩れると何が揺れるかを言える
   time: 興味に合わせて
   exam: false
   tone: purple
@@ -54,8 +54,8 @@
   key: sozo
   name: 創造
   icon: "💡"
-  aim: 新しい方法を生む
-  state: 知識を組み合わせて自分で解決策を作れる
+  aim: 統計で考え、統計の外と切り分ける
+  state: 混ざったデータで問いを立て、統計と解釈を分けられる
   time: 課題1つ30分〜
   exam: false
   tone: purple

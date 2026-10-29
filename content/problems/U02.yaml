@@ -287,7 +287,7 @@
     why: 2×4＋5＝13。x を1増やすと点は2上がる（a＝2）。
 
 - id: Q-U02-040
-  stage: S5
+  stage: S3
   tag: 1から n までの和
   format: written
   powers: [P1, P2]
