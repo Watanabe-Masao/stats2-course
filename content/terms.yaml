@@ -85,6 +85,8 @@
   en: variance
   definition: 確率変数が期待値からどれだけ散らばるかを、ずれの2乗の期待値で表した量。
   version: 1
+  labs:
+  - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
   principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
   formulas:
   - tex: V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2
@@ -128,6 +130,36 @@
 - id: TERM-sd
   name: 標準偏差
   en: standard deviation
+  definition: 分散の正の平方根。散らばりを元の単位で表す。
+  version: 1
+  labs:
+  - {id: LAB-z, preset: s1-sigma, purpose: 標準偏差が広がると、同じ値の z得点がどう変わるかを見る}
+  principle: 分散は単位が2乗になるので、平方根をとって元の単位に戻す。期待値（平均）からの典型的なずれの大きさの目安。
+  formulas:
+  - tex: '\sigma=\sqrt{V(X)}'
+    symbols:
+    - symbol: σ
+      meaning: 標準偏差
+      range: 0以上
+    - symbol: V(X)
+      meaning: X の分散
+  conditions:
+    math:
+    - 分散が有限
+    data:
+    - 外れ値に強く引っ張られる（2乗が効く）。山が2つあるときや裾が長いときは、分布の形と一緒に見る
+  example: さいころの目の標準偏差は √(35/12)≒1.71。
+  counterexample: 標準偏差が同じでも、分布の形が違えば平均±1σ に入る割合は違う（正規分布で約68.3%、一様分布で約57.7%）。
+  misconceptions:
+  - misconception: 標準偏差は「平均からのずれの平均」
+    correction: ずれの2乗の平均の平方根。ずれの大きさ（絶対値）の平均と同じか、それより大きくなる
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - abs(math.sqrt(35/12)-1.71)<0.005
+  - abs(2*statistics.NormalDist().cdf(1)-1-0.683)<0.0005
+  - abs(1/math.sqrt(3)-0.577)<0.0005
 - id: TERM-cv
   name: 変動係数
   en: coefficient of variation
@@ -139,6 +171,8 @@
   en: standardization
   definition: 値から平均を引き、標準偏差で割って、平均0・標準偏差1 の尺度に直すこと。
   version: 1
+  labs:
+  - {id: LAB-z, preset: s1-z, purpose: 単位や散らばりの違うものを z得点でそろえて比べる}
   principle: 1次の変換なので分布の形は変わらない。単位や大きさの違う値を「平均から標準偏差いくつ分か」で比べられる。正規分布なら標準正規分布 N(0, 1) になり、1つの表で確率が読める。
   formulas:
   - tex: Z=\dfrac{X-\mu}{\sigma}
@@ -176,7 +210,9 @@
   name: 正規分布
   en: normal distribution
   definition: 確率密度が f(x) の式で表される連続分布 N(μ, σ²)。平均 μ を中心に左右対称な釣鐘の形になる。
-  version: 1
+  version: 2
+  labs:
+  - {id: LAB-cont, preset: s1-norm, purpose: 平均と標準偏差から、区間の確率を面積で読む}
   principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
   formulas:
   - tex: f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)
@@ -195,7 +231,7 @@
     - ヒストグラムが左右対称で山が1つなのは手掛かりにすぎず、それだけでは正規分布と言えない（裾の重さなども見る）
     - 正規分布を前提にする方法は、ずれがあると結論が揺れる
   example: 二項分布 B(100, 0.5) は、平均50・標準偏差5 の正規分布で近似できる。
-  counterexample: 売上や所得のように右に裾が長いデータでは、平均±2σ に95%が入るとは限らない。
+  counterexample: 売上や所得のように右に裾が長いデータでは、平均±2σ の中の割合は95%前後でも（対数正規分布で約96.3%）、外に出る分はほぼ右側だけ（左 0%・右 約3.7%）。平均±1σ の中は約91%で、正規分布の約68.3%と大きく違う。
   misconceptions:
   - misconception: 左右対称で山が1つなら正規分布
     correction: 左右対称な山1つの分布はほかにもある（裾の重い分布など）。形の手掛かりと、正規分布であることは別
@@ -208,11 +244,18 @@
   - abs(math.erf(1/math.sqrt(2))-0.68)<0.005
   - abs(math.erf(2/math.sqrt(2))-0.95)<0.005
   - 100*0.5==50 and math.sqrt(100*0.5*0.5)==5
+  - abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+2*math.sqrt((math.e-1)*math.e)))-0.963)<0.0005
+  - math.exp(0.5)-2*math.sqrt((math.e-1)*math.e) < 0
+  - abs(1-statistics.NormalDist().cdf(math.log(math.exp(0.5)+2*math.sqrt((math.e-1)*math.e)))-0.037)<0.0005
+  - math.exp(0.5)-math.sqrt((math.e-1)*math.e) < 0 and abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+math.sqrt((math.e-1)*math.e)))-0.91)<0.005
+  - abs(2*statistics.NormalDist().cdf(1)-1-0.683)<0.0005
 - id: TERM-expect
   name: 期待値
   en: expected value
   definition: 確率変数がとる値を、その確率で重み付けした平均。
   version: 1
+  labs:
+  - {id: LAB-expect, preset: s1-dist, purpose: 期待値が分布の重心になることを、予想してから確かめる}
   principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
   formulas:
   - tex: E(X)=\sum_x x\,p(x)
@@ -269,6 +312,8 @@
   en: independence
   definition: 一方が起きたかどうかで、もう一方の起こりやすさが変わらないこと。
   version: 1
+  labs:
+  - {id: LAB-expect, preset: s5-free, purpose: P(両方)＝P(X)P(Y) のときに共分散が0になるのを見る}
   principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
   formulas:
   - tex: P(A\cap B)=P(A)\,P(B)
@@ -309,6 +354,8 @@
   en: random variable
   definition: 試行の結果に応じて値が決まり、どの値が出るかが確率で表される量。
   version: 1
+  labs:
+  - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を動かして、確率変数が「値の出方の規則」を持つことを見る}
   principle: 起こりうる値と、その確率の組（確率分布）で性質が決まる。1つの記録された値ではなく、記録する前の「値の出方」を扱う。
   formulas:
   - tex: P(X=x)=p(x),\quad \sum_x p(x)=1
@@ -339,14 +386,77 @@
 - id: TERM-dist
   name: 確率分布
   en: probability distribution
+  definition: 確率変数がとる値と、それぞれの値をとる確率（連続なら確率密度）の対応。
+  version: 1
+  labs:
+  - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を変えると、期待値（重心）がどう動くかを見る}
+  principle: 起こりうる値を全部挙げ、確率を割り振ったもの。確率は0以上で、合計（連続なら面積）が1。期待値や分散は、分布を1つの数に要約したもの。
+  formulas:
+  - tex: '\sum_x p(x)=1,\quad p(x)\ge 0'
+    symbols:
+    - symbol: p(x)
+      meaning: X が x になる確率
+      range: 0以上1以下
+  conditions:
+    math:
+    - どの値の確率も0以上
+    - 全部の値の確率の合計が1（連続なら密度の面積が1）
+    data:
+    - データの相対度数の一覧は、分布の推定値。データが少ないと形が揺れる
+  example: 1人が買う個数が 0個 0.2・1個 0.5・2個 0.3 なら、合計が1なので確率分布になっている。
+  counterexample: 0個 0.2・1個 0.5・2個 0.4 は合計が 1.1 になるので、確率分布ではない。
+  misconceptions:
+  - misconception: 確率分布はグラフの形のこと
+    correction: 中身は「値と確率の一覧」。棒グラフでも表でも、一覧が同じなら同じ分布
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - Fraction(2,10)+Fraction(5,10)+Fraction(3,10)==1
+  - Fraction(2,10)+Fraction(5,10)+Fraction(4,10)==Fraction(11,10)
 - id: TERM-cov
   name: 共分散
   en: covariance
+  definition: 2つの確率変数が、それぞれの期待値から同じ向きにずれるか逆向きにずれるかを、ずれの積の期待値で表した量。
+  version: 1
+  labs:
+  - {id: LAB-expect, preset: s5-free, purpose: 同時分布で共分散を0にすると独立になる場合を確かめる}
+  principle: (X−μ_X)(Y−μ_Y) の期待値。同じ向きのずれが多いと正、逆向きが多いと負。和の分散に 2Cov として効く。
+  formulas:
+  - tex: '\mathrm{Cov}(X,Y)=E\big[(X-\mu_X)(Y-\mu_Y)\big]=E(XY)-E(X)E(Y)'
+    symbols:
+    - symbol: Cov(X, Y)
+      meaning: X と Y の共分散
+    - symbol: μ_X・μ_Y
+      meaning: X・Y の期待値
+  - tex: 'V(X+Y)=V(X)+V(Y)+2\,\mathrm{Cov}(X,Y)'
+    label: 和の分散
+    symbols:
+    - symbol: 2Cov(X, Y)
+      meaning: 同じ向きにずれると和のばらつきが増え、逆向きだと減る
+  conditions:
+    math:
+    - X・Y の分散が有限
+    data:
+    - 単位で値が変わる（円を千円にすると1000分の1）。関係の強さを比べるなら相関係数にする
+    - 直線的な関係しか測らない
+  example: X が 0・1 を確率 1/2 ずつとり Y＝X のとき、Cov(X, Y)＝V(X)＝1/2−(1/2)²＝1/4。
+  counterexample: X が −1・0・1 を確率 1/3 ずつとり Y＝X² のとき、Y は X で決まるのに Cov(X, Y)＝0（無相関でも独立ではない）。
+  misconceptions:
+  - misconception: 共分散が0なら関係がない（独立）
+    correction: 0なのは直線的な関係がないだけ。Y＝X² のように強い関係があっても0になる
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(1,2)-Fraction(1,2)**2==Fraction(1,4)
+  - Fraction(-1,3)+0+Fraction(1,3)==0
 - id: TERM-binom
   name: 二項分布
   en: binomial distribution
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
   version: 1
+  labs:
+  - {id: LAB-binom, preset: s1-path, purpose: 並び方の数×1つの並びの確率を、予想してから確かめる}
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
   formulas:
   - tex: P(X=k)={}_nC_k\,p^k(1-p)^{n-k}
@@ -392,6 +502,8 @@
   en: Poisson distribution
   definition: 一定の時間や範囲で、まれな出来事が平均 λ 回起きるときの、起きた回数の分布。
   version: 1
+  labs:
+  - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
   formulas:
   - tex: P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!}
@@ -424,18 +536,181 @@
 - id: TERM-geom
   name: 幾何分布
   en: geometric distribution
+  definition: 成功確率 p の独立な試行を、初めて成功するまで繰り返したときの試行回数の分布。
+  version: 1
+  labs:
+  - {id: LAB-pois, preset: s3-free, purpose: 「成功するまで」のモードで、初めて成功する回の確率と平均を見る}
+  principle: k−1 回続けて失敗してから成功する確率なので (1−p)^(k−1)p。毎回の確率が同じで独立なので、それまでの失敗は次の確率を変えない（無記憶性）。
+  formulas:
+  - tex: 'P(X=k)=(1-p)^{k-1}p\quad(k=1,2,\dots)'
+    symbols:
+    - symbol: k
+      meaning: 初めて成功した回（成功した回も数える）
+      range: 1以上の整数
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0より大きく1以下
+  - tex: 'E(X)=\frac{1}{p},\qquad V(X)=\frac{1-p}{p^2}'
+    label: 期待値と分散
+  conditions:
+    math:
+    - 各回が独立
+    - 成功確率 p が毎回同じ
+    data:
+    - 回を重ねるほど成功しやすくなる（慣れ・学習）や、しにくくなる場面には当てはまらない
+    - 「失敗の回数」で数える流儀もある（期待値は (1−p)/p）。問題文の数え方を確かめる
+  example: さいころで初めて6が出るまでの回数の期待値は 1÷(1/6)＝6回。
+  counterexample: 期待値が6回でも、いちばん起きやすいのは1回目（確率 1/6）。6回目に初めて出る確率は (5/6)⁵×(1/6)≒0.067 と小さい。
+  misconceptions:
+  - misconception: 5回続けて外れたので、次は当たりやすい
+    correction: 各回は独立なので、次の当たる確率は p のまま（無記憶性）
+  - misconception: 幾何分布の期待値はいつも 1/p
+    correction: 失敗の回数で数えると (1−p)/p。何を数えるかで式が変わる
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(1,1)/Fraction(1,6)==6
+  - abs((5/6)**5*(1/6)-0.067)<0.0005
 - id: TERM-hyper
   name: 超幾何分布
   en: hypergeometric distribution
+  definition: N 個のうち当たりが M 個ある集団から、n 個を戻さずに取り出したときの、当たりの個数の分布。
+  version: 1
+  labs:
+  - {id: LAB-pois, preset: rel-hyper, purpose: 戻さず取り出す確率を、戻す場合（二項分布）と比べる}
+  principle: 取り出し方の組合せの数の比。戻さないので、1個取るたびに残りの当たりの割合が変わる（各回は独立ではない）。
+  formulas:
+  - tex: 'P(X=k)=\frac{\binom{M}{k}\binom{N-M}{n-k}}{\binom{N}{n}}'
+    symbols:
+    - symbol: N
+      meaning: 集団の個数
+    - symbol: M
+      meaning: 集団の中の当たりの個数
+    - symbol: n
+      meaning: 取り出す個数
+    - symbol: k
+      meaning: 取り出した中の当たりの個数
+  - tex: 'E(X)=n\frac{M}{N}'
+    label: 期待値
+  conditions:
+    math:
+    - 戻さずに取り出す
+    - どの n 個の組も同じ確率で選ばれる
+    data:
+    - 集団 N が取り出す数 n に比べて十分大きいと、二項分布 B(n, M/N) とほとんど同じになる
+  example: 10個中3個が不良の箱から2個取り出して、2個とも不良の確率は C(3,2)÷C(10,2)＝3/45＝1/15。
+  counterexample: 戻して取り出すと二項分布 B(2, 0.3) になり、2個とも不良の確率は 0.09。戻さないとき（1/15≒0.067）と違う。
+  misconceptions:
+  - misconception: 抜き取り検査はいつでも二項分布
+    correction: 戻さないので本当は超幾何分布。集団が大きいときだけ二項分布で近似できる
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(math.comb(3,2),math.comb(10,2))==Fraction(1,15)
+  - abs(0.3**2-0.09)<1e-12
+  - abs(1/15-0.067)<0.0005
 - id: TERM-expo
   name: 指数分布
   en: exponential distribution
+  definition: 一定の割合 λ で独立に起きる出来事の、次に起きるまでの待ち時間の分布。
+  version: 1
+  labs:
+  - {id: LAB-cont, preset: s5-free, purpose: すでに待った時間を動かしても、その先の確率が変わらないのを見る}
+  principle: 密度 λe^(−λx)。待つほど密度が下がる、右に裾の長い形。すでに待った時間は残りの待ち時間を変えない（無記憶性）。ポアソン分布で数える出来事の間隔にあたる。
+  formulas:
+  - tex: 'f(x)=\lambda e^{-\lambda x}\quad(x\ge 0)'
+    symbols:
+    - symbol: λ
+      meaning: 単位時間あたりに起きる平均の回数
+      range: 0より大きい
+    - symbol: x
+      meaning: 待ち時間
+      range: 0以上
+  - tex: 'P(X>x)=e^{-\lambda x},\qquad E(X)=\frac{1}{\lambda},\quad V(X)=\frac{1}{\lambda^2}'
+    label: 待ち時間が x を超える確率・期待値・分散
+  conditions:
+    math:
+    - λ＞0
+    - 出来事が一定の割合で独立に起きる
+    data:
+    - 時間帯で起きる割合が変わる（昼と夕方で客の来方が違う）と当てはまらない。時間帯を分けて見る
+  example: 1時間に平均4人来る（λ＝4/時）とき、次の客までの平均の待ち時間は 1/4 時間＝15分。
+  counterexample: 10分待っても、そこから先の待ち時間の分布は待ち始めと同じ。「そろそろ来るはず」は成り立たない。
+  misconceptions:
+  - misconception: 平均15分なら、15分あたりで来ることが多い
+    correction: 密度は0分がいちばん高く、待つほど下がる。平均より早く来る確率は 1−e^(−1)≒63%
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(60,4)==15
+  - math.isclose(math.exp(-4*(15/60))/math.exp(-4*(10/60)), math.exp(-4*(5/60)))
+  - abs(1-math.exp(-1)-0.632)<0.0005
 - id: TERM-pdf
   name: 確率密度関数
   en: probability density function
+  definition: 連続な確率変数で、区間に入る確率を、その区間の下の面積で表す関数。
+  version: 1
+  labs:
+  - {id: LAB-cont, preset: s1-dens, purpose: 密度の高さは1を超えても、面積は1のままなのを見る}
+  principle: 連続では1点の確率は0で、確率は面積（積分）で決まる。高さ f(x) は「その付近の出やすさの密度」。
+  formulas:
+  - tex: 'P(a\le X\le b)=\int_a^b f(x)\,dx,\qquad \int_{-\infty}^{\infty} f(x)\,dx=1'
+    symbols:
+    - symbol: f(x)
+      meaning: 確率密度（高さ）
+      range: 0以上（1を超えてもよい）
+    - symbol: a, b
+      meaning: 区間の両端
+  conditions:
+    math:
+    - f(x) が0以上
+    - 全体の面積が1
+    data:
+    - ヒストグラムを「相対度数÷階級の幅」で描くと、密度の推定になる
+  example: 0〜10分に一様に来るバスで、3〜5分の間に来る確率は 2÷10＝0.2。
+  counterexample: 0〜0.5 の一様分布の密度の高さは 2 で、1を超える。密度は確率ではないので1を超えてよい。
+  misconceptions:
+  - misconception: f(x) は X が x になる確率
+    correction: 連続では1点の確率は0。f(x) は面積を作る高さで、確率は区間の面積
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(2,10)==Fraction(1,5)
+  - 1/0.5==2
 - id: TERM-uniform
   name: 一様分布
   en: uniform distribution
+  definition: 区間 [a, b] のどこにも同じ密度で値をとる連続分布。
+  version: 1
+  labs:
+  - {id: LAB-cont, preset: s3-free, purpose: 「一様分布」のモードで、確率が区間の長さに比例するのを見る}
+  principle: 密度は 1/(b−a) で一定なので、確率は区間の長さに比例する。
+  formulas:
+  - tex: 'f(x)=\frac{1}{b-a}\quad(a\le x\le b)'
+    symbols:
+    - symbol: a, b
+      meaning: 値のとりうる範囲の両端
+      range: a＜b
+  - tex: 'E(X)=\frac{a+b}{2},\qquad V(X)=\frac{(b-a)^2}{12}'
+    label: 期待値と分散
+  conditions:
+    math:
+    - a＜b
+    - 区間の外の密度は0
+    data:
+    - 「どこも同じ出やすさ」は仮定。ヒストグラムが平らかで確かめる
+  example: 0〜10分の一様分布の期待値は5分、分散は 100/12≒8.33。
+  counterexample: 平均±1σ に入る割合は 1/√3≒57.7% で、正規分布の約68.3%と違う。標準偏差が同じでも、形が違えば割合は違う。
+  misconceptions:
+  - misconception: 一様分布なら、どの値も同じ確率で出る
+    correction: 連続なので1点の確率は0。同じなのは「同じ長さの区間に入る確率」
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - Fraction(0+10,2)==5
+  - abs(100/12-8.33)<0.005
+  - abs(1/math.sqrt(3)-0.577)<0.0005
+  - abs(2*statistics.NormalDist().cdf(1)-1-0.683)<0.0005
 - id: TERM-sampdist
   name: 標本分布
   en: sampling distribution
