@@ -33,6 +33,37 @@
       "items": {
         "$ref": "#/$defs/gid"
       }
+    },
+    "labs": {
+      "type": "array",
+      "description": "数理ラボへの参照（概念・関係で共通の形）。ラボの定義（値・学習目標）はラボの側。url は教材の build が作る",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "url"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^LAB-[A-Za-z0-9-]+$"
+          },
+          "preset": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -243,6 +274,9 @@
             "type": "integer",
             "minimum": 1,
             "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          },
+          "labs": {
+            "$ref": "#/$defs/labs"
           }
         },
         "if": {
@@ -330,6 +364,9 @@
             "type": "integer",
             "minimum": 1,
             "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          },
+          "labs": {
+            "$ref": "#/$defs/labs"
           }
         },
         "allOf": [
@@ -481,6 +518,13 @@
           }
         }
       }
+    },
+    "schema_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "書き出した教材が使った型の改訂番号（x-revision）"
     }
-  }
+  },
+  "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
+  "x-revision": 2
 }
