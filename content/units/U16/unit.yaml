@@ -27,6 +27,19 @@ evidence:
 concepts_linked: true
 status: drafted
 version: 1
+figures:
+  - id: FIG-U16-concept
+    caption: 平均100・標準偏差10 の正規分布（例題A）。90〜110 に約68%、80〜120 の外側に合わせて約5%。確率は高さではなく面積。
+    spec:
+      type: dist
+      family: normal
+      mu: 100
+      sigma: 10
+      ticks: [70, 130, 10]
+      shade:
+        - {from: 90, to: 110, label: 約68%}
+        - {outside: [80, 120], label: 合わせて約5%}
+      note: 平均±標準偏差に約68%、±2標準偏差に約95%。この割合は正規分布のときだけ。
 checks:
   # Φ(z)＝0.5*(1+math.erf(z/math.sqrt(2)))
   # 入口・前提チェック・一様と指数の例

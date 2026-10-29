@@ -224,6 +224,19 @@ class TestVisuals(unittest.TestCase):
         q["figure"] = dict(q["figure"], stat=["標本の不良率 1/20＝7.3%"])
         self.assertTrue(any("ない数" in e for e in figures.validate_figures(c)))
 
+    def test_dist_figure(self):
+        import figures
+        svg = figures.dist({"type": "dist", "family": "poisson", "lam": 2, "kmax": 6, "unit": "件"})
+        self.assertIn("期待値 2件", svg)          # 棒を6件で切っても、平均は λ のまま
+        svg = figures.dist({"type": "dist", "family": "table", "values": [0, 1, 2], "probs": [0.2, 0.5, 0.3], "band": 1})
+        self.assertIn("期待値 1.1", svg)
+        self.assertIn("0.4〜1.8", svg)
+        self.assertIn("<path", figures.dist({"type": "dist", "family": "normal", "mu": 100, "sigma": 10, "ticks": [70, 130, 10]}))
+        c = course()
+        f = next(f for f in c.units["U16"]["figures"] if f["id"] == "FIG-U16-concept")
+        f["spec"]["mu"] = 105                     # 本文にない数
+        self.assertTrue(any("FIG-U16-concept" in e and "ない数" in e for e in figures.validate_figures(c)))
+
     def test_no_checkbox_in_pages(self):
         r = NotionRenderer(course(), TARGET)
         md = r.unit_page("U03")

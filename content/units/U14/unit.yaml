@@ -27,6 +27,18 @@ evidence:
 concepts_linked: true
 status: drafted
 version: 1
+figures:
+  - id: FIG-U14-concept
+    caption: 二項分布 B(4, 0.25)。購入率25%の売場に4人。ちょうど1人がいちばん起きやすく、▲の平均 np＝1人。
+    spec:
+      type: dist
+      family: binom
+      n: 4
+      p: 0.25
+      unit: 人
+      decimals: 2
+      highlight: [1]
+      note: 1人の棒＝並び方の数（4通り）×1つの並びの確率。棒を全部足すと1。
 checks:
   # 例題A：n＝4、p＝0.25
   - 'comb(4,1) == 4 and math.isclose(0.25*0.75**3, 0.10546875) and abs(0.25*0.75**3 - 0.105) < 0.0005 and math.isclose(4*0.25*0.75**3, 0.421875) and abs(0.421875 - 0.422) < 0.0005'
