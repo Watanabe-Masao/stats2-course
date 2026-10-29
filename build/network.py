@@ -70,6 +70,15 @@ def filled(t: dict) -> bool:
     return bool(t.get("definition"))
 
 
+# 図とラボで補う関係の種類（#95）。gist は必須、図がなければ build が警告する
+VISUAL_TYPES = ("変換", "対比", "導出", "一般化")
+
+
+def relations_without_figures() -> list[str]:
+    rels, _ = load_network()
+    return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES and not r.get("figures")]
+
+
 def validate_network(c: Course) -> list[str]:
     rels, ders = load_network()
     err: list[str] = []
@@ -137,6 +146,8 @@ def validate_network(c: Course) -> list[str]:
             err.append(f"{rid}: version（1以上の整数）を書く")
         if not r.get("description"):
             err.append(f"{rid}: description がない")
+        if r.get("type") in VISUAL_TYPES and not r.get("gist"):   # つまりどういうことか（#95）
+            err.append(f"{rid}: {r.get('type')}の関係には gist（つまり：日常の言葉で1〜2文）を書く")
         for need in (KIND["types"].get(r.get("type")) or {}).get("required", []):
             if not r.get(need):
                 err.append(f"{rid}: {r.get('type')} には {need} を必ず書く（relation-types.yaml）")
@@ -306,7 +317,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise"):
+        for k in ("conditions", "mode", "premise", "gist"):
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):

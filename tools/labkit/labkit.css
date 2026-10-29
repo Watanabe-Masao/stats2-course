@@ -122,3 +122,6 @@ body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 /* 埋め込みは幅も狭いことがある（iPhone の Notion で約320px）。全文は「大きく開く」で読む。操作は1行に収める */
 .lk-embed #lk-all{display:none}
 .lk-embed .lk-tsub{flex-wrap:nowrap}
+/* 最後の段「つまり」（関係の gist）：埋め込みでは図を畳んで文を大きく読む（#95） */
+.lk-gist .lk-say{font-size:15.5px;font-weight:600}
+.lk-embed.lk-gist [data-tour-anchor]{display:none}

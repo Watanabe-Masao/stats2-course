@@ -549,8 +549,8 @@ def _pmf(sp: dict):
         return list(zip(sp["values"], sp["probs"]))
     if f == "binom":
         n, p = sp["n"], sp["p"]
-        top = min(n, sp["kmax"]) if sp.get("kmax") is not None else n   # kmax：棒を出す範囲（解説付き再生でラボと共有）
-        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k)) for k in range(top + 1)]
+        top = sp["kmax"] if sp.get("kmax") is not None else n   # kmax：棒を出す範囲（解説付き再生でラボと共有）。n より先は0（上限が見える）
+        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k) if k <= n else 0.0) for k in range(top + 1)]
     if f == "poisson":
         lam = sp["lam"]
         return [(k, math.exp(-lam) * lam ** k / math.factorial(k)) for k in range(sp["kmax"] + 1)]
@@ -652,6 +652,10 @@ def dist(sp: dict) -> str:
         while t <= hi + 1e-9:
             c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
             t += step
+    if discrete and sp.get("overlay") and sp["family"] == "binom" and sp["n"] < pmf[-1][0]:   # 二項の上限 n（そこから先は0）
+        xl = (X(sp["n"]) + X(sp["n"] + 1)) / 2
+        c.line(xl, top - 4, xl, base, INK2, 1.2, dash="4 3")
+        c.text(xl + 4, top + 8, f"二項の上限 n＝{sp['n']}", 11.5, INK2)
     if sp.get("mark_mean", True):   # 期待値＝重心の▲
         mx = X(mean)
         c.add(f'<path d="M{mx:.1f},{base + 20} l-7,12 h14 z" fill="{ORANGE}"/>')

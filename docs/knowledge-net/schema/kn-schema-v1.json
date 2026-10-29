@@ -517,6 +517,10 @@
           },
           "figures": {
             "$ref": "#/$defs/figures"
+          },
+          "gist": {
+            "type": "string",
+            "description": "つまり：その関係が言っていることを日常の言葉で1〜2文。説明・図・ラボより先に出す（stats2-course #95）"
           }
         },
         "allOf": [
@@ -676,5 +680,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 5
+  "x-revision": 6
 }

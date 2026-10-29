@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 
 TOUR_KEYS = ("kmax", "decimals", "steps")
-TSTEP_KEYS = ("title", "text", "set", "frames", "focus", "ms")
+TSTEP_KEYS = ("title", "text", "set", "frames", "focus", "ms", "gist")
 
 
 def states(tour: dict) -> list[dict]:
@@ -30,6 +30,20 @@ def states(tour: dict) -> list[dict]:
         out.append({"start": start, "frames": frames, "end": end})
         cur = end
     return out
+
+
+def with_gist(lid: str, name: str, preset: dict) -> dict:
+    """関係の labs からこの版を開くとき、最後に「つまり」の段を足す（文は関係の gist。2か所に書かない。#95）。"""
+    if not preset.get("tour"):
+        return preset
+    from network import load_network
+    rels, _ = load_network()
+    gist = next((r["gist"] for r in rels if r.get("gist") and any(
+        lab.get("id") == lid and lab.get("preset") == name for lab in r.get("labs") or [])), None)
+    if not gist:
+        return preset
+    steps = [*preset["tour"]["steps"], {"title": "つまり", "text": f"💡 {gist}", "gist": True}]
+    return {**preset, "tour": {**preset["tour"], "steps": steps}}
 
 
 def plain(text: str) -> str:

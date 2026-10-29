@@ -196,17 +196,16 @@ class TestLabs(unittest.TestCase):
         p = COURSE.labs["LAB-pois"]["presets"]["rel-approx-tour"]
         st = tour.states(p["tour"])
         self.assertEqual(st[1]["start"]["n"], 10)          # 段2の始め＝段1の終わり
-        self.assertEqual([f["n"] for f in st[3]["frames"]], [300, 1000])
-        self.assertEqual(st[1]["start"], st[0]["end"])    # 動きのない段は前の段の終わりのまま
+        self.assertEqual([f["n"] for f in st[2]["frames"]], [300, 1000])
+        self.assertEqual(st[1]["start"], st[0]["end"])    # 段の始め＝前の段の終わり
         ex = tour.expect("LAB-pois", p)
         self.assertTrue(all(abs(x["lambda"] - 3) < 1e-12 for step in ex for x in step))   # 途中も np＝λ
-        self.assertGreater(ex[0][0]["maxdiff"], ex[3][-1]["maxdiff"])   # n を大きくすると差が縮む
+        self.assertGreater(ex[0][0]["maxdiff"], ex[2][-1]["maxdiff"])   # n を大きくすると差が縮む
         self.assertAlmostEqual(ex[0][0]["bvar"], 2.1)                     # 平均は同じ3でも、分散は 2.1 と 3
-        self.assertAlmostEqual(ex[3][-1]["bvar"], 2.991)                  # n＝1000 で分散も λ に近づく
+        self.assertAlmostEqual(ex[2][-1]["bvar"], 2.991)                  # n＝1000 で分散も λ に近づく
         figs = tour.figure_specs(COURSE)
-        self.assertEqual(sorted(f for f in figs if "pois" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 3, 4)])
-        self.assertTrue(figs["FIG-LAB-pois-rel-approx-tour-1"]["caption"].startswith("平均は同じ、形は違う："))
-        self.assertEqual(figs["FIG-LAB-pois-rel-approx-tour-1"]["spec"]["vars"], [2.1, 3])
+        self.assertEqual(sorted(f for f in figs if "approx-tour" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
+        self.assertEqual(figs["FIG-LAB-pois-rel-contrast-tour-2"]["spec"]["vars"], [1.2, 3])   # 対比：上限5回なら分散1.2
 
     def test_tour_definition_binom(self):
         import tour
@@ -219,6 +218,16 @@ class TestLabs(unittest.TestCase):
         from render_notion import NotionRenderer
         page = NotionRenderer(course(), TARGET).unit_page("U14")
         self.assertIn("<b>▶ ラボで解説</b>\n\n<embed source=", page)   # 解説の版には見出しが付く
+
+    def test_tour_gist_step(self):
+        from labs import variants
+        v = variants(COURSE)
+        last = v["LAB-pois@rel-contrast-tour"]["tour"]["steps"][-1]
+        self.assertEqual(last["title"], "つまり")   # 関係の gist から build が足す（原本の tour には書かない）
+        self.assertIn("散らばりが小さい", last["text"])
+        self.assertEqual(len(v["LAB-pois@rel-contrast-tour"]["tour"]["steps"]),
+                         len(COURSE.labs["LAB-pois"]["presets"]["rel-contrast-tour"]["tour"]["steps"]) + 1)
+        self.assertNotIn("つまり", [s.get("title") for s in v["LAB-binom@def-tour"]["tour"]["steps"]])   # 概念の解説には足さない
 
     def test_tour_validation(self):
         from labs import _check_spec
@@ -402,6 +411,16 @@ class TestNetwork(unittest.TestCase):
 
     def test_clean(self):
         self.assertEqual(self._validate(), [])
+
+    def test_gist_required_for_visual_types(self):
+        bad = copy.deepcopy(self.rels)
+        r = next(x for x in bad if x["type"] == "対比")
+        r.pop("gist")
+        p = next(x for x in bad if x["type"] == "前提")
+        self.assertNotIn("gist", p)   # 前提には要らない
+        err = self._validate(rels=bad)
+        self.assertTrue(any(f"{r['id']}: 対比の関係には gist" in e for e in err))
+        self.assertEqual(len([e for e in err if "gist" in e]), 1)
 
     def test_unknown_term_and_type(self):
         bad = copy.deepcopy(self.rels)

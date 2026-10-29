@@ -114,7 +114,7 @@ const LK=(()=>{
  function tourStates(){let c={};return TOUR.steps.map(s=>{const start={...c,...(s.set||{})};let st=start;const fr=(s.frames||[]).map(x=>(st={...st,...x}));c=fr.length?fr[fr.length-1]:start;return {start,frames:fr,end:c};});}
  const say=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<mark>$1</mark>");
  function tState(){const S=T.states[T.i];return T.f<0?S.start:S.frames[T.f];}
- function tApply(){modes[cur].apply&&modes[cur].apply(tState());if(modes[cur].render)modes[cur].render();tFocus();}
+ function tApply(){document.body.classList.toggle("lk-gist",!!TOUR.steps[T.i].gist&&!T.free);modes[cur].apply&&modes[cur].apply(tState());if(modes[cur].render)modes[cur].render();tFocus();}
  function tFocus(){const fo=T.free?null:TOUR.steps[T.i].focus;
   document.querySelectorAll(`#m-${cur} [data-focus]`).forEach(e=>e.classList.toggle("lk-hl",!!fo&&e.dataset.focus.split(" ").includes(fo)));}
  function tStop(){if(T.timer){clearTimeout(T.timer);T.timer=null;}}
@@ -126,7 +126,7 @@ const LK=(()=>{
   const ms=TOUR.steps[T.i].ms||900;
   const tick=()=>{T.f++;tApply();if(T.f>=n-1){T.timer=null;tDraw();return;}tDraw();T.timer=setTimeout(tick,ms);};
   T.timer=setTimeout(tick,T.f<0?300:ms);tDraw();}
- function tFree(){tStop();T.free=true;document.body.classList.add("lk-free");tFocus();tDraw();}
+ function tFree(){tStop();T.free=true;document.body.classList.add("lk-free");document.body.classList.remove("lk-gist");tFocus();tDraw();}
  function tBack(){T.free=false;document.body.classList.remove("lk-free");tApply();tDraw();}
  function tDraw(){const box=$("lk-tour");if(!box)return;const N=TOUR.steps.length,s=TOUR.steps[T.i],S=T.states[T.i],n=S.frames.length;
   if(T.free){box.innerHTML=`<div class="lk-tfree"><span>✋ 自分で動かしている（解説 ${T.i+1}／${N} で止めた）</span><button type="button" class="act" id="lk-back">↩ 解説に戻る</button></div>`;

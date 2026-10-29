@@ -21,6 +21,7 @@ import re
 from pathlib import Path
 
 from model import ROOT, TOOLS, Course
+from tour import with_gist
 
 OUT = ROOT / "out" / "labs"
 CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why", "steps", "law", "tour")
@@ -74,7 +75,7 @@ def variants(course: Course) -> dict[str, dict]:
             continue
         out[lid] = {}
         for name, p in (t.get("presets") or {}).items():
-            out[f"{lid}@{name}"] = p
+            out[f"{lid}@{name}"] = with_gist(lid, name, p)   # 関係から開く解説には最後に「つまり」の段（#95）
     for u in course.units.values():
         for qid, q in u["problems"].items():
             if q.get("lab"):
