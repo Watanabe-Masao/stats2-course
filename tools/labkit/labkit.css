@@ -118,7 +118,7 @@ body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 .lk-embed.lk-touring [data-tour-anchor]>.legend,.lk-embed.lk-touring [data-tour-anchor]>.lk-tline{display:inline-block;margin:0 4px 0 0;vertical-align:middle;font-size:12px}
 .lk-embed.lk-touring [data-tour-anchor]>.legend span{margin-right:4px;font-size:12px}
 .lk-embed.lk-touring [data-tour-anchor]>.lk-tline span{padding:0 1px}
-.lk-embed.lk-touring [data-tour-anchor] .mut{display:none}
+.lk-embed.lk-touring [data-tour-anchor]>div.mut:not(.legend):not(.lk-tline){display:none}
 /* 埋め込みは幅も狭いことがある（iPhone の Notion で約320px）。全文は「大きく開く」で読む。操作は1行に収める */
 .lk-embed #lk-all{display:none}
 .lk-embed .lk-tsub{flex-wrap:nowrap}
