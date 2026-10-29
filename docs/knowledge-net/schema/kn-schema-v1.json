@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kn-schema-v1",
+  "title": "knowledge-net：教材が書き出す概念・関係・導出のデータ（v1 下書き）",
+  "description": "ID は『教材名:教材の中のID』。関係は別の教材の概念も指せる。リポジトリ knowledge-net を作るまでは、このファイルが元（教材の build はこれで検査する）。 関係の種類の定義・矢印の読み方・該当例・該当しない例は relation-types.yaml。",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "course",
+    "concepts",
+    "relations",
+    "derivations"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "gid": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+:[A-Za-z0-9-]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "texts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      }
+    },
+    "gids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gid"
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "kn-schema"
+    },
+    "version": {
+      "const": 1
+    },
+    "course": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "units"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "number",
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/gid"
+              },
+              "number": {
+                "$ref": "#/$defs/text"
+              },
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "name": {
+            "$ref": "#/$defs/text"
+          },
+          "en": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "filled",
+              "stub"
+            ],
+            "description": "stub：関係から指されているが、説明がまだない概念"
+          },
+          "definition": {
+            "$ref": "#/$defs/text"
+          },
+          "principle": {
+            "$ref": "#/$defs/text"
+          },
+          "conditions": {
+            "type": "object",
+            "required": [
+              "math"
+            ],
+            "additionalProperties": false,
+            "description": "math：数学的な定義・成立の条件。data：現実のデータに当てはめるときの条件・確かめ方の手掛かり",
+            "properties": {
+              "math": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/text"
+                }
+              },
+              "data": {
+                "$ref": "#/$defs/texts"
+              }
+            }
+          },
+          "example": {
+            "$ref": "#/$defs/text"
+          },
+          "counterexample": {
+            "$ref": "#/$defs/text"
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "problems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "formulas": {
+            "type": "array",
+            "description": "式ごとに記号の意味を持つ",
+            "items": {
+              "type": "object",
+              "required": [
+                "tex"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "tex": {
+                  "$ref": "#/$defs/text"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "symbols": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "symbol",
+                      "meaning"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "symbol": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "meaning": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "range": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "misconceptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "misconception",
+                "correction"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "misconception": {
+                  "$ref": "#/$defs/text"
+                },
+                "correction": {
+                  "$ref": "#/$defs/text"
+                }
+              }
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "title": {
+                  "$ref": "#/$defs/text"
+                },
+                "locator": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          }
+        },
+        "if": {
+          "properties": {
+            "status": {
+              "const": "filled"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "definition",
+            "principle",
+            "conditions",
+            "example",
+            "counterexample"
+          ]
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "from",
+          "to",
+          "type",
+          "description",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "from": {
+            "$ref": "#/$defs/gid"
+          },
+          "to": {
+            "$ref": "#/$defs/gid"
+          },
+          "type": {
+            "enum": [
+              "前提",
+              "導出",
+              "一般化",
+              "特殊化",
+              "変換",
+              "対比",
+              "統合",
+              "応用"
+            ]
+          },
+          "description": {
+            "$ref": "#/$defs/text"
+          },
+          "conditions": {
+            "$ref": "#/$defs/texts"
+          },
+          "derivation": {
+            "$ref": "#/$defs/gid"
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "mode": {
+            "enum": [
+              "exact",
+              "approximation",
+              "limit"
+            ],
+            "description": "変換のとき必須。厳密・近似・極限"
+          },
+          "premise": {
+            "enum": [
+              "learning",
+              "mathematical"
+            ],
+            "description": "前提のとき必須。理解に必要な知識／数学的な成立条件"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "変換"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "mode",
+                "conditions"
+              ],
+              "properties": {
+                "conditions": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "導出"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "conditions"
+              ],
+              "properties": {
+                "conditions": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "前提"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "premise"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "not": {
+                    "const": "変換"
+                  }
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "mode"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "not": {
+                    "const": "前提"
+                  }
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "premise"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "premises",
+          "conclusion",
+          "statement",
+          "steps",
+          "conditions",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "premises": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/gid"
+            }
+          },
+          "conclusion": {
+            "$ref": "#/$defs/gid"
+          },
+          "statement": {
+            "$ref": "#/$defs/text"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/text"
+            }
+          },
+          "conditions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/text"
+            }
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          }
+        }
+      }
+    }
+  }
+}

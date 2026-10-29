@@ -24,6 +24,7 @@ items:
     replaced_by: 原本の問題（content/problems）
     absent: ["REF-Q-"]
     when: 最初のブランチ（cleanup-home）
+    deleted: 2026-10-29   # 33単元を公開し直し、取得して照合が通ってから削除（#50）
   - id: LEG-pq-db
     name: 本番形式問題（15問）
     notion: [{id: da3b5947153c4ae59304e308a9b1e9e2, type: database, title: 本番形式問題}]

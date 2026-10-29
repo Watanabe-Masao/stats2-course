@@ -3,6 +3,7 @@
 home_page: 401b7cd539a1818aaf89cc7aeb8522dc   # 📐 一番上のページ（ホーム。生成）
 root_page: 406b7cd539a181009c17d5cf82af377c   # 📚 教材 v2
 guide_page: 406b7cd539a181df985edc50a2b248af  # 学び方ガイド（生成）
+progress_page: 408b7cd539a181748b74ff8a630c5a31  # 進み具合（build/progress.py から生成）
 legacy_page: 408b7cd539a181ea9e3bc678a323c865  # 旧版（削除予定）。publish/legacy.yaml から生成
 personal_root: 406b7cd539a181719cfdfd53a2501d4a  # 個人用の学習記録（配布しない。配布先の設定では空にする）
 units:                 # 新しく生成した単元ページ

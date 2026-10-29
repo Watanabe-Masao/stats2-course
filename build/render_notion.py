@@ -264,8 +264,9 @@ class NotionRenderer:
         lines += ["", "## 準備中", "",
                   "- 🕸 知識ネットワーク：概念と関係の地図（前提をさかのぼる・比べる）",
                   "- 🤖 AI と学ぶ：学習記録を読んで、問いかけ→ヒント→確認問題で進める"]
-        if self.t.get("legacy_page"):
-            lines += ["", "## 片付け中", "", child(self.t["legacy_page"], "旧版（削除予定）")]
+        status = [child(self.t[k], name) for k, name in (("progress_page", "進み具合"), ("legacy_page", "旧版（削除予定）")) if self.t.get(k)]
+        if status:
+            lines += ["", "## 作業の状況", "", "\n\n".join(status)]
         return "\n".join(lines).rstrip("\n") + "\n"
 
     def legacy_page(self, report: list[dict]) -> str:
