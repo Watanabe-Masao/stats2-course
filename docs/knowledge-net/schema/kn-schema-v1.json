@@ -61,6 +61,14 @@
           "url": {
             "type": "string",
             "format": "uri"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "tour",
+              "check"
+            ],
+            "description": "tour：ラボで解説（解説付き再生。答えを見せる）／check：ラボで確かめる（予想・法則・自由に動かす）。教材の build が版から判定する（stats2-course #90）"
           }
         }
       }
@@ -668,5 +676,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 4
+  "x-revision": 5
 }
