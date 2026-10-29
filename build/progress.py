@@ -51,6 +51,11 @@ def unit_row(c, uid: str, target: dict) -> dict:
     }
 
 
+def legacy_term_count(c, target) -> int:
+    """旧版の用語ページを指している用語の数（説明のある概念はネットワークを指すので数えない）。"""
+    return sum(1 for t in (target.get("terms") or {}) if not c.terms.get(t, {}).get("definition"))
+
+
 def mark(v) -> str:
     if v is None:
         return "—"
@@ -85,7 +90,7 @@ def notion_page(c=None, target: dict | None = None) -> str:
              "## 最終ゴールごと", "",
              f"- 概念の説明：{sum(1 for t in c.terms.values() if t.get('definition'))}/{len(c.terms)} 語",
              f"- 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
-             f"- 旧版を指す用語リンク：{len(target.get('terms') or {})}（0 で完了）",
+             f"- 旧版を指す用語リンク：{legacy_term_count(c, target)}（0 で完了）",
              f"- 概念図 {sum(r['figure'] for r in rows.values())}/{len(rows)}・発展 {sum(r['hatten'] for r in rows.values())}/{len(rows)}"
              f"・創造 {sum(r['sozo'] for r in rows.values())}/{len(rows)} 単元",
              "- 旧版：", *[f"  - {_legacy_short(x)}" for x in legacy_status({})[1]], ""]
@@ -118,7 +123,7 @@ def report() -> str:
     lines += ["", "## 最終ゴールごと（#55）", "",
               f"- 1 概念の説明：{filled}/{len(c.terms)} 語",
               f"- 3 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
-              f"- 4 用語リンクの切り替え：旧版を指す用語 {len(target.get('terms') or {})}（0 で完了）",
+              f"- 4 用語リンクの切り替え：旧版を指す用語 {legacy_term_count(c, target)}（0 で完了）",
               f"- 5 概念図 {sum(r['figure'] for r in rows)}/{n}・手本 {sum(1 for r in rows if r['model'])}/{sum(1 for r in rows if r['model'] is not None)}"
               f"・発展 {sum(r['hatten'] for r in rows)}/{n}・創造 {sum(r['sozo'] for r in rows)}/{n} 単元",
               "- 6 旧版：", *[f"  {x.strip()}" for x in legacy_status({})[1]],
