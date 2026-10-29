@@ -1,0 +1,25 @@
+# 導出。複数の前提（概念・関係）から結論が出るときの、導出そのもの（KSLP 3.2：独立した点として扱う）。
+# id は変えない（ネットワークでは stats2:DER-…）。premises・conclusion は概念か関係の id。
+# conditions は必ず書く（どの前提がどこで要るか）。
+derivations:
+  - id: DER-binom-moments
+    premises: [TERM-expect, TERM-var, TERM-indep]
+    conclusion: TERM-binom
+    statement: 二項分布 B(n, p) の期待値は np、分散は np(1−p)。
+    steps:
+      - 成功回数 X を、各回の成功を1・失敗を0とする n 個の量の和 X₁＋…＋Xₙ と見る。
+      - 各 Xᵢ は0か1しかとらないので、E(Xᵢ)＝p、E(Xᵢ²)＝p、V(Xᵢ)＝p−p²＝p(1−p)。
+      - 期待値は和に分けられる（線形性）ので、E(X)＝np。
+      - 各回が独立なので分散も和に分けられ、V(X)＝np(1−p)。
+    conditions: [各回の成功確率が同じ, 分散を和に分けるには各回が独立であること（期待値を和に分けるのに独立は要らない）]
+    basis: {units: [U14]}
+  - id: DER-std-moments
+    premises: [TERM-expect, TERM-var]
+    conclusion: TERM-std
+    statement: 標準化した Z＝(X−μ)÷σ は、期待値0・分散1 になる。
+    steps:
+      - Z＝(1/σ)X−μ/σ は X の1次式 aX＋b（a＝1/σ、b＝−μ/σ）。
+      - E(aX＋b)＝aE(X)＋b なので、E(Z)＝μ/σ−μ/σ＝0。
+      - V(aX＋b)＝a²V(X) なので、V(Z)＝σ²/σ²＝1。
+    conditions: [σ が0でない]
+    basis: {units: [U16]}

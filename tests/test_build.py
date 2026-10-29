@@ -251,7 +251,8 @@ class TestCheckChanged(unittest.TestCase):
         from check_changed import classify
         for f in ["build/model.py", "tests/test_build.py", "tools/labkit/labkit.js", "tools/test_labs.js",
                   "templates/notion/components.yaml", "content/stages.yaml", "content/shared.yaml",
-                  "content/units/index.yaml", "publish/notion.yaml"]:
+                  "content/units/index.yaml", "publish/notion.yaml", "content/relations.yaml",
+                  "docs/knowledge-net/schema/kn-schema-v1.json"]:
             self.assertEqual(classify([f])[3], [f], f)
 
     def test_unit_assets_exist(self):
@@ -319,3 +320,72 @@ class TestHomeAndLegacyPages(unittest.TestCase):
         md = r.legacy_page(rep)
         self.assertIn('<database url="https://app.notion.com/p/aaaa">', md)
         self.assertNotIn("消したもの", md)
+
+
+class TestNetwork(unittest.TestCase):
+    """概念・関係・導出：参照の誤り・種類・成立条件・孤立・型を見逃さない。"""
+
+    def setUp(self):
+        import network
+        self.n = network
+        self.rels, self.ders = network.load_network()
+
+    def _validate(self, c=None, rels=None, ders=None):
+        orig = self.n.load_network
+        self.n.load_network = lambda: (rels if rels is not None else self.rels, ders if ders is not None else self.ders)
+        try:
+            return self.n.validate_network(c or course())
+        finally:
+            self.n.load_network = orig
+
+    def test_clean(self):
+        self.assertEqual(self._validate(), [])
+
+    def test_unknown_term_and_type(self):
+        bad = copy.deepcopy(self.rels)
+        bad[0]["to"] = "TERM-nothing"
+        bad[1]["type"] = "似ている"
+        err = self._validate(rels=bad)
+        self.assertTrue(any("TERM-nothing" in e for e in err))
+        self.assertTrue(any("似ている" in e for e in err))
+
+    def test_transform_needs_conditions(self):
+        bad = copy.deepcopy(self.rels)
+        r = next(x for x in bad if x["type"] == "変換")
+        r.pop("conditions")
+        self.assertTrue(any("成立条件" in e for e in self._validate(rels=bad)))
+
+    def test_other_course_allowed_own_prefix_not(self):
+        rels = copy.deepcopy(self.rels)
+        rels[0]["from"] = "math:CON-ratio"
+        rels[1]["from"] = "stats2:TERM-expect"
+        err = self._validate(rels=rels)
+        self.assertFalse(any("math:CON-ratio" in e for e in err))
+        self.assertTrue(any("教材名を付けずに" in e for e in err))
+
+    def test_isolated_concept_and_missing_fields(self):
+        c = course()
+        c.terms["TERM-perm"]["definition"] = "並べ方の数"
+        err = self._validate(c=c)
+        self.assertTrue(any("TERM-perm: 説明のある概念なのに" in e for e in err))
+        self.assertTrue(any("TERM-perm: 概念の説明に" in e for e in err))
+
+    def test_numbers_need_checks(self):
+        c = course()
+        c.terms["TERM-binom"].pop("checks")
+        self.assertTrue(any("TERM-binom: 説明に数がある" in e for e in self._validate(c=c)))
+
+    def test_export_matches_schema_and_is_namespaced(self):
+        data = self.n.export_network(course(), TARGET)
+        self.assertEqual(self.n.schema_errors(data), [])
+        self.assertTrue(all(x["id"].startswith("stats2:") for x in data["concepts"]))
+        bad = copy.deepcopy(data)
+        bad["relations"][0]["type"] = "似ている"
+        bad["concepts"][0].pop("definition", None)
+        bad["concepts"][0]["status"] = "filled"
+        self.assertGreaterEqual(len(self.n.schema_errors(bad)), 2)
+
+    def test_concept_checks_pass(self):
+        from model import run_check
+        for tid, e in self.n.network_checks(course()):
+            self.assertTrue(run_check(e), f"{tid}: {e}")

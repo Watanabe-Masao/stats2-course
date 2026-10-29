@@ -1,0 +1,71 @@
+# 概念と概念の関係。id は変えない（ネットワークでは stats2:REL-…）。
+# from・to は用語（概念）の id。別の教材の概念は「教材名:id」で書く（例 math:CON-…）。
+# type：前提・導出・一般化・特殊化・変換・対比・統合・応用（KSLP 4.4）
+#   from → to の向きで読む：「from は to の前提」「from を変換すると to」「from を to に応用する」。対比は向きを問わない。
+#   導出・変換には成立条件（conditions）を必ず書く。似ているだけのもの（類似）と、数学的に同じもの（同値）を混ぜない。
+# basis：根拠（その関係を扱う単元 units、導出 derivation）。
+relations:
+  - id: REL-rv-expect
+    from: TERM-rv
+    to: TERM-expect
+    type: 前提
+    description: 期待値は、確率変数のとる値とその確率から作る。
+    basis: {units: [U13]}
+  - id: REL-expect-var
+    from: TERM-expect
+    to: TERM-var
+    type: 前提
+    description: 分散は「期待値からのずれ」の2乗の期待値。期待値がなければ測る基準がない。
+    basis: {units: [U13]}
+  - id: REL-indep-binom
+    from: TERM-indep
+    to: TERM-binom
+    type: 前提
+    description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。
+    basis: {units: [U14]}
+  - id: REL-binom-poisson
+    from: TERM-binom
+    to: TERM-poisson
+    type: 変換
+    description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。
+    conditions: [n が大きい, p が小さい, np＝λ を一定に保つ]
+    basis: {units: [U15]}
+  - id: REL-binom-normal
+    from: TERM-binom
+    to: TERM-normal
+    type: 変換
+    description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
+    conditions: [np と n(1−p) がどちらも十分大きい（目安は5以上）, 整数の棒を曲線で近似するので、境目を0.5ずらす（連続修正）]
+    basis: {units: [U14, U16]}
+  - id: REL-binom-poisson-contrast
+    from: TERM-binom
+    to: TERM-poisson
+    type: 対比
+    description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
+    basis: {units: [U15]}
+  - id: REL-var-std
+    from: TERM-var
+    to: TERM-std
+    type: 前提
+    description: 標準化では、分散の平方根（標準偏差）で割る。
+    basis: {units: [U16]}
+  - id: REL-expect-std
+    from: TERM-expect
+    to: TERM-std
+    type: 前提
+    description: 標準化では、まず期待値（平均）を引く。
+    basis: {units: [U16]}
+  - id: REL-std-normal
+    from: TERM-std
+    to: TERM-normal
+    type: 応用
+    description: 正規分布に従う値を標準化すると標準正規分布 N(0, 1) になり、1つの表で確率が読める。
+    conditions: [X が正規分布に従う]
+    basis: {units: [U16]}
+  - id: REL-clt-normal
+    from: TERM-clt
+    to: TERM-normal
+    type: 応用
+    description: 独立な要因の和や平均は、元の分布によらず正規分布に近づく。正規分布がよく使われる理由。
+    conditions: [足し合わせる量が独立, 分散が有限, 個数が十分多い]
+    basis: {units: [U19]}

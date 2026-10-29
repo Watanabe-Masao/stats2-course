@@ -1,4 +1,4 @@
-# 用語。id は変えない。説明本文は今後ここへ移す（現在はNotionの用語辞典にある）。
+# 用語＝概念。id は変えない（ネットワークでは stats2:TERM-…）。説明（definition など）がある用語は概念として検査し、ネットワーク用に書き出す。まだ説明のない用語の本文は旧版の用語辞典にある（publish/legacy.yaml）。
 - id: TERM-perm
   name: 順列
   en: permutation
@@ -83,6 +83,17 @@
 - id: TERM-var
   name: 分散
   en: variance
+  definition: 確率変数が期待値からどれだけ散らばるかを、ずれの2乗の期待値で表した量。
+  principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
+  formula: V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2,\quad V(aX+b)=a^2V(X)
+  conditions:
+  - 期待値と2乗の期待値が有限
+  example: さいころの目の分散は 91÷6−3.5²＝35/12≒2.92。
+  counterexample: X＋Y の分散は、独立（または共分散が0）でなければ V(X)＋V(Y) にならない。
+  checks:
+  - Fraction(sum(i*i for i in range(1,7)),6)-Fraction(7,2)**2==Fraction(35,12)
+  - abs(35/12-2.92)<0.005
+  - sum(i*i for i in range(1,7))==91
 - id: TERM-unbvar
   name: 不偏分散
   en: unbiased variance
@@ -98,6 +109,15 @@
 - id: TERM-std
   name: 標準化
   en: standardization
+  definition: 値から平均を引き、標準偏差で割って、平均0・標準偏差1 の尺度に直すこと。
+  principle: 1次の変換なので分布の形は変わらない。単位や大きさの違う値を「平均から標準偏差いくつ分か」で比べられる。正規分布なら標準正規分布 N(0, 1) になり、1つの表で確率が読める。
+  formula: Z=\dfrac{X-\mu}{\sigma},\quad E(Z)=0,\ V(Z)=1
+  conditions:
+  - 標準偏差が0でない
+  example: 平均60点・標準偏差10点のテストで、80点は z＝2。
+  counterexample: 標準化しても分布の形は変わらない。右に裾の長いデータを標準化しても、正規分布にはならない。
+  checks:
+  - (80-60)/10==2
 - id: TERM-skew
   name: 歪度
   en: skewness
@@ -107,9 +127,29 @@
 - id: TERM-normal
   name: 正規分布
   en: normal distribution
+  definition: 平均 μ を中心に左右対称な、釣鐘の形をした連続分布 N(μ, σ²)。
+  principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
+  formula: f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)
+  conditions:
+  - 値が連続で、左右対称な山が1つ（データに当てはめるときは、形を確かめてから使う）
+  example: 二項分布 B(100, 0.5) は、平均50・標準偏差5 の正規分布で近似できる。
+  counterexample: 売上や所得のように右に裾が長いデータでは、平均±2σ に95%が入るとは限らない。
+  checks:
+  - abs(math.erf(1/math.sqrt(2))-0.68)<0.005
+  - abs(math.erf(2/math.sqrt(2))-0.95)<0.005
+  - 100*0.5==50 and math.sqrt(100*0.5*0.5)==5
 - id: TERM-expect
   name: 期待値
   en: expected value
+  definition: 確率変数がとる値を、その確率で重み付けした平均。
+  principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
+  formula: E(X)=\sum_x x\,p(x),\quad E(aX+b)=aE(X)+b
+  conditions:
+  - 和（連続なら積分）が有限の値になる
+  example: さいころの目の期待値は (1＋2＋…＋6)÷6＝3.5。
+  counterexample: 期待値 3.5 の目は実際には出ない。期待値は「よく出る値」（最頻値）でも「真ん中の値」（中央値）でもない。
+  checks:
+  - sum(range(1,7))/6==3.5
 - id: TERM-geomean
   name: 幾何平均
   en: geometric mean
@@ -131,6 +171,15 @@
 - id: TERM-indep
   name: 独立
   en: independence
+  definition: 一方が起きたかどうかで、もう一方の起こりやすさが変わらないこと。
+  principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
+  formula: P(A\cap B)=P(A)\,P(B)
+  conditions:
+  - 確率が決まった2つの事象（または確率変数）について言う
+  example: さいころを2回投げると、1回目と2回目の目は独立。両方6になる確率は 1/6×1/6＝1/36。
+  counterexample: 排反（同時に起きない）は独立ではない。P(A) と P(B) が0でなければ、排反なら P(A∩B)＝0 で P(A)P(B) と等しくない。
+  checks:
+  - Fraction(1,6)*Fraction(1,6)==Fraction(1,36)
 - id: TERM-cond
   name: 条件付き確率
   en: conditional probability
@@ -146,6 +195,16 @@
 - id: TERM-rv
   name: 確率変数
   en: random variable
+  definition: 試行の結果に応じて値が決まり、どの値が出るかが確率で表される量。
+  principle: 起こりうる値と、その確率の組（確率分布）で性質が決まる。1つの記録された値ではなく、記録する前の「値の出方」を扱う。
+  formula: P(X=x)=p(x),\quad \sum_x p(x)=1
+  conditions:
+  - 起こりうる値が決まっている
+  - 各値の確率が0以上で、合計が1
+  example: さいころの目 X は、1〜6 の値をそれぞれ確率 1/6 でとる。
+  counterexample: 「今日の売上 120万円」という1つの記録は確率変数ではなく、実現した1つの値。
+  checks:
+  - 6*Fraction(1,6)==1
 - id: TERM-dist
   name: 確率分布
   en: probability distribution
@@ -155,9 +214,32 @@
 - id: TERM-binom
   name: 二項分布
   en: binomial distribution
+  definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
+  principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
+  formula: P(X=k)={}_nC_k\,p^k(1-p)^{n-k},\quad E(X)=np,\ V(X)=np(1-p)
+  conditions:
+  - 回数 n が決まっている
+  - 結果が成功・失敗の2つ
+  - 各回の成功確率 p が同じ
+  - 各回が独立
+  example: 来店客10人がそれぞれ確率 0.3 で買う（互いに独立）なら、買う人数は B(10, 0.3)。期待値は3人、分散は2.1。
+  counterexample: 箱から戻さずに取り出すと、各回の確率が変わり独立でもないので二項分布ではない（超幾何分布）。
+  checks:
+  - abs(10*0.3-3)<1e-12 and abs(10*0.3*0.7-2.1)<1e-12
 - id: TERM-poisson
   name: ポアソン分布
   en: Poisson distribution
+  definition: 一定の時間や範囲で、まれな出来事が平均 λ 回起きるときの、起きた回数の分布。
+  principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
+  formula: P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!},\quad E(X)=V(X)=\lambda
+  conditions:
+  - 出来事が互いに独立に起きる
+  - 同時に2つは起きない
+  - 起きる平均の割合が一定
+  example: 1時間に平均2件の問い合わせがあるとき、ある1時間に1件もない確率は e⁻²≒0.135。
+  counterexample: 昼に集中する来店のように時間帯で割合が変わるなら、1日をまとめて1つのポアソン分布にしてはいけない。
+  checks:
+  - abs(math.exp(-2)-0.135)<0.0005
 - id: TERM-geom
   name: 幾何分布
   en: geometric distribution

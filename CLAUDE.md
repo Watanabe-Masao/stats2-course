@@ -101,6 +101,15 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
     law: {title: 式で説明する, lines: [式…], text: 説明, limit: この式で言えないこと}
 ```
 
+## 概念・関係・導出（知識ネットワークのデータ）
+
+- 概念＝用語（content/terms.yaml）。`definition` を書いた用語が概念になり、`principle`・`conditions`（並び）・`example`・`counterexample` も必須、`formula`（KaTeX）は任意。説明に数があれば `checks`。
+- 関係は content/relations.yaml（REL-…）。type は 前提・導出・一般化・特殊化・変換・対比・統合・応用。導出・変換には成立条件を必ず書く。似ているだけのもの（類似）と同値を混ぜない。
+- 導出は content/derivations.yaml（DER-…）。前提（概念・関係）→ 結論。手順と、どの前提がどこで要るか（conditions）を書く。
+- 自分の教材の id は教材名を付けずに書く。別の教材の概念は `math:CON-…` のように教材名を付ける（ネットワークでは自分の id も `stats2:TERM-…` になる）。
+- 説明のある概念は、どれかの関係か導出につながっていること（孤立させない）。build が止める。
+- build が docs/knowledge-net/schema/kn-schema-v1.json（型。knowledge-net を作るまではこれが元）で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。
+
 ## 例題・問題にはラボか図を付ける（build が止める）
 
 - 問題には `lab:`（上）か `figure:` を書く。`figure:` は答えの中に「🖼️ 図で確かめる」として入る（図ID は `FIG-<問題ID>`）。

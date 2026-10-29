@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kn-schema-v1",
+  "title": "knowledge-net：教材が書き出す概念・関係・導出のデータ（v1 下書き）",
+  "description": "ID は『教材名:教材の中のID』。関係は別の教材の概念も指せる。リポジトリ knowledge-net を作るまでは、このファイルが元（教材の build はこれで検査する）。",
+  "type": "object",
+  "required": ["schema", "version", "course", "concepts", "relations", "derivations"],
+  "additionalProperties": false,
+  "$defs": {
+    "gid": {"type": "string", "pattern": "^[a-z0-9-]+:[A-Za-z0-9-]+$"},
+    "text": {"type": "string", "minLength": 1},
+    "texts": {"type": "array", "items": {"$ref": "#/$defs/text"}},
+    "gids": {"type": "array", "items": {"$ref": "#/$defs/gid"}}
+  },
+  "properties": {
+    "schema": {"const": "kn-schema"},
+    "version": {"const": 1},
+    "course": {
+      "type": "object",
+      "required": ["id", "title", "units"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "title": {"$ref": "#/$defs/text"},
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "number", "title"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {"$ref": "#/$defs/gid"},
+              "number": {"$ref": "#/$defs/text"},
+              "title": {"$ref": "#/$defs/text"},
+              "url": {"type": "string", "format": "uri"}
+            }
+          }
+        }
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "status", "units"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/gid"},
+          "name": {"$ref": "#/$defs/text"},
+          "en": {"type": "string"},
+          "status": {"enum": ["filled", "stub"], "description": "stub：関係から指されているが、説明がまだない概念"},
+          "definition": {"$ref": "#/$defs/text"},
+          "principle": {"$ref": "#/$defs/text"},
+          "formula": {"type": "string", "description": "KaTeX で表示する式"},
+          "conditions": {"$ref": "#/$defs/texts"},
+          "example": {"$ref": "#/$defs/text"},
+          "counterexample": {"$ref": "#/$defs/text"},
+          "units": {"$ref": "#/$defs/gids"},
+          "problems": {"type": "array", "items": {"type": "string"}}
+        },
+        "if": {"properties": {"status": {"const": "filled"}}},
+        "then": {"required": ["definition", "principle", "conditions", "example", "counterexample"]}
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "type", "description", "units"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/gid"},
+          "from": {"$ref": "#/$defs/gid"},
+          "to": {"$ref": "#/$defs/gid"},
+          "type": {"enum": ["前提", "導出", "一般化", "特殊化", "変換", "対比", "統合", "応用"]},
+          "description": {"$ref": "#/$defs/text"},
+          "conditions": {"$ref": "#/$defs/texts"},
+          "derivation": {"$ref": "#/$defs/gid"},
+          "units": {"$ref": "#/$defs/gids"}
+        },
+        "if": {"properties": {"type": {"enum": ["導出", "変換"]}}},
+        "then": {"required": ["conditions"], "properties": {"conditions": {"minItems": 1}}}
+      }
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "premises", "conclusion", "statement", "steps", "conditions", "units"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"$ref": "#/$defs/gid"},
+          "premises": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/gid"}},
+          "conclusion": {"$ref": "#/$defs/gid"},
+          "statement": {"$ref": "#/$defs/text"},
+          "steps": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+          "conditions": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+          "units": {"$ref": "#/$defs/gids"}
+        }
+      }
+    }
+  }
+}

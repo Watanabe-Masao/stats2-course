@@ -21,7 +21,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DOCS = re.compile(r"^(CLAUDE\.md|README\.md|docs/)")
+DOCS = re.compile(r"^(CLAUDE\.md|README\.md|docs/(?!knowledge-net/schema/))")   # 型（schema）は build が使うので共通部分
 UNIT = re.compile(r"^(?:content/units/(U\d+T?)/|content/problems/(U\d+T?)\.yaml$|migration/(?:old|waivers)/(U\d+T?)\.)")
 LAB = re.compile(r"^tools/([a-z0-9_]+_lab)/")
 
