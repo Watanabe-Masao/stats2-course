@@ -14,7 +14,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
   - key: approx
     name: 二項とポアソン
     purpose: n が大きく p が小さい二項分布 B(n, p) と、λ＝np のポアソン分布を棒で並べて比べる
-    set: [n, p, k, lam]             # lam：n と一緒に渡すと p＝lam÷n にする（np＝λ を保つ。解説付き再生で使う）
+    set: [n, p, k, lam, only]       # lam：n と一緒に渡すと p＝lam÷n にする（np＝λ を保つ）。only: binom でポアソンを重ねない（解説付き再生で使う）
     values: [bin, poi, diff, lambda, maxdiff, bvar]   # maxdiff：棒の範囲（0〜kmax）で二項とポアソンの確率の差の最大
   - key: geom
     name: 成功するまで
@@ -88,6 +88,46 @@ presets:
           focus: bars
         - title: 散らばりの違い
           text: だから二項の分散 **np(1−p)＝1.2** は、ポアソンの **λ＝3** より小さい。
+          focus: var
+  rel-geom-contrast-tour:   # 解説付き再生（#95）。関係「二項分布 と 幾何分布 を比べる（対比）」。二項（approx の二項だけ）と幾何を段で切り替える
+    mode: approx
+    tour:
+      kmax: 10
+      decimals: 3
+      steps:
+        - title: 二項
+          text: 二項：**回数を10回に決めて**、当たり（p＝0.3）の数 0〜10 を数える。
+          set: {n: 10, lam: 3, k: 3, only: binom}
+          focus: bars
+        - title: 幾何
+          text: 幾何：**当たり1回に決めて**、そこまでの回数 1, 2, 3, … を数える。上限はない。
+          mode: geom
+          set: {p: 0.3, r: 1, k: 3}
+          focus: bars
+        - title: 数える物が違う
+          text: 平均は二項が np＝3（当たりの数）、幾何が 1/p≒3.3（回数）。**数えている物が違う**。
+          focus: mean
+  rel-geom:   # 関係「二項分布 と 幾何分布 を比べる（対比）」から開く「確かめる」（予想なし）
+    mode: geom
+    modes: [approx, geom]
+    set: {p: 0.3, r: 1, k: 3}
+    task: タブを切り替えて、二項（回数を決めて当たりの数を数える）と幾何（当たりを決めて回数を数える）で、横軸が何を数えているかを比べる。
+  rel-hyper-contrast-tour:   # 解説付き再生（#95）。関係「二項分布 と 超幾何分布 を比べる（対比）」。平均は同じ→取る数を増やす→全部取る
+    mode: hyper
+    tour:
+      decimals: 3
+      steps:
+        - title: 平均は同じ
+          text: 20個中6個が当たりの箱から5個取る。戻さない（超幾何）と戻す（二項）で、**平均はどちらも1.5**。
+          set: {N: 20, K: 6, n: 5, k: 1}
+          focus: mean
+        - title: 取る数を増やす
+          text: '**取る数を増やす**と、戻さない方の分散は **(N−n)/(N−1) 倍**に小さくなる。'
+          frames: [{n: 10, k: 3}, {n: 15, k: 4}]   # 強調する棒も平均の近くへ動かす
+          focus: fpc
+        - title: 全部取る
+          text: 全部取る（n＝N）と、当たりは必ず6個。戻さない方の**散らばりは0**。
+          frames: [{n: 20, k: 6}]
           focus: var
   s3-free:
     mode: pois
