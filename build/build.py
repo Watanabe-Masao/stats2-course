@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from figures import build_figures, validate_figures  # noqa: E402
 from legacy import legacy_report, legacy_status  # noqa: E402
+from progress import notion_page as progress_page  # noqa: E402
 from network import export_network, network_checks, schema_errors, validate_network, write_network  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
@@ -60,6 +61,8 @@ def main(argv: list[str]) -> int:
     pages.update({uid: r.unit_page(uid) for uid in course.units})
     if r.t.get("home_page"):
         pages["home"] = r.home_page()
+    if r.t.get("progress_page"):
+        pages["progress"] = progress_page(course, r.t)
     if r.t.get("legacy_page"):
         pages["legacy"] = r.legacy_page(legacy_report(pages))
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]

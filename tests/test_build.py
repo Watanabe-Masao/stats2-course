@@ -389,3 +389,16 @@ class TestNetwork(unittest.TestCase):
         from model import run_check
         for tid, e in self.n.network_checks(course()):
             self.assertTrue(run_check(e), f"{tid}: {e}")
+
+
+class TestProgress(unittest.TestCase):
+    def test_counts_from_source(self):
+        from progress import notion_page, unit_row
+        c = course()
+        r = unit_row(c, "U14", TARGET)
+        self.assertEqual(r["concepts"][0], r["concepts"][1])   # W0a で U14 の用語は全部説明あり
+        c.terms["TERM-binom"].pop("definition")
+        self.assertLess(unit_row(c, "U14", TARGET)["concepts"][0], r["concepts"][1])
+        md = notion_page(course(), TARGET)
+        self.assertNotIn("| ", md)   # スマホ前提：表を使わない
+        self.assertIn("U32：", md)
