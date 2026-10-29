@@ -2,6 +2,7 @@
 # 検算の Φ(z) は 0.5*(1+math.erf(z/math.sqrt(2)))
 - id: Q-U16-001
   stage: S1
+  concepts: [TERM-normal, TERM-std]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -25,6 +26,7 @@
 
 - id: Q-U16-002
   stage: S1
+  concepts: [TERM-uniform]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -44,6 +46,7 @@
 
 - id: Q-U16-003
   stage: S1
+  concepts: [TERM-std, TERM-normal]
   difficulty: 1
   format: written
   powers: [P1]
@@ -62,6 +65,7 @@
 
 - id: Q-U16-004
   stage: S1
+  concepts: [TERM-uniform, TERM-pdf]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -80,6 +84,7 @@
 
 - id: Q-U16-005
   stage: S1
+  concepts: [TERM-expo]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -98,6 +103,7 @@
 
 - id: Q-U16-010
   stage: S2
+  concepts: [TERM-normal, TERM-std]
   format: written
   powers: [P1, P2]
   prompt: 弁当の重さは平均400g・標準偏差8gの正規分布に従う。390g 未満の弁当の割合は？（Φ(1.25)＝0.8944）
@@ -115,6 +121,7 @@
 
 - id: Q-U16-011
   stage: S2
+  concepts: [TERM-normal, TERM-std]
   format: written
   powers: [P1, P3]
   prompt: 試験の点数は平均60点・標準偏差10点の正規分布に従う。上位5%に入るには何点以上が必要か。（上側5%の z は1.645）
@@ -132,6 +139,7 @@
 
 - id: Q-U16-012
   stage: S2
+  concepts: [REL-poisson-expo, TERM-poisson, TERM-expo]
   format: written
   powers: [P1, P3]
   prompt: 問い合わせは1時間に平均3件（ポアソン分布、{{unit:U15}}）。次の問い合わせまで20分以上待つ確率を、① ポアソン分布の「20分間に0件」と ② 指数分布の待ち時間 の2通りで求めて比べよ。
@@ -149,6 +157,7 @@
 
 - id: Q-U16-020
   stage: S3
+  concepts: [TERM-normal, TERM-expo, TERM-uniform, TERM-pdf]
   format: written
   powers: [P3]
   prompt: 次の量に合う分布は？ (a) 1袋のポテトチップスの重さ (b) 次の客がレジに来るまでの時間 (c) 止まった時計の秒針が指す位置（0〜60秒）。(c) で秒針が0秒から10秒の間にある確率は？
@@ -166,6 +175,7 @@
 
 - id: Q-U16-021
   stage: S3
+  concepts: [TERM-std, TERM-normal]
   format: written
   powers: [P1, P3]
   prompt: 手元の正規分布表は「z 以上になる確率（上側確率）」で、z＝1.5 の欄に 0.0668 と書いてある。標準正規分布で P(−1.5≦Z≦1.5) は？
@@ -183,6 +193,7 @@
 
 - id: Q-U16-022
   stage: S3
+  concepts: [TERM-normal, TERM-std, TERM-sd]
   format: written
   powers: [P1, P3]
   prompt: 製品の重さは平均500g・標準偏差3gの正規分布に従う。規格は494g以上506g以下。規格外になる割合は？ 標準偏差を2gに下げると、規格外の割合はどうなるか。（Φ(2)＝0.9772、Φ(3)＝0.9987）
@@ -201,6 +212,7 @@
 
 - id: Q-U16-023
   stage: S3
+  concepts: [TERM-pdf, TERM-std, TERM-expo, TERM-uniform]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -231,6 +243,7 @@
 
 - id: Q-U16-030
   stage: S4
+  concepts: [TERM-normal, TERM-std]
   format: written
   powers: [P1, P3]
   prompt: ある商品の1日の販売数は平均80個・標準偏差12個の正規分布に従う。欠品する日を5%以下にするには、1日に何個用意すればよいか。（上側5%の z は1.645）
@@ -248,6 +261,7 @@
 
 - id: Q-U16-031
   stage: S4
+  concepts: [TERM-normal, TERM-std]
   format: written
   powers: [P1, P3]
   prompt: 内容量は平均502g・標準偏差2gの正規分布に従う。表示の500gを下回る割合は？ 平均を504gに上げるとどうなるか。（Φ(1)＝0.8413、Φ(2)＝0.9772）
@@ -265,6 +279,7 @@
 
 - id: Q-U16-032
   stage: S4
+  concepts: [TERM-expo]
   format: written
   powers: [P1, P3]
   prompt: レジの待ち時間は平均3分の指数分布に従うとする。5分を超えて待つ客の割合は？ 平均より長く待つ客は半分より多いか少ないか。
@@ -282,6 +297,7 @@
 
 - id: Q-U16-040
   stage: S3
+  concepts: [TERM-uniform, TERM-var, TERM-sd]
   format: written
   powers: [P1, P3]
   prompt: バスが15分おきに来るとき、でたらめな時刻に行ったときの待ち時間 U(0, 15) の分散と標準偏差は？

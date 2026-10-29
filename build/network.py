@@ -134,6 +134,39 @@ def validate_network(c: Course) -> list[str]:
         for u in (d.get("basis") or {}).get("units", []):
             if u not in c.index:
                 err.append(f"{did}: basis の単元 {u} がない")
+    # ラボへの参照（概念・関係の labs:）。ラボと場面の版がある。値・学習目標はラボの側（tool.yaml）
+    def check_labs(owner: str, labs) -> None:
+        for lab in labs or []:
+            lid, pre = lab.get("id"), lab.get("preset")
+            if lid not in c.labs:
+                err.append(f"{owner}: labs の {lid} がない")
+            elif pre and pre not in (c.labs[lid].get("presets") or {}):
+                err.append(f"{owner}: labs の {lid} に場面の版 {pre} がない（tool.yaml の presets）")
+            if set(lab) - {"id", "preset", "purpose"}:
+                err.append(f"{owner}: labs に書けるのは id・preset・purpose だけ（URL は build が作る）")
+    for tid, t in c.terms.items():
+        check_labs(tid, t.get("labs"))
+    for r in rels:
+        check_labs(r.get("id", "?"), r.get("labs"))
+    # 問題 → 確かめる概念・関係（concepts:）。説明のある概念か、ある関係だけを指せる。
+    # unit.yaml に concepts_linked: true がある単元は、retired 以外の全問に concepts: を書く。
+    for uid, u in c.units.items():
+        for qid, q in u["problems"].items():
+            refs = q.get("concepts") or []
+            if not isinstance(refs, list):
+                err.append(f"{qid}: concepts は概念・関係の id の一覧で書く")
+                continue
+            for ref in refs:
+                if NS.match(str(ref)):
+                    continue
+                if ref in rel_ids:
+                    continue
+                if ref not in c.terms:
+                    err.append(f"{qid}: concepts の {ref} が用語・関係にない")
+                elif not filled(c.terms[ref]):
+                    err.append(f"{qid}: concepts の {ref} はまだ説明のない用語（概念にしてから指す）")
+            if u.get("concepts_linked") and not q.get("retired") and not refs:
+                err.append(f"{qid}: {uid} は concepts_linked なので、確かめる概念（concepts:）を書く")
     # 説明のある概念は、どこかの関係か導出につながっている（孤立させない）
     linked = {r.get(k) for r in rels for k in ("from", "to")}
     linked |= {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
@@ -153,6 +186,22 @@ def export_network(c: Course, target: dict) -> dict:
 
     def g(x: str) -> str:
         return x if NS.match(x) else f"{cid}:{x}"
+
+    base = target.get("site_base_url") or ""
+
+    def labs(items) -> list[dict]:
+        from labs import lab_url
+        out = []
+        for lab in items or []:
+            if not base:
+                continue   # 公開先がない配布先では、ラボへの参照を出さない
+            aid = lab["id"] + (f"@{lab['preset']}" if lab.get("preset") else "")
+            e = {"id": lab["id"], "url": lab_url(base, c, aid), "title": c.labs[lab["id"]].get("name", lab["id"])}
+            for k in ("preset", "purpose"):
+                if lab.get(k):
+                    e[k] = lab[k]
+            out.append(e)
+        return out
 
     units_of: dict[str, list[str]] = {}
     for uid, u in c.units.items():
@@ -176,6 +225,8 @@ def export_network(c: Course, target: dict) -> dict:
             for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions"):
                 if t.get(k):
                     e[k] = t[k]
+            if labs(t.get("labs")):
+                e["labs"] = labs(t.get("labs"))
             if t.get("sources"):
                 url = {s["name"]: s.get("url") for s in c.shared.get("sources", [])}
                 e["sources"] = [{"title": s["source"], **({"locator": s["locator"]} if s.get("locator") else {}),
@@ -197,11 +248,14 @@ def export_network(c: Course, target: dict) -> dict:
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
             e["derivation"] = g(r["basis"]["derivation"])
+        if labs(r.get("labs")):
+            e["labs"] = labs(r.get("labs"))
         relations.append(e)
     derivations = [{"id": g(d["id"]), "version": d["version"], "premises": [g(p) for p in d["premises"]], "conclusion": g(d["conclusion"]),
                     "statement": d["statement"], "steps": d["steps"], "conditions": d["conditions"],
                     "units": [g(u) for u in (d.get("basis") or {}).get("units", [])]} for d in ders]
-    return {"schema": "kn-schema", "version": 1,
+    revision = json.loads(SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
+    return {"schema": "kn-schema", "version": 1, "schema_revision": revision,
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
             "concepts": concepts, "relations": relations, "derivations": derivations}
 

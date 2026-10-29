@@ -36,6 +36,8 @@ relations:
     from: TERM-binom
     to: TERM-poisson
     version: 1
+    labs:
+      - {id: LAB-pois, preset: rel-approx, purpose: np を保って n を大きくすると、二項分布がポアソン分布に重なる}
     type: 変換
     mode: limit
     description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。
@@ -45,6 +47,8 @@ relations:
     from: TERM-binom
     to: TERM-normal
     version: 1
+    labs:
+      - {id: LAB-binom, preset: s5-norm, purpose: n を大きくすると、棒が正規分布の曲線に重なる（p が小さいと崩れる）}
     type: 変換
     mode: approximation
     description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
@@ -77,6 +81,8 @@ relations:
     from: TERM-std
     to: TERM-normal
     version: 1
+    labs:
+      - {id: LAB-z, preset: s4-normal, purpose: 標準化すると、どの正規分布も同じ表で読める}
     type: 応用
     description: 正規分布に従う値を標準化すると標準正規分布 N(0, 1) になり、1つの表で確率が読める。
     conditions: [X が正規分布に従う]
@@ -89,3 +95,127 @@ relations:
     description: 独立な要因の和や平均は、元の分布によらず正規分布に近づく。正規分布がよく使われる理由。
     conditions: [足し合わせる量が独立, 分散が有限, 個数が十分多い]
     basis: {units: [U19]}
+  - id: REL-rv-dist
+    from: TERM-rv
+    to: TERM-dist
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 確率分布は、確率変数がとる値とその確率の対応。確率変数がなければ分布は作れない。
+    basis: {units: [U13]}
+  - id: REL-dist-expect
+    from: TERM-dist
+    to: TERM-expect
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 期待値は、確率分布の「値×確率」を全部足して作る。分布を1つの数に要約したもの。
+    basis: {units: [U13]}
+  - id: REL-var-sd
+    from: TERM-var
+    to: TERM-sd
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 標準偏差は分散の正の平方根。2乗した単位を元の単位に戻す。
+    basis: {units: [U13]}
+  - id: REL-var-cov
+    from: TERM-var
+    to: TERM-cov
+    version: 1
+    type: 一般化
+    description: 分散は1つの変数のずれの2乗の期待値。2つの変数のずれの積に広げると共分散になる（Cov(X, X)＝V(X)）。
+    basis: {units: [U13]}
+  - id: REL-indep-cov
+    from: TERM-indep
+    to: TERM-cov
+    version: 1
+    labs:
+      - {id: LAB-expect, preset: s5-free, purpose: 独立なら共分散が0。0でも独立とは限らないことも確かめる}
+    type: 導出
+    description: 独立なら E(XY)＝E(X)E(Y) なので、共分散は0になる。逆（共分散0なら独立）は成り立たない。
+    conditions: [X と Y が独立, 期待値が有限]
+    basis: {units: [U13]}
+  - id: REL-indep-geom
+    from: TERM-indep
+    to: TERM-geom
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 各回が独立なので、失敗が続いてから成功する確率が掛け算 (1−p)^(k−1)p で求まる。
+    basis: {units: [U15]}
+  - id: REL-binom-geom-contrast
+    from: TERM-binom
+    to: TERM-geom
+    version: 1
+    type: 対比
+    description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
+    basis: {units: [U15]}
+  - id: REL-hyper-binom
+    from: TERM-hyper
+    to: TERM-binom
+    version: 1
+    labs:
+      - {id: LAB-pois, preset: rel-hyper, purpose: 集団を大きくすると、戻さない確率が戻す確率に近づく}
+    type: 変換
+    mode: limit
+    description: 集団 N を大きくして当たりの割合 M/N を保つと、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。
+    conditions: [N が取り出す数 n に比べて十分大きい, 当たりの割合 M/N を一定に保つ]
+    basis: {units: [U15]}
+  - id: REL-binom-hyper-contrast
+    from: TERM-binom
+    to: TERM-hyper
+    version: 1
+    type: 対比
+    description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が (N−n)/(N−1) 倍だけ小さい。
+    basis: {units: [U15]}
+  - id: REL-poisson-expo
+    from: TERM-poisson
+    to: TERM-expo
+    version: 1
+    labs:
+      - {id: LAB-pois, preset: s5-free, purpose: 0件の確率を時間を延ばして見ると、待ち時間の確率になる}
+    type: 導出
+    description: 一定の割合 λ で独立に起きる出来事では、一定時間の件数がポアソン分布、次に起きるまでの待ち時間が指数分布になる。
+    conditions: [出来事が一定の割合 λ で起きる, 重ならない時間の件数が互いに独立]
+    basis: {units: [U15, U16]}
+  - id: REL-dist-pdf
+    from: TERM-dist
+    to: TERM-pdf
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 連続な確率変数の分布は、値ごとの確率では書けない（1点の確率が0）ので、確率密度関数の面積で表す。
+    basis: {units: [U16]}
+  - id: REL-pdf-normal
+    from: TERM-pdf
+    to: TERM-normal
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 正規分布は確率密度関数 f(x) で定義され、確率は曲線の下の面積で読む。
+    basis: {units: [U16]}
+  - id: REL-pdf-uniform
+    from: TERM-pdf
+    to: TERM-uniform
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 一様分布は、密度が一定の確率密度関数 1/(b−a) で定義される。
+    basis: {units: [U16]}
+  - id: REL-pdf-expo
+    from: TERM-pdf
+    to: TERM-expo
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 指数分布は、確率密度関数 λe^(−λx) で定義される。
+    basis: {units: [U16]}
+  - id: REL-sd-std
+    from: TERM-sd
+    to: TERM-std
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 標準化では、平均を引いたあと標準偏差で割り、単位のない「標準偏差いくつ分」にする。
+    basis: {units: [U16]}

@@ -1,6 +1,7 @@
 # 単元U15の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U15-001
   stage: S1
+  concepts: [TERM-poisson]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -23,6 +24,7 @@
 
 - id: Q-U15-002
   stage: S1
+  concepts: [REL-binom-poisson, TERM-poisson]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -42,6 +44,7 @@
 
 - id: Q-U15-003
   stage: S1
+  concepts: [TERM-poisson]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U15-004
   stage: S1
+  concepts: [TERM-poisson]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -78,6 +82,7 @@
 
 - id: Q-U15-005
   stage: S1
+  concepts: [TERM-poisson, TERM-indep]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -96,6 +101,7 @@
 
 - id: Q-U15-010
   stage: S2
+  concepts: [TERM-poisson]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -114,6 +120,7 @@
 
 - id: Q-U15-011
   stage: S2
+  concepts: [TERM-geom]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -132,6 +139,7 @@
 
 - id: Q-U15-012
   stage: S2
+  concepts: [REL-binom-poisson, TERM-binom, TERM-poisson]
   label: 約1か月後の問
   format: written
   powers: [P1, P3]
@@ -150,6 +158,7 @@
 
 - id: Q-U15-020
   stage: S3
+  concepts: [TERM-poisson, TERM-binom, TERM-geom, REL-binom-geom-contrast]
   tag: 分布を選ぶ
   format: written
   powers: [P3]
@@ -168,6 +177,7 @@
 
 - id: Q-U15-021
   stage: S3
+  concepts: [TERM-geom, TERM-indep]
   tag: 負の二項分布
   format: written
   powers: [P1, P3]
@@ -186,6 +196,7 @@
 
 - id: Q-U15-022
   stage: S3
+  concepts: [TERM-hyper]
   tag: 戻さずに取り出す
   format: written
   powers: [P1, P2]
@@ -204,6 +215,7 @@
 
 - id: Q-U15-023
   stage: S3
+  concepts: [TERM-poisson]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -234,6 +246,7 @@
 
 - id: Q-U15-030
   stage: S4
+  concepts: [TERM-poisson]
   tag: レジの応援基準
   format: written
   powers: [P1, P3]
@@ -252,6 +265,7 @@
 
 - id: Q-U15-031
   stage: S4
+  concepts: [TERM-hyper, REL-binom-hyper-contrast]
   tag: 箱からの抜き取り
   format: written
   powers: [P1, P3]
@@ -270,6 +284,7 @@
 
 - id: Q-U15-032
   stage: S4
+  concepts: [TERM-poisson]
   tag: クレームの件数
   format: written
   powers: [P1, P3]
@@ -288,6 +303,7 @@
 
 - id: Q-U15-040
   stage: S3
+  concepts: [REL-poisson-expo, TERM-expo]
   tag: 待ち時間
   format: written
   powers: [P1, P3]

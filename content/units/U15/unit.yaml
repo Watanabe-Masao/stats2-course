@@ -24,6 +24,7 @@ evidence:
   S4: 売場や検査の場面で、分布を選んで k 件以上・0件の確率を説明できた
   S5: 1つ選んで理解を確かめた（任意）
   S6: 課題を1つ作り、検証まで行った（任意）
+concepts_linked: true
 status: drafted
 version: 1
 checks:

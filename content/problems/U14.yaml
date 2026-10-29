@@ -1,6 +1,7 @@
 # 単元U14の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U14-001
   stage: S1
+  concepts: [TERM-binom, TERM-indep]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -23,6 +24,7 @@
 
 - id: Q-U14-002
   stage: S1
+  concepts: [TERM-binom]
   label: 例題C（自力）
   format: written
   powers: [P1, P2]
@@ -42,6 +44,7 @@
 
 - id: Q-U14-003
   stage: S1
+  concepts: [TERM-binom]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U14-004
   stage: S1
+  concepts: [TERM-binom]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -78,6 +82,7 @@
 
 - id: Q-U14-005
   stage: S1
+  concepts: [TERM-binom, TERM-indep]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -96,6 +101,7 @@
 
 - id: Q-U14-010
   stage: S2
+  concepts: [TERM-binom]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -114,6 +120,7 @@
 
 - id: Q-U14-011
   stage: S2
+  concepts: [TERM-binom, TERM-sd]
   label: 約1週間後の問
   format: written
   powers: [P1]
@@ -132,6 +139,7 @@
 
 - id: Q-U14-012
   stage: S2
+  concepts: [TERM-binom, TERM-expect, TERM-var, TERM-indep]
   label: 約1か月後の問
   format: written
   powers: [P1, P3]
@@ -150,6 +158,7 @@
 
 - id: Q-U14-020
   stage: S3
+  concepts: [TERM-binom, TERM-indep]
   tag: 以上は反対側から
   format: written
   powers: [P1, P3]
@@ -168,6 +177,7 @@
 
 - id: Q-U14-021
   stage: S3
+  concepts: [TERM-binom]
   tag: n を決める
   format: written
   powers: [P1, P3]
@@ -186,6 +196,7 @@
 
 - id: Q-U14-022
   stage: S3
+  concepts: [TERM-binom, TERM-var]
   tag: 平均と分散から n・p
   format: written
   powers: [P1, P3]
@@ -204,6 +215,7 @@
 
 - id: Q-U14-023
   stage: S3
+  concepts: [TERM-binom, TERM-indep, TERM-hyper, TERM-geom]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -234,6 +246,7 @@
 
 - id: Q-U14-030
   stage: S4
+  concepts: [TERM-binom]
   tag: クーポンが0人
   format: written
   powers: [P1, P3]
@@ -252,6 +265,7 @@
 
 - id: Q-U14-031
   stage: S4
+  concepts: [TERM-binom]
   tag: 抜き取り検査
   format: written
   powers: [P1, P3]
@@ -270,6 +284,7 @@
 
 - id: Q-U14-032
   stage: S4
+  concepts: [TERM-binom, TERM-expect]
   tag: 予約の受けすぎ
   format: written
   powers: [P1, P3]
@@ -288,6 +303,7 @@
 
 - id: Q-U14-040
   stage: S3
+  concepts: [REL-binom-normal, TERM-normal, TERM-std]
   tag: 正規分布で近似
   format: written
   powers: [P1, P3]

@@ -349,6 +349,28 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("TERM-nothing" in e for e in err))
         self.assertTrue(any("似ている" in e for e in err))
 
+    def test_problem_concepts(self):
+        c = course()
+        qid = next(iter(c.units["U13"]["problems"]))
+        q = c.units["U13"]["problems"][qid]
+        q["concepts"] = ["TERM-nothing", "TERM-perm", "REL-rv-expect", "TERM-expect"]
+        err = self._validate(c)
+        self.assertTrue(any(f"{qid}: concepts の TERM-nothing が用語・関係にない" in e for e in err))
+        self.assertTrue(any(f"{qid}: concepts の TERM-perm はまだ説明のない用語" in e for e in err))
+        self.assertFalse(any("REL-rv-expect" in e or "TERM-expect" in e for e in err))
+        q.pop("concepts")
+        c.units["U13"]["concepts_linked"] = True
+        self.assertTrue(any(f"{qid}: U13 は concepts_linked" in e for e in self._validate(c)))
+
+    def test_lab_refs(self):
+        c = course()
+        c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},
+                                         {"id": "LAB-expect", "url": "https://x"}]
+        err = self._validate(c)
+        self.assertTrue(any("TERM-expect: labs の LAB-nothing がない" in e for e in err))
+        self.assertTrue(any("場面の版 s9-none がない" in e for e in err))
+        self.assertTrue(any("URL は build が作る" in e for e in err))
+
     def test_transform_needs_conditions(self):
         bad = copy.deepcopy(self.rels)
         r = next(x for x in bad if x["type"] == "変換")
