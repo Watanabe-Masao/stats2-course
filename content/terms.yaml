@@ -89,22 +89,46 @@
   - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
   principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
   formulas:
-  - tex: V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2
+  - tex: 'V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2'
     symbols:
-    - symbol: V(X)
-      meaning: X の分散
-      range: 0以上
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: μ
       meaning: X の期待値 E(X)
-    - symbol: (X−μ)²
-      meaning: 期待値からのずれの2乗
-  - tex: V(aX+b)=a^2V(X)
+      key: mu
+      concept: TERM-expect
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"num": 2}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "pow", "args": [{"sym": "X"}, {"num": 2}]}], "name": "E"}, {"op": "pow", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"num": 2}]}]}]}
+  - tex: 'V(aX+b)=a^2V(X)'
     label: 1次式の分散
     symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: a
       meaning: 掛ける定数（2乗で効く）
+      key: a
+      kind: const
     - symbol: b
       meaning: 足す定数（散らばりは変えない）
+      key: b
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "V"}, {"op": "mul", "args": [{"op": "pow", "args": [{"sym": "a"}, {"num": 2}]}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   conditions:
     math:
     - 期待値と、2乗の期待値が有限
@@ -141,8 +165,17 @@
     - symbol: σ
       meaning: 標準偏差
       range: 0以上
-    - symbol: V(X)
-      meaning: X の分散
+      key: sigma
+      kind: param
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    tree: {"op": "eq", "args": [{"sym": "sigma"}, {"op": "sqrt", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   conditions:
     math:
     - 分散が有限
@@ -175,16 +208,52 @@
   - {id: LAB-z, preset: s1-z, purpose: 単位や散らばりの違うものを z得点でそろえて比べる}
   principle: 1次の変換なので分布の形は変わらない。単位や大きさの違う値を「平均から標準偏差いくつ分か」で比べられる。正規分布なら標準正規分布 N(0, 1) になり、1つの表で確率が読める。
   formulas:
-  - tex: Z=\dfrac{X-\mu}{\sigma}
+  - tex: 'Z=\dfrac{X-\mu}{\sigma}'
     symbols:
     - symbol: Z
       meaning: 標準化した値（平均から標準偏差いくつ分か）
+      key: Z
+      kind: rv
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: μ
-      meaning: 平均
+      meaning: X の期待値 E(X)
+      key: mu
+      concept: TERM-expect
+      kind: param
     - symbol: σ
-      meaning: 標準偏差
+      meaning: X の標準偏差
       range: 0より大きい
-  - tex: E(Z)=0,\quad V(Z)=1
+      key: sigma
+      concept: TERM-sd
+      kind: param
+    tree: {"op": "eq", "args": [{"sym": "Z"}, {"op": "div", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"sym": "sigma"}]}]}
+  - tex: 'E(Z)=0'
+    label: 標準化した値の期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: Z
+      meaning: 標準化した値（平均から標準偏差いくつ分か）
+      key: Z
+      kind: rv
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "Z"}], "name": "E"}, {"num": 0}]}
+  - tex: 'V(Z)=1'
+    label: 標準化した値の分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: Z
+      meaning: 標準化した値（平均から標準偏差いくつ分か）
+      key: Z
+      kind: rv
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "Z"}], "name": "V"}, {"num": 1}]}
   conditions:
     math:
     - 標準偏差が0でない
@@ -215,15 +284,32 @@
   - {id: LAB-cont, preset: s1-norm, purpose: 平均と標準偏差から、区間の確率を面積で読む}
   principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
   formulas:
-  - tex: f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)
+  - tex: 'f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)'
     symbols:
+    - symbol: f(x)
+      meaning: 確率密度（高さ。面積が確率）
+      key: f
+      concept: TERM-pdf
+    - symbol: x
+      meaning: 値
+      key: x
+      kind: value
     - symbol: μ
       meaning: 平均（山の中心）
+      key: mu
+      concept: TERM-expect
+      kind: param
     - symbol: σ
       meaning: 標準偏差（山の広がり）
       range: 0より大きい
-    - symbol: f(x)
-      meaning: 確率密度（高さ。面積が確率）
+      key: sigma
+      concept: TERM-sd
+      kind: param
+    - symbol: π
+      meaning: 円周率
+      key: pi
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "mul", "args": [{"op": "div", "args": [{"num": 1}, {"op": "mul", "args": [{"op": "sqrt", "args": [{"op": "mul", "args": [{"num": 2}, {"sym": "pi"}]}]}, {"sym": "sigma"}]}]}, {"op": "fn", "args": [{"op": "neg", "args": [{"op": "div", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "x"}, {"sym": "mu"}]}, {"num": 2}]}, {"op": "mul", "args": [{"num": 2}, {"op": "pow", "args": [{"sym": "sigma"}, {"num": 2}]}]}]}]}], "name": "exp"}]}]}
   conditions:
     math:
     - 確率密度が f(x) の式で表される（μ と σ で決まる）
@@ -258,20 +344,46 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 期待値が分布の重心になることを、予想してから確かめる}
   principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
   formulas:
-  - tex: E(X)=\sum_x x\,p(x)
+  - tex: 'E(X)=\sum_x x\,p(x)'
     symbols:
-    - symbol: E(X)
-      meaning: X の期待値（平均の行き着く先）
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: x
       meaning: X がとりうる値
+      key: x
+      kind: index
     - symbol: p(x)
       meaning: X が x になる確率（重み）
       range: 0以上1以下・合計1
-  - tex: E(aX+b)=aE(X)+b
+      key: p
+      concept: TERM-dist
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "sum", "args": [{"op": "mul", "args": [{"sym": "x"}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}], "var": "x"}]}
+  - tex: 'E(aX+b)=aE(X)+b'
     label: 線形性
     symbols:
-    - symbol: a, b
-      meaning: 定数（単位の換算や、一律の上乗せ）
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: a
+      meaning: 掛ける定数（単位の換算）
+      key: a
+      kind: const
+    - symbol: b
+      meaning: 足す定数（一律の上乗せ）
+      key: b
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "E"}, {"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"op": "fn", "args": [{"sym": "X"}], "name": "E"}]}, {"sym": "b"}]}]}
   conditions:
     math:
     - 和（連続なら積分）が有限の値になる
@@ -316,12 +428,25 @@
   - {id: LAB-expect, preset: s5-free, purpose: P(両方)＝P(X)P(Y) のときに共分散が0になるのを見る}
   principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
   formulas:
-  - tex: P(A\cap B)=P(A)\,P(B)
+  - tex: 'P(A\cap B)=P(A)\,P(B)'
     symbols:
-    - symbol: A, B
-      meaning: 2つの事象
-    - symbol: P(A∩B)
-      meaning: A と B が両方起きる確率
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: A
+      meaning: 事象
+      key: A
+      kind: value
+    - symbol: B
+      meaning: 事象
+      key: B
+      kind: value
+    - symbol: A∩B
+      meaning: A と B が両方起きる
+      key: AB
+      kind: value
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "AB"}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "A"}], "name": "P"}, {"op": "fn", "args": [{"sym": "B"}], "name": "P"}]}]}
   conditions:
     math:
     - 確率が決まった2つの事象（または確率変数）について言う
@@ -358,15 +483,38 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を動かして、確率変数が「値の出方の規則」を持つことを見る}
   principle: 起こりうる値と、その確率の組（確率分布）で性質が決まる。1つの記録された値ではなく、記録する前の「値の出方」を扱う。
   formulas:
-  - tex: P(X=x)=p(x),\quad \sum_x p(x)=1
+  - tex: 'P(X=x)=p(x)'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
     - symbol: X
-      meaning: 確率変数（値の出方を表すもの）
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: x
-      meaning: X がとりうる1つの値
+      meaning: X がとる値
+      key: x
+      kind: value
     - symbol: p(x)
       meaning: X が x になる確率
       range: 0以上1以下
+      key: p
+      concept: TERM-dist
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "x"}]}], "name": "P"}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}
+  - tex: '\sum_x p(x)=1'
+    label: 確率の合計
+    symbols:
+    - symbol: p(x)
+      meaning: X が x になる確率
+      key: p
+      concept: TERM-dist
+    - symbol: x
+      meaning: X がとる値
+      key: x
+      kind: index
+    tree: {"op": "eq", "args": [{"op": "sum", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "p"}], "var": "x"}, {"num": 1}]}
   conditions:
     math:
     - 起こりうる値の範囲が決まっている
@@ -392,11 +540,18 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を変えると、期待値（重心）がどう動くかを見る}
   principle: 起こりうる値を全部挙げ、確率を割り振ったもの。確率は0以上で、合計（連続なら面積）が1。期待値や分散は、分布を1つの数に要約したもの。
   formulas:
-  - tex: '\sum_x p(x)=1,\quad p(x)\ge 0'
+  - tex: '\sum_x p(x)=1'
+    label: 確率の合計は1
     symbols:
     - symbol: p(x)
       meaning: X が x になる確率
       range: 0以上1以下
+      key: p
+    - symbol: x
+      meaning: X がとる値
+      key: x
+      kind: index
+    tree: {"op": "eq", "args": [{"op": "sum", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "p"}], "var": "x"}, {"num": 1}]}
   conditions:
     math:
     - どの値の確率も0以上
@@ -427,13 +582,50 @@
     symbols:
     - symbol: Cov(X, Y)
       meaning: X と Y の共分散
-    - symbol: μ_X・μ_Y
-      meaning: X・Y の期待値
+      key: Cov
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: Y
+      meaning: 確率変数
+      key: Y
+      kind: rv
+    - symbol: μ_X
+      meaning: X の期待値
+      key: muX
+      concept: TERM-expect
+      kind: param
+    - symbol: μ_Y
+      meaning: Y の期待値
+      key: muY
+      concept: TERM-expect
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "Y"}], "name": "Cov"}, {"op": "fn", "args": [{"op": "mul", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "muX"}]}, {"op": "sub", "args": [{"sym": "Y"}, {"sym": "muY"}]}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "mul", "args": [{"sym": "X"}, {"sym": "Y"}]}], "name": "E"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "Y"}], "name": "E"}]}]}]}
   - tex: 'V(X+Y)=V(X)+V(Y)+2\,\mathrm{Cov}(X,Y)'
     label: 和の分散
     symbols:
-    - symbol: 2Cov(X, Y)
-      meaning: 同じ向きにずれると和のばらつきが増え、逆向きだと減る
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: Cov( )
+      meaning: 共分散（ずれの積の期待値）
+      key: Cov
+      concept: TERM-cov
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: Y
+      meaning: 確率変数
+      key: Y
+      kind: rv
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"sym": "X"}, {"sym": "Y"}]}], "name": "V"}, {"op": "add", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"sym": "Y"}], "name": "V"}, {"op": "mul", "args": [{"num": 2}, {"op": "fn", "args": [{"sym": "X"}, {"sym": "Y"}], "name": "Cov"}]}]}]}
   conditions:
     math:
     - X・Y の分散が有限
@@ -459,26 +651,80 @@
   - {id: LAB-binom, preset: s1-path, purpose: 並び方の数×1つの並びの確率を、予想してから確かめる}
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
   formulas:
-  - tex: P(X=k)={}_nC_k\,p^k(1-p)^{n-k}
+  - tex: 'P(X=k)={}_nC_k\,p^k(1-p)^{n-k}'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: n
       meaning: 試行の回数
       range: 1以上の整数
+      key: n
+      kind: param
     - symbol: k
-      meaning: 成功した回数
+      meaning: 成功の回数
       range: 0以上 n 以下の整数
+      key: k
+      kind: value
     - symbol: p
-      meaning: 1回あたりの成功確率
+      meaning: 1回の成功確率
       range: 0以上1以下
+      key: p
+      kind: param
     - symbol: ₙCₖ
-      meaning: n 回のうちどの k 回が成功かの選び方の数
-  - tex: E(X)=np,\quad V(X)=np(1-p)
-    label: 期待値と分散
+      meaning: n 回から成功の k 回を選ぶ組合せの数
+      key: comb
+      concept: TERM-comb
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "n"}, {"sym": "k"}], "name": "comb"}, {"op": "pow", "args": [{"sym": "p"}, {"sym": "k"}]}, {"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "n"}, {"sym": "k"}]}]}]}]}
+  - tex: 'E(X)=np'
+    label: 期待値
     symbols:
-    - symbol: np
-      meaning: 成功回数の期待値
-    - symbol: np(1−p)
-      meaning: 成功回数の分散
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: n
+      meaning: 試行の回数
+      range: 1以上の整数
+      key: n
+      kind: param
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0以上1以下
+      key: p
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}]}]}
+  - tex: 'V(X)=np(1-p)'
+    label: 分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: n
+      meaning: 試行の回数
+      range: 1以上の整数
+      key: n
+      kind: param
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0以上1以下
+      key: p
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}, {"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}]}]}
   conditions:
     math:
     - 回数 n が決まっている
@@ -506,16 +752,56 @@
   - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
   formulas:
-  - tex: P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!}
+  - tex: 'P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!}'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: λ
-      meaning: 決めた時間・範囲で起きる平均の回数
+      meaning: 一定の範囲あたりの平均件数
       range: 0より大きい
+      key: lambda
+      kind: param
     - symbol: k
-      meaning: 起きた回数
-      range: 0以上の整数（上限なし）
-  - tex: E(X)=V(X)=\lambda
+      meaning: 起きた件数
+      range: 0以上の整数
+      key: k
+      kind: value
+    - symbol: e
+      meaning: 自然対数の底（約2.718）
+      key: e
+      kind: const
+    - symbol: k!
+      meaning: k の階乗
+      key: fact
+      concept: TERM-fact
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "div", "args": [{"op": "mul", "args": [{"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"sym": "lambda"}]}]}, {"op": "pow", "args": [{"sym": "lambda"}, {"sym": "k"}]}]}, {"op": "fn", "args": [{"sym": "k"}], "name": "fact"}]}]}
+  - tex: 'E(X)=V(X)=\lambda'
     label: 期待値と分散
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: λ
+      meaning: 一定の範囲あたりの平均件数
+      range: 0より大きい
+      key: lambda
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"sym": "lambda"}]}
   conditions:
     math:
     - 出来事が互いに独立に起きる
@@ -544,14 +830,59 @@
   formulas:
   - tex: 'P(X=k)=(1-p)^{k-1}p\quad(k=1,2,\dots)'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: k
       meaning: 初めて成功した回（成功した回も数える）
       range: 1以上の整数
+      key: k
+      kind: value
     - symbol: p
       meaning: 1回の成功確率
       range: 0より大きく1以下
-  - tex: 'E(X)=\frac{1}{p},\qquad V(X)=\frac{1-p}{p^2}'
-    label: 期待値と分散
+      key: p
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "k"}, {"num": 1}]}]}, {"sym": "p"}]}]}
+  - tex: 'E(X)=\frac{1}{p}'
+    label: 期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0より大きく1以下
+      key: p
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "p"}]}]}
+  - tex: 'V(X)=\frac{1-p}{p^2}'
+    label: 分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0より大きく1以下
+      key: p
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "pow", "args": [{"sym": "p"}, {"num": 2}]}]}]}
   conditions:
     math:
     - 各回が独立
@@ -582,16 +913,59 @@
   formulas:
   - tex: 'P(X=k)=\frac{\binom{M}{k}\binom{N-M}{n-k}}{\binom{N}{n}}'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: N
       meaning: 集団の個数
+      key: N
+      kind: param
     - symbol: M
       meaning: 集団の中の当たりの個数
+      key: M
+      kind: param
     - symbol: n
       meaning: 取り出す個数
+      key: n
+      kind: param
     - symbol: k
       meaning: 取り出した中の当たりの個数
+      key: k
+      kind: value
+    - symbol: C( , )
+      meaning: 組合せの数
+      key: comb
+      concept: TERM-comb
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "div", "args": [{"op": "mul", "args": [{"op": "fn", "args": [{"sym": "M"}, {"sym": "k"}], "name": "comb"}, {"op": "fn", "args": [{"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}, {"op": "sub", "args": [{"sym": "n"}, {"sym": "k"}]}], "name": "comb"}]}, {"op": "fn", "args": [{"sym": "N"}, {"sym": "n"}], "name": "comb"}]}]}
   - tex: 'E(X)=n\frac{M}{N}'
     label: 期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: n
+      meaning: 取り出す個数
+      key: n
+      kind: param
+    - symbol: M
+      meaning: 集団の中の当たりの個数
+      key: M
+      kind: param
+    - symbol: N
+      meaning: 集団の個数
+      key: N
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"op": "div", "args": [{"sym": "M"}, {"sym": "N"}]}]}]}
   conditions:
     math:
     - 戻さずに取り出す
@@ -620,14 +994,85 @@
   formulas:
   - tex: 'f(x)=\lambda e^{-\lambda x}\quad(x\ge 0)'
     symbols:
+    - symbol: f(x)
+      meaning: 確率密度（高さ。面積が確率）
+      key: f
+      concept: TERM-pdf
     - symbol: λ
       meaning: 単位時間あたりに起きる平均の回数
       range: 0より大きい
+      key: lambda
+      kind: param
     - symbol: x
       meaning: 待ち時間
       range: 0以上
-  - tex: 'P(X>x)=e^{-\lambda x},\qquad E(X)=\frac{1}{\lambda},\quad V(X)=\frac{1}{\lambda^2}'
-    label: 待ち時間が x を超える確率・期待値・分散
+      key: x
+      kind: value
+    - symbol: e
+      meaning: 自然対数の底（約2.718）
+      key: e
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "mul", "args": [{"sym": "lambda"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}]}
+  - tex: 'P(X>x)=e^{-\lambda x}'
+    label: 待ち時間が x を超える確率
+    symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: λ
+      meaning: 単位時間あたりに起きる平均の回数
+      range: 0より大きい
+      key: lambda
+      kind: param
+    - symbol: x
+      meaning: 待ち時間
+      range: 0以上
+      key: x
+      kind: value
+    - symbol: e
+      meaning: 自然対数の底（約2.718）
+      key: e
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "x"}], "name": "gt"}], "name": "P"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}
+  - tex: 'E(X)=\frac{1}{\lambda}'
+    label: 期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: λ
+      meaning: 単位時間あたりに起きる平均の回数
+      range: 0より大きい
+      key: lambda
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "lambda"}]}]}
+  - tex: 'V(X)=\frac{1}{\lambda^2}'
+    label: 分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: λ
+      meaning: 単位時間あたりに起きる平均の回数
+      range: 0より大きい
+      key: lambda
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"num": 1}, {"op": "pow", "args": [{"sym": "lambda"}, {"num": 2}]}]}]}
   conditions:
     math:
     - λ＞0
@@ -654,13 +1099,44 @@
   - {id: LAB-cont, preset: s1-dens, purpose: 密度の高さは1を超えても、面積は1のままなのを見る}
   principle: 連続では1点の確率は0で、確率は面積（積分）で決まる。高さ f(x) は「その付近の出やすさの密度」。
   formulas:
-  - tex: 'P(a\le X\le b)=\int_a^b f(x)\,dx,\qquad \int_{-\infty}^{\infty} f(x)\,dx=1'
+  - tex: 'P(a\le X\le b)=\int_a^b f(x)\,dx'
     symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
     - symbol: f(x)
       meaning: 確率密度（高さ）
       range: 0以上（1を超えてもよい）
-    - symbol: a, b
-      meaning: 区間の両端
+      key: f
+    - symbol: x
+      meaning: 積分で動かす値
+      key: x
+      kind: index
+    - symbol: a
+      meaning: 区間の左端
+      key: a
+      kind: value
+    - symbol: b
+      meaning: 区間の右端
+      key: b
+      kind: value
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "a"}, {"sym": "X"}, {"sym": "b"}], "name": "between"}], "name": "P"}, {"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x", "lower": {"sym": "a"}, "upper": {"sym": "b"}}]}
+  - tex: '\int_{-\infty}^{\infty} f(x)\,dx=1'
+    label: 全体の面積は1
+    symbols:
+    - symbol: f(x)
+      meaning: 確率密度（高さ）
+      key: f
+    - symbol: x
+      meaning: 積分で動かす値
+      key: x
+      kind: index
+    tree: {"op": "eq", "args": [{"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x"}, {"num": 1}]}
   conditions:
     math:
     - f(x) が0以上
@@ -688,11 +1164,66 @@
   formulas:
   - tex: 'f(x)=\frac{1}{b-a}\quad(a\le x\le b)'
     symbols:
-    - symbol: a, b
-      meaning: 値のとりうる範囲の両端
-      range: a＜b
-  - tex: 'E(X)=\frac{a+b}{2},\qquad V(X)=\frac{(b-a)^2}{12}'
-    label: 期待値と分散
+    - symbol: f(x)
+      meaning: 確率密度（高さ。面積が確率）
+      key: f
+      concept: TERM-pdf
+    - symbol: x
+      meaning: 値
+      key: x
+      kind: value
+    - symbol: a
+      meaning: 値のとりうる範囲の左端
+      key: a
+      kind: param
+    - symbol: b
+      meaning: 値のとりうる範囲の右端
+      range: a より大きい
+      key: b
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "div", "args": [{"num": 1}, {"op": "sub", "args": [{"sym": "b"}, {"sym": "a"}]}]}]}
+  - tex: 'E(X)=\frac{a+b}{2}'
+    label: 期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: a
+      meaning: 値のとりうる範囲の左端
+      key: a
+      kind: param
+    - symbol: b
+      meaning: 値のとりうる範囲の右端
+      range: a より大きい
+      key: b
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"op": "add", "args": [{"sym": "a"}, {"sym": "b"}]}, {"num": 2}]}]}
+  - tex: 'V(X)=\frac{(b-a)^2}{12}'
+    label: 分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: a
+      meaning: 値のとりうる範囲の左端
+      key: a
+      kind: param
+    - symbol: b
+      meaning: 値のとりうる範囲の右端
+      range: a より大きい
+      key: b
+      kind: param
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "b"}, {"sym": "a"}]}, {"num": 2}]}, {"num": 12}]}]}
   conditions:
     math:
     - a＜b

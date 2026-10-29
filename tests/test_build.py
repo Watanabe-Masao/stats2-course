@@ -362,6 +362,19 @@ class TestNetwork(unittest.TestCase):
         c.units["U13"]["concepts_linked"] = True
         self.assertTrue(any(f"{qid}: U13 は concepts_linked" in e for e in self._validate(c)))
 
+    def test_formula_tree(self):
+        c = course()
+        f = c.terms["TERM-std"]["formulas"][0]
+        self.assertEqual(f["tree"]["op"], "eq")
+        f["tree"]["args"][1]["args"][1] = {"sym": "s"}                    # symbols にない記号
+        f["tree"]["args"][0] = {"op": "fn", "name": "Q", "args": [{"num": 1}]}   # 知らない関数
+        f["symbols"][2]["concept"] = "TERM-nothing"
+        err = self._validate(c)
+        self.assertTrue(any("記号 s が symbols の key にない" in e for e in err))
+        self.assertTrue(any("関数 Q が symbols の key にない" in e for e in err))
+        self.assertTrue(any("concept TERM-nothing が用語にない" in e for e in err))
+        self.assertEqual(self.n.tree_errors({"op": "fn", "name": "exp", "args": [{"num": 1}]}, set()), [])
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},
