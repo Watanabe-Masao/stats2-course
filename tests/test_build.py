@@ -196,15 +196,17 @@ class TestLabs(unittest.TestCase):
         p = COURSE.labs["LAB-pois"]["presets"]["rel-approx-tour"]
         st = tour.states(p["tour"])
         self.assertEqual(st[1]["start"]["n"], 10)          # 段2の始め＝段1の終わり
-        self.assertEqual([f["n"] for f in st[2]["frames"]], [50, 75, 100])
-        self.assertEqual(st[3]["start"], st[2]["end"])    # 動きのない段は前の段の終わりのまま
+        self.assertEqual([f["n"] for f in st[3]["frames"]], [300, 1000])
+        self.assertEqual(st[1]["start"], st[0]["end"])    # 動きのない段は前の段の終わりのまま
         ex = tour.expect("LAB-pois", p)
         self.assertTrue(all(abs(x["lambda"] - 3) < 1e-12 for step in ex for x in step))   # 途中も np＝λ
-        self.assertGreater(ex[0][0]["maxdiff"], ex[2][-1]["maxdiff"])   # n を大きくすると差が縮む
+        self.assertGreater(ex[0][0]["maxdiff"], ex[3][-1]["maxdiff"])   # n を大きくすると差が縮む
+        self.assertAlmostEqual(ex[0][0]["bvar"], 2.1)                     # 平均は同じ3でも、分散は 2.1 と 3
+        self.assertAlmostEqual(ex[3][-1]["bvar"], 2.991)                  # n＝1000 で分散も λ に近づく
         figs = tour.figure_specs(COURSE)
-        self.assertEqual(sorted(f for f in figs if "pois" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
-        self.assertTrue(figs["FIG-LAB-pois-rel-approx-tour-3"]["caption"].startswith("さらに大きく："))
-        self.assertEqual(figs["FIG-LAB-pois-rel-approx-tour-3"]["spec"]["maxdiff"], 0.003)
+        self.assertEqual(sorted(f for f in figs if "pois" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 3, 4)])
+        self.assertTrue(figs["FIG-LAB-pois-rel-approx-tour-1"]["caption"].startswith("平均は同じ、形は違う："))
+        self.assertEqual(figs["FIG-LAB-pois-rel-approx-tour-1"]["spec"]["vars"], [2.1, 3])
 
     def test_tour_definition_binom(self):
         import tour

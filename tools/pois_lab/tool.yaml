@@ -15,7 +15,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     name: 二項とポアソン
     purpose: n が大きく p が小さい二項分布 B(n, p) と、λ＝np のポアソン分布を棒で並べて比べる
     set: [n, p, k, lam]             # lam：n と一緒に渡すと p＝lam÷n にする（np＝λ を保つ。解説付き再生で使う）
-    values: [bin, poi, diff, lambda, maxdiff]   # maxdiff：棒の範囲（0〜kmax）で二項とポアソンの確率の差の最大
+    values: [bin, poi, diff, lambda, maxdiff, bvar]   # maxdiff：棒の範囲（0〜kmax）で二項とポアソンの確率の差の最大
   - key: geom
     name: 成功するまで
     purpose: r 回目の成功が k 回目の試行で起きる確率（r＝1 で幾何分布、2以上で負の二項分布）。平均 r/p・分散 r(1−p)/p²
@@ -56,20 +56,23 @@ presets:
       kmax: 10        # 棒を出す範囲 0〜kmax（ラボと静止図で共有）
       decimals: 3     # 差の丸め（ラボと静止図で共有）
       steps:
-        - title: λ を決める
-          text: 二項分布で **n×p＝λ** を一定に保つ。λ＝3、まず n＝10・p＝0.3。
+        - title: 平均は同じ、形は違う
+          text: 不良率30%を10個検品（二項）と、平均3個（ポアソン λ＝3）。**平均はどちらも3**なのに、棒の形が違う。
           set: {n: 10, lam: 3, k: 3}
-          focus: np
-        - title: n を大きく・p を小さく
-          text: '**n を大きく**すると **p＝λ÷n** は小さくなる。n×p は3のまま。'
-          frames: [{n: 15}, {n: 20}, {n: 30}]
-          focus: np
-        - title: さらに大きく
-          text: n＝100（p＝0.03）まで進めて、**棒の形**を見る。
-          frames: [{n: 50}, {n: 75}, {n: 100}]
           focus: bars
+        - title: 違いの正体
+          text: 二項は**最大 n 個**で、分散 **np(1−p)＝2.1**。ポアソンは上限がなく、分散 **λ＝3**。
+          focus: var
+        - title: n を大きく・p を小さく
+          text: '**n を大きく**、**p＝λ÷n** を小さくする。平均 np は3のまま。'
+          frames: [{n: 15}, {n: 20}, {n: 30}, {n: 50}, {n: 100}]
+          focus: np
+        - title: 分散も λ へ
+          text: n＝1000（p＝0.003）まで。(1−p) が1に近づき、**分散 np(1−p) も λ に近づく**。
+          frames: [{n: 300}, {n: 1000}]
+          focus: var
         - title: ポアソン分布に近づく
-          text: 棒が点線の**ポアソン分布（λ＝3）**に重なり、**差の最大**が縮んだ。
+          text: 棒が点線に重なり、**差の最大**が縮んだ。まれな事を大量に数えるときは **λ だけ**で計算できる。
           focus: diff
   s3-free:
     mode: pois

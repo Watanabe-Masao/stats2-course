@@ -37,9 +37,9 @@ relations:
     to: TERM-poisson
     version: 1
     labs:
-      - {id: LAB-pois, preset: rel-approx-tour, purpose: np＝3 を保って n を 10→100 にし、二項分布がポアソン分布に重なるのを段ごとに見る}
+      - {id: LAB-pois, preset: rel-approx-tour, purpose: 平均が同じでも形が違う理由（上限と分散）から、n を 10→1000 にして重なるまでを段ごとに見る}
       - {id: LAB-pois, preset: rel-approx, purpose: np を保って n を大きくすると、二項分布がポアソン分布に重なる}
-    figures: [FIG-LAB-pois-rel-approx-tour-1, FIG-LAB-pois-rel-approx-tour-2, FIG-LAB-pois-rel-approx-tour-3]
+    figures: [FIG-LAB-pois-rel-approx-tour-1, FIG-LAB-pois-rel-approx-tour-3, FIG-LAB-pois-rel-approx-tour-4]
     type: 変換
     mode: limit
     description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。

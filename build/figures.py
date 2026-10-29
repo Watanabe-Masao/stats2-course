@@ -663,6 +663,9 @@ def dist(sp: dict) -> str:
         c.add(f'<rect x="190" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
         c.text(206, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
         y += 20
+        if sp.get("vars"):   # 平均は同じでも、分散が違う（二項 np(1−p)・ポアソン λ）
+            c.text(8, y + 12, f"分散　二項 {_num(sp['vars'][0])}　／　ポアソン {_num(sp['vars'][1])}", 12.5, INK)
+            y += 20
         if sp.get("maxdiff") is not None:
             c.text(8, y + 12, f"棒どうしの差の最大 {sp['maxdiff']:.{sp.get('decimals', 3)}f}", 12.5, INK, weight="bold")
             y += 20

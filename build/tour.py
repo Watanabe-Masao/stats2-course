@@ -45,7 +45,7 @@ def _approx(state: dict, tour: dict) -> dict:
     kmax, k = tour["kmax"], state.get("k", 0)
     b = [math.comb(n, i) * p ** i * (1 - p) ** (n - i) if i <= n else 0.0 for i in range(kmax + 1)]
     q = [math.exp(-lam) * lam ** i / math.factorial(i) for i in range(kmax + 1)]
-    return {"n": n, "p": p, "k": k, "lambda": n * p, "bin": b[k], "poi": q[k], "diff": q[k] - b[k],
+    return {"n": n, "p": p, "k": k, "lambda": n * p, "bin": b[k], "poi": q[k], "diff": q[k] - b[k], "bvar": n * p * (1 - p),
             "maxdiff": max(abs(x - y) for x, y in zip(b, q)), "pmf": b, "pmf2": q}
 
 
@@ -54,7 +54,8 @@ def _approx_fig(x: dict, state: dict, tour: dict) -> dict:
     return {"type": "dist", "family": "binom", "n": x["n"], "p": x["p"], "kmax": tour["kmax"], "decimals": dec,
             "highlight": [x["k"]], "mark_mean": True,
             "overlay": {"family": "poisson", "lam": state["lam"], "label": f"ポアソン λ＝{_n(state['lam'])}"},
-            "label": f"二項 n＝{x['n']}、p＝{_n(x['p'])}", "maxdiff": round(x["maxdiff"], dec)}
+            "label": f"二項 n＝{x['n']}、p＝{_n(x['p'])}", "maxdiff": round(x["maxdiff"], dec),
+            "vars": [round(x["bvar"], dec), state["lam"]]}   # 分散 二項 np(1−p) ／ ポアソン λ
 
 
 def _path(state: dict, tour: dict) -> dict:
@@ -70,7 +71,7 @@ def _path_fig(x: dict, state: dict, tour: dict) -> dict:
 
 
 MODES = {
-    ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff"), "figure": _approx_fig},
+    ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
 }
 
