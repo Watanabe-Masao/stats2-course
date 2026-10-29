@@ -7,6 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 echo "== 1. 単体テスト"; python3 -m unittest discover -s tests -q
+echo "== 1b. 知識ネットワークの型の写し"; python3 build/sync_schema.py
 echo "== 2. 生成"; python3 build/build.py
 echo "== 3. 旧版との突き合わせ"
 for f in migration/old/*.md; do python3 build/audit.py "$(basename "$f" .md)"; done
