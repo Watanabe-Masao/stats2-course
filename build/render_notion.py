@@ -37,8 +37,13 @@ class NotionRenderer:
         return f"教科書{self.c.index[uid]['number']}"
 
     def term_ref(self, tid: str) -> str:
+        """用語のリンク。説明のある概念は知識ネットワークの画面へ、まだのものは旧版の用語ページへ。"""
+        t = self.c.terms[tid]
+        if t.get("definition") and self.t.get("network_url"):
+            from network import course_id
+            return f"[{t['name']} 🕸]({self.t['network_url']}?c={course_id(self.c)}:{tid})"
         pid = (self.t.get("terms") or {}).get(tid)
-        return mention(pid) if pid else self.c.terms[tid]["name"]
+        return mention(pid) if pid else t["name"]
 
     def lab_src(self, aid: str) -> str:
         """公開サイトがあれば URL、なければアップロードの差し込み口（publish_prep が置き換える）。"""

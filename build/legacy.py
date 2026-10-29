@@ -33,9 +33,10 @@ def _require(name: str, target: dict) -> str | None:
         terms = load_yaml(ROOT / "content" / "terms.yaml") or []
         missing = [t["id"] for t in terms if not t.get("definition")]
         return f"定義のない用語 {len(missing)}" if missing else None
-    if name == "term_pages_unlinked":
-        n = len(target.get("terms") or {})
-        return f"旧版の用語ページへの対応 {n}" if n else None
+    if name == "term_pages_unlinked":   # 説明のある概念はネットワークを指すので、旧版を指す残りだけ数える
+        terms = {t["id"]: t for t in load_yaml(ROOT / "content" / "terms.yaml") or []}
+        n = sum(1 for tid in (target.get("terms") or {}) if not terms.get(tid, {}).get("definition"))
+        return f"旧版の用語ページを指す用語 {n}" if n else None
     return f"知らない検査 {name}"
 
 
