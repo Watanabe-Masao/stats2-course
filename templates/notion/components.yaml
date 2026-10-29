@@ -35,6 +35,7 @@ labels:
   meta_title: ⚙️ 教材の情報（作成者向け）
   guide_link: タブの選び方・印の意味 →
   lab_check: ラボで確かめる
+  lab_tour: ▶ ラボで解説   # 解説付き再生の版（tour）の埋め込みの前に付く見出し（#90）
   fig_check: 図で確かめる
   checklist_note: できたら個人用の学習記録に付ける（教材には書き込まない）
   lab_check_note: （この問題の数値が入った状態で開く）

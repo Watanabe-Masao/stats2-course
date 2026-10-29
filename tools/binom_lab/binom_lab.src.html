@@ -9,6 +9,9 @@
 .seqs{display:flex;flex-direction:column;gap:3px;margin:6px 0;font-size:18px;line-height:1.2}
 .seqs div{display:flex;align-items:center;gap:8px}
 .seqs .pp{font-size:12px;color:var(--mut);font-family:ui-monospace,Menlo,monospace}
+.lk-embed.lk-touring .seqs{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:2px 14px;font-size:14px;margin:2px 0}
+.lk-embed.lk-touring .seqs .pp,.lk-embed.lk-touring #qplot .legend{display:none}
+.lk-embed.lk-touring #qsum{padding:4px 10px;margin:4px 0;font-size:13.5px;line-height:1.45}
 </style></head><body>
 <h1>🧪 二項分布ラボ</h1>
 <div id="lk-task"></div>
@@ -33,8 +36,8 @@
  <input type="range" id="qp" min="0" max="1" step="0.01" value="0.25" data-name="確率 p">
  <input type="range" id="qk" min="0" max="4" step="1" value="1" data-name="k">
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
- <div class="res key" id="qplot"></div>
- <div class="card res key" id="qsum"></div>
+ <div class="res key" id="qplot" data-tour-show></div>
+ <div class="card res key" id="qsum" data-tour-anchor></div>
 </div>
 
 <div id="m-bern" class="mode">
@@ -85,8 +88,8 @@ LK.register("pmf",{name:"二項分布 B(n, p)",
 function qVals(){const n=+$("qn").value,p=+$("qp").value,k=Math.min(+$("qk").value,n),path=Math.pow(p,k)*Math.pow(1-p,n-k),ncr=C(n,k);return {n,p,k,path,ncr,pk:ncr*path};}
 function seqs(n,k){const out=[];const rec=(i,a,c)=>{if(i===n){if(c===k)out.push(a.slice());return;}if(c<k){a.push(1);rec(i+1,a,c+1);a.pop();}if(n-i-1>=k-c){a.push(0);rec(i+1,a,c);a.pop();}};rec(0,[],0);return out;}
 function qRender(){fixK("qn","qk");const Q=qVals(),list=seqs(Q.n,Q.k);
- $("qplot").innerHTML=`<div class="seqs">${list.map(a=>`<div><span>${a.map(x=>x?"🛒":"❌").join(" ")}</span><span class="pp">${a.map(x=>x?f(Q.p,2):f(1-Q.p,2)).join("×")}</span></div>`).join("")}</div><div class="legend mut"><span>🛒 成功（確率 p）</span><span>❌ 失敗（確率 1−p）</span></div>`;
- $("qsum").innerHTML=`<div>並び1つの確率＝${f(Q.p)}^${Q.k}×${f(1-Q.p)}^${Q.n-Q.k}＝<b>${f(Q.path,6)}</b></div><div>並びの数＝${Q.n}C${Q.k}＝<b>${Q.ncr}</b> 通り（どの回が成功かの選び方）</div><div>ちょうど ${Q.k} 回＝${Q.ncr}×${f(Q.path,6)}＝<b>${f(Q.pk)}</b></div><div class="mut">並びどうしは同時に起きない（排反）ので足せる。どの並びも確率が同じなので、足し算が掛け算 ₙCₖ× になる。</div>`;}
+ $("qplot").innerHTML=`<div class="seqs" data-focus="seq">${list.map(a=>`<div><span>${a.map(x=>x?"🛒":"❌").join(" ")}</span><span class="pp">${a.map(x=>x?f(Q.p,2):f(1-Q.p,2)).join("×")}</span></div>`).join("")}</div><div class="legend mut"><span>🛒 成功（確率 p）</span><span>❌ 失敗（確率 1−p）</span></div>`;
+ $("qsum").innerHTML=`<div data-focus="path">並び1つの確率＝${f(Q.p)}^${Q.k}×${f(1-Q.p)}^${Q.n-Q.k}＝<b>${f(Q.path,6)}</b></div><div data-focus="ncr pk">並びの数＝${Q.n}C${Q.k}＝<b>${Q.ncr}</b> 通り<span class="lk-long">（どの回が成功かの選び方）</span></div><div data-focus="pk">ちょうど ${Q.k} 回＝${Q.ncr}×${f(Q.path,6)}＝<b>${f(Q.pk)}</b></div><div class="mut">並びどうしは同時に起きない（排反）ので足せる。どの並びも確率が同じなので、足し算が掛け算 ₙCₖ× になる。</div>`;}
 LK.register("path",{name:"並びを書き出す",
  init(){["qn","qp","qk"].forEach(id=>LK.stepper($(id),qRender));qRender();},
  apply(s){if(s.n!==undefined)LK.setRange("qn",s.n);if(s.p!==undefined)LK.setRange("qp",s.p);$("qk").max=+$("qn").value;if(s.k!==undefined)LK.setRange("qk",s.k);qRender();},

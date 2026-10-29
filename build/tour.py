@@ -36,7 +36,8 @@ def plain(text: str) -> str:
     return text.replace("**", "")
 
 
-# ---- モードごとの「状態 → 静止図・照合する数」。今は LAB-pois の approx だけ（試作。広げるときにここへ足す）
+# ---- モードごとの「状態 → 照合する数・静止図」。1本広げるごとにここへ足す
+# calc(状態, tour) → 数（照合する数は check の key）、figure(数, 状態, tour) → 図の設定（build/figures.py の型）
 
 def _approx(state: dict, tour: dict) -> dict:
     n, lam = state["n"], state["lam"]
@@ -48,17 +49,39 @@ def _approx(state: dict, tour: dict) -> dict:
             "maxdiff": max(abs(x - y) for x, y in zip(b, q)), "pmf": b, "pmf2": q}
 
 
-MODES = {("LAB-pois", "approx"): _approx}
-CHECK_KEYS = {("LAB-pois", "approx"): ("lambda", "bin", "poi", "diff", "maxdiff")}
+def _approx_fig(x: dict, state: dict, tour: dict) -> dict:
+    dec = tour.get("decimals", 3)
+    return {"type": "dist", "family": "binom", "n": x["n"], "p": x["p"], "kmax": tour["kmax"], "decimals": dec,
+            "highlight": [x["k"]], "mark_mean": True,
+            "overlay": {"family": "poisson", "lam": state["lam"], "label": f"ポアソン λ＝{_n(state['lam'])}"},
+            "label": f"二項 n＝{x['n']}、p＝{_n(x['p'])}", "maxdiff": round(x["maxdiff"], dec)}
+
+
+def _path(state: dict, tour: dict) -> dict:
+    n, p = state["n"], state["p"]
+    k = min(state.get("k", 0), n)
+    path = p ** k * (1 - p) ** (n - k)
+    ncr = math.comb(n, k)
+    return {"n": n, "p": p, "k": k, "path": path, "ncr": ncr, "pk": ncr * path}
+
+
+def _path_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "paths", "n": x["n"], "k": x["k"], "p": x["p"], "decimals": tour.get("decimals", 4)}
+
+
+MODES = {
+    ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff"), "figure": _approx_fig},
+    ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
+}
 
 
 def numbers(lid: str, mode: str, state: dict, tour: dict) -> dict:
-    return MODES[(lid, mode)](state, tour)
+    return MODES[(lid, mode)]["calc"](state, tour)
 
 
 def expect(lid: str, preset: dict) -> list[list[dict]]:
     """照合する数：段ごとに [始め, frame…] の各状態の数（HTML には入れない）。"""
-    keys = CHECK_KEYS[(lid, preset["mode"])]
+    keys = MODES[(lid, preset["mode"])]["check"]
     out = []
     for st in states(preset["tour"]):
         seq = [st["start"], *st["frames"]]
@@ -72,27 +95,18 @@ def figure_specs(course) -> dict[str, dict]:
     for lid, t in course.labs.items():
         for name, p in (t.get("presets") or {}).items():
             tour = p.get("tour")
-            if not tour or (lid, p.get("mode")) not in MODES:
+            m = MODES.get((lid, p.get("mode")))
+            if not tour or not m:
                 continue
             steps = tour["steps"]
             for i, (s, st) in enumerate(zip(steps, states(tour)), 1):
                 if not (s.get("set") or s.get("frames")):
                     continue
-                x = numbers(lid, p["mode"], st["end"], tour)
-                dec = tour.get("decimals", 3)
-                spec = {"type": "dist", "family": "binom", "n": x["n"], "p": x["p"], "kmax": tour["kmax"], "decimals": dec,
-                        "highlight": [x["k"]], "mark_mean": True,
-                        "overlay": {"family": "poisson", "lam": state_lam(st["end"]), "label": f"ポアソン λ＝{_n(state_lam(st['end']))}"},
-                        "label": f"二項 n＝{x['n']}、p＝{_n(x['p'])}",
-                        "maxdiff": round(x["maxdiff"], dec)}
+                spec = m["figure"](numbers(lid, p["mode"], st["end"], tour), st["end"], tour)
                 cap = f"{s.get('title', '')}：{plain(s['text'])}"   # 数は図の中にある（説明文に重ねて書かない）
                 out[f"FIG-{lid}-{name}-{i}"] = {"spec": spec, "caption": cap, "where": f"{lid}@{name} の段{i}",
                                                  "source": None, "used_by": [f"{lid}@{name}"]}
     return out
-
-
-def state_lam(state: dict):
-    return state["lam"]
 
 
 def _n(v) -> str:
@@ -137,6 +151,7 @@ def validate(where: str, p: dict, mode: dict | None, lid: str) -> list[str]:
                     err.append(f"{w}: n は整数で書く（値を補間しない）")
     if not err:
         first = states(tour)[0]["start"]
-        if (lid, p.get("mode")) == ("LAB-pois", "approx") and not {"n", "lam"} <= set(first):
-            err.append(f"{where}: 段1の set に n と lam を書く（np＝λ を保つ）")
+        need = {("LAB-pois", "approx"): {"n", "lam"}, ("LAB-binom", "path"): {"n", "p", "k"}}.get((lid, p.get("mode")), set())
+        if not need <= set(first):
+            err.append(f"{where}: 段1の set に {sorted(need)} を書く（静止図と照合の計算に要る）")
     return err

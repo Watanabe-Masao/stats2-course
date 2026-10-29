@@ -650,8 +650,9 @@
   en: binomial distribution
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
   version: 1
-  figures: [FIG-U14-concept]
+  figures: [FIG-U14-concept, FIG-LAB-binom-def-tour-1, FIG-LAB-binom-def-tour-2, FIG-LAB-binom-def-tour-3]
   labs:
+  - {id: LAB-binom, preset: def-tour, purpose: 1回の試行から、並び1つの確率×並びの数で式を組み立てる}
   - {id: LAB-binom, preset: s1-path, purpose: 並び方の数×1つの並びの確率を、予想してから確かめる}
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
   formulas:
