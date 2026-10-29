@@ -27,6 +27,18 @@ evidence:
 concepts_linked: true
 status: drafted
 version: 1
+figures:
+  - id: FIG-U13-concept
+    caption: 1人が買う個数 X の確率分布（例題A）。▲が期待値1.1（分布の重心）、薄い帯が期待値±標準偏差（0.4〜1.8）。
+    spec:
+      type: dist
+      family: table
+      values: [0, 1, 2]
+      probs: [0.2, 0.5, 0.3]
+      unit: 個
+      decimals: 1
+      band: 1
+      note: 値×確率を足すと▲（重心）。ずれの2乗×確率を足すと分散0.49、平方根で標準偏差0.7。
 checks:
   # 例題A：0個0.2・1個0.5・2個0.3
   - 'Fraction(2,10)+Fraction(5,10)+Fraction(3,10) == 1 and 0*Fraction(2,10)+1*Fraction(5,10)+2*Fraction(3,10) == Fraction(11,10) and 1*Fraction(5,10)+4*Fraction(3,10) == Fraction(17,10)'

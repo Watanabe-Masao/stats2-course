@@ -27,6 +27,17 @@ evidence:
 concepts_linked: true
 status: drafted
 version: 1
+figures:
+  - id: FIG-U15-concept
+    caption: ポアソン分布（λ＝2）。1時間に平均2件。1件と2件がいちばん高く、右に裾が伸びる。▲の平均と分散はどちらも2。
+    spec:
+      type: dist
+      family: poisson
+      lam: 2
+      kmax: 6
+      unit: 件
+      decimals: 2
+      note: 上限はないが、6件より多い確率はごく小さい。平均 λ が大きくなると山が右へ動き、左右対称に近づく。
 checks:
   # 例題A：1時間に平均2件
   - 'abs(math.exp(-2) - 0.135) < 0.0005 and abs(math.exp(-1) - 0.368) < 0.0005 and abs(2*math.exp(-2) - 0.271) < 0.0005 and abs(4*math.exp(-2)/2 - 0.271) < 0.0005'

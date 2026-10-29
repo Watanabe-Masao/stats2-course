@@ -541,8 +541,122 @@ def dev(sp: dict) -> str:
     return c.done(y + 6)
 
 
+# ---- 確率分布の概念図（棒か曲線。期待値の▲・±標準偏差・確率の面積） ----
+def _pmf(sp: dict):
+    import math
+    f = sp["family"]
+    if f == "table":
+        return list(zip(sp["values"], sp["probs"]))
+    if f == "binom":
+        n, p = sp["n"], sp["p"]
+        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k)) for k in range(n + 1)]
+    if f == "poisson":
+        lam = sp["lam"]
+        return [(k, math.exp(-lam) * lam ** k / math.factorial(k)) for k in range(sp["kmax"] + 1)]
+    raise ValueError(f"family {f}")
+
+
+def _pdf(sp: dict):
+    import math
+    f = sp["family"]
+    if f == "normal":
+        mu, s = sp["mu"], sp["sigma"]
+        return (lambda x: math.exp(-((x - mu) / s) ** 2 / 2) / (s * math.sqrt(2 * math.pi))), mu, s
+    if f == "uniform":
+        a, b = sp["a"], sp["b"]
+        return (lambda x: 1 / (b - a) if a <= x <= b else 0.0), (a + b) / 2, (b - a) / math.sqrt(12)
+    if f == "expo":
+        lam = sp["lam"]
+        return (lambda x: lam * math.exp(-lam * x) if x >= 0 else 0.0), 1 / lam, 1 / lam
+    raise ValueError(f"family {f}")
+
+
+def dist(sp: dict) -> str:
+    import math
+    c = Canvas()
+    unit = sp.get("unit", "")
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    top, base, left, right = y + (44 if sp.get("band") else 26), y + 190, 20, 340
+    discrete = sp["family"] in ("table", "binom", "poisson")
+    if discrete:
+        pmf = _pmf(sp)
+        if sp["family"] == "binom":      # 棒を途中で切っても、平均・標準偏差は分布の値を使う
+            mean, sd = sp["n"] * sp["p"], math.sqrt(sp["n"] * sp["p"] * (1 - sp["p"]))
+        elif sp["family"] == "poisson":
+            mean, sd = sp["lam"], math.sqrt(sp["lam"])
+        else:
+            mean = sum(x * p for x, p in pmf)
+            sd = math.sqrt(sum(x * x * p for x, p in pmf) - mean ** 2)
+        lo, hi = pmf[0][0] - 0.5, pmf[-1][0] + 0.5
+        X = lambda v: left + (v - lo) / (hi - lo) * (right - left)  # noqa: E731
+        pmax = max(p for _, p in pmf)
+        scale = (base - top - 18) / pmax
+        slot = (right - left) / len(pmf)
+        bw = min(40, slot * 0.62)
+        dec = sp.get("decimals", 2)
+        hl = set(sp.get("highlight") or [])
+    else:
+        f, mean, sd = _pdf(sp)
+        lo, hi, step = sp["ticks"]
+        X = lambda v: left + (v - lo) / (hi - lo) * (right - left)  # noqa: E731
+        xs = [lo + (hi - lo) * i / 240 for i in range(241)]
+        pmax = max(f(x) for x in xs)
+        scale = (base - top - 18) / pmax
+    k = sp.get("band")
+    if k:   # 期待値±k標準偏差の帯（後ろに薄く）
+        a, b = max(lo, mean - k * sd), min(hi, mean + k * sd)
+        c.rect(X(a), top - 4, X(b) - X(a), base - top + 4, "#eef3fb")
+        c.line(X(a), top - 14, X(b), top - 14, BLUE, 1.5)
+        c.text(X(mean), top - 20, ("±標準偏差" if k == 1 else f"±{_num(k)}標準偏差") + f"（{_num(round(mean - k * sd, 2))}〜{_num(round(mean + k * sd, 2))}）", 11.5, BLUE, "middle", "bold")
+    c.line(left, base, right, base, INK2, 1)
+    if discrete:
+        for x, p in pmf:
+            cx = X(x)
+            col = ORANGE if x in hl else "#8fb3e3"
+            c.rect(cx - bw / 2, base - p * scale, bw, p * scale, col, rx=3)
+            if p * scale > 1.5 or x in hl:
+                c.add(f'<text x="{cx:.1f}" y="{base - p * scale - 5:.1f}" font-size="11.5" fill="{INK}" text-anchor="middle" '
+                      f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(f"{p:.{dec}f}")}</text>')
+            c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
+    else:
+        for sh in sp.get("shade") or []:
+            if "outside" in sh:
+                parts = [(lo, sh["outside"][0]), (sh["outside"][1], hi)]
+                col, op = ORANGE, 0.55
+            else:
+                parts = [(sh["from"], sh["to"])]
+                col, op = BLUE, 0.35
+            for a, b in parts:
+                pts = [a + (b - a) * i / 80 for i in range(81)]
+                d = f"M{X(a):.1f},{base} " + " ".join(f"L{X(x):.1f},{base - f(x) * scale:.1f}" for x in pts) + f" L{X(b):.1f},{base} Z"
+                c.add(f'<path d="{d}" fill="{col}" fill-opacity="{op}"/>')
+            if sh.get("label"):
+                if "outside" in sh:
+                    c.text(right, base - 62, sh["label"], 11.5, ORANGE, "end", "bold")
+                else:
+                    mid = (sh["from"] + sh["to"]) / 2
+                    c.add(f'<text x="{X(mid):.1f}" y="{base - f(mid) * scale * 0.45:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
+                          f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(sh["label"])}</text>')
+        d = "M" + " L".join(f"{X(x):.1f},{base - f(x) * scale:.1f}" for x in xs)
+        c.add(f'<path d="{d}" fill="none" stroke="{BLUE}" stroke-width="2.2"/>')
+        t = lo
+        while t <= hi + 1e-9:
+            c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
+            t += step
+    if sp.get("mark_mean", True):   # 期待値＝重心の▲
+        mx = X(mean)
+        c.add(f'<path d="M{mx:.1f},{base + 20} l-7,12 h14 z" fill="{ORANGE}"/>')
+        c.text(mx, base + 46, f"{'期待値' if discrete else '平均'} {_num(round(mean, 2))}{unit}", 12, ORANGE, "middle", "bold")
+    y = base + 58
+    if sp.get("note"):
+        y = c.para(8, y + 10, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist}
 
 
 def specs(course: Course) -> dict[str, dict]:
@@ -563,7 +677,7 @@ def specs(course: Course) -> dict[str, dict]:
     return out
 
 
-LAYOUT_KEYS = ("type", "caption", "scale", "mark", "density", "cumulative", "fence", "step", "decimals", "k", "whole", "mean", "mark_extremes", "geom", "zero", "dash", "show_values")
+LAYOUT_KEYS = ("type", "family", "band", "mark_mean", "highlight_label", "caption", "scale", "mark", "density", "cumulative", "fence", "step", "decimals", "k", "whole", "mean", "mark_extremes", "geom", "zero", "dash", "show_values")
 
 
 def _strings(v):
