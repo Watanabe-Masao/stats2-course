@@ -177,7 +177,7 @@
 
 - id: Q-U15-021
   stage: S3
-  concepts: [TERM-geom, TERM-indep]
+  concepts: [TERM-negbinom, TERM-indep]
   tag: 負の二項分布
   format: written
   powers: [P1, P3]

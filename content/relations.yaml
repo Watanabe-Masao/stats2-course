@@ -167,7 +167,7 @@ relations:
     to: TERM-hyper
     version: 1
     type: 対比
-    description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が (N−n)/(N−1) 倍だけ小さい。
+    description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が二項分布の (N−n)/(N−1) 倍になる（小さくなる）。
     basis: {units: [U15]}
   - id: REL-poisson-expo
     from: TERM-poisson
@@ -219,3 +219,10 @@ relations:
     premise: mathematical
     description: 標準化では、平均を引いたあと標準偏差で割り、単位のない「標準偏差いくつ分」にする。
     basis: {units: [U16]}
+  - id: REL-geom-negbinom
+    from: TERM-geom
+    to: TERM-negbinom
+    version: 1
+    type: 一般化
+    description: 幾何分布は「1回目の成功」まで待つ。待つ成功を r 回に広げると負の二項分布（r＝1 が幾何分布）。
+    basis: {units: [U15]}

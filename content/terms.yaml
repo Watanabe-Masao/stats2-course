@@ -902,6 +902,55 @@
   checks:
   - Fraction(1,1)/Fraction(1,6)==6
   - abs((5/6)**5*(1/6)-0.067)<0.0005
+- id: TERM-negbinom
+  name: 負の二項分布
+  en: negative binomial distribution
+  definition: 成功確率 p の独立な試行を、r 回目の成功が起きるまで繰り返したときの試行回数の分布。
+  version: 1
+  labs:
+  - {id: LAB-pois, preset: s3-free, purpose: 「成功するまで」のモードで r を増やし、r＝1 の幾何分布から形が変わるのを見る}
+  principle: k 回目に r 回目の成功が起きるのは、それまでの k−1 回にちょうど r−1 回成功し、k 回目に成功するとき。並び方の数 ₖ₋₁C_{r−1} を掛ける。r＝1 なら幾何分布。
+  formulas:
+  - tex: 'P(X=k)={}_{k-1}C_{r-1}\,p^r(1-p)^{k-r}\quad(k=r,r+1,\dots)'
+    symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: k
+      meaning: r 回目の成功が起きた回（成功した回も数える）
+      key: k
+      kind: value
+      range: r 以上の整数
+    - symbol: r
+      meaning: 待つ成功の回数
+      key: r
+      kind: param
+      range: 1以上の整数
+    - symbol: p
+      meaning: 1回の成功確率
+      key: p
+      kind: param
+      range: 0より大きく1以下
+    - symbol: ₖ₋₁C_{r−1}
+      meaning: 前の k−1 回から成功の r−1 回を選ぶ組合せの数
+      key: comb
+      concept: TERM-comb
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"op": "sub", "args": [{"sym": "k"}, {"num": 1}]}, {"op": "sub", "args": [{"sym": "r"}, {"num": 1}]}], "name": "comb"}, {"op": "pow", "args": [{"sym": "p"}, {"sym": "r"}]}, {"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "k"}, {"sym": "r"}]}]}]}]}
+  conditions:
+    math:
+    - 各回が独立
+    - 成功確率 p が毎回同じ
+    data:
+    - 「r 回成功するまで」を数える場面（3件成約するまでの訪問回数など）。回数を決めて成功の数を数えるなら二項分布
+  example: 成功率0.5で、2回目の成功がちょうど3回目の試行で起きる確率は ₂C₁×0.5²×0.5＝0.25。
+  counterexample: 回数 n を先に決めて成功の数を数えるなら二項分布。何を固定し、何を数えるかが逆になる。
+  checks:
+  - math.comb(2,1)*0.5**2*0.5==0.25
 - id: TERM-hyper
   name: 超幾何分布
   en: hypergeometric distribution
