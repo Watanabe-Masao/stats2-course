@@ -1,11 +1,12 @@
 # 関係の種類（kn-schema v1）。どの教材も同じ8種類を使う。build と画面はこのファイルから種類を読む。
 # 矢印は from → to。「読み方」の □ に from、■ に to を入れて文になるように登録する。
 # required：その種類で必ず書く項目。
-# trace：「前提をさかのぼる」で、to から from へたどるか（to を理解するのに from が要る向きか）。
+# trace：「前提をさかのぼる」で、B から A へたどるか（B を理解するのに A が要る向きか）。前提・導出・一般化・特殊化・統合だけ。
+# 定義の文では、矢印の起点（from）を A、終点（to）を B と書く。
 types:
   前提:
     trace: true
-    definition: to を理解する・成り立たせるのに、from が先に要る。
+    definition: B を理解する・成り立たせるのに、A が先に要る。
     reading: □ は ■ の前提
     required: [premise]   # learning（理解に必要な知識）／mathematical（数学的な成立条件・定義に使う）
     examples:
@@ -16,7 +17,7 @@ types:
       - "単元の並び順（教える順番は関係ではない）"
   導出:
     trace: true
-    definition: from から to が式の変形・計算で導ける。前提が1つのとき。前提が2つ以上なら導出（derivations）の点として書く。
+    definition: A から B が式の変形・計算で導ける。前提が1つのとき。前提が2つ以上なら導出（derivations）の点として書く。
     reading: □ から ■ が導ける
     required: [conditions]
     examples:
@@ -25,7 +26,7 @@ types:
       - "期待値・分散・独立 → 二項分布の期待値と分散（前提が3つなので導出の点）"
   一般化:
     trace: true
-    definition: from を広げた（条件を外した・次元を上げた）ものが to。逆向きの「特殊化」はデータに書かず、画面で裏から読む。
+    definition: A を広げた（条件を外した・次元を上げた）ものが B。逆向きの「特殊化」はデータに書かず、画面で裏から読む。
     reading: □ を一般化すると ■
     required: []
     examples:
@@ -34,7 +35,7 @@ types:
       - "二項分布 → ポアソン分布（広げたのではなく極限の変換）"
   特殊化:
     trace: true
-    definition: from の特別な場合が to。一般化と同じ関係を逆から書くことになるので、原則は一般化で書く。一般化で書けないときだけ使う。
+    definition: A の特別な場合が B。一般化と同じ関係を逆から書くことになるので、原則は一般化で書く。一般化で書けないときだけ使う。
     reading: □ の特別な場合が ■
     required: []
     examples:
@@ -42,8 +43,8 @@ types:
     non_examples:
       - "一般化と同じ組を両方向に書くこと"
   変換:
-    trace: true
-    definition: from に操作や極限・近似をほどこすと to になる。厳密か、近似か、極限かを必ず区別する（「近い」と「等しい」を混ぜない）。
+    trace: false   # 変換は学ぶ順ではない（二項→正規の近似で、正規分布に二項分布が要るわけではない）。学ぶ順に要るものは「前提」で別に書く
+    definition: A に操作や極限・近似をほどこすと B になる。厳密か、近似か、極限かを必ず区別する（「近い」と「等しい」を混ぜない）。
     reading: □ を変換すると ■
     required: [mode, conditions]   # mode：exact（厳密）／approximation（有限の条件での近似）／limit（条件を保って進めた極限）
     examples:
@@ -64,7 +65,7 @@ types:
       - "一方が他方の特別な場合（一般化・特殊化で書く）"
   統合:
     trace: true
-    definition: from を含むいくつかの概念を組み合わせて、to という枠組みになる（to の側から見て複数の from がある）。
+    definition: A を含むいくつかの概念を組み合わせて、B という枠組みになる（B の側から見て複数の A がある）。
     reading: □ は ■ に組み込まれる
     required: []
     examples:
@@ -74,7 +75,7 @@ types:
       - "式で導けるもの（導出）"
   応用:
     trace: false
-    definition: from の考え方・道具を、to の場面や問題に使う。
+    definition: A の考え方・道具を、B の場面や問題に使う。
     reading: □ を ■ に使う
     required: []
     examples:
