@@ -21,6 +21,41 @@ OPTIONAL_FIELDS = ("formulas", "misconceptions", "sources")
 NS = re.compile(r"^[a-z0-9-]+:")
 
 
+# 式の分解の木（kn-schema の formulaNode）。葉の記号・関数の名前・動かす記号は、その式の symbols の key を指す。
+# 次の関数だけは記号に書かなくてよい（どの式でも同じ意味）。計算・展開・表示は math-lab（#72）。
+BUILTIN_FN = {"exp", "log", "gt", "ge", "lt", "le", "between"}
+TREE_OPS = {"eq", "add", "sub", "mul", "div", "pow", "neg", "sqrt", "abs", "sum", "prod", "int", "fn"}
+
+
+def tree_errors(node, keys: set) -> list[str]:
+    err: list[str] = []
+
+    def walk(n) -> None:
+        if not isinstance(n, dict):
+            err.append(f"節が辞書でない（{n!r}）")
+            return
+        if "sym" in n:
+            if n["sym"] not in keys:
+                err.append(f"記号 {n['sym']} が symbols の key にない")
+            return
+        if "num" in n:
+            return
+        o = n.get("op")
+        if o not in TREE_OPS:
+            err.append(f"知らない演算 {o}")
+        if o == "fn" and n.get("name") not in keys and n.get("name") not in BUILTIN_FN:
+            err.append(f"関数 {n.get('name')} が symbols の key にない（{'・'.join(sorted(BUILTIN_FN))} は書かなくてよい）")
+        if o in ("sum", "prod", "int") and n.get("var") and n["var"] not in keys:
+            err.append(f"動かす記号 {n['var']} が symbols の key にない")
+        if not n.get("args"):
+            err.append(f"{o} に args がない")
+        for a in n.get("args", []) + [n[k] for k in ("lower", "upper") if k in n]:
+            walk(a)
+
+    walk(node)
+    return err
+
+
 def course_id(c: Course) -> str:
     return c.shared.get("course", {}).get("id", "stats2")
 
@@ -67,6 +102,10 @@ def validate_network(c: Course) -> list[str]:
             for s in f.get("symbols", []):
                 if not (s.get("symbol") and s.get("meaning")):
                     err.append(f"{tid}: 記号には symbol と meaning を書く")
+                if s.get("concept") and not NS.match(str(s["concept"])) and s["concept"] not in c.terms:
+                    err.append(f"{tid}: 記号 {s.get('symbol')} の concept {s['concept']} が用語にない")
+            if f.get("tree"):
+                err += [f"{tid}: 式 {f['tex']} の木：{e}" for e in tree_errors(f["tree"], {s.get("key") for s in f.get("symbols", []) if s.get("key")})]
         for m in t.get("misconceptions", []):
             if not (m.get("misconception") and m.get("correction")):
                 err.append(f"{tid}: よくある誤解には misconception と correction を書く")
@@ -225,6 +264,9 @@ def export_network(c: Course, target: dict) -> dict:
             for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions"):
                 if t.get(k):
                     e[k] = t[k]
+            if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
+                e["formulas"] = [{**f, **({"symbols": [{**s, **({"concept": g(s["concept"])} if s.get("concept") else {})}
+                                                       for s in f["symbols"]]} if f.get("symbols") else {})} for f in t["formulas"]]
             if labs(t.get("labs")):
                 e["labs"] = labs(t.get("labs"))
             if t.get("sources"):
