@@ -120,9 +120,10 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
           ms: 900                                        # 1つの frame の時間（省略 900）
 ```
 
+- **使い所と切り分け**（#90）：「ラボで解説」（tour。答えを見せる）と「ラボで確かめる」（予想・法則・自由に動かす）を分ける。解説は**定義の説明**（概念の labs と、単元の初学「式の構造を読む」）と**つながり**（関係の labs と、発展「ほかでは？」）に置く。同じページで予想させる数を解説で先に見せない（別の数・場面にする）。問題の答えの中・創造には置かない。1つの概念・関係に解説は1つ。区別は書き足さない（版に tour があれば解説。ネットワークの kind と Notion の見出し「▶ ラボで解説」は build が付ける）。
 - 再生は今の段だけ動かして止まる（自動で次へ進めない）。操作は「前へ／再生／次へ」。「自分で動かす」で解説を止め、「解説に戻る」で値・説明・強調を止めた frame に戻す。
 - 静止図は build が set か frames のある段ごとに作る（図ID `FIG-<ラボ>-<版>-<段>`）。関係の `figures:` に書くとネットワークに出る。
-- 状態から静止図と照合する数を作る計算は build/tour.py の MODES に、ラボのモードごとに書く（今は LAB-pois の approx だけ）。テスト（test_labs.js）が段と frame ごとにラボの値と照合し、再生・戻る・埋め込みの収まりを確かめる。
+- 状態から静止図と照合する数を作る計算は build/tour.py の MODES に、ラボのモードごとに書く（今は LAB-pois の approx と LAB-binom の path）。テスト（test_labs.js）が段と frame ごとにラボの値と照合し、再生・戻る・埋め込みの収まりを確かめる。
 - build が止めるもの：tour と predict・steps・task の同居、2段未満、text がない・`**` が閉じない、モードの set にない値、整数の値を小数で書く、MODES にないモード。
 
 ## 概念・関係・導出（知識ネットワークのデータ）
@@ -204,7 +205,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 - 問題には `lab:`（上）か `figure:` を書く。`figure:` は答えの中に「🖼️ 図で確かめる」として入る（図ID は `FIG-<問題ID>`）。
 - 本文の例題（`**例題…`）には、次の例題・見出し・問題までに `{{lab:…}}` か `{{fig:…}}` を置く。例題の図は unit.yaml の `figures:` に書く。
-- 図は設定から作る（build/figures.py）：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・normal・uniform・expo）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
+- 図は設定から作る（build/figures.py）：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`paths`（n 回中ちょうど k 回成功する並びを全部書き出す。解説付き再生の静止図）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・normal・uniform・expo）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
 - 各単元の初学「意味」か「式の構造」に、単元の中心を1枚で見せる概念図を置く。初学「図を再現する」は、その概念図を手本として示し、自分で描いて照らし合わせる形にする（手本のない「図を再現する」を作らない）。
 - 図の中の数は問題文・答え（例題なら本文）にある数だけ。計算で出す数（合計・比・係数）は図を作るときに計算する。
 - まだ付け終えていない単元は unit.yaml に `visuals_pending: true`（build が警告する）。

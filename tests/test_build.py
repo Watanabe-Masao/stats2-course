@@ -202,9 +202,21 @@ class TestLabs(unittest.TestCase):
         self.assertTrue(all(abs(x["lambda"] - 3) < 1e-12 for step in ex for x in step))   # 途中も np＝λ
         self.assertGreater(ex[0][0]["maxdiff"], ex[2][-1]["maxdiff"])   # n を大きくすると差が縮む
         figs = tour.figure_specs(COURSE)
-        self.assertEqual(sorted(figs), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
+        self.assertEqual(sorted(f for f in figs if "pois" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
         self.assertTrue(figs["FIG-LAB-pois-rel-approx-tour-3"]["caption"].startswith("さらに大きく："))
         self.assertEqual(figs["FIG-LAB-pois-rel-approx-tour-3"]["spec"]["maxdiff"], 0.003)
+
+    def test_tour_definition_binom(self):
+        import tour
+        p = COURSE.labs["LAB-binom"]["presets"]["def-tour"]
+        ex = tour.expect("LAB-binom", p)
+        self.assertEqual([x["ncr"] for x in ex[1]], [1, 2, 3, 4])      # 成功1回の並びは n 通り
+        self.assertAlmostEqual(ex[2][0]["pk"], 6 * 0.3 ** 2 * 0.7 ** 2)
+        figs = tour.figure_specs(COURSE)
+        self.assertEqual(figs["FIG-LAB-binom-def-tour-3"]["spec"], {"type": "paths", "n": 4, "k": 2, "p": 0.3, "decimals": 4})
+        from render_notion import NotionRenderer
+        page = NotionRenderer(course(), TARGET).unit_page("U14")
+        self.assertIn("<b>▶ ラボで解説</b>\n\n<embed source=", page)   # 解説の版には見出しが付く
 
     def test_tour_validation(self):
         from labs import _check_spec

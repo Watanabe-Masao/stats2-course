@@ -104,7 +104,7 @@ body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 .lk-touring:not(.lk-free) .mode .ctl,.lk-touring:not(.lk-free) .mode>p.mut{display:none}
 .lk-hl{outline:3px solid #f0b400;outline-offset:2px;border-radius:6px}
 .lk-embed.lk-touring .mode .det{display:none}
-.lk-embed.lk-touring:not(.lk-free) .mode .res.key:not([data-tour-anchor]){display:none}
+.lk-embed.lk-touring:not(.lk-free) .mode .res.key:not([data-tour-anchor]):not([data-tour-show]){display:none}
 .lk-embed .lk-tour{padding:6px 10px;margin:4px 0}
 .lk-embed .lk-say{font-size:14px;margin:0 0 4px}
 .lk-embed .lk-tsub{margin-top:4px}
@@ -118,3 +118,4 @@ body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 .lk-embed.lk-touring [data-tour-anchor]>.legend,.lk-embed.lk-touring [data-tour-anchor]>.lk-tline{display:inline-block;margin:0 4px 0 0;vertical-align:middle;font-size:12px}
 .lk-embed.lk-touring [data-tour-anchor]>.legend span{margin-right:4px;font-size:12px}
 .lk-embed.lk-touring [data-tour-anchor]>.lk-tline span{padding:0 1px}
+.lk-embed.lk-touring [data-tour-anchor] .mut{display:none}

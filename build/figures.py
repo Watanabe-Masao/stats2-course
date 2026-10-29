@@ -671,8 +671,36 @@ def dist(sp: dict) -> str:
     return c.done(y + 6)
 
 
+def paths(sp: dict) -> str:
+    """n 回中ちょうど k 回成功する並びを全部書き出す（🛒 成功・❌ 失敗）。並び1つの確率×並びの数＝ちょうど k 回の確率。"""
+    import itertools
+    import math
+    n, k, p = sp["n"], sp["k"], sp["p"]
+    dec = sp.get("decimals", 4)
+    rows = [c for c in itertools.product([1, 0], repeat=n) if sum(c) == k]
+    c = Canvas()
+    y, r, gap = 42, 9, 24
+    c.text(16, 18, f"n＝{n} 回のうち ちょうど {k} 回成功する並び（{len(rows)} 通り）", 12.5, INK2)
+    for row in rows:
+        y += gap
+        for j, x in enumerate(row):   # ラボと同じ印（🛒 成功・❌ 失敗）
+            c.text(16 + j * 26, y + 1, "🛒" if x else "❌", 17)
+        pr = "×".join(_num(round(p if x else 1 - p, 6)) for x in row)
+        c.text(36 + n * 26, y, pr, 12, INK2)
+    path = p ** k * (1 - p) ** (n - k)
+    ncr = math.comb(n, k)
+    y += 30
+    c.text(16, y, f"並び1つの確率 {_num(round(p, 6))}^{k}×{_num(round(1 - p, 6))}^{n - k}＝{path:.{dec}f}", 12.5, INK)
+    y += 20
+    c.text(16, y, f"並びの数 {n}C{k}＝{ncr} 通り", 12.5, INK)
+    y += 22
+    c.text(16, y, f"ちょうど {k} 回＝{ncr}×{path:.{dec}f}＝{ncr * path:.{dec}f}", 13.5, INK, weight="bold")
+    c.text(16, 38, f"🛒 成功（確率 {_num(round(p, 6))}）　❌ 失敗（確率 {_num(round(1 - p, 6))}）", 11.5, INK2)
+    return c.done(y + 14)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths}
 
 
 def specs(course: Course) -> dict[str, dict]:

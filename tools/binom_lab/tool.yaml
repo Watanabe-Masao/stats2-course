@@ -30,6 +30,26 @@ presets:
     predict: {type: number, key: pk, label: "P(X＝1)"}
     expect: 0.4219
     why: 誰が買うかの並びは4通り（₄C₁）、どれも 0.25×0.75³≒0.105。4×0.105≒0.422。0.25 だけ、0.105 だけだと並び方を数え忘れている。
+  def-tour:   # 解説付き再生（#90）：定義の説明。概念「二項分布」と U14 の「式の構造を読む」から開く。数は例題（n＝4・p＝0.25・k＝1）と別にする
+    mode: path
+    tour:
+      decimals: 4
+      steps:
+        - title: 1回だけ試す
+          text: 成功（🛒）の確率は **p**、失敗（❌）は **1−p**。p＝0.3 で1回だけ試す。
+          set: {n: 1, p: 0.3, k: 1}
+          focus: seq
+        - title: n 回くり返す
+          text: '**n 回くり返す**と、成功1回の並びは n 通りに増える。'
+          frames: [{n: 2}, {n: 3}, {n: 4}]
+          focus: seq
+        - title: 並び1つの確率
+          text: 成功を2回にする。どの並びも確率は同じ **pᵏ(1−p)ⁿ⁻ᵏ**（独立なので掛け算）。
+          set: {k: 2}
+          focus: path
+        - title: 並びの数を掛ける
+          text: 並びの数 **ₙCₖ** を掛けると、ちょうど k 回の確率 **ₙCₖpᵏ(1−p)ⁿ⁻ᵏ**。これが二項分布。
+          focus: pk
   s1-n:
     mode: pmf
     set: {n: 20, p: 0.25, k: 5, kind: eq}

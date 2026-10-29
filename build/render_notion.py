@@ -72,8 +72,11 @@ class NotionRenderer:
                 return self.stage_label(arg)
             if kind == "shared":
                 return self.inline(self.c.shared[arg])
-            if kind == "lab":
-                return f'<embed source="{self.lab_src(arg)}" />'
+            if kind == "lab":   # 解説付き再生の版には「▶ ラボで解説」を付ける（確かめる版と見分ける。#90）
+                lid, _, pre = arg.partition("@")
+                head = (f'<b>{COMP["labels"]["lab_tour"]}</b>\n\n'
+                        if pre and ((self.c.labs[lid].get("presets") or {}).get(pre) or {}).get("tour") else "")
+                return f'{head}<embed source="{self.lab_src(arg)}" />'
             if kind == "fig":
                 fid, _, cap = arg.partition("|")
                 cap = cap or self.c.figures[fid].get("caption", "")
