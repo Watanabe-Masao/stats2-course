@@ -690,9 +690,11 @@ def paths(sp: dict) -> str:
     path = p ** k * (1 - p) ** (n - k)
     ncr = math.comb(n, k)
     y += 30
-    c.text(16, y, f"並び1つの確率 {_num(round(p, 6))}^{k}×{_num(round(1 - p, 6))}^{n - k}＝{path:.{dec}f}", 12.5, INK)
+    sup = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")   # ラボと同じ書き方（0.3²×0.7²・₄C₂）
+    sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    c.text(16, y, f"並び1つの確率 {_num(round(p, 6))}{str(k).translate(sup)}×{_num(round(1 - p, 6))}{str(n - k).translate(sup)}＝{path:.{dec}f}", 12.5, INK)
     y += 20
-    c.text(16, y, f"並びの数 {n}C{k}＝{ncr} 通り", 12.5, INK)
+    c.text(16, y, f"並びの数 {str(n).translate(sub)}C{str(k).translate(sub)}＝{ncr} 通り", 12.5, INK)
     y += 22
     c.text(16, y, f"ちょうど {k} 回＝{ncr}×{path:.{dec}f}＝{ncr * path:.{dec}f}", 13.5, INK, weight="bold")
     c.text(16, 38, f"🛒 成功（確率 {_num(round(p, 6))}）　❌ 失敗（確率 {_num(round(1 - p, 6))}）", 11.5, INK2)
