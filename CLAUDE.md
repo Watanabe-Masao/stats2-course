@@ -103,7 +103,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 概念・関係・導出（知識ネットワークのデータ）
 
-型 v1（2026-10-29 決定）：docs/knowledge-net/schema/kn-schema-v1.json。関係の種類の定義は同じフォルダの relation-types.yaml。
+型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。関係の種類の定義は relation-types.yaml。
 
 - 概念＝用語（content/terms.yaml）。`definition` を書いた用語が概念になる。
   - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。

@@ -41,6 +41,8 @@ units:                 # 新しく生成した単元ページ
   U31: 407b7cd539a181a88ab6c893703ac6ff
   U32: 407b7cd539a1813db83be3c966e4afb2
 
+# 知識ネットワークの画面（knowledge-net）。ホームの入口に出す。
+network_url: https://watanabe-masao.github.io/knowledge-net/
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
 site_base_url: https://watanabe-masao.github.io/stats2-labs
 
