@@ -259,11 +259,15 @@ class NotionRenderer:
             "教材は GitHub の原本（stats2-course）から生成している。\n</callout>",
             "", "## 入口", "", child(self.t["root_page"], "教材 v2｜統計検定2級"),
         ]
+        net = "🕸 知識ネットワーク：概念と関係の地図（前提をさかのぼる・比べる）"
+        if self.t.get("network_url"):   # 公開した画面（knowledge-net）
+            lines += ["", f"- 🕸 [知識ネットワーク]({self.t['network_url']})：概念と関係の地図（前提をさかのぼる・比べる）"]
         if self.t.get("personal_root"):
             lines += ["", child(self.t["personal_root"], "学習記録（個人用）")]
-        lines += ["", "## 準備中", "",
-                  "- 🕸 知識ネットワーク：概念と関係の地図（前提をさかのぼる・比べる）",
-                  "- 🤖 AI と学ぶ：学習記録を読んで、問いかけ→ヒント→確認問題で進める"]
+        lines += ["", "## 準備中", ""]
+        if not self.t.get("network_url"):
+            lines.append(f"- {net}")
+        lines.append("- 🤖 AI と学ぶ：学習記録を読んで、問いかけ→ヒント→確認問題で進める")
         status = [child(self.t[k], name) for k, name in (("progress_page", "進み具合"), ("legacy_page", "旧版（削除予定）")) if self.t.get(k)]
         if status:
             lines += ["", "## 作業の状況", "", "\n\n".join(status)]
