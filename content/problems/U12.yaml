@@ -291,7 +291,7 @@
     why: 95÷392≒24%。正常な取引が99%と多いので、3%の誤警告でも警告の多くを占める。
 
 - id: Q-U12-040
-  stage: S5
+  stage: S3
   tag: 事後を次の事前に
   format: written
   powers: [P1, P3]

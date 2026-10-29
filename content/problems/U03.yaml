@@ -347,7 +347,7 @@
     - 20品目の値入率
 
 - id: Q-U03-040
-  stage: S5
+  stage: S3
   label: 確かめ問題
   format: written
   powers: [P2]

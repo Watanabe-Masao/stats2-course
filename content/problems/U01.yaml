@@ -287,7 +287,7 @@
     why: 部分＝基準量×割合＝500×0.35＝175万円。原価は 500×0.65＝325万円。
   
 - id: Q-U01-040
-  stage: S5
+  stage: S3
   tag: 元に戻す率
   format: written
   powers: [P1, P2]

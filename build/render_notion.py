@@ -31,7 +31,7 @@ class NotionRenderer:
 
     # ---- 参照 -------------------------------------------------------
     def unit_ref(self, uid: str) -> str:
-        pid = (self.t.get("units") or {}).get(uid) or (self.t.get("legacy_units") or {}).get(uid)
+        pid = (self.t.get("units") or {}).get(uid)
         if pid:
             return mention(pid)
         return f"教科書{self.c.index[uid]['number']}"
@@ -248,6 +248,43 @@ class NotionRenderer:
         if rows:   # 全部移したら、旧版の一覧は出さない
             lines += ["## まだ旧版の単元", "", "| 番号 | 単元 |", "| --- | --- |", *rows,
                       "", '<span color="gray">新しい形に移すと、上の一覧に移る。</span>']
+        return "\n".join(lines).rstrip("\n") + "\n"
+
+    def home_page(self) -> str:
+        """一番上のページ（ホーム）。入口だけを置く。子ページは <page> ブロックで並べる。"""
+        def child(pid, title):
+            return f'<page url="https://app.notion.com/p/{pid.replace("-", "")}">\n{title}\n</page>'
+        lines = [
+            '<callout icon="📐" color="gray_bg">\n統計検定2級の教材と、自分の学習記録の入口。'
+            "教材は GitHub の原本（stats2-course）から生成している。\n</callout>",
+            "", "## 入口", "", child(self.t["root_page"], "教材 v2｜統計検定2級"),
+        ]
+        if self.t.get("personal_root"):
+            lines += ["", child(self.t["personal_root"], "学習記録（個人用）")]
+        lines += ["", "## 準備中", "",
+                  "- 🕸 知識ネットワーク：概念と関係の地図（前提をさかのぼる・比べる）",
+                  "- 🤖 AI と学ぶ：学習記録を読んで、問いかけ→ヒント→確認問題で進める"]
+        if self.t.get("legacy_page"):
+            lines += ["", "## 片付け中", "", child(self.t["legacy_page"], "旧版（削除予定）")]
+        return "\n".join(lines).rstrip("\n") + "\n"
+
+    def legacy_page(self, report: list[dict]) -> str:
+        """旧版（削除予定）。publish/legacy.yaml の項目ごとに、置き換え先・削除の条件・今の状態と、旧版そのもの（子）を並べる。"""
+        state = {"still": "まだ参照あり", "ready": "削除してよい", "deleted": "削除済み"}
+        lines = ['<callout icon="🗄" color="gray_bg">\n新しい構造に取り込むまで残している旧版。'
+                 "条件を満たしたものから削除する（管理表は GitHub の publish/legacy.yaml）。新しく参照しない。\n</callout>"]
+        for r in report:
+            it = r["item"]
+            if r["state"] == "deleted":
+                continue
+            lines += ["", f"## {it['name']}", "",
+                      f"- 置き換え先：{it.get('replaced_by', '')}",
+                      f"- 削除する時期：{it.get('when', '未定')}",
+                      f"- 今の状態：<b>{state[r['state']]}</b>", ""]
+            for n in it.get("notion", []):
+                pid = str(n["id"]).replace("-", "")
+                tag = "database" if n.get("type") == "database" else "page"
+                lines += [f'<{tag} url="https://app.notion.com/p/{pid}">\n{n.get("title", "")}\n</{tag}>', ""]
         return "\n".join(lines).rstrip("\n") + "\n"
 
     def guide_page(self) -> str:

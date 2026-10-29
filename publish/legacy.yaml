@@ -1,0 +1,50 @@
+# 旧版（Notion）のうち、新しい構造に取り込むまで残しているもの。ここが削除の管理表。
+#   - build が毎回、各項目の状態（まだ参照あり／削除してよい／削除済み）を出す
+#   - 「削除してよい」になったら Notion で削除し、deleted: に日付を書く
+#   - deleted の項目の文字列・ID が原本や生成物に残っていると build が止まる（消し忘れ・戻し忘れの検出）
+#   - 全部の項目が deleted になったら、最終ゴール6「旧版がすべて削除されている」の完了
+#
+# 条件：
+#   absent    原本（content/・templates/・publish/notion.yaml）と生成物（out/notion）にあってはならない文字列
+#             notion: の ID も自動で absent に入る（notion: は Notion の旧版ページ・DB。type と title は「旧版（削除予定）」ページの子として並べるため）
+#   require   名前で決めた検査
+#             terms_defined：terms.yaml の全部の用語に definition がある
+#             term_pages_unlinked：publish/notion.yaml の terms:（旧版の用語ページへの対応）が空
+items:
+  - id: LEG-confirm-q
+    name: 理解確認・問題集（確認問題・記述式）
+    notion:
+      - {id: 5d5f0ed128d84534a4a4f3e2ccd73bbe, type: database, title: 理解確認・問題集}
+      - {id: 404b7cd539a181d4b9c0df2d5bee856a, type: page, title: Q05-T1}   # 旧教材から外に出した6ページ
+      - {id: 404b7cd539a181b18875eb800ab69d60, type: page, title: Q05-T2}
+      - {id: 404b7cd539a1814490abe645a8c86d8a, type: page, title: Q05-T3}
+      - {id: 404b7cd539a18174b8fae262afc7bf31, type: page, title: Q05-T4}
+      - {id: 404b7cd539a181e5bdf6e870c5715b80, type: page, title: Q30}
+      - {id: 404b7cd539a18172851de744700b91ec, type: page, title: Q32}
+    replaced_by: 原本の問題（content/problems）
+    absent: ["REF-Q-"]
+    when: 最初のブランチ（cleanup-home）
+  - id: LEG-pq-db
+    name: 本番形式問題（15問）
+    notion: [{id: da3b5947153c4ae59304e308a9b1e9e2, type: database, title: 本番形式問題}]
+    replaced_by: 原本の問題に取り込む（本番形式の5択）
+    absent: ["REF-PQ-DB"]
+    when: W0 の後の小さなブランチ
+  - id: LEG-confusion
+    name: 混同しやすい概念｜図で比べる（比較13組）
+    notion: [{id: 406b7cd539a1813095c5c41c64477e81, type: page, title: 混同しやすい概念｜図で比べる}]
+    replaced_by: 関係データの「対比」と、そこから生成する比較
+    absent: ["REF-CONFUSION"]
+    when: 該当する単元の段階が終わったとき（遅くとも W5）
+  - id: LEG-term-db
+    name: 統計用語辞典（114行）
+    notion: [{id: da48813bf8b74e69824967eb3c68399c, type: database, title: 統計用語辞典}]
+    replaced_by: 原本の概念データ（terms.yaml を広げたもの）と、ネットワークの画面
+    require: [terms_defined, term_pages_unlinked]
+    when: W5 の終わり
+  - id: LEG-reference
+    name: 公式・用語リファレンス
+    notion: [{id: 405b7cd539a1818f9198f683d487c86d, type: page, title: 公式・用語リファレンス}]
+    replaced_by: 単元の「忘れたら」をネットワークの画面へ
+    absent: ["legacy_reference"]
+    when: W5 の終わり

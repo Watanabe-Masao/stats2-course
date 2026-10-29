@@ -119,7 +119,7 @@ def main() -> None:
     if assets:
         run(f"単元のラボの版（{len(assets)}）", ["node", "tools/test_labs.js"], {"ASSETS": ",".join(assets)})
     if labs_note:
-        print("⚠️ 共通部分が変わったので、マージの前に build/check_all.sh（全部）を通す")
+        print("⚠️ 共通部分が変わった。ラボの版は PR で GitHub が全部を確かめる（結果を見てからマージ）")
     print("✅ 範囲内 OK")
 
 

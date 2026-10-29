@@ -1,5 +1,10 @@
 name: check
-on: [push, pull_request]
+# 全部の確認（約30分）は PR と main への取り込みでだけ走らせる。ブランチの途中は build/check_changed.py で範囲だけ確かめる。
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
 jobs:
   check:
     runs-on: ubuntu-latest

@@ -287,7 +287,7 @@
     why: 21人と22人の2本を足して約0.34。n を21にすると約0.11まで下がる。
 
 - id: Q-U14-040
-  stage: S5
+  stage: S3
   tag: 正規分布で近似
   format: written
   powers: [P1, P3]

@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from figures import build_figures, validate_figures  # noqa: E402
+from legacy import legacy_report, legacy_status  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
 from model import ROOT, load_course, load_yaml, run_checks, validate  # noqa: E402
@@ -49,14 +50,24 @@ def main(argv: list[str]) -> int:
     r = NotionRenderer(course, load_yaml(ROOT / "publish" / "notion.yaml"))
     pages = {"guide": r.guide_page(), "root": r.root_page()}
     pages.update({uid: r.unit_page(uid) for uid in course.units})
+    if r.t.get("home_page"):
+        pages["home"] = r.home_page()
+    if r.t.get("legacy_page"):
+        pages["legacy"] = r.legacy_page(legacy_report(pages))
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
     if lint:
         return fail("生成物の検査", lint)
+    legacy_errors, legacy_lines = legacy_status(pages)
+    if legacy_errors:
+        return fail("旧版の削除の管理表（publish/legacy.yaml）", legacy_errors)
     outdir = ROOT / "out" / "notion"
     outdir.mkdir(parents=True, exist_ok=True)
     for name, md in pages.items():
         (outdir / f"{name}.md").write_text(md, encoding="utf-8")
     print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版、out/site/ にラボ {sum(1 for e in site if not e['query'])} 本・図 {len(course.figures)}（問題・例題の図 {len(figs)}）（生成物の検査 OK）")
+    if legacy_lines:
+        print("旧版（publish/legacy.yaml）")
+        print("\n".join(legacy_lines))
     return 0
 
 

@@ -393,7 +393,7 @@
       note: 合計・平均・前年比◯
 
 - id: Q-U04-040
-  stage: S5
+  stage: S3
   label: 確かめ問題
   format: written
   powers: [P2, P1]

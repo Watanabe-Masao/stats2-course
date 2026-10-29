@@ -287,7 +287,7 @@
     why: λ＝3.5、e⁻³·⁵≒0.030。偶然かどうかの判断は検定の単元で正式に扱う。
 
 - id: Q-U15-040
-  stage: S5
+  stage: S3
   tag: 待ち時間
   format: written
   powers: [P1, P3]

@@ -1,7 +1,9 @@
 # Notion（渡辺さんのワークスペース）への公開設定。原本ID → NotionページID の対応表。
 # 配布先に公開するときは、このファイルを別に用意する（原本は変えない）。
+home_page: 401b7cd539a1818aaf89cc7aeb8522dc   # 📐 一番上のページ（ホーム。生成）
 root_page: 406b7cd539a181009c17d5cf82af377c   # 📚 教材 v2
 guide_page: 406b7cd539a181df985edc50a2b248af  # 学び方ガイド（生成）
+legacy_page: 408b7cd539a181ea9e3bc678a323c865  # 旧版（削除予定）。publish/legacy.yaml から生成
 personal_root: 406b7cd539a181719cfdfd53a2501d4a  # 個人用の学習記録（配布しない。配布先の設定では空にする）
 units:                 # 新しく生成した単元ページ
   U01: 407b7cd539a181eab4e2e2b432162d65
@@ -38,82 +40,14 @@ units:                 # 新しく生成した単元ページ
   U31: 407b7cd539a181a88ab6c893703ac6ff
   U32: 407b7cd539a1813db83be3c966e4afb2
 
-# 旧版（まだ移していない単元・用語辞典など）へのリンク。移したら units に移す。
 # 公開サイト（ラボと図）。書くと、ラボと図をアップロードせず URL で埋め込む。消すとアップロード方式に戻る。
 site_base_url: https://watanabe-masao.github.io/stats2-labs
 
+# 旧版へのリンク（新しい構造に取り込むまで残す。削除の条件は publish/legacy.yaml）
 legacy_reference: 405b7cd539a1818f9198f683d487c86d   # 公式・用語リファレンス
-legacy_units:
-  U01: 404b7cd539a181f7bceaca01b3d7d30d
-  U02: 404b7cd539a1818e9a7fc14c561e2fff
-  U03: 404b7cd539a181c8b401eff8ea64a114
-  U04: 404b7cd539a181ae9f2cf8dd36aaedab
-  U05: 404b7cd539a1811b9f3ed3a1cef1d193
-  U05T: 404b7cd539a181d5abd1edac25efd358
-  U06: 404b7cd539a18132bad9d794abbe718a
-  U07: 404b7cd539a181a0b8cfd8fb68828f9d
-  U08: 404b7cd539a181d79f78ef79a5540af4
-  U10: 404b7cd539a181ec8d65dae396ccf8bc
-  U11: 404b7cd539a18118a924fefe26da2827
-  U12: 404b7cd539a181f7b6cde094fec1f87b
-  U13: 404b7cd539a181dc882bdd79f87b3618
-  U14: 404b7cd539a1810cb3bad8cf8cc8a1aa
-  U15: 404b7cd539a181a3a886cdaaadaa2204
-  U16: 404b7cd539a18105a53edf1e30eae4d1
-  U17: 404b7cd539a181a9b436f51f41e77d53
-  U18: 404b7cd539a18184bd07d62b225f662c
-  U19: 404b7cd539a18117b702d4a0a2ffacc1
-  U20: 404b7cd539a181b99919c4fdab6e001e
-  U21: 404b7cd539a181f39304e6f848ab978c
-  U22: 404b7cd539a181898f63d62b5da9dab6
-  U23: 404b7cd539a1817da872d7985b1daf97
-  U24: 404b7cd539a1814d9e4fc70c61be3877
-  U25: 404b7cd539a18111bd84d73e8a732e35
-  U26: 404b7cd539a18163b703d4af1ef30df2
-  U27: 404b7cd539a1814ab05ac194b629f6e8
-  U28: 404b7cd539a1819d9e15ece276042389
-  U29: 404b7cd539a1811e8cd2e65ff96b69dc
-  U30: 404b7cd539a1818ca942dd14a6d753a1
-  U31: 404b7cd539a181f290b8f54f4baec30b
-  U32: 404b7cd539a18104a6d5e51d404464a9
 refs:
   REF-PQ-DB: da3b5947153c4ae59304e308a9b1e9e2
   REF-CONFUSION: 406b7cd539a1813095c5c41c64477e81
-  REF-Q-U03: 402b7cd539a181b395afefab24282878
-  REF-Q-U04: 402b7cd539a1819fab4ee8434938ad01
-  REF-Q-U05: 402b7cd539a1812fab0eed024a3c1108
-  REF-Q-U06: 402b7cd539a18168aa9fd86135ccc0cd
-  REF-Q-U07: 402b7cd539a181eda58df84bc3ba1ca2
-  REF-Q-U08: 402b7cd539a1815f98bde2f52959e40c
-  REF-Q-U01: 402b7cd539a18188a71ef3f61ee84355
-  REF-Q-U02: 402b7cd539a181378704c6a4ed5e3c99
-  REF-Q-U10: 402b7cd539a1819ab42cdd2842e922d5
-  REF-Q-U11: 402b7cd539a181979739ca063532aec3
-  REF-Q-U12: 402b7cd539a181ed9d2accc6a79a6488
-  REF-Q-U13: 402b7cd539a1811bbabff1d6af67eee5
-  REF-Q-U14: 402b7cd539a181c19bbdc55fc3960968
-  REF-Q-U15: 402b7cd539a1811792e2d31ec101609f
-  REF-Q-U16: 402b7cd539a181e99270c13910cefc40
-  REF-Q-U17: 402b7cd539a1811c8a08f50eb1391792
-  REF-Q-U18: 402b7cd539a1814089c0f002434831bc
-  REF-Q-U19: 402b7cd539a1811fb32bfac3a35b922d
-  REF-Q-U20: 402b7cd539a18173bd10e8e6fa647b01
-  REF-Q-U21: 402b7cd539a181b7bbc4de3a5dbb8016
-  REF-Q-U22: 402b7cd539a181bf8a29c583add7bfff
-  REF-Q-U23: 402b7cd539a1814085e8d6f8de8e0bbb
-  REF-Q-U24: 402b7cd539a1812faa71e62fb418d9b9
-  REF-Q-U25: 402b7cd539a18126b4a4f1ec096dec58
-  REF-Q-U26: 402b7cd539a181c2ac5cce67b1fbfdf3
-  REF-Q-U27: 402b7cd539a1818faa06d550d637e3a1
-  REF-Q-U28: 402b7cd539a181e0a3e1ced2c94f1683
-  REF-Q-U29: 402b7cd539a181a993e6c05493b4ec61
-  REF-Q-U30: 404b7cd539a181e5bdf6e870c5715b80
-  REF-Q-U31: 402b7cd539a181bb87b9e9618bb86e8c
-  REF-Q-U32: 404b7cd539a18172851de744700b91ec
-  REF-Q-U05T-1: 404b7cd539a181d4b9c0df2d5bee856a
-  REF-Q-U05T-2: 404b7cd539a181b18875eb800ab69d60
-  REF-Q-U05T-3: 404b7cd539a1814490abe645a8c86d8a
-  REF-Q-U05T-4: 404b7cd539a18174b8fae262afc7bf31
 terms:
   TERM-ratio: 405b7cd539a1815cba0ccd40387a54b7
   TERM-point: 405b7cd539a181d6ad3eea8fba23d204
