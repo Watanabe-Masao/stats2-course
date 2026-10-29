@@ -205,7 +205,7 @@ class TestLabs(unittest.TestCase):
         self.assertAlmostEqual(ex[2][-1]["bvar"], 2.991)                  # n＝1000 で分散も λ に近づく
         figs = tour.figure_specs(COURSE)
         self.assertEqual(sorted(f for f in figs if "approx-tour" in f), [f"FIG-LAB-pois-rel-approx-tour-{i}" for i in (1, 2, 3)])
-        self.assertEqual(figs["FIG-LAB-pois-rel-contrast-tour-2"]["spec"]["vars"], [1.2, 3])   # 対比：上限5回なら分散1.2
+        self.assertEqual(figs["FIG-LAB-pois-rel-contrast-tour-2"]["spec"]["lines"], ["分散　二項 1.2　／　ポアソン 3"])   # 対比：上限5回なら分散1.2
         self.assertTrue(figs["FIG-LAB-binom-def-tour-2"]["caption"].startswith("n 回くり返すと"))   # 題を重ねない
 
     def test_tour_definition_binom(self):
@@ -229,6 +229,22 @@ class TestLabs(unittest.TestCase):
         self.assertEqual(len(v["LAB-pois@rel-contrast-tour"]["tour"]["steps"]),
                          len(COURSE.labs["LAB-pois"]["presets"]["rel-contrast-tour"]["tour"]["steps"]) + 1)
         self.assertNotIn("つまり", [s.get("title") for s in v["LAB-binom@def-tour"]["tour"]["steps"]])   # 概念の解説には足さない
+
+    def test_tour_relation_visuals_batch1(self):
+        import tour
+        figs = tour.figure_specs(COURSE)
+        # 二項→正規：n＝100 は平均±4標準偏差の範囲だけ（ラボと同じ決まり）、p＝0.02 は曲線とずれる
+        sp2, sp3 = figs["FIG-LAB-binom-rel-norm-tour-2"]["spec"], figs["FIG-LAB-binom-rel-norm-tour-3"]["spec"]
+        self.assertEqual((sp2["kmin"], sp2["kmax"]), tour.binom_window(100, 30, (100 * 0.3 * 0.7) ** 0.5))
+        self.assertGreater(sp3["maxdiff"], sp2["maxdiff"])
+        # 二項↔幾何：段でモードを変える。幾何の段は値を持ち越さない
+        st = tour.states(COURSE.labs["LAB-pois"]["presets"]["rel-geom-contrast-tour"]["tour"])
+        self.assertEqual(st[1]["start"], {"mode": "geom", "p": 0.3, "r": 1, "k": 3})
+        self.assertEqual(figs["FIG-LAB-pois-rel-geom-contrast-tour-2"]["spec"]["family"], "geom")
+        # 二項↔超幾何：全部取ると分散0
+        ex = tour.expect("LAB-pois", COURSE.labs["LAB-pois"]["presets"]["rel-hyper-contrast-tour"])
+        self.assertAlmostEqual(ex[0][0]["mean"], 1.5)
+        self.assertAlmostEqual(ex[2][-1]["var"], 0)
 
     def test_tour_validation(self):
         from labs import _check_spec

@@ -51,7 +51,9 @@ relations:
     to: TERM-normal
     version: 1
     labs:
+      - {id: LAB-binom, preset: rel-norm-tour, purpose: n を 10→100 にして棒が曲線に重なり、p が小さいとずれるのを段ごとに見る}
       - {id: LAB-binom, preset: s5-norm, purpose: n を大きくすると、棒が正規分布の曲線に重なる（p が小さいと崩れる）}
+    figures: [FIG-LAB-binom-rel-norm-tour-1, FIG-LAB-binom-rel-norm-tour-2, FIG-LAB-binom-rel-norm-tour-3]
     type: 変換
     mode: approximation
     description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
@@ -162,6 +164,10 @@ relations:
     type: 対比
     description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
     gist: 二項は「回数を決めて、当たりの数を数える」。幾何は「当たり1回を決めて、そこまでの回数を数える」。決める物と数える物が逆。   # つまり（#95）
+    labs:
+      - {id: LAB-pois, preset: rel-geom-contrast-tour, purpose: 二項（回数を決めて当たりを数える）と幾何（当たりを決めて回数を数える）を段ごとに並べる}
+      - {id: LAB-pois, preset: rel-geom, purpose: タブで二項と幾何を切り替え、横軸が何を数えているかを比べる}
+    figures: [FIG-LAB-pois-rel-geom-contrast-tour-1, FIG-LAB-pois-rel-geom-contrast-tour-2]
     basis: {units: [U15]}
   - id: REL-hyper-binom
     from: TERM-hyper
@@ -182,6 +188,10 @@ relations:
     type: 対比
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が二項分布の (N−n)/(N−1) 倍になる（小さくなる）。
     gist: 戻さずに取り出すと、取るたびに残りの割合が変わり、結果のぶれが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
+    labs:
+      - {id: LAB-pois, preset: rel-hyper-contrast-tour, purpose: 平均は同じまま、取る数を増やすと戻さない方の散らばりが小さくなるのを段ごとに見る}
+      - {id: LAB-pois, preset: rel-hyper, purpose: 集団を大きくすると、戻さない確率が戻す確率に近づく}
+    figures: [FIG-LAB-pois-rel-hyper-contrast-tour-1, FIG-LAB-pois-rel-hyper-contrast-tour-2, FIG-LAB-pois-rel-hyper-contrast-tour-3]
     basis: {units: [U15]}
   - id: REL-poisson-expo
     from: TERM-poisson

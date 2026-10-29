@@ -26,7 +26,7 @@
  <div class="row ctl"><label>求める <select id="bkind" data-key="kind"><option value="eq">ちょうど k 回</option><option value="le">k 回以下</option><option value="ge">k 回以上</option></select></label>
   <label>重ねる <select id="bnorm" data-key="norm"><option value="no">なし</option><option value="yes">正規分布</option></select></label></div>
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
- <div class="res key" id="bplot"></div>
+ <div class="res key" id="bplot" data-tour-anchor></div>
  <div class="card res key" id="bsum"></div>
  <div class="res det" id="btab"></div>
 </div>
@@ -67,17 +67,22 @@ function fixK(nId,kId){const n=+$(nId).value,e=$(kId);e.max=n;if(+e.value>n)LK.s
 // ---- B(n, p)
 function bVals(){const n=+$("bn").value,p=+$("bp").value,k=Math.min(+$("bk").value,n),kind=$("bkind").value;
  const ps=[];for(let i=0;i<=n;i++)ps.push(pmf(n,p,i));let le=0,ge=0;ps.forEach((q,i)=>{if(i<=k)le+=q;if(i>=k)ge+=q;});
- const mean=n*p,vr=n*p*(1-p);return {n,p,k,kind,ps,pk:ps[k],le,ge,mean,var:vr,sd:Math.sqrt(vr),p0:ps[0],atleast1:1-ps[0],sel:kind==="eq"?ps[k]:kind==="le"?le:ge,mode:ps.indexOf(Math.max(...ps))};}
-function bRender(){fixK("bn","bk");const B=bVals(),H=180,L=30,R=W-10,base=H-28,top=22,mx=Math.max(...B.ps,0.01);
- const X=i=>L+(i+0.5)/(B.n+1)*(R-L),Y=q=>base-q/mx*(base-top),bw=Math.max(2,Math.min(30,(R-L)/(B.n+1)*0.75));
+ const mean=n*p,vr=n*p*(1-p),sd=Math.sqrt(vr),ngap=sd>0?Math.max(...ps.map((q,i)=>Math.abs(q-phi((i-mean)/sd)/sd))):0;   // ngap：棒と正規分布の曲線の高さの差の最大
+ return {n,p,k,kind,ps,ngap,pk:ps[k],le,ge,mean,var:vr,sd,p0:ps[0],atleast1:1-ps[0],sel:kind==="eq"?ps[k]:kind==="le"?le:ge,mode:ps.indexOf(Math.max(...ps))};}
+function bRender(){fixK("bn","bk");const B=bVals(),H=LK.embed&&LK.cfg.tour?100:180,L=30,R=W-10,base=H-28,top=22;
+ // 解説付き再生で n が30より大きいときは、平均±4標準偏差の範囲だけ出す（静止図と同じ決まり：build/tour.py の binom_window）
+ const a=LK.cfg.tour&&B.n>30?Math.max(0,Math.floor(B.mean-4*B.sd)):0,b=LK.cfg.tour&&B.n>30?Math.min(B.n,Math.ceil(B.mean+4*B.sd)):B.n,cnt=b-a+1;
+ const mx=Math.max(...B.ps.slice(a,b+1),B.sd>0&&$("bnorm").value==="yes"?phi(0)/B.sd:0,0.01);
+ const X=i=>L+(i-a+0.5)/cnt*(R-L),Y=q=>base-q/mx*(base-top),bw=Math.max(2,Math.min(30,(R-L)/cnt*0.75));
  const on=i=>B.kind==="eq"?i===B.k:B.kind==="le"?i<=B.k:i>=B.k;
  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="二項分布"><line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--line)"/>`;
- B.ps.forEach((q,i)=>{s+=`<rect x="${X(i)-bw/2}" y="${Y(q)}" width="${bw}" height="${base-Y(q)}" rx="2" fill="${on(i)?"var(--acc2)":"var(--acc)"}" fill-opacity="${on(i)?.85:.45}"/>`;
-  const step=Math.ceil((B.n+1)/12);if(i%step===0||i===B.k)s+=`<text x="${X(i)}" y="${base+13}" font-size="10" text-anchor="middle" fill="${i===B.k?"var(--acc2)":"var(--fg)"}">${i}</text>`;
-  if(B.n<=8&&q>0.0005)s+=`<text x="${X(i)}" y="${Y(q)-3}" font-size="10" text-anchor="middle" fill="var(--mut)">${f(q,3)}</text>`;});
- if($("bnorm").value==="yes"&&B.sd>0){let d="";for(let t=0;t<=120;t++){const x=-0.5+t/120*(B.n+1),v=phi((x-B.mean)/B.sd)/B.sd;d+=`${t?"L":"M"}${(L+(x+0.5)/(B.n+1)*(R-L)).toFixed(1)} ${Y(v).toFixed(1)} `;}s+=`<path d="${d}" fill="none" stroke="var(--fg)" stroke-width="1.6" stroke-dasharray="4 3"/>`;}
- const mxp=L+(B.mean+0.5)/(B.n+1)*(R-L);s+=`<path d="M${mxp-6} ${base+26} L${mxp+6} ${base+26} L${mxp} ${base+17} Z" fill="var(--acc2)"/><text x="${Math.min(R,Math.max(L,mxp))}" y="14" font-size="11" text-anchor="${mxp>W*0.7?"end":mxp<W*0.3?"start":"middle"}" fill="var(--acc2)">平均 np＝${f(B.mean)}</text></svg>`;
- $("bplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>求める範囲</span><span><i class="sw" style="background:var(--acc2)"></i>▲平均</span>${$("bnorm").value==="yes"?`<span><i class="sw" style="border:2px dashed var(--fg)"></i>正規分布（平均 np・分散 np(1−p)）</span>`:""}</div>`;
+ B.ps.forEach((q,i)=>{if(i<a||i>b)return;s+=`<rect x="${X(i)-bw/2}" y="${Y(q)}" width="${bw}" height="${base-Y(q)}" rx="2" fill="${on(i)?"var(--acc2)":"var(--acc)"}" fill-opacity="${on(i)?.85:.45}"/>`;
+  const step=Math.ceil(cnt/12);if((i-a)%step===0||i===B.k)s+=`<text x="${X(i)}" y="${base+13}" font-size="10" text-anchor="middle" fill="${i===B.k?"var(--acc2)":"var(--fg)"}">${i}</text>`;
+  if(cnt<=9&&q>0.0005)s+=`<text x="${X(i)}" y="${Y(q)-3}" font-size="10" text-anchor="middle" fill="var(--mut)">${f(q,3)}</text>`;});
+ if($("bnorm").value==="yes"&&B.sd>0){let d="";for(let t=0;t<=120;t++){const x=a-0.5+t/120*cnt,v=phi((x-B.mean)/B.sd)/B.sd;d+=`${t?"L":"M"}${(L+(x-a+0.5)/cnt*(R-L)).toFixed(1)} ${Y(v).toFixed(1)} `;}s+=`<path d="${d}" fill="none" stroke="var(--fg)" stroke-width="1.6" stroke-dasharray="4 3"/>`;}
+ const mxp=X(B.mean);s+=`<path d="M${mxp-6} ${base+26} L${mxp+6} ${base+26} L${mxp} ${base+17} Z" fill="var(--acc2)"/><text x="${Math.min(R,Math.max(L,mxp))}" y="14" font-size="11" text-anchor="${mxp>W*0.7?"end":mxp<W*0.3?"start":"middle"}" fill="var(--acc2)">平均 np＝${f(B.mean)}</text></svg>`;
+ $("bplot").innerHTML=`<div data-focus="bars">`+s+`</div><div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>求める範囲</span><span><i class="sw" style="background:var(--acc2)"></i>▲平均</span>${$("bnorm").value==="yes"?`<span><i class="sw" style="border:2px dashed var(--fg)"></i>正規分布<span class="lk-long">（平均 np・分散 np(1−p)）</span></span>`:""}</div>`
+  +(LK.cfg.tour?`<div class="mut lk-tline"><span data-focus="np">np＝<b>${f(B.mean,3)}</b>・n(1−p)＝<b>${f(B.n*(1-B.p),3)}</b></span> <span data-focus="gap">${LK.embed?"差":"棒と曲線の差"} <b>${B.ngap<Math.pow(10,-(LK.cfg.tour.decimals??3))?`${Math.pow(10,-(LK.cfg.tour.decimals??3)).toFixed(LK.cfg.tour.decimals??3)}未満`:B.ngap.toFixed(LK.cfg.tour.decimals??3)}</b></span></div>`:"");
  const lab=B.kind==="eq"?`P(X＝${B.k})`:B.kind==="le"?`P(X≦${B.k})`:`P(X≧${B.k})`;
  $("bsum").innerHTML=`<div>P(X＝${B.k})＝${B.n}C${B.k}×${f(B.p)}^${B.k}×${f(1-B.p)}^${B.n-B.k}＝${C(B.n,B.k)}×${f(Math.pow(B.p,B.k)*Math.pow(1-B.p,B.n-B.k),6)}＝<b>${f(B.pk)}</b></div><div>${lab}＝<b>${f(B.sel)}</b>　1回もない＝${f(1-B.p)}^${B.n}＝${f(B.p0)}、少なくとも1回＝${f(B.atleast1)}</div><div>平均 np＝<b>${f(B.mean)}</b>　分散 np(1−p)＝<b>${f(B.var)}</b>　標準偏差＝${f(B.sd)}</div><div class="mut">いちばん起きやすいのは ${B.mode} 回。全部の確率を足すと1。</div>`;
  $("btab").innerHTML=B.n<=20?`<table><tr><th>k</th><th>ₙCₖ</th><th>P(X＝k)</th><th>k 以下の合計</th></tr>${B.ps.map((q,i)=>`<tr><td>${i}</td><td>${C(B.n,i)}</td><td>${f(q)}</td><td>${f(B.ps.slice(0,i+1).reduce((a,b)=>a+b,0))}</td></tr>`).join("")}</table>`:`<div class="mut">n が20以下のとき、表を出す。</div>`;}

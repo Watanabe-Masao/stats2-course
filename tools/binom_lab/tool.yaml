@@ -10,7 +10,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     name: 二項分布 B(n, p)
     purpose: B(n, p) の棒グラフ。ちょうど k 回・k 回以下・k 回以上の確率、平均 np・分散 np(1−p)。正規分布を重ねられる
     set: [n, p, k, kind, norm]      # kind：eq／le／ge、norm：no／yes
-    values: [pk, le, ge, mean, var, sd, p0, atleast1, mode]
+    values: [pk, le, ge, mean, var, sd, p0, atleast1, mode, ngap]   # ngap：棒と正規分布の曲線の高さの差の最大
   - key: path
     name: 並びを書き出す
     purpose: n 回中ちょうど k 回成功する並びを全部書き出し、並び1つの確率×並びの数（ₙCₖ）を見る（n は6まで）
@@ -50,6 +50,23 @@ presets:
         - title: 並びの数を掛ける
           text: 並びの数 **ₙCₖ** を掛けると、ちょうど k 回の確率 **ₙCₖpᵏ(1−p)ⁿ⁻ᵏ**。これが二項分布。
           focus: pk
+  rel-norm-tour:   # 解説付き再生（#95）。関係「二項分布 → 正規分布（近似）」から開く。最後の「つまり」は build が関係の gist から足す
+    mode: pmf
+    tour:
+      decimals: 3
+      steps:
+        - title: 曲線を重ねる
+          text: B(10, 0.3) の棒に、平均 np・分散 np(1−p) の**正規分布の曲線**を重ねる。
+          set: {n: 10, p: 0.3, k: 3, kind: eq, norm: 'yes'}
+          focus: bars
+        - title: n を大きく
+          text: '**n を大きく**すると、棒の山がなめらかになり、**曲線との差**が小さくなる。'
+          frames: [{n: 20}, {n: 40}, {n: 100}]
+          focus: gap
+        - title: p が小さいと
+          text: p＝0.02 だと np＝2。山が端に寄り**曲線とずれる**（np・n(1−p)≧5 が目安）。
+          set: {p: 0.02}
+          focus: np
   s1-n:
     mode: pmf
     set: {n: 20, p: 0.25, k: 5, kind: eq}

@@ -244,7 +244,7 @@ def _check_spec(where: str, p: dict, tool: dict | None) -> list[str]:
         err.append(f"{where}: set や predict を使うときは mode を書く")
     if p.get("tour") is not None:
         import tour
-        err += tour.validate(where, p, mode, (tool or {}).get("id", ""))
+        err += tour.validate(where, p, mode, (tool or {}).get("id", ""), modes)
     steps = p.get("steps")
     if steps is not None:
         if not isinstance(steps, list) or len(steps) < 2:

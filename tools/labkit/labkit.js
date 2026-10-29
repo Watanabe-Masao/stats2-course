@@ -111,11 +111,15 @@ const LK=(()=>{
  // 解説付き再生
  const TOUR=cfg.tour&&Array.isArray(cfg.tour.steps)&&cfg.tour.steps.length?cfg.tour:null;
  const T={i:0,f:-1,timer:null,free:false,states:[]};
- function tourStates(){let c={};return TOUR.steps.map(s=>{const start={...c,...(s.set||{})};let st=start;const fr=(s.frames||[]).map(x=>(st={...st,...x}));c=fr.length?fr[fr.length-1]:start;return {start,frames:fr,end:c};});}
+ function tourStates(){let c={};return TOUR.steps.map(s=>{if(s.mode&&s.mode!==c.mode)c={mode:s.mode};const start={...c,...(s.set||{})};let st=start;const fr=(s.frames||[]).map(x=>(st={...st,...x}));c=fr.length?fr[fr.length-1]:start;return {start,frames:fr,end:c};});}
  const say=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<mark>$1</mark>");
  function tState(){const S=T.states[T.i];return T.f<0?S.start:S.frames[T.f];}
- function tApply(){document.body.classList.toggle("lk-gist",!!TOUR.steps[T.i].gist&&!T.free);modes[cur].apply&&modes[cur].apply(tState());if(modes[cur].render)modes[cur].render();tFocus();}
+ function tPlace(){const m=$("m-"+cur),box=$("lk-tour");if(!m||!box)return;const a=m.querySelector("[data-tour-anchor]")||m.querySelector(".res.key")||m.lastElementChild;if(box.previousElementSibling!==a)a.after(box);}
+ function tApply(){document.body.classList.toggle("lk-gist",!!TOUR.steps[T.i].gist&&!T.free);const st=tState();
+  if(st.mode&&st.mode!==cur&&modes[st.mode]){show(st.mode);tPlace();}   // 段がモードを変える（例：二項→幾何を並べて比べる）
+  modes[cur].apply&&modes[cur].apply(st);if(modes[cur].render)modes[cur].render();tFocus();}
  function tFocus(){const fo=T.free?null:TOUR.steps[T.i].focus;
+  document.querySelectorAll(".lk-hl").forEach(e=>e.classList.remove("lk-hl"));   // ほかのモードに残った強調も消す
   document.querySelectorAll(`#m-${cur} [data-focus]`).forEach(e=>e.classList.toggle("lk-hl",!!fo&&e.dataset.focus.split(" ").includes(fo)));}
  function tStop(){if(T.timer){clearTimeout(T.timer);T.timer=null;}}
  function tGo(i){tStop();T.i=Math.max(0,Math.min(TOUR.steps.length-1,i));T.f=-1;T.free=false;tApply();tDraw();}
@@ -142,10 +146,9 @@ const LK=(()=>{
   const all=$("lk-all");all.onclick=()=>{const l=$("lk-tlist"),on=l.hidden;l.hidden=!on;all.setAttribute("aria-expanded",on);all.textContent=on?"全文 ▴":"全文 ▾";};
   box.querySelectorAll("#lk-tlist button").forEach(b=>b.onclick=()=>tGo(+b.dataset.i));}
  function tourStart(){T.states=tourStates();document.body.classList.add("lk-touring");const t=$("lk-task");if(t)t.remove();
-  const m=$("m-"+cur),anchor=m.querySelector("[data-tour-anchor]")||m.querySelector(".res.key")||m.lastElementChild;
-  const box=document.createElement("div");box.id="lk-tour";box.className="lk-tour";anchor.after(box);
+  const box=document.createElement("div");box.id="lk-tour";box.className="lk-tour";document.body.appendChild(box);tPlace();
   // 自由に動かした値は、解説の外の操作として扱う（解説に戻ると段の値を渡し直す）
-  m.addEventListener("input",()=>{if(!T.free)tFree();});
+  document.querySelectorAll(".mode").forEach(m=>m.addEventListener("input",()=>{if(!T.free)tFree();}));
   tGo(0);$("lk-bar").hidden=true;}
 
  function start(def){const tabs=$("tabs");

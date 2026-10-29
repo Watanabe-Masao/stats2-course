@@ -550,10 +550,18 @@ def _pmf(sp: dict):
     if f == "binom":
         n, p = sp["n"], sp["p"]
         top = sp["kmax"] if sp.get("kmax") is not None else n   # kmax：棒を出す範囲（解説付き再生でラボと共有）。n より先は0（上限が見える）
-        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k) if k <= n else 0.0) for k in range(top + 1)]
+        return [(k, math.comb(n, k) * p ** k * (1 - p) ** (n - k) if k <= n else 0.0) for k in range(sp.get("kmin", 0), top + 1)]
     if f == "poisson":
         lam = sp["lam"]
         return [(k, math.exp(-lam) * lam ** k / math.factorial(k)) for k in range(sp["kmax"] + 1)]
+    if f == "geom":   # r 回目の成功が k 回目（r＝1 で幾何分布）。k は r から kmax まで
+        p, r = sp["p"], sp.get("r", 1)
+        return [(k, math.comb(k - 1, r - 1) * p ** r * (1 - p) ** (k - r)) for k in range(r, sp["kmax"] + 1)]
+    if f == "hyper":  # N 個中 K 個が当たり、戻さず n 個
+        N, K, n = sp["N"], sp["K"], sp["n"]
+        top = sp["kmax"] if sp.get("kmax") is not None else n
+        return [(k, math.comb(K, k) * math.comb(N - K, n - k) / math.comb(N, n) if 0 <= n - k <= N - K and k <= K else 0.0)
+                for k in range(top + 1)]
     raise ValueError(f"family {f}")
 
 
@@ -580,20 +588,30 @@ def dist(sp: dict) -> str:
     if sp.get("title"):
         y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
     top, base, left, right = y + (44 if sp.get("band") else 26), y + 190, 20, 340
-    discrete = sp["family"] in ("table", "binom", "poisson")
+    discrete = sp["family"] in ("table", "binom", "poisson", "geom", "hyper")
+    curve = None
     if discrete:
         pmf = _pmf(sp)
         if sp["family"] == "binom":      # 棒を途中で切っても、平均・標準偏差は分布の値を使う
             mean, sd = sp["n"] * sp["p"], math.sqrt(sp["n"] * sp["p"] * (1 - sp["p"]))
         elif sp["family"] == "poisson":
             mean, sd = sp["lam"], math.sqrt(sp["lam"])
+        elif sp["family"] == "geom":
+            r = sp.get("r", 1)
+            mean, sd = r / sp["p"], math.sqrt(r * (1 - sp["p"])) / sp["p"]
+        elif sp["family"] == "hyper":
+            q = sp["K"] / sp["N"]
+            mean = sp["n"] * q
+            sd = math.sqrt(sp["n"] * q * (1 - q) * (sp["N"] - sp["n"]) / (sp["N"] - 1))
         else:
             mean = sum(x * p for x, p in pmf)
             sd = math.sqrt(sum(x * x * p for x, p in pmf) - mean ** 2)
         lo, hi = pmf[0][0] - 0.5, pmf[-1][0] + 0.5
         X = lambda v: left + (v - lo) / (hi - lo) * (right - left)  # noqa: E731
-        ov = dict(_pmf({**sp["overlay"], "kmax": pmf[-1][0]})) if sp.get("overlay") else None   # 重ねる分布（同じ範囲）
-        pmax = max([p for _, p in pmf] + (list(ov.values()) if ov else []))
+        curve = sp.get("overlay") if (sp.get("overlay") or {}).get("family") == "normal" else None   # 正規分布の曲線を重ねる
+        ov = dict(_pmf({**sp["overlay"], "kmax": pmf[-1][0]})) if sp.get("overlay") and not curve else None   # 重ねる分布の棒（同じ範囲）
+        pmax = max([p for _, p in pmf] + (list(ov.values()) if ov else [])
+                   + ([1 / (curve["sigma"] * math.sqrt(2 * math.pi))] if curve else []))
         scale = (base - top - 18) / pmax
         slot = (right - left) / len(pmf)
         bw = min(40, slot * (0.36 if ov else 0.62))
@@ -623,10 +641,17 @@ def dist(sp: dict) -> str:
                 c.add(f'<rect x="{cx + bw / 2 + 2:.1f}" y="{base - q * scale:.1f}" width="{bw:.1f}" height="{q * scale:.1f}" rx="2" '
                       f'fill="none" stroke="{INK}" stroke-width="1.2" stroke-dasharray="3 2"/>')
                 cx = X(x)
-            if (p * scale > 1.5 and not ov) or x in hl:
+            if (p * scale > 1.5 and not ov and len(pmf) <= 12) or x in hl:
                 c.add(f'<text x="{cx:.1f}" y="{base - p * scale - 5:.1f}" font-size="11.5" fill="{INK}" text-anchor="middle" '
                       f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(f"{p:.{dec}f}")}</text>')
-            c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
+            every = max(1, math.ceil(len(pmf) / 12))   # 棒が多いときは目盛りを間引く
+            if (x - pmf[0][0]) % every == 0 or x in hl:
+                c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
+        if curve:
+            mu, sg = curve["mu"], curve["sigma"]
+            xs2 = [lo + (hi - lo) * i / 160 for i in range(161)]
+            d = "M" + " L".join(f"{X(x):.1f},{base - math.exp(-((x - mu) / sg) ** 2 / 2) / (sg * math.sqrt(2 * math.pi)) * scale:.1f}" for x in xs2)
+            c.add(f'<path d="{d}" fill="none" stroke="{INK}" stroke-width="1.6" stroke-dasharray="4 3"/>')
     else:
         for sh in sp.get("shade") or []:
             if "outside" in sh:
@@ -652,7 +677,7 @@ def dist(sp: dict) -> str:
         while t <= hi + 1e-9:
             c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
             t += step
-    if discrete and sp.get("overlay") and sp["family"] == "binom" and sp["n"] < pmf[-1][0]:   # 二項の上限 n（そこから先は0）
+    if discrete and sp.get("overlay") and sp["family"] == "binom" and not curve and sp["n"] < pmf[-1][0]:   # 二項の上限 n（そこから先は0）
         xl = (X(sp["n"]) + X(sp["n"] + 1)) / 2
         c.line(xl, top - 4, xl, base, INK2, 1.2, dash="4 3")
         c.text(xl + 4, top + 8, f"二項の上限 n＝{sp['n']}", 11.5, INK2)
@@ -661,17 +686,23 @@ def dist(sp: dict) -> str:
         c.add(f'<path d="M{mx:.1f},{base + 20} l-7,12 h14 z" fill="{ORANGE}"/>')
         c.text(mx, base + 46, f"{'期待値' if discrete else '平均'} {_num(round(mean, 2))}{unit}", 12, ORANGE, "middle", "bold")
     y = base + 58
-    if sp.get("overlay"):   # 凡例と差の最大
+    if sp.get("overlay") or sp.get("label"):   # 凡例・分散・差の最大（解説付き再生の静止図）
         c.rect(8, y + 2, 12, 12, "#8fb3e3", rx=2)
         c.text(24, y + 12, sp.get("label", "棒"), 12, INK2)
-        c.add(f'<rect x="190" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
-        c.text(206, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
+        if sp.get("overlay"):
+            if curve:
+                c.line(190, y + 8, 202, y + 8, INK, 1.6, dash="4 3")
+            else:
+                c.add(f'<rect x="190" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
+            c.text(206, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
         y += 20
-        if sp.get("vars"):   # 平均は同じでも、分散が違う（二項 np(1−p)・ポアソン λ）
-            c.text(8, y + 12, f"分散　二項 {_num(sp['vars'][0])}　／　ポアソン {_num(sp['vars'][1])}", 12.5, INK)
+        for line in sp.get("lines") or []:   # 数の行（例：分散 二項 2.1 ／ ポアソン 3）
+            c.text(8, y + 12, line, 12.5, INK)
             y += 20
         if sp.get("maxdiff") is not None:
-            c.text(8, y + 12, f"棒どうしの差の最大 {sp['maxdiff']:.{sp.get('decimals', 3)}f}", 12.5, INK, weight="bold")
+            dec = sp.get("decimals", 3)
+            md = f"{10 ** -dec:.{dec}f}未満" if sp["maxdiff"] < 10 ** -dec else f"{sp['maxdiff']:.{dec}f}"   # 丸めて0に見せない
+            c.text(8, y + 12, f"{sp.get('maxdiff_label', '棒どうしの差の最大')} {md}", 12.5, INK, weight="bold")
             y += 20
     if sp.get("note"):
         y = c.para(8, y + 10, sp["note"], 344, 12.5, INK2)
