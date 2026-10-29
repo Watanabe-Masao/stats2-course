@@ -119,13 +119,58 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 導出は content/derivations.yaml（DER-…、`version` 必須）。前提（概念・関係）→ 結論。手順と、どの前提がどこで要るか（conditions）を書く。
 - 自分の教材の id は教材名を付けずに書く。別の教材の概念は `math:CON-…` のように教材名を付ける（ネットワークでは自分の id も `stats2:TERM-…` になる）。
 - 説明のある概念は、どれかの関係か導出につながっていること（孤立させない）。build が止める。
+
+### 問題 → 確かめる概念（`concepts:`）
+
+問題に、その問題を**解く・解説を理解するのに必要な**概念か関係を書く。選択肢や文中に名前が出るだけの概念は書かない。
+
+```yaml
+- id: Q-U13-021
+  stage: S3
+  concepts: [TERM-expect, TERM-var, TERM-sd, TERM-indep]   # 用語（説明のある概念）か REL-… の id
+```
+
+- unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に `concepts:` を書く。
+- build が止めるもの：用語・関係にない id、まだ説明のない用語（先に概念にする）、`concepts_linked` の単元で `concepts:` のない問題。
+- 書いた概念は、ネットワークの概念の「確かめる問題」に出る。
+
+### 概念・関係からラボを開く（`labs:`）
+
+```yaml
+  labs:
+  - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
+```
+
+- 概念（terms.yaml）と関係（relations.yaml）に書ける。書けるのは id・preset・purpose だけ。URL は build が `site_base_url` から作る（配布先で空なら出さない）。
+- build が止めるもの：ないラボ、そのラボにない場面の版（tool.yaml の presets）、id・preset・purpose 以外の項目。
+
+### 式の分解の木（`formulas[].tree`）
+
+式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。
+
+```yaml
+  formulas:
+  - tex: 'Z=\dfrac{X-\mu}{\sigma}'
+    symbols:
+    - {symbol: Z, meaning: 標準化した値, key: Z, kind: rv}
+    - {symbol: X, meaning: 確率変数, key: X, kind: rv}
+    - {symbol: μ, meaning: X の期待値, key: mu, concept: TERM-expect, kind: param}
+    - {symbol: σ, meaning: X の標準偏差, key: sigma, concept: TERM-sd, kind: param}
+    tree: {"op": "eq", "args": [{"sym": "Z"}, {"op": "div", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"sym": "sigma"}]}]}
+```
+
+- 葉は `{"sym": key}` か `{"num": 数}`。演算は eq・add・sub・mul・div・pow・neg・sqrt・abs・sum・prod・int・fn（kn-schema の formulaNode）。sum・prod・int は `var`（動かす記号）と `lower`・`upper`。
+- `fn` の `name` は、その式の symbols の key（E・V・P・Cov・comb・fact など。記号に `concept` を書けば、その概念の式へ開く）か、記号に書かなくてよい共通の関数（exp・log・gt・ge・lt・le・between）。比べる式（X＞x・a≦X≦b）を gt・between で書くのは仮の形で、#72 で型として決め直す。
+- 記号の `kind`：value（1つの値）・data（データの一覧）・rv（確率変数）・param（母数）・index（添え字）・const（定数）。
+- build が止めるもの：symbols の key にない葉・関数・動かす記号、記号の `concept` が用語にない、知らない演算。
+- **#72 で木から TeX を作るまでは、tex と tree を両方持つ。式を直すときは両方を直し、同じ式になっているかを自分で読み合わせる**（今は build が一致を確かめない）。単元の「式の構造」の表も手書きのままなので、記号を概念に合わせる。
 - build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。
 
 ## 例題・問題にはラボか図を付ける（build が止める）
 
 - 問題には `lab:`（上）か `figure:` を書く。`figure:` は答えの中に「🖼️ 図で確かめる」として入る（図ID は `FIG-<問題ID>`）。
 - 本文の例題（`**例題…`）には、次の例題・見出し・問題までに `{{lab:…}}` か `{{fig:…}}` を置く。例題の図は unit.yaml の `figures:` に書く。
-- 図は設定から作る（build/figures.py）：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
+- 図は設定から作る（build/figures.py）：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・normal・uniform・expo）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
 - 各単元の初学「意味」か「式の構造」に、単元の中心を1枚で見せる概念図を置く。初学「図を再現する」は、その概念図を手本として示し、自分で描いて照らし合わせる形にする（手本のない「図を再現する」を作らない）。
 - 図の中の数は問題文・答え（例題なら本文）にある数だけ。計算で出す数（合計・比・係数）は図を作るときに計算する。
 - まだ付け終えていない単元は unit.yaml に `visuals_pending: true`（build が警告する）。

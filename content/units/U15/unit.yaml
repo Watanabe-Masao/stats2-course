@@ -7,7 +7,7 @@ prev: U14
 next: U16
 prereq: [U14, U02, U09]
 used_by: [U16, U27]
-terms: [TERM-poisson, TERM-geom, TERM-hyper, TERM-binom, TERM-expect]
+terms: [TERM-poisson, TERM-geom, TERM-negbinom, TERM-hyper, TERM-binom, TERM-expect]
 labs: [LAB-pois]
 goal: 「何を数えているか」から、**二項・ポアソン・幾何・超幾何の中で使う分布を選べ**、「1時間に何件」の確率をポアソン分布で求められる。
 stage_goals:

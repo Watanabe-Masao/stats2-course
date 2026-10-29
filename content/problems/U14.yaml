@@ -215,7 +215,7 @@
 
 - id: Q-U14-023
   stage: S3
-  concepts: [TERM-binom, TERM-indep, TERM-hyper, TERM-geom]
+  concepts: [TERM-binom, TERM-indep]
   tag: 本番形式
   format: choice
   powers: [P3]
