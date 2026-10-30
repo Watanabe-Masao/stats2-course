@@ -363,13 +363,31 @@
                       "domain": {
                         "type": "object",
                         "additionalProperties": false,
-                        "description": "定義域（値を入れて計算するときの範囲。range は文の説明）。min・max と端を含むか（既定は含む）、整数か、0でないか（stats2-course #109）",
+                        "description": "定義域（値を入れて計算するときの範囲。range は文の説明）。min・max は数か同じ式の記号の key（k ≦ n）、端を含むか（既定は含む）、整数か、0でないか（stats2-course #109）",
                         "properties": {
                           "min": {
-                            "type": "number"
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
                           },
                           "max": {
-                            "type": "number"
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
                           },
                           "minOpen": {
                             "type": "boolean",

@@ -124,8 +124,14 @@ def validate_network(c: Course) -> list[str]:
                         err.append(f"{tid}: 記号 {s.get('symbol')} に domain を書けるのは value・param・const・index だけ")
                     if not isinstance(d, dict) or set(d) - {"min", "max", "minOpen", "maxOpen", "integer", "nonzero"}:
                         err.append(f"{tid}: 記号 {s.get('symbol')} の domain は min・max・minOpen・maxOpen・integer・nonzero だけ")
-                    elif d.get("min") is not None and d.get("max") is not None and not d["min"] <= d["max"]:
-                        err.append(f"{tid}: 記号 {s.get('symbol')} の domain は min ≦ max")
+                    else:
+                        lo, hi = d.get("min"), d.get("max")
+                        nums = {x.get("key") for x in f.get("symbols", []) if x.get("kind") in ("value", "param", "const", "index")}
+                        for b in (lo, hi):   # 記号どうしの範囲（k ≦ n なら max: n）は、同じ式の値を入れられる記号
+                            if isinstance(b, str) and (b not in nums or b == s.get("key")):
+                                err.append(f"{tid}: 記号 {s.get('symbol')} の domain の {b} は、同じ式のほかの値・母数の記号の key で書く")
+                        if isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and not lo <= hi:
+                            err.append(f"{tid}: 記号 {s.get('symbol')} の domain は min ≦ max")
             if f.get("tree"):
                 err += [f"{tid}: 式 {f['tex']} の木：{e}" for e in tree_errors(f["tree"], {s.get("key") for s in f.get("symbols", []) if s.get("key")})]
         for m in t.get("misconceptions", []):

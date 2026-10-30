@@ -503,6 +503,8 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("of Y が、同じ式の確率変数" in e for e in err))
         self.assertTrue(any("domain は min ≦ max" in e for e in err))
         self.assertTrue(any("domain を書けるのは value・param・const・index だけ" in e for e in err))
+        sig["domain"] = {"max": "nothing"}               # 記号どうしの範囲は同じ式の記号
+        self.assertTrue(any("domain の nothing は、同じ式のほかの値・母数の記号" in e for e in self._validate(c)))
         mu["domain"] = {"lo": 0}
         self.assertTrue(any("domain は min・max・minOpen・maxOpen・integer・nonzero だけ" in e for e in self._validate(c)))
 
