@@ -49,7 +49,7 @@ const ORDER={"全体":0,"なし":0,"あり":1,"平日":0,"週末":1,"晴れ":0,"
 const FILT={all:()=>true,weekday:x=>!x.wk,weekend:x=>x.wk,A:x=>x.st==="A",B:x=>x.st==="B",noevent:x=>!x.ev};
 const FNAME={all:"全部の日",weekday:"平日だけ",weekend:"週末だけ",A:"A店だけ",B:"B店だけ",noevent:"特別な日を除く"};
 const VNAME={sales:"売上（万円）",cust:"客数（人）",ticket:"客単価（円）"};
-const COL=["var(--acc)","var(--acc2)","#2a9d8f"];
+const COL=["var(--acc)","var(--acc2)","var(--data-3)"];
 const med=s=>{const n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;};
 function stats(v){const s=[...v].sort((a,b)=>a-b),n=s.length,h=Math.floor(n/2),m=v.reduce((a,b)=>a+b,0)/n;
  const sd=Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/(n-1));const q1=med(s.slice(0,h)),q3=med(s.slice(n-h));

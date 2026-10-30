@@ -26,10 +26,15 @@ const LK=(()=>{
  const $=id=>document.getElementById(id);
  const modes={},order=[];let cur=null,locked=false,last=null,revealed=false,moved=false;
  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+ // 手触り（#42）：動きを減らす設定では動かさない。flash＝結果が出た所を一度だけ光らせる。haptic＝iPhone でスイッチの振動を借りる試み
+ const RM=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}};
+ function flash(el){if(!el||RM()||!el.animate)return;const cs=getComputedStyle(document.documentElement);el.animate([{backgroundColor:cs.getPropertyValue("--flash").trim()||"transparent"},{backgroundColor:"transparent"}],{duration:parseFloat(cs.getPropertyValue("--dur-flash"))||700,easing:"ease-out"});}
+ let sw=null;function haptic(){if(!/iP(hone|ad|od)/.test(navigator.userAgent))return;if(!sw){sw=document.createElement("label");sw.setAttribute("aria-hidden","true");sw.style.display="none";const i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");sw.appendChild(i);document.body.appendChild(sw);}sw.click();}
+ document.addEventListener("touchstart",()=>{},{passive:true});   // iPhone の Safari で :active（押した返事）を出す
  const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})()||/[?&]embed=1/.test(location.search);
  const FOCUS=!!(cfg.task&&cfg.mode);
  function register(key,spec){modes[key]=spec;order.push(key);}
- function show(k){cur=k;order.forEach(m=>{$("m-"+m).style.display=m===k?"block":"none";});
+ function show(k,ease){cur=k;order.forEach(m=>{const e=$("m-"+m);e.style.display=m===k?"block":"none";e.classList.toggle("lk-in",!!ease&&m===k);});
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===k));
   if(modes[k].render)modes[k].render();live();}
  function fmtNum(v){if(typeof v!=="number")return String(v);return String(+v.toFixed(3));}
@@ -96,7 +101,7 @@ const LK=(()=>{
   h+=`<div class="lk-live" id="lk-live" hidden></div>`;
   if(STEPS){if(si<STEPS.length-1)h+=`<div class="row"><button type="button" class="act" id="lk-next">次の条件で予想する ▶</button></div>`;
    else if(cfg.law)h+=`<div class="lk-lawask"><div class="mut">ここまでの結果から、決まりを1文で書いてみる。書けたら式で確かめる。</div><div class="row"><button type="button" class="act" id="lk-law">式で説明する ▼</button></div></div><div id="lk-lawbox"></div>`;}
-  $("lk-verdict").innerHTML=`<div class="lk-verdict">${h}</div>`;
+  $("lk-verdict").innerHTML=`<div class="lk-verdict">${h}</div>`;flash($("lk-verdict").firstElementChild);haptic();
   const nx=$("lk-next");if(nx)nx.onclick=nextStep;const lw=$("lk-law");if(lw)lw.onclick=showLaw;
   const ask=$("lk-ask");if(ask)ask.remove();document.querySelector(".lk-task").classList.add("lk-done");
   live();bar();if(EMBED)window.scrollTo(0,0);}
@@ -154,7 +159,7 @@ const LK=(()=>{
  function start(def){const tabs=$("tabs");
   const m=cfg.mode&&modes[cfg.mode]?cfg.mode:def;
   const shown=(cfg.modes||(cfg.mode?[cfg.mode]:order)).filter(k=>modes[k]);
-  shown.forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=modes[k].name;b.dataset.m=k;b.onclick=()=>{if(!b.disabled)show(k);};tabs.appendChild(b);});
+  shown.forEach(k=>{const b=document.createElement("button");b.type="button";b.textContent=modes[k].name;b.dataset.m=k;b.onclick=()=>{if(!b.disabled)show(k,k!==cur);};tabs.appendChild(b);});
   if(shown.length<2)tabs.hidden=true;
   document.body.classList.toggle("lk-embed",EMBED);document.body.classList.toggle("lk-focus",FOCUS);document.body.classList.toggle("lk-pred",!!(FOCUS&&cfg.predict));
   if(!$("lk-bar")){const b=document.createElement("div");b.id="lk-bar";b.className="lk-bar";document.body.appendChild(b);}

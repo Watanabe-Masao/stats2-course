@@ -1,4 +1,4 @@
-"""知識ネットワークの型（元は knowledge-net の schema/）の写しを確かめる・取り込む。
+"""知識ネットワークの型（元は knowledge-net の schema/）と見た目の値（design/tokens.json）の写しを確かめる・取り込む。
 
 使い方:
     python3 build/sync_schema.py           # 写しが元と同じか確かめる（違えば止まる）
@@ -11,9 +11,9 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BASE = "https://raw.githubusercontent.com/Watanabe-Masao/knowledge-net/main/schema/"
-FILES = ("kn-schema-v1.json", "relation-types.yaml")
-COPY = ROOT / "docs" / "knowledge-net" / "schema"
+BASE = "https://raw.githubusercontent.com/Watanabe-Masao/knowledge-net/main/"
+FILES = ("schema/kn-schema-v1.json", "schema/relation-types.yaml", "design/tokens.json")
+COPY = ROOT / "docs" / "knowledge-net"
 
 
 def main(argv: list[str]) -> int:
@@ -33,9 +33,9 @@ def main(argv: list[str]) -> int:
             else:
                 bad.append(name)
     if bad:
-        print("❌ 型の写しが knowledge-net の元と違う：" + "・".join(bad) + "（python3 build/sync_schema.py --update で取り込む）")
+        print("❌ 写しが knowledge-net の元と違う：" + "・".join(bad) + "（python3 build/sync_schema.py --update で取り込む）")
         return 1
-    print("✅ 型の写しは knowledge-net の元と同じ")
+    print("✅ 型と見た目の値の写しは knowledge-net の元と同じ")
     return 0
 
 

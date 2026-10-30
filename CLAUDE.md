@@ -247,6 +247,14 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - ラボのテストを同時に2つ走らせない（ブラウザが落ちて誤った結果になる）。
 - 個別には `ONLY=LAB-x,LAB-y node tools/test_labs.js`（そのラボの全部の版）、`ASSETS=LAB-prob@s6-free,… node tools/test_labs.js`（その版だけ）。
 
+## 見た目と手触り（#42）
+
+色・動きの値の元は knowledge-net の design/tokens.json。ここの docs/knowledge-net/design/tokens.json は写しで、型と同じく `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。
+
+- ラボ：build が値を labkit の先頭に差し込む。ラボの中に色の値を書かない（build が止める。色付きの面の上の白い文字だけ例外）。データは `--acc`（主の系列）・`--acc2`（注目する値・2つ目の群）・`--data-2`・`--data-3`、操作（選んだタブ・主ボタン・つまみ）は `--accent`。
+- 静止図：svgkit の色（BLUE・ORANGE など）は写しから読む。ラボと静止図で同じ系列は同じ色。
+- 動きは「何が変わったか」を伝えるためだけ。押すと少し沈む・タブを替えると中身がすっと出る・予想の結果を一度だけ光らせる（iPhone では軽く振動する試み）。1つの操作に動きは1つ。動きを減らす設定では止める。
+
 ## 公開サイト（ラボと図）
 
 `publish/notion.yaml` に `site_base_url` があると、ラボと図はアップロードせず URL で埋め込む（`<slug>/?p=場面`、`fig/<図ID>.svg`）。

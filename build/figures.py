@@ -16,13 +16,13 @@ from pathlib import Path
 from model import ROOT, Course, numbers
 
 sys.path.insert(0, str(ROOT / "tools" / "figure-src"))
-from svgkit import BLUE, GRID, INK, INK2, LIGHT, ORANGE, RED, Svg, esc  # noqa: E402
+from svgkit import BG, BLUE, GRID, INK, INK2, INK3, LIGHT, ORANGE, RED, SOFT, SURFACE, VIOLET, WARM_BG, Svg, esc  # noqa: E402
 
 OUT = ROOT / "out" / "fig"
 W = 360
 SCALES = ["名義", "順序", "間隔", "比例"]
 OPS = ["＝ ≠", "＜ ＞", "＋ −", "× ÷"]
-WARM, WARM_BG = ORANGE, "#fdf0e9"
+WARM = ORANGE
 NO_HEAD = "、。，．）」』】〕・ー々…）)"
 NO_TAIL = "（「『【〔("
 
@@ -68,7 +68,7 @@ class Canvas(Svg):
 
     def done(self, h):
         self.h = int(h)
-        self.parts.insert(0, f'<rect width="{W}" height="{self.h}" rx="10" fill="#fcfcfb"/>')
+        self.parts.insert(0, f'<rect width="{W}" height="{self.h}" rx="10" fill="{BG}"/>')
         return self.svg()
 
 
@@ -100,7 +100,7 @@ def popsample(sp: dict) -> str:
     pbox = (8, top, 344, sbox[1] + sbox[3] + 12 - top)
     box = [f'<rect x="{pbox[0]}" y="{pbox[1]}" width="{pbox[2]}" height="{pbox[3]:.0f}" rx="12" fill="{LIGHT}" stroke="{BLUE}" stroke-width="1.5"/>']
     if dash:
-        box.append(f'<rect x="{sbox[0]}" y="{sbox[1]}" width="{sbox[2]}" height="{sbox[3]:.0f}" rx="10" fill="#ffffff" stroke="{BLUE}" stroke-width="1.5" stroke-dasharray="5 4"/>')
+        box.append(f'<rect x="{sbox[0]}" y="{sbox[1]}" width="{sbox[2]}" height="{sbox[3]:.0f}" rx="10" fill="{SURFACE}" stroke="{BLUE}" stroke-width="1.5" stroke-dasharray="5 4"/>')
     else:
         box.append(f'<rect x="{sbox[0]}" y="{sbox[1]}" width="{sbox[2]}" height="{sbox[3]:.0f}" rx="10" fill="{WARM_BG}" stroke="{WARM}" stroke-width="1.5"/>')
     c.parts[c_parts_before:c_parts_before] = box
@@ -156,14 +156,14 @@ def ladder(sp: dict) -> str:
         c.text(lx + 8, y + 20, name, 14, color, weight="bold")
         c.text(lx + 8, y + 37, STEP_OPS[i], 11, INK2)
         for (x, yy, wpx, hpx, name_l, note_l, ng) in cards:
-            c.rect(x, yy, wpx, hpx, "#ffffff", rx=6, stroke=color)
+            c.rect(x, yy, wpx, hpx, SURFACE, rx=6, stroke=color)
             ty = yy + 18
             for ln in name_l:
                 c.text(x + 8, ty, ln, 13, INK, weight="bold"); ty += 17
             for ln in note_l:
                 c.text(x + 8, ty - 1, ln, 12, RED if ng else INK2); ty += 16
         if not cards:
-            c.text(cx0 + 10, y + 27, "（この段のデータはない）", 11.5, "#9a9894")
+            c.text(cx0 + 10, y + 27, "（この段のデータはない）", 11.5, INK3)
         y += band + 6
     c.rect(lx, y + 4, 10, 10, WARM, rx=2); c.text(lx + 16, y + 13, "質的変数（名義・順序）", 12, INK2)
     c.rect(lx + 176, y + 4, 10, 10, BLUE, rx=2); c.text(lx + 192, y + 13, "量的変数（間隔・比例）", 12, INK2)
@@ -194,10 +194,10 @@ def bars(sp: dict) -> str:
     hi, lo = max(vals), min(vals)
     for i, (lab, v) in enumerate(data):
         cx = left + slot * (i + 0.5)
-        color = BLUE if v in (hi, lo) and sp.get("mark_extremes") else "#8fb3e3"
+        color = BLUE if v in (hi, lo) and sp.get("mark_extremes") else SOFT
         c.rect(cx - bw / 2, base - v * scale, bw, v * scale, color, rx=3)
         c.add(f'<text x="{cx:.1f}" y="{base - v * scale - 6:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
-              f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(fmt(v) + unit)}</text>')
+              f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(fmt(v) + unit)}</text>')
         for k, ln in enumerate(wrap(lab, slot - 4, 11.5)):
             c.text(cx, base + 16 + k * 14, ln, 11.5, INK2, "middle")
     if "mean" in sp:
@@ -236,8 +236,8 @@ def pairs(sp: dict) -> str:
         x = x0 + (i % per) * (bw + gx)
         yy = y + (i // per) * (bh + 8)
         on = mark in cb
-        c.rect(x, yy, bw, bh, BLUE if on else "#ffffff", rx=8, stroke=BLUE)
-        c.text(x + bw / 2, yy + 22, "・".join(cb), 13.5, "#ffffff" if on else INK, "middle", "bold")
+        c.rect(x, yy, bw, bh, BLUE if on else SURFACE, rx=8, stroke=BLUE)
+        c.text(x + bw / 2, yy + 22, "・".join(cb), 13.5, SURFACE if on else INK, "middle", "bold")
     y += ((len(combos) - 1) // per + 1) * (bh + 8) + 16
     if mark:
         p = Fraction(len(hit), len(combos))
@@ -285,7 +285,7 @@ def capture(sp: dict) -> str:
         for i in range(cnt):
             cx = x0 + 9 + (i % cols) * 16
             cy = 56 + (i // cols) * 16
-            c.circle(cx, cy, 6, ORANGE if i < mk else "#ffffff", stroke=ORANGE if i < mk else INK2, width=1.2)
+            c.circle(cx, cy, 6, ORANGE if i < mk else SURFACE, stroke=ORANGE if i < mk else INK2, width=1.2)
     y = 56 + ((max(M, n) - 1) // 10 + 1) * 16 + 10
     c.circle(16, y - 4, 6, ORANGE, stroke=ORANGE); c.text(28, y, "印あり", 12, INK2)
     y += 22
@@ -314,7 +314,7 @@ def fpc(sp: dict) -> str:
     c.poly([(X(0), Y(1)), (X(N), Y(0))], BLUE, 2)
     c.line(left, Y(1), right, Y(1), INK2, 1, "4 3")
     c.text(right, Y(1) - 6, "戻して選ぶ＝1（修正なし）", 11.5, INK2, "end")
-    c.circle(X(n), Y(k), 5, ORANGE, stroke="#ffffff", width=2)
+    c.circle(X(n), Y(k), 5, ORANGE, stroke=SURFACE, width=2)
     c.text(X(n) + 9, Y(k) + 18, f"n＝{n}：{k:.3f}", 13, ORANGE, weight="bold")
     y = base + 48
     y = c.para(8, y, f"分散は約{k:.2f}倍、標準偏差は √{k:.3f}≒{k ** 0.5:.2f}倍。n が N に近づくほど係数は0に近づく。", 344, 12.5, INK2)
@@ -351,7 +351,7 @@ def _box(c, F, y, X, color=BLUE, fence=False, label=None, mean=None):
     c.add(f'<rect x="{X(F["q1"]):.1f}" y="{y - 11}" width="{max(1, X(F["q3"]) - X(F["q1"])):.1f}" height="22" rx="3" fill="none" stroke="{color}" stroke-width="2"/>')
     c.line(X(F["q2"]), y - 11, X(F["q2"]), y + 11, color, 3)
     for v in F["out"]:
-        c.circle(X(v), y, 4.5, "#ffffff", stroke=RED, width=2)
+        c.circle(X(v), y, 4.5, SURFACE, stroke=RED, width=2)
     if mean is not None:                                       # 平均の位置（▲）。中央値（箱の中の線）との違いを見せる
         m = X(mean)
         c.add(f'<path d="M{m:.1f} {y + 13} l-5 8 h10 z" fill="{INK}"/>')
@@ -394,7 +394,7 @@ def hist(sp: dict) -> str:
         c.rect(X(a), base - hh, X(b) - X(a) - 1.5, hh, col, opacity=0.8)
         lab = (f"{_num(round(h, 3))}" if dens else f"{n}")
         c.add(f'<text x="{(X(a) + X(b)) / 2:.1f}" y="{base - hh - 5:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
-              f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(lab)}</text>')
+              f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(lab)}</text>')
     ticks = sorted({v for a, b, _ in cls for v in (a, b)})
     c.line(16, base, W - 16, base, INK2, 1)
     for t in ticks:
@@ -486,7 +486,7 @@ def line(sp: dict) -> str:
     X = lambda i: 30 + i * (W - 60) / max(1, n - 1)            # noqa: E731
     Y = lambda v: base - (v - lo) / (hi - lo) * (base - top)  # noqa: E731
     c.line(16, base, W - 16, base, INK2, 1)
-    colors = [BLUE, ORANGE, "#6250d6"]
+    colors = [BLUE, ORANGE, VIOLET]
     for k, s in enumerate(series + extra):
         col = colors[k % len(colors)]
         pts = [(X(i), Y(v)) for i, v in enumerate(s["values"])]
@@ -495,7 +495,7 @@ def line(sp: dict) -> str:
             c.circle(px, py, 4, col)
             if k == 0 or s.get("show_values", True):
                 c.add(f'<text x="{px:.1f}" y="{py - 9:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
-                      f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(_num(round(s["values"][i], 2)))}</text>')
+                      f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(_num(round(s["values"][i], 2)))}</text>')
     for i, t in enumerate(labels):
         c.text(X(i), base + 16, t, 11.5, INK2, "middle")
     y = base + 32
@@ -627,14 +627,14 @@ def dist(sp: dict) -> str:
     k = sp.get("band")
     if k:   # 期待値±k標準偏差の帯（後ろに薄く）
         a, b = max(lo, mean - k * sd), min(hi, mean + k * sd)
-        c.rect(X(a), top - 4, X(b) - X(a), base - top + 4, "#eef3fb")
+        c.rect(X(a), top - 4, X(b) - X(a), base - top + 4, LIGHT)
         c.line(X(a), top - 14, X(b), top - 14, BLUE, 1.5)
         c.text(X(mean), top - 20, ("±標準偏差" if k == 1 else f"±{_num(k)}標準偏差") + f"（{_num(round(mean - k * sd, 2))}〜{_num(round(mean + k * sd, 2))}）", 11.5, BLUE, "middle", "bold")
     c.line(left, base, right, base, INK2, 1)
     if discrete:
         for x, p in pmf:
             cx = X(x) - (bw / 2 + 1 if ov else 0)
-            col = ORANGE if x in hl else "#8fb3e3"
+            col = ORANGE if x in hl else SOFT
             c.rect(cx - bw / 2, base - p * scale, bw, p * scale, col, rx=3)
             if ov:   # 重ねる分布は点線の枠（ラボと同じ見せ方）
                 q = ov.get(x, 0.0)
@@ -643,7 +643,7 @@ def dist(sp: dict) -> str:
                 cx = X(x)
             if (p * scale > 1.5 and not ov and len(pmf) <= 12) or x in hl:
                 c.add(f'<text x="{cx:.1f}" y="{base - p * scale - 5:.1f}" font-size="11.5" fill="{INK}" text-anchor="middle" '
-                      f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(f"{p:.{dec}f}")}</text>')
+                      f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(f"{p:.{dec}f}")}</text>')
             every = max(1, math.ceil(len(pmf) / 12))   # 棒が多いときは目盛りを間引く
             if (x - pmf[0][0]) % every == 0 or x in hl:
                 c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
@@ -670,7 +670,7 @@ def dist(sp: dict) -> str:
                 else:
                     mid = (sh["from"] + sh["to"]) / 2
                     c.add(f'<text x="{X(mid):.1f}" y="{base - f(mid) * scale * 0.45:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
-                          f'stroke="#fcfcfb" stroke-width="4" paint-order="stroke">{esc(sh["label"])}</text>')
+                          f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(sh["label"])}</text>')
         d = "M" + " L".join(f"{X(x):.1f},{base - f(x) * scale:.1f}" for x in xs)
         c.add(f'<path d="{d}" fill="none" stroke="{BLUE}" stroke-width="2.2"/>')
         t = lo
@@ -687,7 +687,7 @@ def dist(sp: dict) -> str:
         c.text(mx, base + 46, f"{'期待値' if discrete else '平均'} {_num(round(mean, 2))}{unit}", 12, ORANGE, "middle", "bold")
     y = base + 58
     if sp.get("overlay") or sp.get("label"):   # 凡例・分散・差の最大（解説付き再生の静止図）
-        c.rect(8, y + 2, 12, 12, "#8fb3e3", rx=2)
+        c.rect(8, y + 2, 12, 12, SOFT, rx=2)
         c.text(24, y + 12, sp.get("label", "棒"), 12, INK2)
         if sp.get("overlay"):
             ox = 190
