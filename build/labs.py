@@ -204,7 +204,7 @@ def validate_labs(course: Course) -> list[str]:
             # 色は design/tokens.json の変数で（#42。ラボ・静止図・知識ネットワークで同じ色）。色付きの面の上の白い文字だけ例外
             for m in re.finditer(r"#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(", (t["dir"] / t["src"]).read_text(encoding="utf-8")):
                 if m.group(0).lower() not in ("#fff", "#ffffff"):
-                    err.append(f"{lid}: 色の値 {m.group(0)} は書かない（var(--data-1) などの変数で。値は docs/knowledge-net/design/tokens.json）")
+                    err.append(f"{lid}: 色の値 {m.group(0)} は書かない（var(--data-1) などの変数で。値は docs/math-lab/tokens.json）")
                     break
         if not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
             err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")

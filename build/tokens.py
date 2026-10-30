@@ -1,4 +1,4 @@
-"""見た目と手触りの値（元は knowledge-net の design/tokens.json。写しは docs/knowledge-net/design/tokens.json）。
+"""見た目と手触りの値（元は math-lab の packages/ui/tokens.json。写しは docs/math-lab/tokens.json）。
 
 - css()：ラボ（labkit）に差し込む CSS の変数（knowledge-net の scripts/tokens.mjs と同じ名前・同じ値）
 - color(名前)・dark(名前)：静止図（svgkit・figures.py）が使う色
@@ -10,7 +10,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-PATH = Path(__file__).resolve().parent.parent / "docs" / "knowledge-net" / "design" / "tokens.json"
+PATH = Path(__file__).resolve().parent.parent / "docs" / "math-lab" / "tokens.json"
 
 
 def _value(v, typ: str) -> str:
