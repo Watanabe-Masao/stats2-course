@@ -4,8 +4,8 @@ import math
 import json
 from pathlib import Path
 
-# 色は design/tokens.json（knowledge-net と共通。写しは docs/knowledge-net/design/）から。ラボと同じ系列の色（#42）
-_T = json.loads((Path(__file__).resolve().parents[2] / "docs" / "knowledge-net" / "design" / "tokens.json").read_text(encoding="utf-8"))["color"]
+# 色は math-lab の tokens.json（写しは docs/math-lab/tokens.json）から。ラボと同じ系列の色（#42）
+_T = json.loads((Path(__file__).resolve().parents[2] / "docs" / "math-lab" / "tokens.json").read_text(encoding="utf-8"))["color"]
 C = {k: v["$value"] for k, v in _T.items() if not k.startswith("$")}
 BG = C["figure-bg"]; INK = C["ink"]; INK2 = C["ink-2"]; INK3 = C["ink-3"]; GRID = C["line"]; SURFACE = C["surface"]
 BLUE = C["data-1"]; ORANGE = C["data-hi"]; VIOLET = C["data-2"]; AQUA = C["data-3"]; RED = C["bad"]

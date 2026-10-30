@@ -258,7 +258,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 見た目と手触り（#42）
 
-色・動きの値の元は knowledge-net の design/tokens.json。ここの docs/knowledge-net/design/tokens.json は写しで、型と同じく `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。
+色・動きの値の元は math-lab の packages/ui/tokens.json（#107）。ここの docs/math-lab/tokens.json は写しで、型と同じく `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。
 
 - ラボ：build が値を labkit の先頭に差し込む。ラボの中に色の値を書かない（build が止める。色付きの面の上の白い文字だけ例外）。データは `--acc`（主の系列）・`--acc2`（注目する値・2つ目の群）・`--data-2`・`--data-3`、操作（選んだタブ・主ボタン・つまみ）は `--accent`。
 - 静止図：svgkit の色（BLUE・ORANGE など）は写しから読む。ラボと静止図で同じ系列は同じ色。
