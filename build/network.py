@@ -72,6 +72,28 @@ def load_experiments() -> list[dict]:
     return (load_yaml(path) or {}).get("experiments", []) if path.exists() else []
 
 
+def table_errors(eid: str, x: dict) -> list[str]:
+    """値の表の実験（#119）：値は小さい順で重なりなし、呼び名・重みは値と同じ数、重みは0以上で合計が正。前と変えた重みは違うこと"""
+    err: list[str] = []
+    def one(where: str, values: list, weights: dict, labels) -> None:
+        if not values or any(b <= a for a, b in zip(values, values[1:])):
+            err.append(f"{eid}: {where} の values は小さい順で重ならない（1つ以上）")
+        if labels is not None and len(labels) != len(values):
+            err.append(f"{eid}: {where} の labels は values と同じ数")
+        for k, w in weights.items():
+            if len(w) != len(values):
+                err.append(f"{eid}: {where} の {k} は values と同じ数")
+            elif any(v < 0 for v in w) or not sum(w) > 0:
+                err.append(f"{eid}: {where} の {k} は0以上で、合計が0より大きい")
+    for t in x.get("themes") or []:
+        one(f"テーマ {t.get('id')}", t.get("values") or [], {"start": t.get("start") or [], "compare": t.get("compare") or []}, t.get("labels"))
+        if t.get("start") == t.get("compare"):
+            err.append(f"{eid}: テーマ {t.get('id')} の start と compare が同じ（問いで何も変わらない）")
+    for b in x.get("counterexamples") or []:
+        one(f"反例 {b.get('id')}", b.get("values") or [], {"weights": b.get("weights") or []}, b.get("labels"))
+    return err
+
+
 def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
     """実験の定義を確かめる：id・つなぐ概念と線・条件の範囲・テーマ・反例（崩す条件は概念の成り立つ条件の言葉で）。予想の答えは書かない（画面がモデルから求める）"""
     err: list[str] = []
@@ -127,6 +149,8 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
             for part in str(b.get("breaks", "")).split("・"):
                 if conds and not any(part.strip() and part.strip() in q for q in conds):
                     err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念の成り立つ条件にない")
+        if x.get("model") == "table":
+            err += table_errors(eid, x)
         rs = x.get("reason") or {}
         if rs.get("concept"):
             t = c.terms.get(rs["concept"])

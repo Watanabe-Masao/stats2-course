@@ -219,6 +219,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - `start`（前の条件）と `compare`（問いで変える条件）、`vary`（条件の範囲）。`reason`（理由の段：概念の式と1〜3行）
 - `themes`：場面（こういう時に使う）。計算は同じで、並びの絵・言葉・最初の p が変わる
 - `counterexamples`：反例を実験する。成り立つ条件（`breaks`。概念の `conditions.math` の言葉で）を1つ崩した起き方（urn・streak・mix）で理論とのずれを見る。数は概念しだい
+- `model`：`binom`（二項分布。vary・start・compare）か `table`（値の表。#119：テーマごとに values・labels・start と compare の重み・change、反例は values と weights の表）。値の表は、値が小さい順・重みと呼び名が値と同じ数・前と変えた重みが違うことを build が確かめる
 - **予想の答えは書かない**（公開の JSON に出る。画面が理論のモデルから求める）。build が止める
 - 発見メモは ChatGPT に渡し、ChatGPT が学習記録へ書く（公開サイトは個人の記録を持たない）
 
