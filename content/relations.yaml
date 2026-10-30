@@ -24,6 +24,22 @@ relations:
     premise: mathematical
     description: 分散は「期待値からのずれ」の2乗の期待値。期待値がなければ測る基準がない。
     basis: {units: [U13]}
+  - id: REL-fact-comb
+    from: TERM-fact
+    to: TERM-comb
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 組合せの数は、全部の並べ方 n! を、選んだ中と残した中の並べ方 k!・(n−k)! で割って求める。
+    basis: {units: [U09]}
+  - id: REL-comb-binom
+    from: TERM-comb
+    to: TERM-binom
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: n 回のうちどの k 回が成功かの選び方 ₙCₖ 通りは、どれも同じ確率なので、その数だけ足し合わせる（掛ける）。
+    basis: {units: [U14]}
   - id: REL-indep-binom
     from: TERM-indep
     to: TERM-binom

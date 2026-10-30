@@ -5,12 +5,102 @@
 - id: TERM-comb
   name: 組合せ
   en: combination
+  definition: n 個の中から、順番を区別せずに k 個を選ぶ選び方の数。ₙCₖ と書く。
+  version: 1
+  principle: n 個を1列に並べる n! 通りのうち、選んだ k 個の中の並び（k! 通り）と、残した n−k 個の中の並び（(n−k)! 通り）は区別しないので、その分で割る。
+  formulas:
+  - tex: '{}_{n}\mathrm{C}_{k}=\dfrac{n!}{k!\,(n-k)!}'
+    label: 階乗で表す
+    symbols:
+    - symbol: ₙCₖ
+      meaning: n 個から k 個を選ぶ選び方の数
+      key: comb
+      concept: TERM-comb
+    - symbol: n
+      meaning: 全体の個数
+      key: n
+      kind: value
+      domain: {min: 0, integer: true}
+    - symbol: k
+      meaning: 選ぶ個数
+      key: k
+      kind: value
+      domain: {min: 0, max: n, integer: true}
+    - symbol: n!
+      meaning: 階乗（1からその数までを掛けた数）
+      key: fact
+      concept: TERM-fact
+    tree: {"op": "eq", "args": [{"op": "fn", "name": "comb", "args": [{"sym": "n"}, {"sym": "k"}]}, {"op": "div", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "n"}]}, {"op": "mul", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "k"}]}, {"op": "fn", "name": "fact", "args": [{"op": "sub", "args": [{"sym": "n"}, {"sym": "k"}]}]}]}]}]}
+    parts:
+    - path: [1, 0]
+      name: 全部の並べ方
+      meaning: n 個を1列に並べる並べ方の数
+    - path: [1, 1, 0]
+      name: 選んだ中の並べ方
+      meaning: 選んだ k 個は順番を区別しないので、その並べ方の数で割る
+    - path: [1, 1, 1]
+      name: 残した中の並べ方
+      meaning: 残した n−k 個も順番を区別しないので、その並べ方の数で割る
+  conditions:
+    math:
+    - n と k は整数で、0 ≦ k ≦ n
+    data:
+    - 「順番を区別しない」選び方かを確かめる。役（委員長・副委員長）や順位があるなら順列で数える
+  example: 5人から2人の係を選ぶ選び方は ₅C₂＝5!÷(2!×3!)＝120÷12＝10 通り。
+  counterexample: 5人から委員長と副委員長を1人ずつ選ぶときは役が違うので順番を区別する。10 通りではなく 5×4＝20 通り（順列）。
+  misconceptions:
+  - misconception: ₁₀C₃ と ₁₀C₇ は別の数
+    correction: 選ぶ3人を決めることは、残す7人を決めることと同じ。ₙCₖ＝ₙCₙ₋ₖ で、どちらも120
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - math.comb(5,2)==10 and math.factorial(5)==120 and math.factorial(2)*math.factorial(3)==12 and 120//12==10
+  - math.perm(5,2)==20 and 5*4==20
+  - math.comb(10,3)==math.comb(10,7)==120
 - id: TERM-sigma
   name: 総和記号（Σ）
   en: summation
 - id: TERM-fact
   name: 階乗
   en: factorial
+  definition: 1 から n までの整数をすべて掛けた数。n! と書く。0! は 1 と決める。
+  version: 1
+  principle: n 個のものを1列に並べる並べ方の数。先頭は n 通り、次は n−1 通り……と1つずつ減るので、それを全部掛け合わせる。
+  formulas:
+  - tex: 'n!=\prod_{i=1}^{n} i'
+    label: 1 から n までの積
+    symbols:
+    - symbol: n!
+      meaning: n の階乗
+      key: fact
+      concept: TERM-fact
+    - symbol: n
+      meaning: 並べるものの個数
+      key: n
+      kind: value
+      domain: {min: 0, integer: true}
+    - symbol: i
+      meaning: 掛ける数（1 から n まで動く）
+      key: i
+      kind: index
+    tree: {"op": "eq", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "n"}]}, {"op": "prod", "var": "i", "lower": {"num": 1}, "upper": {"sym": "n"}, "args": [{"sym": "i"}]}]}
+  conditions:
+    math:
+    - n は0以上の整数（0! は 1 と決める。何も並べない並べ方は1通り）
+    data:
+    - n が大きいとすぐに大きくなる（10! は 3628800）。計算では約分してから掛けると楽になる
+  example: 3人を1列に並べる並べ方は 3!＝3×2×1＝6 通り。
+  counterexample: 赤玉2個と白玉1個のように同じものを含む並べ方は 3!＝6 通りではない。赤どうしを区別しないので 6÷2!＝3 通り。
+  misconceptions:
+  - misconception: 0! は 0
+    correction: 0! は 1。何も並べない並べ方は1通りで、ₙCₙ＝n!÷(n!×0!)＝1 とも合う
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - math.factorial(3)==6==3*2*1 and math.factorial(10)==3628800
+  - math.factorial(3)//math.factorial(2)==3 and math.factorial(0)==1 and math.comb(4,4)==1
 - id: TERM-population
   name: 母集団
   en: population
