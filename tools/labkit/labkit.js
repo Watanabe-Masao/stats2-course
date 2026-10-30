@@ -32,6 +32,9 @@ const LK=(()=>{
  let sw=null;function haptic(){if(!/iP(hone|ad|od)/.test(navigator.userAgent))return;if(!sw){sw=document.createElement("label");sw.setAttribute("aria-hidden","true");sw.style.display="none";const i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");sw.appendChild(i);document.body.appendChild(sw);}sw.click();}
  document.addEventListener("touchstart",()=>{},{passive:true});   // iPhone の Safari で :active（押した返事）を出す
  const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})()||/[?&]embed=1/.test(location.search);
+ // 知識ネットワークの中（host=kn）では、↗ のリンクを別の画面に出さず、親の画面に全面で開いてもらう（閉じれば元の画面に戻れる）
+ if(/[?&]host=kn\b/.test(location.search))document.addEventListener("click",e=>{const l=e.target.closest&&e.target.closest('a.lk-link[target="_blank"]');if(!l)return;
+  e.preventDefault();parent.postMessage({type:"lab:open",url:l.href.replace(/([?&])host=kn(&|$)/,(m,a,b)=>b?a:"")},"*");});
  const FOCUS=!!(cfg.task&&cfg.mode);
  function register(key,spec){modes[key]=spec;order.push(key);}
  function show(k,ease){cur=k;order.forEach(m=>{const e=$("m-"+m);e.style.display=m===k?"block":"none";e.classList.toggle("lk-in",!!ease&&m===k);});
