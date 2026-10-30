@@ -66,6 +66,80 @@ def load_network() -> tuple[list[dict], list[dict]]:
     return rel, der
 
 
+def load_experiments() -> list[dict]:
+    """実験室の定義（#102・計画の 6 の骨格 1）：content/experiments.yaml"""
+    path = CONTENT / "experiments.yaml"
+    return (load_yaml(path) or {}).get("experiments", []) if path.exists() else []
+
+
+def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
+    """実験の定義を確かめる：id・つなぐ概念と線・条件の範囲・テーマ・反例（崩す条件は概念の成り立つ条件の言葉で）。予想の答えは書かない（画面がモデルから求める）"""
+    err: list[str] = []
+    seen = set()
+    for x in load_experiments():
+        eid = x.get("id", "?")
+        if not str(eid).startswith("EXP-"):
+            err.append(f"{eid}: 実験の id は EXP- で始める")
+        if eid in seen:
+            err.append(f"{eid}: id が重なっている")
+        seen.add(eid)
+        links = x.get("links") or {}
+        if not (links.get("concepts") or links.get("relations")):
+            err.append(f"{eid}: つなぐ概念（concepts）か線（relations）を1つ以上書く")
+        for ref in links.get("concepts") or []:
+            if ref not in c.terms or not filled(c.terms[ref]):
+                err.append(f"{eid}: links.concepts の {ref} が説明のある概念にない")
+        for ref in links.get("relations") or []:
+            if ref not in rel_ids and ref not in der_ids:
+                err.append(f"{eid}: links.relations の {ref} が関係・導出にない")
+        vary = x.get("vary") or {}
+        for where in ("start", "compare"):
+            for k, v in (x.get(where) or {}).items():
+                r = vary.get(k)
+                if not r or not (r["min"] <= v <= r["max"]):
+                    err.append(f"{eid}: {where}.{k}＝{v} が vary の範囲にない")
+        for nx in x.get("next") or []:
+            for k, v in (nx.get("set") or {}).items():
+                r = vary.get(k)
+                if not r or not (r["min"] <= v <= r["max"]):
+                    err.append(f"{eid}: next の {k}＝{v} が vary の範囲にない")
+        ids = [t.get("id") for t in x.get("themes") or []]
+        if len(ids) != len(set(ids)):
+            err.append(f"{eid}: テーマの id が重なっている")
+        for t in x.get("themes") or []:
+            if "p" in t and not (vary.get("p", {}).get("min", 0) <= t["p"] <= vary.get("p", {}).get("max", 1)):
+                err.append(f"{eid}: テーマ {t.get('id')} の p が vary の範囲にない")
+        for b in x.get("counterexamples") or []:
+            m = b.get("mechanism") or {}
+            if m.get("kind") == "urn" and not (m.get("total") and vary["n"]["max"] <= m["total"] and (m.get("success") is None or m["success"] <= m["total"])):
+                err.append(f"{eid}: 反例 {b.get('id')}：箱（total）は取る数（n の最大）以上、当たり（success。省くと p×total）は total 以下")
+            if m.get("kind") == "streak" and m.get("carry") is None:
+                err.append(f"{eid}: 反例 {b.get('id')}：streak には carry を書く")
+            if m.get("kind") == "mix" and m.get("spread") is None:
+                err.append(f"{eid}: 反例 {b.get('id')}：mix には spread を書く")
+            if b.get("concept") and (b["concept"] not in c.terms or not filled(c.terms[b["concept"]])):
+                err.append(f"{eid}: 反例 {b.get('id')} の concept {b['concept']} が説明のある概念にない")
+            # 崩す条件は、つなぐ概念の「成り立つ条件」の言葉で書く（どの条件の反例かを地図とそろえる）
+            def math_conds(ref: str) -> list:
+                cd = (c.terms.get(ref) or {}).get("conditions") or {}
+                return cd.get("math", []) if isinstance(cd, dict) else []   # 形の違う条件は、その概念の検査が別に止める
+            conds = [q for ref in links.get("concepts") or [] for q in math_conds(ref)]
+            for part in str(b.get("breaks", "")).split("・"):
+                if conds and not any(part.strip() and part.strip() in q for q in conds):
+                    err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念の成り立つ条件にない")
+        rs = x.get("reason") or {}
+        if rs.get("concept"):
+            t = c.terms.get(rs["concept"])
+            if not t or not filled(t):
+                err.append(f"{eid}: reason.concept {rs['concept']} が説明のある概念にない")
+            elif "formula" in rs and not (0 <= rs["formula"] < len(t.get("formulas") or [])):
+                err.append(f"{eid}: reason.formula {rs['formula']} が {rs['concept']} の式にない")
+        for bad in ("answer", "expect"):
+            if bad in x or bad in (x.get("predict") or {}):
+                err.append(f"{eid}: 予想の答え（{bad}）は書かない（公開の JSON に出てしまう。画面がモデルから求める）")
+    return err
+
+
 def filled(t: dict) -> bool:
     return bool(t.get("definition"))
 
@@ -278,6 +352,7 @@ def validate_network(c: Course) -> list[str]:
     for tid, t in c.terms.items():
         if filled(t) and tid not in linked:
             err.append(f"{tid}: 説明のある概念なのに、関係・導出のどれにもつながっていない")
+    err += experiment_errors(c, rel_ids, {d["id"] for d in ders})
     return err
 
 
@@ -375,10 +450,20 @@ def export_network(c: Course, target: dict) -> dict:
     derivations = [{"id": g(d["id"]), "version": d["version"], "premises": [g(p) for p in d["premises"]], "conclusion": g(d["conclusion"]),
                     "statement": d["statement"], "steps": d["steps"], "conditions": d["conditions"],
                     "units": [g(u) for u in (d.get("basis") or {}).get("units", [])]} for d in ders]
+    experiments = []
+    for x in load_experiments():
+        e = {k: v for k, v in x.items() if k not in ("links", "reason", "counterexamples")}
+        e["id"] = g(x["id"])
+        e["links"] = {k: [g(r) for r in v] for k, v in (x.get("links") or {}).items() if v}
+        if x.get("reason"):
+            e["reason"] = {**x["reason"], **({"concept": g(x["reason"]["concept"])} if x["reason"].get("concept") else {})}
+        if x.get("counterexamples"):
+            e["counterexamples"] = [{**b, **({"concept": g(b["concept"])} if b.get("concept") else {})} for b in x["counterexamples"]]
+        experiments.append(e)
     revision = json.loads(SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision,
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
-            "concepts": concepts, "relations": relations, "derivations": derivations}
+            "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments} if experiments else {})}
 
 
 def schema_errors(data: dict) -> list[str]:
