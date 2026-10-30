@@ -487,6 +487,32 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("concept TERM-nothing が用語にない" in e for e in err))
         self.assertEqual(self.n.tree_errors({"op": "fn", "name": "exp", "args": [{"num": 1}]}, set()), [])
 
+    def test_symbol_of_and_domain(self):
+        # 記号と確率変数の対応（of）・定義域（domain）（#109）
+        c = course()
+        f = c.terms["TERM-std"]["formulas"][0]
+        mu = next(s for s in f["symbols"] if s.get("key") == "mu")
+        self.assertEqual(mu.get("of"), "X")
+        self.assertFalse(self._validate(c))
+        mu["of"] = "Y"                                   # 同じ式に確率変数 Y はない
+        sig = next(s for s in f["symbols"] if s.get("key") == "sigma")
+        sig["domain"] = {"min": 1, "max": 0}             # min > max
+        X = next(s for s in f["symbols"] if s.get("key") == "X")
+        X["domain"] = {"min": 0}                         # 確率変数に定義域は書かない
+        err = self._validate(c)
+        self.assertTrue(any("of Y が、同じ式の確率変数" in e for e in err))
+        self.assertTrue(any("domain は min ≦ max" in e for e in err))
+        self.assertTrue(any("domain を書けるのは value・param・const・index だけ" in e for e in err))
+        mu["domain"] = {"lo": 0}
+        self.assertTrue(any("domain は min・max・minOpen・maxOpen・integer・nonzero だけ" in e for e in self._validate(c)))
+
+    def test_mu_definition(self):
+        # μ＝E(X)：μ を押して期待値の定義で開けるように（#109）
+        c = course()
+        f = next(f for f in c.terms["TERM-expect"]["formulas"] if f["tree"]["args"][0] == {"sym": "mu"})
+        self.assertEqual(f["tree"]["args"][1], {"op": "fn", "name": "E", "args": [{"sym": "X"}]})
+        self.assertEqual(next(s for s in f["symbols"] if s["key"] == "mu")["of"], "X")
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},
