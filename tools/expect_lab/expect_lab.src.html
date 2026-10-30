@@ -64,7 +64,7 @@
  <input type="range" id="j01" min="0" max="100" step="1" value="10" data-name="Yだけ" data-unit="%">
  <div class="rest mut ctl" id="jlast"></div>
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
- <div class="res key" id="jplot"></div>
+ <div class="res key" id="jplot" data-tour-anchor></div>
  <div class="card res key" id="jsum"></div>
 </div>
 
@@ -176,16 +176,16 @@ let JN={x:"弁当",y:"お茶"};
 function jVals(){let p11=+$("j11").value,p10=+$("j10").value,p01=+$("j01").value;
  if(p11+p10>100){p10=100-p11;LK.setRange("j10",p10);}if(p11+p10+p01>100){p01=100-p11-p10;LK.setRange("j01",p01);}
  const q11=p11/100,q10=p10/100,q01=p01/100,q00=1-q11-q10-q01,px=q11+q10,py=q11+q01,cov=q11-px*py,den=Math.sqrt(px*(1-px)*py*(1-py));
- return {p11:q11,p10:q10,p01:q01,p00:q00,px,py,exy:q11,cov,corr:den?cov/den:0,expect11:px*py,indep:Math.abs(cov)<1e-9?"はい":"いいえ"};}
+ return {p11:q11,p10:q10,p01:q01,p00:q00,px,py,exy:q11,cov,corr:den?cov/den:0,expect11:px*py,vx:px*(1-px),indep:Math.abs(cov)<1e-9?"はい":"いいえ"};}
 function jRender(){const J=jVals();$("jnx").textContent=JN.x;$("jny").textContent=JN.y;
  $("jlast").textContent=`どちらもしない（残り）＝${f(J.p00*100)}%`;
- const cw=110,ch=46,ox=72,oy=26,H=oy+2*ch+40;const cell=(r,c,q,e)=>{const x=ox+c*cw,y=oy+r*ch;return `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="var(--acc)" fill-opacity="${(0.08+q*0.9).toFixed(3)}" stroke="var(--line)"/><text x="${x+cw/2}" y="${y+19}" font-size="13" text-anchor="middle" fill="var(--fg)" font-weight="700">${pc(q)}</text><text x="${x+cw/2}" y="${y+36}" font-size="10" text-anchor="middle" fill="var(--mut)">独立なら ${pc(e)}</text>`;};
+ const cw=110,ch=LK.embed&&LK.cfg.tour?34:46,ox=72,oy=26,H=oy+2*ch+(LK.embed&&LK.cfg.tour?26:40);const cell=(r,c,q,e)=>{const x=ox+c*cw,y=oy+r*ch;return `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="var(--acc)" fill-opacity="${(0.08+q*0.9).toFixed(3)}" stroke="var(--line)"/><text x="${x+cw/2}" y="${y+19}" font-size="13" text-anchor="middle" fill="var(--fg)" font-weight="700">${pc(q)}</text><text x="${x+cw/2}" y="${y+36}" font-size="10" text-anchor="middle" fill="var(--mut)">独立なら ${pc(e)}</text>`;};
  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="同時確率の表">`;
  s+=`<text x="${ox+cw/2}" y="${oy-8}" font-size="11" text-anchor="middle" fill="var(--fg)">Y＝1（${esc(JN.y)}）</text><text x="${ox+cw*1.5}" y="${oy-8}" font-size="11" text-anchor="middle" fill="var(--fg)">Y＝0</text>`;
  s+=`<text x="${ox-6}" y="${oy+ch/2+4}" font-size="11" text-anchor="end" fill="var(--fg)">X＝1</text><text x="${ox-6}" y="${oy+ch*1.5+4}" font-size="11" text-anchor="end" fill="var(--fg)">X＝0</text>`;
  s+=cell(0,0,J.p11,J.px*J.py)+cell(0,1,J.p10,J.px*(1-J.py))+cell(1,0,J.p01,(1-J.px)*J.py)+cell(1,1,J.p00,(1-J.px)*(1-J.py));
  s+=`<text x="${ox+cw}" y="${oy+2*ch+18}" font-size="11" text-anchor="middle" fill="var(--mut)">P(X＝1)＝${pc(J.px)}　P(Y＝1)＝${pc(J.py)}</text></svg>`;
- $("jplot").innerHTML=s;
+ $("jplot").innerHTML=`<div data-focus="table">`+s+`</div>`+(LK.cfg.tour?`<div class="mut lk-tline"><span data-focus="cov">Cov＝${f(J.exy)}−${f(J.px)}×${f(J.py)}＝<b>${f(J.cov)}</b></span> <span data-focus="var">V(X)＝<b>${f(J.vx)}</b></span></div>`:"");
  $("jsum").innerHTML=`<div>E(X)＝P(X＝1)＝${f(J.px)}、E(Y)＝P(Y＝1)＝${f(J.py)}、E(XY)＝P(両方)＝${f(J.exy)}</div><div>Cov(X,Y)＝E(XY)−E(X)E(Y)＝${f(J.exy)}−${f(J.px)}×${f(J.py)}＝<b>${f(J.cov)}</b>　相関係数 ${f(J.corr)}</div><div class="mut">${J.indep==="はい"?"P(両方)＝P(X＝1)P(Y＝1) なので独立（共分散0）。":J.cov>0?`共分散が正：${esc(JN.x)}をする人は${esc(JN.y)}もしやすい。独立ではない。`:`共分散が負：${esc(JN.x)}をする人は${esc(JN.y)}をしにくい。独立ではない。`}</div>`;}
 LK.register("joint",{name:"同時分布",
  init(){["j11","j10","j01"].forEach(id=>LK.stepper($(id),jRender));jRender();},

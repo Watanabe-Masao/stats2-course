@@ -246,6 +246,20 @@ class TestLabs(unittest.TestCase):
         self.assertAlmostEqual(ex[0][0]["mean"], 1.5)
         self.assertAlmostEqual(ex[2][-1]["var"], 0)
 
+    def test_tour_relation_visuals_batch2(self):
+        import tour
+        from network import relations_without_figures
+        self.assertEqual(relations_without_figures(), [])   # 変換・対比・導出・一般化の全部に図がある（#95）
+        figs = tour.figure_specs(COURSE)
+        ex = tour.expect("LAB-expect", COURSE.labs["LAB-expect"]["presets"]["rel-indep-tour"])
+        self.assertEqual([round(e[0]["cov"], 9) for e in ex], [0, 0.1, -0.1])   # 独立→正→負（周辺は同じ）
+        ex = tour.expect("LAB-expect", COURSE.labs["LAB-expect"]["presets"]["rel-varcov-tour"])
+        self.assertAlmostEqual(ex[1][0]["cov"], ex[1][0]["vx"])                 # Cov(X, X)＝V(X)
+        ex = tour.expect("LAB-pois", COURSE.labs["LAB-pois"]["presets"]["rel-hyper-tour"])
+        self.assertAlmostEqual(ex[1][-1]["fpc"], 195 / 199)                     # 箱を大きくすると補正は1に近い（N＝200 で 0.98）
+        self.assertTrue(figs["FIG-LAB-pois-rel-negbinom-tour-2"]["spec"]["label"].startswith("負の二項"))
+        self.assertEqual(figs["FIG-LAB-expect-rel-indep-tour-1"]["spec"]["type"], "joint")
+
     def test_tour_validation(self):
         from labs import _check_spec
         tool = COURSE.labs["LAB-pois"]

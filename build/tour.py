@@ -129,8 +129,13 @@ def _geom(state: dict, tour: dict) -> dict:
 def _geom_fig(x: dict, state: dict, tour: dict) -> dict:
     dec = tour.get("decimals", 3)
     return {"type": "dist", "family": "geom", "p": x["p"], "r": x["r"], "kmax": tour["kmax"], "decimals": dec,
-            "highlight": [x["k"]], "label": f"幾何 p＝{_n(x['p'])}（{x['r']}回目の当たりまでの回数）",
-            "lines": [f"平均 1/p＝{_n(round(x['mean'], dec))} 回　上限なし"]}
+            "highlight": [x["k"]],
+            "label": f"{'幾何' if x['r'] == 1 else '負の二項'} p＝{_n(x['p'])}（{x['r']}回目の当たりまでの回数）",
+            "lines": [f"平均 {mean_label(x)}＝{_n(round(x['mean'], dec))} 回　上限なし"]}
+
+
+def mean_label(x: dict) -> str:
+    return "1/p" if x["r"] == 1 else f"r/p＝{x['r']}/{_n(x['p'])}"
 
 
 def _hyper(state: dict, tour: dict) -> dict:
@@ -153,12 +158,42 @@ def _hyper_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": [f"分散　超幾何 {_n(round(x['var'], dec))}　／　二項 {_n(round(x['bvar'], dec))}（×{_n(round(x['fpc'], dec))}）"]}
 
 
+def _pois(state: dict, tour: dict) -> dict:
+    rate, t, k = state["rate"], state.get("t", 1), state.get("k", 0)
+    lam = rate * t
+    pk = math.exp(-lam) * lam ** k / math.factorial(k)
+    return {"rate": rate, "t": t, "k": k, "lambda": lam, "pk": pk, "p0": math.exp(-lam), "mean": lam, "var": lam}
+
+
+def _pois_fig(x: dict, state: dict, tour: dict) -> dict:
+    dec = tour.get("decimals", 3)
+    return {"type": "dist", "family": "poisson", "lam": x["lambda"], "kmax": tour["kmax"], "decimals": dec,
+            "highlight": [x["k"]], "label": f"ポアソン λ＝{_n(x['rate'])}×{_n(x['t'])}＝{_n(round(x['lambda'], 6))}",
+            "lines": [f"0件の確率 e^(−λ)＝{x['p0']:.{dec}f}"]}
+
+
+def _joint(state: dict, tour: dict) -> dict:
+    q11, q10, q01 = state["p11"] / 100, state["p10"] / 100, state["p01"] / 100
+    px, py = q11 + q10, q11 + q01
+    return {"p11": q11, "p10": q10, "p01": q01, "p00": 1 - q11 - q10 - q01, "px": px, "py": py, "exy": q11,
+            "cov": q11 - px * py, "vx": px * (1 - px)}
+
+
+def _joint_fig(x: dict, state: dict, tour: dict) -> dict:
+    dec = tour.get("decimals", 3)
+    return {"type": "joint", "p11": x["p11"], "p10": x["p10"], "p01": x["p01"],
+            "lines": [f"Cov＝E(XY)−E(X)E(Y)＝{_n(round(x['exy'], dec))}−{_n(round(x['px'], dec))}×{_n(round(x['py'], dec))}＝{_n(round(x['cov'], dec))}",
+                      f"V(X)＝{_n(round(x['vx'], dec))}"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
     ("LAB-binom", "pmf"): {"calc": _pmf_binom, "check": ("pk", "mean", "var", "sd", "ngap"), "figure": _pmf_binom_fig},
     ("LAB-pois", "geom"): {"calc": _geom, "check": ("pk", "mean", "var"), "figure": _geom_fig},
     ("LAB-pois", "hyper"): {"calc": _hyper, "check": ("pk", "mean", "var", "binom", "fpc"), "figure": _hyper_fig},
+    ("LAB-pois", "pois"): {"calc": _pois, "check": ("pk", "p0", "lambda"), "figure": _pois_fig},
+    ("LAB-expect", "joint"): {"calc": _joint, "check": ("px", "py", "exy", "cov", "vx"), "figure": _joint_fig},
 }
 
 
@@ -251,7 +286,8 @@ def validate(where: str, p: dict, mode: dict | None, lid: str, modes: dict | Non
     if not err:
         first = states(tour)[0]["start"]
         need = {("LAB-pois", "approx"): {"n", "lam"}, ("LAB-binom", "path"): {"n", "p", "k"}, ("LAB-binom", "pmf"): {"n", "p", "k"},
-                ("LAB-pois", "geom"): {"p", "k"}, ("LAB-pois", "hyper"): {"N", "K", "n", "k"}}.get((lid, p.get("mode")), set())
+                ("LAB-pois", "geom"): {"p", "k"}, ("LAB-pois", "hyper"): {"N", "K", "n", "k"},
+                ("LAB-pois", "pois"): {"rate", "t", "k"}, ("LAB-expect", "joint"): {"p11", "p10", "p01"}}.get((lid, p.get("mode")), set())
         if not need <= set(first):
             err.append(f"{where}: 段1の set に {sorted(need)} を書く（静止図と照合の計算に要る）")
     return err

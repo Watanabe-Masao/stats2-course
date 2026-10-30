@@ -30,7 +30,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     name: 同時分布
     purpose: 2つの 0/1 の量の同時確率から、周辺確率・E(XY)・共分散・独立か
     set: [p11, p10, p01, nameX, nameY]   # % 。どちらもしない は残りで決まる
-    values: [px, py, exy, cov, corr, indep]
+    values: [px, py, exy, cov, corr, indep, vx]   # vx：V(X)＝P(X＝1)(1−P(X＝1))
 data: スライダーと選択欄で値を決める（データの読み込みなし）
 presets:
   s1-dist:
@@ -57,6 +57,36 @@ presets:
     modes: [total, lin, sum]
     set: {n: 300, mu: 1.1, var: 0.49, unit: 個}
     task: 自分の売場の数字（1人あたりの期待値・分散と来店数）を入れ、合計の見込みと、その標準偏差を読む。人数を増やすと、標準偏差がどう増えるかを見る。
+  rel-indep-tour:   # 解説付き再生（#95）。関係「独立 → 共分散（導出）」。周辺の確率（50%・40%）は同じまま、両方の確率だけ変える
+    mode: joint
+    tour:
+      decimals: 3
+      steps:
+        - title: 独立
+          text: 両方＝20%＝50%×40%。独立なら E(XY)＝E(X)E(Y) で **共分散は0**。
+          set: {p11: 20, p10: 30, p01: 20, nameX: 弁当, nameY: お茶}
+          focus: cov
+        - title: 一緒に起きやすい
+          text: 両方を30%にする（XとYの割合は同じ）。一緒に起きやすいと**共分散は正**。
+          set: {p11: 30, p10: 20, p01: 10}
+          focus: cov
+        - title: 一緒に起きにくい
+          text: 両方を10%にすると**共分散は負**。0でないので独立ではない。
+          set: {p11: 10, p10: 40, p01: 30}
+          focus: cov
+  rel-varcov-tour:   # 解説付き再生（#95）。関係「分散 → 共分散（一般化）」。Y を X と同じにすると Cov(X, X)＝V(X)
+    mode: joint
+    tour:
+      decimals: 3
+      steps:
+        - title: 2つのずれの積
+          text: 共分散は **X と Y のずれの積**の平均。弁当とお茶なら Cov＝0.1。
+          set: {p11: 30, p10: 20, p01: 10, nameX: 弁当, nameY: お茶}
+          focus: cov
+        - title: Y を X と同じに
+          text: Y＝X にすると **Cov(X, X)＝V(X)**＝0.25。分散は共分散の特別な場合。
+          set: {p11: 50, p10: 0, p01: 0, nameY: 弁当}
+          focus: var
   s5-free:
     mode: joint
     modes: [joint, total, dist]
