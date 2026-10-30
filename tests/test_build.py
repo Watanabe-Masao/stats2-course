@@ -532,6 +532,35 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("over p は主役の式の、上限のある整数の記号" in e for e in err))
         self.assertTrue(any("mean 9 が木のある式を指していない" in e for e in err))
 
+    def test_experiments(self):
+        # 実験室の定義（#102）：つなぐ概念と線・条件の範囲・反例（崩す条件）・予想の答えを書かない
+        import network
+        c = course()
+        self.assertFalse([e for e in self._validate(c) if "EXP-" in e])
+        rel_ids = {r["id"] for r in network.load_network()[0]}
+        der_ids = {d["id"] for d in network.load_network()[1]}
+        orig = network.load_experiments
+        x = dict(orig()[0])
+        x.update({"links": {"concepts": ["TERM-binom", "TERM-nothing"], "relations": ["REL-nothing"]}, "compare": {"p": 2},
+                  "counterexamples": [{"id": "urn", "name": "箱", "breaks": "空が青い", "mechanism": {"kind": "urn", "total": 5}, "text": "t"}], "answer": "右"})
+        try:
+            network.load_experiments = lambda: [x]
+            err = network.experiment_errors(c, rel_ids, der_ids)
+        finally:
+            network.load_experiments = orig
+        self.assertTrue(any("links.concepts の TERM-nothing" in e for e in err))
+        self.assertTrue(any("links.relations の REL-nothing" in e for e in err))
+        self.assertTrue(any("compare.p＝2 が vary の範囲にない" in e for e in err))
+        self.assertTrue(any("箱（total）は取る数（n の最大）以上" in e for e in err))
+        self.assertTrue(any("予想の答え（answer）は書かない" in e for e in err))
+        self.assertTrue(any("breaks「空が青い」が、つなぐ概念の成り立つ条件にない" in e for e in err))
+        d = network.export_network(c, {"site_base_url": ""})
+        e = d["experiments"][0]
+        self.assertEqual(e["id"], "stats2:EXP-binom-p")
+        self.assertIn("stats2:REL-indep-binom", e["links"]["relations"])
+        self.assertEqual(e["reason"]["concept"], "stats2:TERM-binom")
+        self.assertFalse(network.schema_errors(d))
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},

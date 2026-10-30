@@ -176,6 +176,322 @@
           }
         }
       }
+    },
+    "experiment": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "title",
+        "question",
+        "links",
+        "model",
+        "vary",
+        "start",
+        "compare",
+        "themes"
+      ],
+      "additionalProperties": false,
+      "description": "実験室（stats2-course #102・計画の 6 の骨格）。実験の定義をデータで書き、画面は読むだけ。予想の答えは書かない（モデルから画面が求める）",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/gid"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "question": {
+          "$ref": "#/$defs/text",
+          "description": "今回の問い（毎画面の上に出す）"
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "つなぐ概念（点）と関係・導出（線）。どちらか1つ以上",
+          "minProperties": 1,
+          "properties": {
+            "concepts": {
+              "$ref": "#/$defs/gids"
+            },
+            "relations": {
+              "$ref": "#/$defs/gids"
+            }
+          }
+        },
+        "model": {
+          "enum": [
+            "binom"
+          ],
+          "description": "理論のモデル（v0 は二項分布）"
+        },
+        "vary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n",
+            "p"
+          ],
+          "properties": {
+            "n": {
+              "type": "object",
+              "required": [
+                "min",
+                "max",
+                "step"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "p": {
+              "type": "object",
+              "required": [
+                "min",
+                "max",
+                "step"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          }
+        },
+        "start": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n",
+            "p"
+          ],
+          "description": "予測の段で見せる前の条件",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "p": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "問いで変える条件（start からの差分）",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "p": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "steps"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "#/$defs/text"
+            },
+            "concept": {
+              "$ref": "#/$defs/gid"
+            },
+            "formula": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "steps": {
+              "$ref": "#/$defs/texts"
+            }
+          }
+        },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "icon",
+              "success",
+              "failure"
+            ],
+            "additionalProperties": false,
+            "description": "場面（こういう時に使う）。計算は同じで、並びの絵・言葉・最初の p が変わる",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "icon": {
+                "$ref": "#/$defs/text"
+              },
+              "success": {
+                "$ref": "#/$defs/text"
+              },
+              "failure": {
+                "$ref": "#/$defs/text"
+              },
+              "unit": {
+                "$ref": "#/$defs/text"
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "story": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        },
+        "next": {
+          "type": "array",
+          "description": "応用の段の次の問い",
+          "items": {
+            "type": "object",
+            "required": [
+              "question",
+              "set"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "$ref": "#/$defs/text"
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "points": {
+          "$ref": "#/$defs/texts",
+          "description": "ⓘ のシートのポイント"
+        },
+        "counterexamples": {
+          "type": "array",
+          "description": "反例を実験する：成り立つ条件（breaks）を1つ崩した起き方で、理論とのずれを見る。数は概念しだい（いくつでも）",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "breaks",
+              "mechanism",
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "mechanism": {
+                "type": "object",
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false,
+                "description": "起き方（math-lab の engine の Mechanism）。n・p は条件から入る",
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "urn",
+                      "streak",
+                      "mix"
+                    ]
+                  },
+                  "total": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "success": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "carry": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "spread": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "concept": {
+                "$ref": "#/$defs/gid"
+              },
+              "breaks": {
+                "$ref": "#/$defs/text",
+                "description": "崩した成り立つ条件（概念の conditions の言葉で）"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -788,8 +1104,14 @@
       "type": "integer",
       "minimum": 1,
       "description": "書き出した教材が使った型の改訂番号（x-revision）"
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/experiment"
+      }
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 8
+  "x-revision": 9
 }
