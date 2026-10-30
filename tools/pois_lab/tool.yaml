@@ -129,6 +129,50 @@ presets:
           text: 全部取る（n＝N）と、当たりは必ず6個。戻さない方の**散らばりは0**。
           frames: [{n: 20, k: 6}]
           focus: var
+  rel-hyper-tour:   # 解説付き再生（#95）。関係「超幾何分布 → 二項分布（極限）」。当たりの割合0.3を保って箱を大きくする
+    mode: hyper
+    tour:
+      decimals: 3
+      steps:
+        - title: 小さな箱
+          text: 20個中6個（割合0.3）の箱から5個取る。戻さない方の分散は、戻す二項の **×0.789**。
+          set: {N: 20, K: 6, n: 5, k: 1}
+          focus: fpc
+        - title: 箱を大きく
+          text: 割合0.3のまま**箱を大きく**すると、補正 (N−n)/(N−1) が **1に近づく**。
+          frames: [{N: 40, K: 12}, {N: 100, K: 30}, {N: 200, K: 60}]
+          focus: fpc
+  rel-expo-tour:   # 解説付き再生（#95）。関係「ポアソン分布 → 指数分布（導出）」。t 時間に0件＝次まで t より長く待つ
+    mode: pois
+    tour:
+      kmax: 8
+      decimals: 3
+      steps:
+        - title: 1時間に0件
+          text: 1時間に平均2件（λ＝2）。**1時間に0件**の確率は e⁻²≒0.135。
+          set: {rate: 2, t: 1, k: 0, kind: eq}
+          focus: p0
+        - title: 時間を延ばす
+          text: 時間 t を延ばすと λ＝2t が増え、**0件の確率 e^(−2t)** は小さくなる。
+          frames: [{t: 1.5}, {t: 2}, {t: 3}]
+          focus: p0
+        - title: 待ち時間の見方
+          text: 「t 時間に0件」＝「次の1件まで **t より長く待つ**」。だから P(待ち＞t)＝e^(−λt)。これが指数分布。
+          focus: lambda
+  rel-negbinom-tour:   # 解説付き再生（#95）。関係「幾何分布 → 負の二項分布（一般化）」。待つ当たりを r 回に広げる
+    mode: geom
+    tour:
+      kmax: 20
+      decimals: 3
+      steps:
+        - title: 1回目の当たり
+          text: 幾何分布：当たり（p＝0.3）の **1回目**が何回目に来るか。平均 1/p≒3.3回。
+          set: {p: 0.3, r: 1, k: 3}
+          focus: mean
+        - title: r 回目の当たり
+          text: 待つ当たりを **r 回**に広げると負の二項分布。平均 **r/p** も r 倍に。
+          frames: [{r: 2, k: 6}, {r: 3, k: 9}]
+          focus: mean
   s3-free:
     mode: pois
     modes: [pois, approx, geom, hyper]

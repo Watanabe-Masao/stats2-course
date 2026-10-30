@@ -19,7 +19,7 @@
  <input type="range" id="pk" min="0" max="40" step="1" value="0" data-name="k 件">
  <div class="row ctl"><label>求める <select id="pkind" data-key="kind"><option value="eq">ちょうど k 件</option><option value="le">k 件以下</option><option value="ge">k 件以上</option></select></label></div>
  <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
- <div class="res key" id="pplot"></div>
+ <div class="res key" id="pplot" data-tour-anchor></div>
  <div class="card res key" id="psum"></div>
  <div class="res det" id="ptab"></div>
 </div>
@@ -83,9 +83,10 @@ function bars(ps,opt){const lim=opt.limit;const H=opt.H||170,L=30,R=W-10,base=H-
 let PU="時間";
 function pVals(){const r=+$("pr").value,t=+$("pt").value,l=r*t,k=+$("pk").value,kind=$("pkind").value;
  let le=0;for(let i=0;i<=k;i++)le+=pois(l,i);const pk=pois(l,k),ge=1-le+pk;return {r,t,lambda:l,k,kind,pk,le,ge:Math.max(0,ge),p0:Math.exp(-l),mean:l,var:l,sel:kind==="eq"?pk:kind==="le"?le:Math.max(0,ge)};}
-function pRender(){const P=pVals(),top=Math.max(P.k+2,Math.ceil(P.lambda+4*Math.sqrt(P.lambda))+1,8),ps=[];for(let i=0;i<=top;i++)ps.push(pois(P.lambda,i));
+function pRender(){const P=pVals(),top=TK!=null?TK:Math.max(P.k+2,Math.ceil(P.lambda+4*Math.sqrt(P.lambda))+1,8),ps=[];for(let i=0;i<=top;i++)ps.push(pois(P.lambda,i));
  const on=i=>P.kind==="eq"?i===P.k:P.kind==="le"?i<=P.k:i>=P.k;
- $("pplot").innerHTML=bars(ps,{on,mean:P.lambda,kmark:P.k,label:"ポアソン分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>求める範囲</span><span>▲ 平均 λ</span></div>`;
+ $("pplot").innerHTML=`<div data-focus="bars">`+bars(ps,{on,mean:P.lambda,kmark:P.k,label:"ポアソン分布",H:LK.embed&&LK.cfg.tour?92:170})+`</div><div class="legend mut"><span><i class="sw" style="background:var(--acc2)"></i>求める範囲</span><span>▲ 平均 λ</span></div>`
+  +(LK.cfg.tour?`<div class="mut lk-tline"><span data-focus="lambda">λ＝${f(P.r)}×${f(P.t)}＝<b>${f(P.lambda)}</b></span> <span data-focus="p0">0件＝e<sup>−λ</sup>＝<b>${f(P.p0,3)}</b></span></div>`:"");
  const lab=P.kind==="eq"?`P(X＝${P.k})`:P.kind==="le"?`P(X≦${P.k})`:`P(X≧${P.k})`;
  $("psum").innerHTML=`<div>λ＝1${PU} ${f(P.r)}件 × ${f(P.t)}${PU}＝<b>${f(P.lambda)}</b>（平均＝分散＝λ）</div><div>P(X＝${P.k})＝e^(−${f(P.lambda)})×${f(P.lambda)}^${P.k}÷${P.k}!＝${f(P.p0)}×${f(Math.pow(P.lambda,P.k)/fact(P.k))}＝<b>${f(P.pk)}</b></div><div>${lab}＝<b>${f(P.sel)}</b>　0件＝e^(−λ)＝${f(P.p0)}</div><div class="mut">件数に上限はない。区間（${PU}）を2倍にすると λ も2倍。</div>`;
  $("ptab").innerHTML=`<table><tr><th>k</th><th>P(X＝k)</th><th>k 以下の合計</th></tr>${ps.slice(0,Math.min(ps.length,16)).map((q,i)=>`<tr><td>${i}</td><td>${f(q)}</td><td>${f(ps.slice(0,i+1).reduce((a,b)=>a+b,0))}</td></tr>`).join("")}</table>`;}

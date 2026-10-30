@@ -690,11 +690,15 @@ def dist(sp: dict) -> str:
         c.rect(8, y + 2, 12, 12, "#8fb3e3", rx=2)
         c.text(24, y + 12, sp.get("label", "棒"), 12, INK2)
         if sp.get("overlay"):
+            ox = 190
+            if len(sp.get("label", "棒")) > 14:   # 長い凡例は次の行へ（重ならないように）
+                y += 20
+                ox = 8
             if curve:
-                c.line(190, y + 8, 202, y + 8, INK, 1.6, dash="4 3")
+                c.line(ox, y + 8, ox + 12, y + 8, INK, 1.6, dash="4 3")
             else:
-                c.add(f'<rect x="190" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
-            c.text(206, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
+                c.add(f'<rect x="{ox}" y="{y + 2}" width="12" height="12" rx="2" fill="none" stroke="{INK}" stroke-dasharray="3 2"/>')
+            c.text(ox + 16, y + 12, sp["overlay"].get("label", "重ねる分布"), 12, INK2)
         y += 20
         for line in sp.get("lines") or []:   # 数の行（例：分散 二項 2.1 ／ ポアソン 3）
             c.text(8, y + 12, line, 12.5, INK)
@@ -739,8 +743,33 @@ def paths(sp: dict) -> str:
     return c.done(y + 14)
 
 
+def joint(sp: dict) -> str:
+    """2つの「する（1）・しない（0）」の同時確率の表（2×2）。各ますに確率と「独立なら」の値。下に数の行（解説付き再生の静止図）。"""
+    q11, q10, q01 = sp["p11"], sp["p10"], sp["p01"]
+    q00 = 1 - q11 - q10 - q01
+    px, py = q11 + q10, q11 + q01
+    c = Canvas()
+    cw, ch, ox, oy = 110, 46, 82, 30
+    pc = lambda v: f"{round(v * 100, 2):g}%"  # noqa: E731
+    c.text(ox + cw / 2, oy - 10, "Y＝1", 12, INK, "middle")
+    c.text(ox + cw * 1.5, oy - 10, "Y＝0", 12, INK, "middle")
+    c.text(ox - 8, oy + ch / 2 + 4, "X＝1", 12, INK, "end")
+    c.text(ox - 8, oy + ch * 1.5 + 4, "X＝0", 12, INK, "end")
+    for r, cc, q, e in ((0, 0, q11, px * py), (0, 1, q10, px * (1 - py)), (1, 0, q01, (1 - px) * py), (1, 1, q00, (1 - px) * (1 - py))):
+        x, y = ox + cc * cw, oy + r * ch
+        c.add(f'<rect x="{x}" y="{y}" width="{cw}" height="{ch}" fill="{BLUE}" fill-opacity="{0.08 + q * 0.9:.3f}" stroke="{GRID}"/>')
+        c.text(x + cw / 2, y + 20, pc(q), 13.5, INK, "middle", "bold")
+        c.text(x + cw / 2, y + 37, f"独立なら {pc(e)}", 10.5, INK2, "middle")
+    y = oy + 2 * ch + 20
+    c.text(ox + cw, y, f"P(X＝1)＝{pc(px)}　P(Y＝1)＝{pc(py)}", 12, INK2, "middle")
+    for line in sp.get("lines") or []:
+        y += 20
+        c.text(8, y, line, 12.5, INK)
+    return c.done(y + 12)
+
+
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint}
 
 
 def specs(course: Course) -> dict[str, dict]:

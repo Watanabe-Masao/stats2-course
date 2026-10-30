@@ -137,17 +137,23 @@ relations:
     type: 一般化
     description: 分散は1つの変数のずれの2乗の期待値。2つの変数のずれの積に広げると共分散になる（Cov(X, X)＝V(X)）。
     gist: 分散は「1つの量が平均からどれだけずれるか」。共分散は「2つの量が一緒にずれるか」。同じものどうしの共分散が分散。   # つまり（#95）
+    labs:
+      - {id: LAB-expect, preset: rel-varcov-tour, purpose: Y を X と同じにすると、共分散が分散になるのを見る}
+      - {id: LAB-expect, preset: s5-free, purpose: 同時確率を自分で動かし、共分散の符号と大きさを見る}
+    figures: [FIG-LAB-expect-rel-varcov-tour-1, FIG-LAB-expect-rel-varcov-tour-2]
     basis: {units: [U13]}
   - id: REL-indep-cov
     from: TERM-indep
     to: TERM-cov
     version: 1
     labs:
+      - {id: LAB-expect, preset: rel-indep-tour, purpose: X と Y の割合は同じまま、両方の確率だけを変えて共分散の符号を見る}
       - {id: LAB-expect, preset: s5-free, purpose: 独立なら共分散が0。0でも独立とは限らないことも確かめる}
     type: 導出
     description: 独立なら E(XY)＝E(X)E(Y) なので、共分散は0になる。逆（共分散0なら独立）は成り立たない。
     gist: お互いに影響しない2つの量は、一緒にずれる傾向がないので共分散は0。ただし共分散が0でも、影響し合っていることはある。   # つまり（#95）
     conditions: [X と Y が独立, 期待値が有限]
+    figures: [FIG-LAB-expect-rel-indep-tour-1, FIG-LAB-expect-rel-indep-tour-2, FIG-LAB-expect-rel-indep-tour-3]
     basis: {units: [U13]}
   - id: REL-indep-geom
     from: TERM-indep
@@ -174,12 +180,14 @@ relations:
     to: TERM-binom
     version: 1
     labs:
+      - {id: LAB-pois, preset: rel-hyper-tour, purpose: 割合0.3を保って箱を大きくし、補正 (N−n)/(N−1) が1に近づくのを段ごとに見る}
       - {id: LAB-pois, preset: rel-hyper, purpose: 集団を大きくすると、戻さない確率が戻す確率に近づく}
     type: 変換
     mode: limit
     description: 集団 N を大きくして当たりの割合 M/N を保つと、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。
     gist: 箱がとても大きければ、取り出して戻さなくても中身の割合はほとんど変わらない。戻しても戻さなくても同じとみなせる。   # つまり（#95）
     conditions: [N が取り出す数 n に比べて十分大きい, 当たりの割合 M/N を一定に保つ]
+    figures: [FIG-LAB-pois-rel-hyper-tour-1, FIG-LAB-pois-rel-hyper-tour-2]
     basis: {units: [U15]}
   - id: REL-binom-hyper-contrast
     from: TERM-binom
@@ -198,11 +206,13 @@ relations:
     to: TERM-expo
     version: 1
     labs:
+      - {id: LAB-pois, preset: rel-expo-tour, purpose: t 時間に0件の確率が、次の1件まで t より長く待つ確率になることを段ごとに見る}
       - {id: LAB-pois, preset: s5-free, purpose: 0件の確率を時間を延ばして見ると、待ち時間の確率になる}
     type: 導出
     description: 一定の割合 λ で独立に起きる出来事では、一定時間の件数がポアソン分布、次に起きるまでの待ち時間が指数分布になる。
     gist: 同じ出来事を「一定時間に何件来るか」で見るとポアソン、「次の1件まで何分待つか」で見ると指数分布。見方が違うだけ。   # つまり（#95）
     conditions: [出来事が一定の割合 λ で起きる, 重ならない時間の件数が互いに独立]
+    figures: [FIG-LAB-pois-rel-expo-tour-1, FIG-LAB-pois-rel-expo-tour-2]
     basis: {units: [U15, U16]}
   - id: REL-dist-pdf
     from: TERM-dist
@@ -251,4 +261,8 @@ relations:
     type: 一般化
     description: 幾何分布は「1回目の成功」まで待つ。待つ成功を r 回に広げると負の二項分布（r＝1 が幾何分布）。
     gist: 幾何は「最初の当たりまで」待つ。負の二項は「r 回目の当たりまで」待つ。r＝1 にすると幾何に戻る。   # つまり（#95）
+    labs:
+      - {id: LAB-pois, preset: rel-negbinom-tour, purpose: 待つ当たりを1回→3回に広げ、平均が r/p になるのを段ごとに見る}
+      - {id: LAB-pois, preset: s5-free, purpose: p・r・k を自分で動かし、幾何（r＝1）と負の二項を比べる}
+    figures: [FIG-LAB-pois-rel-negbinom-tour-1, FIG-LAB-pois-rel-negbinom-tour-2]
     basis: {units: [U15]}
