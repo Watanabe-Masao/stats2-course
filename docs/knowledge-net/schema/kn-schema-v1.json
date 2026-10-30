@@ -178,6 +178,26 @@
       }
     },
     "experiment": {
+      "description": "実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
+      "if": {
+        "type": "object",
+        "required": [
+          "model"
+        ],
+        "properties": {
+          "model": {
+            "const": "table"
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/$defs/experimentTable"
+      },
+      "else": {
+        "$ref": "#/$defs/experimentBinom"
+      }
+    },
+    "experimentBinom": {
       "type": "object",
       "required": [
         "id",
@@ -226,7 +246,7 @@
           "enum": [
             "binom"
           ],
-          "description": "理論のモデル（v0 は二項分布）"
+          "description": "理論のモデル：二項分布（binom）"
         },
         "vary": {
           "type": "object",
@@ -490,6 +510,213 @@
               }
             }
           }
+        }
+      }
+    },
+    "experimentTable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "title",
+        "question",
+        "links",
+        "model",
+        "themes"
+      ],
+      "description": "値の表の実験室（stats2-course #119）：値と重みの表から1回ずつ引き、平均（期待値）を確かめる。予想の答えは書かない（表から画面が求める）。values と重みの数が同じことは教材の build が確かめる",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/gid"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "question": {
+          "$ref": "#/$defs/text",
+          "description": "今回の問い（毎画面の上に出す）"
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "つなぐ概念（点）と関係・導出（線）。どちらか1つ以上",
+          "minProperties": 1,
+          "properties": {
+            "concepts": {
+              "$ref": "#/$defs/gids"
+            },
+            "relations": {
+              "$ref": "#/$defs/gids"
+            }
+          }
+        },
+        "model": {
+          "const": "table",
+          "description": "理論のモデル：値の表（table）"
+        },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "icon",
+              "values",
+              "start",
+              "compare",
+              "change"
+            ],
+            "description": "場面（こういう時に使う）。値の表と、前の重み・問いで変えた重み",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "icon": {
+                "$ref": "#/$defs/text"
+              },
+              "unit": {
+                "$ref": "#/$defs/text"
+              },
+              "story": {
+                "$ref": "#/$defs/text"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number"
+                },
+                "description": "値（賞金・目など）。小さい順"
+              },
+              "labels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/text"
+                },
+                "description": "値の呼び名（なければ値と単位）。values と同じ数"
+              },
+              "start": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": "前の表の重み（合計で割って確率にする）"
+              },
+              "compare": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": "問いで変えた重み"
+              },
+              "change": {
+                "$ref": "#/$defs/text",
+                "description": "何を変えたかの文（「6 の面を3倍出やすくする」）"
+              }
+            }
+          }
+        },
+        "reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "steps"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "#/$defs/text"
+            },
+            "concept": {
+              "$ref": "#/$defs/gid"
+            },
+            "formula": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "steps": {
+              "$ref": "#/$defs/texts"
+            }
+          }
+        },
+        "counterexamples": {
+          "type": "array",
+          "description": "反例を実験する：成り立つ条件（breaks）を崩した表で、引いた平均がどうなるかを見る。数は概念しだい",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "breaks",
+              "values",
+              "weights",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "breaks": {
+                "$ref": "#/$defs/text",
+                "description": "崩した成り立つ条件（概念の conditions の言葉で）"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "weights": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "labels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/text"
+                },
+                "description": "値の呼び名（なければ値と単位）。values と同じ数"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "concept": {
+                "$ref": "#/$defs/gid"
+              }
+            }
+          }
+        },
+        "points": {
+          "$ref": "#/$defs/texts",
+          "description": "ⓘ のシートのポイント"
         }
       }
     }
@@ -1113,5 +1340,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 9
+  "x-revision": 10
 }

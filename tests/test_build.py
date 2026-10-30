@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 import tempfile
 import unittest
@@ -559,6 +560,32 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(e["id"], "stats2:EXP-binom-p")
         self.assertIn("stats2:REL-indep-binom", e["links"]["relations"])
         self.assertEqual(e["reason"]["concept"], "stats2:TERM-binom")
+        self.assertFalse(network.schema_errors(d))
+
+    def test_experiment_table(self):
+        # 値の表の実験（#119）：値と重み・呼び名の数がそろい、重みが正。前と変えた重みが同じなら問いにならない。書き出しは型（改訂10）に合う
+        import network
+        c = course()
+        rel_ids = {r["id"] for r in network.load_network()[0]}
+        der_ids = {d["id"] for d in network.load_network()[1]}
+        orig = network.load_experiments
+        x = dict(next(e for e in orig() if e.get("model") == "table"))
+        x["themes"] = [{"id": "a", "name": "a", "icon": "a", "values": [3, 1], "labels": ["x"], "start": [1, 1], "compare": [1, 1], "change": "c"},
+                       {"id": "b", "name": "b", "icon": "b", "values": [1, 2], "start": [0, 0], "compare": [1], "change": "c"}]
+        x["counterexamples"] = [{"id": "w", "name": "w", "breaks": "和（連続なら積分）が有限の値になる", "values": [1, 2], "weights": [1, -1], "text": "t"}]
+        try:
+            network.load_experiments = lambda: [x]
+            err = network.experiment_errors(c, rel_ids, der_ids)
+        finally:
+            network.load_experiments = orig
+        for want in ("テーマ a の values は小さい順", "テーマ a の labels は values と同じ数", "テーマ a の start と compare が同じ",
+                     "テーマ b の start は0以上で、合計が0より大きい", "テーマ b の compare は values と同じ数", "反例 w の weights は0以上"):
+            self.assertTrue(any(want in e for e in err), want)
+        d = network.export_network(c, {"site_base_url": ""})
+        e = next(e for e in d["experiments"] if e["model"] == "table")
+        self.assertEqual(e["id"], "stats2:EXP-expect-table")
+        self.assertEqual(e["reason"]["concept"], "stats2:TERM-expect")
+        self.assertNotIn("expect", json.dumps(e["themes"]))   # 予想の答えは書かない
         self.assertFalse(network.schema_errors(d))
 
     def test_lab_refs(self):
