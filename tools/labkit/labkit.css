@@ -3,7 +3,7 @@
    データの色（--acc＝主の系列・--acc2＝注目する値・2つ目の群）は静止図と同じ（静止図の BLUE・ORANGE）。操作の色（選んだタブ・主ボタン・つまみ）は --accent。 */
 :root{--bg:var(--surface);--fg:var(--ink);--mut:var(--ink-2);--card:var(--surface-2);--acc:var(--data-1);--acc2:var(--data-hi);--ok:var(--good);--ng:var(--bad);--task:var(--accent-soft);--taskline:var(--accent-line)}
 *{box-sizing:border-box}
-body{margin:0;padding:12px 14px 20px;font:15px/1.6 var(--font);background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body{margin:0;padding:12px 14px 20px;font:15px/1.6 var(--font);background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
 h1{font-size:16px;margin:0 0 8px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0 10px}
 .tabs button{flex:1 1 30%;min-height:40px;padding:6px 4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-size:13px;cursor:pointer}
@@ -60,7 +60,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .lk-step .lk-name{min-width:0;font-size:13px;line-height:1.25;max-width:4.5em}
 .lk-step button{width:40px;height:40px}
 .lk-step input[type=range]{min-width:0;width:100%;height:40px}
-.lk-step .lk-val{min-width:3.4em;font-size:14px}
+.lk-step .lk-val{min-width:3.4em;font-size:14px;font-variant-numeric:tabular-nums}   /* 動かしている数だけ等幅（数が変わっても横にずれない。文中の数は詰めたまま） */
 .lk-fixed{font-size:14px}
 .lk-why{margin-top:4px;font-size:14px}
 .lk-live{margin-top:6px;padding:4px 8px;border-radius:8px;background:var(--bg);font-size:14px}
