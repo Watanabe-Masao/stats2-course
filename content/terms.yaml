@@ -703,7 +703,7 @@
       range: 0以上 n 以下の整数
       key: k
       kind: value
-      domain: {min: 0, integer: true}
+      domain: {min: 0, max: n, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       range: 0以上1以下
@@ -972,7 +972,7 @@
       key: k
       kind: value
       range: r 以上の整数
-      domain: {integer: true}   # k ≧ r は記号どうしの条件なので range の文で持つ
+      domain: {min: r, integer: true}
     - symbol: r
       meaning: 待つ成功の回数
       key: r
