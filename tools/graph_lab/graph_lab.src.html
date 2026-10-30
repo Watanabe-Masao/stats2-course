@@ -74,7 +74,7 @@ const DATA={
  nine:{name:"9個のデータ",v:[3,5,6,7,8,9,10,12,30],lo:0},
  visits:{name:"8日の来店客数（人）",v:[47,49,51,52,55,58,60,120],lo:40}};
 const CAT=["食品","日用品","衣料","家電","その他"];
-const CCOL=["var(--acc)","var(--acc2)","#2a9d8f","#e9a23b","var(--mut)"];
+const CCOL=["var(--acc)","var(--acc2)","var(--data-3)","var(--data-hi)","var(--mut)"];
 const sum=a=>a.reduce((s,x)=>s+x,0),mean=a=>sum(a)/a.length;
 const med=s=>{const n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;};
 // 四分位数：中央値を除いた下半分・上半分の中央値（分布ラボ・本文と同じ定義）

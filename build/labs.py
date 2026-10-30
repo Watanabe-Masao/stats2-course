@@ -22,6 +22,7 @@ from pathlib import Path
 
 from model import ROOT, TOOLS, Course
 from tour import with_gist
+import tokens
 
 OUT = ROOT / "out" / "labs"
 CFG_KEYS = ("mode", "modes", "set", "unlock", "task", "predict", "why", "steps", "law", "tour")
@@ -116,7 +117,7 @@ def lab_url(base: str, course: Course, aid: str) -> str:
 
 
 def _assemble(t: dict, cfg_js: str) -> str:
-    kit_css = _drop_head_comment((TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8"))
+    kit_css = tokens.css() + _drop_head_comment((TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8"))   # 値（knowledge-net と共通）→ ラボの見た目
     kit_js = _drop_head_comment((TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8"))
     src = (t["dir"] / t["src"]).read_text(encoding="utf-8")
     html = (src.replace("/*@LABKIT_CSS@*/", kit_css)
@@ -199,6 +200,12 @@ def validate_labs(course: Course) -> list[str]:
         slugs = [x.get("slug") for x in course.labs.values()]
         if slugs.count(t.get("slug")) > 1:
             err.append(f"{lid}: slug {t.get('slug')} がほかのラボと重なる")
+        if t.get("src") and (t["dir"] / t["src"]).exists():
+            # 色は design/tokens.json の変数で（#42。ラボ・静止図・知識ネットワークで同じ色）。色付きの面の上の白い文字だけ例外
+            for m in re.finditer(r"#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(", (t["dir"] / t["src"]).read_text(encoding="utf-8")):
+                if m.group(0).lower() not in ("#fff", "#ffffff"):
+                    err.append(f"{lid}: 色の値 {m.group(0)} は書かない（var(--data-1) などの変数で。値は docs/knowledge-net/design/tokens.json）")
+                    break
         if not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
             err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")
         for name, p in (t.get("presets") or {}).items():

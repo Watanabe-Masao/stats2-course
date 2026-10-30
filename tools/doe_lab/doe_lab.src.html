@@ -71,7 +71,7 @@ const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-
 const r3=v=>Math.round(v*1000)/1000;
 function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
 function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
-const COL=["var(--acc)","var(--acc2)","#2a9d8f","#e9a23b","#8a63d2","var(--mut)"];
+const COL=["var(--acc)","var(--acc2)","var(--data-3)","var(--data-hi)","var(--ink-3)","var(--mut)"];
 const NAMES="ABCDEF";
 
 // ---- 一元配置の分散分析

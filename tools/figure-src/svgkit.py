@@ -1,9 +1,15 @@
 """Tiny SVG chart kit: compact, mobile-friendly, text stays as text."""
 import math
 
-BG = "#fcfcfb"; INK = "#0b0b0b"; INK2 = "#52514e"; GRID = "#e4e3df"
-BLUE = "#2a78d6"; ORANGE = "#eb6834"; AQUA = "#1baf7a"; MUTED = "#b9c9de"
-RED = "#e34948"; VIOLET = "#6250d6"; LIGHT = "#eaf1fb"
+import json
+from pathlib import Path
+
+# 色は design/tokens.json（knowledge-net と共通。写しは docs/knowledge-net/design/）から。ラボと同じ系列の色（#42）
+_T = json.loads((Path(__file__).resolve().parents[2] / "docs" / "knowledge-net" / "design" / "tokens.json").read_text(encoding="utf-8"))["color"]
+C = {k: v["$value"] for k, v in _T.items() if not k.startswith("$")}
+BG = C["figure-bg"]; INK = C["ink"]; INK2 = C["ink-2"]; INK3 = C["ink-3"]; GRID = C["line"]; SURFACE = C["surface"]
+BLUE = C["data-1"]; ORANGE = C["data-hi"]; VIOLET = C["data-2"]; AQUA = C["data-3"]; RED = C["bad"]
+MUTED = C["data-1-soft"]; SOFT = C["data-1-soft"]; LIGHT = C["data-bg"]; WARM_BG = C["data-hi-bg"]
 
 
 def f(v):

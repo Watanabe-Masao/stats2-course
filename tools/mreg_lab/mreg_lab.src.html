@@ -3,8 +3,7 @@
 <title>重回帰ラボ</title>
 <style>
 /*@LABKIT_CSS@*/
-:root{--pos:#c2410c;--neg:#0b63c9;--ln:#7c3aed;--g1:#c2410c}
-@media (prefers-color-scheme:dark){:root{--pos:#ff9a5c;--neg:#4c9bff;--ln:#b794f6;--g1:#ff9a5c}}
+:root{--pos:var(--data-hi);--neg:var(--data-1);--ln:var(--data-2);--g1:var(--data-hi)}
 .legend span{margin-right:10px;font-size:12px;white-space:nowrap}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
 .card{overflow-wrap:anywhere}
@@ -147,7 +146,7 @@ function cVals(){const X=cP.map(p=>[1,p[0],p[1]]),y=cP.map(p=>p[2]),M=ols(X,y),x
  return {ok:true,b0,b1,b2,se1:M.se[1],se2:M.se[2],t1:M.b[1]/M.se[1],t2:M.b[2]/M.se[2],bs:S.b[1],as:S.b[0],r12:corr(x1,x2),r2:M.r2,adjr2:M.adj,sse:M.sse,sst:M.sst,n:M.n,x2bar:x2b,p1,p2,yhat:b0+b1*p1+b2*p2,signflip:(b1<0)!==(S.b[1]<0)?"逆":"同じ"};}
 function cRender(){const C=cVals();if(!cD)cD=domain(cOrig.map(p=>p[0]),cOrig.map(p=>p[2]));
  if(!C.ok){$("csum").innerHTML="x₁ と x₂ が一直線に並ぶと係数が決まらない。点を少し動かす。";return;}
- const mx=Math.max(...cP.map(p=>p[1])),mn=Math.min(...cP.map(p=>p[1])),col=cP.map(p=>`hsl(${210-150*(p[1]-mn)/Math.max(1,mx-mn)} 70% 45%)`);
+ const mx=Math.max(...cP.map(p=>p[1])),mn=Math.min(...cP.map(p=>p[1])),col=cP.map(p=>`color-mix(in oklab, var(--data-1) ${Math.round(25+75*(p[1]-mn)/Math.max(1,mx-mn))}%, var(--data-bg))`);   // 1つの色の濃さで大きさを表す（虹色にしない）
  plot($("cbox"),cP.map(p=>[p[0],p[2]]),cD,{drag:(i,v)=>{cP[i][0]=v[0];cP[i][2]=v[1];cRender();},colors:col,tags:cP.map(p=>"x₂="+p[1]),xlab:cN[0]+" x₁",ylab:cN[2]+" y",label:cN[0]+"と"+cN[2]+"の散布図",
   lines:[{a:C.as,b:C.bs,col:"var(--mut)",dash:"6 4",w:2},{a:C.b0+C.b2*C.x2bar,b:C.b1,col:"var(--ln)",w:2.5}],
   legend:`<div class="legend mut"><span>点線＝x₁ だけの単回帰</span><span><i class="sw" style="background:var(--ln)"></i>重回帰（x₂＝平均 ${f(C.x2bar,2)} にそろえる）</span><span>色：x₂（${esc(cN[1])}）が大きいほど赤</span></div>`});

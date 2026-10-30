@@ -16,7 +16,9 @@ const ROOT=path.resolve(__dirname,'..');
    const all=man.length;man.splice(0,all,...man.filter((_,i)=>i%n===k-1));console.log(`組 ${k}/${n}：${man.length}/${all} 版`);}
  if(!man.length){console.log('❌ 絞り込みに合う版がない');process.exit(1);}
  const shots=process.argv[2];const b=await chromium.launch();let fail=0;const embedH=[];
- const bad=(m)=>{console.log('❌ '+m);fail++;};
+ const GH=!!process.env.GITHUB_ACTIONS;   // GitHub では失敗を注釈にも出す（ログを読めない環境でも API で原因が見える）
+ const bad=(m)=>{console.log('❌ '+m);if(GH)console.log('::error::'+String(m).replace(/\n/g,' '));fail++;};
+ process.on('unhandledRejection',e=>{if(GH)console.log('::error::止まった：'+String(e&&e.message||e).split('\n')[0]);console.log(e);process.exit(1);});
  for(const v of man){for(const scheme of ['light','dark']){
   const p=await b.newPage({viewport:{width:380,height:900},colorScheme:scheme});
   const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
