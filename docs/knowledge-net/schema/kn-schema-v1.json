@@ -411,6 +411,35 @@
                 "tree": {
                   "$ref": "#/$defs/formulaNode",
                   "description": "式の分解の木（任意）。あれば tex はここから作れる"
+                },
+                "parts": {
+                  "type": "array",
+                  "description": "式の意味のかたまり（作業台で押せる部分式。stats2-course #110）。path は木の根からの args の番号（右辺の2つ目の因子なら [1, 1]）",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "name",
+                      "meaning"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "name": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "meaning": {
+                        "$ref": "#/$defs/text"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -474,6 +503,38 @@
           },
           "figures": {
             "$ref": "#/$defs/figures"
+          },
+          "workspace": {
+            "type": "object",
+            "description": "式の作業台（数式・意味・操作・現象を1つの行動で連動させる。stats2-course #110）。formula：主役の式の番号、vary：スライダーで動かす記号、over：分布の横軸の記号（棒を押すと選ぶ）、mean：期待値の式の番号（任意）",
+            "required": [
+              "formula",
+              "vary",
+              "over"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "formula": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "vary": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                }
+              },
+              "over": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "mean": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
           }
         },
         "if": {
@@ -730,5 +791,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 7
+  "x-revision": 8
 }

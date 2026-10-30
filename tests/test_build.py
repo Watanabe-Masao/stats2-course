@@ -515,6 +515,23 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(f["tree"]["args"][1], {"op": "fn", "name": "E", "args": [{"sym": "X"}]})
         self.assertEqual(next(s for s in f["symbols"] if s["key"] == "mu")["of"], "X")
 
+    def test_workspace_and_parts(self):
+        # 式の作業台と意味のかたまり（#110）
+        c = course()
+        t = c.terms["TERM-binom"]
+        self.assertEqual(t["workspace"]["over"], "k")
+        self.assertEqual([p["path"] for p in t["formulas"][0]["parts"]], [[1, 0], [1, 1], [1, 2]])
+        self.assertFalse(self._validate(c))
+        t["formulas"][0]["parts"][0]["path"] = [1, 9]           # 木にない節
+        t["workspace"]["vary"] = ["n", "X"]                      # 定義域のない記号
+        t["workspace"]["over"] = "p"                             # 整数でない
+        t["workspace"]["mean"] = 9
+        err = self._validate(c)
+        self.assertTrue(any("parts の path [1, 9] が木の中の節を指していない" in e for e in err))
+        self.assertTrue(any("vary X は主役の式の、定義域（domain）のある記号" in e for e in err))
+        self.assertTrue(any("over p は主役の式の、上限のある整数の記号" in e for e in err))
+        self.assertTrue(any("mean 9 が木のある式を指していない" in e for e in err))
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},
