@@ -134,6 +134,32 @@ def validate_network(c: Course) -> list[str]:
                             err.append(f"{tid}: 記号 {s.get('symbol')} の domain は min ≦ max")
             if f.get("tree"):
                 err += [f"{tid}: 式 {f['tex']} の木：{e}" for e in tree_errors(f["tree"], {s.get("key") for s in f.get("symbols", []) if s.get("key")})]
+            # 意味のかたまり（#110）：path は木の中の節を指す
+            for part in f.get("parts", []):
+                node = f.get("tree")
+                for i in part.get("path", []):
+                    node = (node or {}).get("args", [None] * (i + 1))[i] if isinstance(node, dict) and i < len(node.get("args", [])) else None
+                if not (part.get("name") and part.get("meaning")):
+                    err.append(f"{tid}: 式 {f['tex']} の parts には path・name・meaning を書く")
+                if not isinstance(node, dict) or not part.get("path"):
+                    err.append(f"{tid}: 式 {f['tex']} の parts の path {part.get('path')} が木の中の節を指していない")
+        # 式の作業台（#110）：主役の式・動かす記号（定義域つき）・横軸の記号（上限つき）・期待値の式
+        ws = t.get("workspace")
+        if ws:
+            fs = t.get("formulas", [])
+            main = fs[ws["formula"]] if isinstance(ws.get("formula"), int) and ws["formula"] < len(fs) else None
+            if not main or not main.get("tree"):
+                err.append(f"{tid}: workspace の formula {ws.get('formula')} が木のある式を指していない")
+            else:
+                syms = {x.get("key"): x for x in main.get("symbols", [])}
+                for k in ws.get("vary", []):
+                    if k not in syms or not syms[k].get("domain"):
+                        err.append(f"{tid}: workspace の vary {k} は主役の式の、定義域（domain）のある記号")
+                o = syms.get(ws.get("over"))
+                if not o or not (o.get("domain") or {}).get("integer") or (o.get("domain") or {}).get("max") is None:
+                    err.append(f"{tid}: workspace の over {ws.get('over')} は主役の式の、上限のある整数の記号（棒を並べるため）")
+            if "mean" in ws and not (isinstance(ws["mean"], int) and ws["mean"] < len(fs) and fs[ws["mean"]].get("tree")):
+                err.append(f"{tid}: workspace の mean {ws.get('mean')} が木のある式を指していない")
         for m in t.get("misconceptions", []):
             if not (m.get("misconception") and m.get("correction")):
                 err.append(f"{tid}: よくある誤解には misconception と correction を書く")
@@ -310,7 +336,7 @@ def export_network(c: Course, target: dict) -> dict:
         if t.get("en"):
             e["en"] = t["en"]
         if filled(t):
-            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions"):
+            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace"):
                 if t.get(k):
                     e[k] = t[k]
             if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
