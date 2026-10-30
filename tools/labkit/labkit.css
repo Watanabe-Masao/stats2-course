@@ -3,7 +3,7 @@
    データの色（--acc＝主の系列・--acc2＝注目する値・2つ目の群）は静止図と同じ（静止図の BLUE・ORANGE）。操作の色（選んだタブ・主ボタン・つまみ）は --accent。 */
 :root{--bg:var(--surface);--fg:var(--ink);--mut:var(--ink-2);--card:var(--surface-2);--acc:var(--data-1);--acc2:var(--data-hi);--ok:var(--good);--ng:var(--bad);--task:var(--accent-soft);--taskline:var(--accent-line)}
 *{box-sizing:border-box}
-body{margin:0;padding:12px 14px 20px;font:15px/1.6 var(--font);background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body{margin:0;padding:12px 14px 20px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
 h1{font-size:16px;margin:0 0 8px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0 10px}
 .tabs button{flex:1 1 30%;min-height:40px;padding:6px 4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-size:13px;cursor:pointer}
