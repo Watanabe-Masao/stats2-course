@@ -354,6 +354,56 @@
                           "const"
                         ],
                         "description": "value：1つの値・data：データの一覧・rv：確率変数・param：母数・index：添え字・const：定数"
+                      },
+                      "of": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                        "description": "どの確率変数の記号か（同じ式の確率変数の key。μ は X の期待値なら X）。関数を開いて引数を結び付けるとき、この記号も一緒に移す（stats2-course #109）"
+                      },
+                      "domain": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "description": "定義域（値を入れて計算するときの範囲。range は文の説明）。min・max は数か同じ式の記号の key（k ≦ n）、端を含むか（既定は含む）、整数か、0でないか（stats2-course #109）",
+                        "properties": {
+                          "min": {
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
+                          },
+                          "max": {
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
+                          },
+                          "minOpen": {
+                            "type": "boolean",
+                            "description": "true なら min を含まない"
+                          },
+                          "maxOpen": {
+                            "type": "boolean",
+                            "description": "true なら max を含まない"
+                          },
+                          "integer": {
+                            "type": "boolean"
+                          },
+                          "nonzero": {
+                            "type": "boolean"
+                          }
+                        }
                       }
                     }
                   }
@@ -680,5 +730,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 6
+  "x-revision": 7
 }

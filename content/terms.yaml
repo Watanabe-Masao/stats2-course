@@ -108,6 +108,7 @@
       key: mu
       concept: TERM-expect
       kind: param
+      of: X
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"num": 2}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "pow", "args": [{"sym": "X"}, {"num": 2}]}], "name": "E"}, {"op": "pow", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"num": 2}]}]}]}
   - tex: 'V(aX+b)=a^2V(X)'
     label: 1次式の分散
@@ -167,6 +168,8 @@
       range: 0以上
       key: sigma
       kind: param
+      of: X
+      domain: {min: 0, minOpen: true}
     - symbol: V( )
       meaning: 分散（ずれの2乗の期待値）
       key: V
@@ -223,12 +226,15 @@
       key: mu
       concept: TERM-expect
       kind: param
+      of: X
     - symbol: σ
       meaning: X の標準偏差
       range: 0より大きい
       key: sigma
       concept: TERM-sd
       kind: param
+      of: X
+      domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"sym": "Z"}, {"op": "div", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"sym": "sigma"}]}]}
   - tex: 'E(Z)=0'
     label: 標準化した値の期待値
@@ -306,6 +312,7 @@
       key: sigma
       concept: TERM-sd
       kind: param
+      domain: {min: 0, minOpen: true}
     - symbol: π
       meaning: 円周率
       key: pi
@@ -366,6 +373,23 @@
       key: p
       concept: TERM-dist
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "sum", "args": [{"op": "mul", "args": [{"sym": "x"}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}], "var": "x"}]}
+  - tex: '\mu=E(X)'
+    label: 記号 μ
+    symbols:
+    - symbol: μ
+      meaning: X の期待値 E(X) を短く書く記号
+      key: mu
+      kind: param
+      of: X
+    - symbol: E( )
+      meaning: 期待値（値×確率を足す）
+      key: E
+      concept: TERM-expect
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    tree: {"op": "eq", "args": [{"sym": "mu"}, {"op": "fn", "args": [{"sym": "X"}], "name": "E"}]}
   - tex: 'E(aX+b)=aE(X)+b'
     label: 線形性
     symbols:
@@ -603,11 +627,13 @@
       key: muX
       concept: TERM-expect
       kind: param
+      of: X
     - symbol: μ_Y
       meaning: Y の期待値
       key: muY
       concept: TERM-expect
       kind: param
+      of: Y
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "Y"}], "name": "Cov"}, {"op": "fn", "args": [{"op": "mul", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "muX"}]}, {"op": "sub", "args": [{"sym": "Y"}, {"sym": "muY"}]}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "mul", "args": [{"sym": "X"}, {"sym": "Y"}]}], "name": "E"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "Y"}], "name": "E"}]}]}]}
   - tex: 'V(X+Y)=V(X)+V(Y)+2\,\mathrm{Cov}(X,Y)'
     label: 和の分散
@@ -671,16 +697,19 @@
       range: 1以上の整数
       key: n
       kind: param
+      domain: {min: 1, integer: true}
     - symbol: k
       meaning: 成功の回数
       range: 0以上 n 以下の整数
       key: k
       kind: value
+      domain: {min: 0, max: n, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       range: 0以上1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     - symbol: ₙCₖ
       meaning: n 回から成功の k 回を選ぶ組合せの数
       key: comb
@@ -702,11 +731,13 @@
       range: 1以上の整数
       key: n
       kind: param
+      domain: {min: 1, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       range: 0以上1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}]}]}
   - tex: 'V(X)=np(1-p)'
     label: 分散
@@ -724,11 +755,13 @@
       range: 1以上の整数
       key: n
       kind: param
+      domain: {min: 1, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       range: 0以上1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}, {"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}]}]}
   conditions:
     math:
@@ -773,11 +806,13 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     - symbol: k
       meaning: 起きた件数
       range: 0以上の整数
       key: k
       kind: value
+      domain: {min: 0, integer: true}
     - symbol: e
       meaning: 自然対数の底（約2.718）
       key: e
@@ -807,6 +842,7 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"sym": "lambda"}]}
   conditions:
     math:
@@ -849,11 +885,13 @@
       range: 1以上の整数
       key: k
       kind: value
+      domain: {min: 1, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       range: 0より大きく1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "k"}, {"num": 1}]}]}, {"sym": "p"}]}]}
   - tex: 'E(X)=\frac{1}{p}'
     label: 期待値
@@ -871,6 +909,7 @@
       range: 0より大きく1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "p"}]}]}
   - tex: 'V(X)=\frac{1-p}{p^2}'
     label: 分散
@@ -888,6 +927,7 @@
       range: 0より大きく1以下
       key: p
       kind: param
+      domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "pow", "args": [{"sym": "p"}, {"num": 2}]}]}]}
   conditions:
     math:
@@ -932,16 +972,19 @@
       key: k
       kind: value
       range: r 以上の整数
+      domain: {min: r, integer: true}
     - symbol: r
       meaning: 待つ成功の回数
       key: r
       kind: param
       range: 1以上の整数
+      domain: {min: 1, integer: true}
     - symbol: p
       meaning: 1回の成功確率
       key: p
       kind: param
       range: 0より大きく1以下
+      domain: {min: 0, max: 1}
     - symbol: ₖ₋₁C_{r−1}
       meaning: 前の k−1 回から成功の r−1 回を選ぶ組合せの数
       key: comb
@@ -980,18 +1023,22 @@
       meaning: 集団の個数
       key: N
       kind: param
+      domain: {min: 0, integer: true}
     - symbol: M
       meaning: 集団の中の当たりの個数
       key: M
       kind: param
+      domain: {min: 0, integer: true}
     - symbol: n
       meaning: 取り出す個数
       key: n
       kind: param
+      domain: {min: 1, integer: true}
     - symbol: k
       meaning: 取り出した中の当たりの個数
       key: k
       kind: value
+      domain: {min: 0, integer: true}
     - symbol: C( , )
       meaning: 組合せの数
       key: comb
@@ -1012,14 +1059,17 @@
       meaning: 取り出す個数
       key: n
       kind: param
+      domain: {min: 1, integer: true}
     - symbol: M
       meaning: 集団の中の当たりの個数
       key: M
       kind: param
+      domain: {min: 0, integer: true}
     - symbol: N
       meaning: 集団の個数
       key: N
       kind: param
+      domain: {min: 0, integer: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"op": "div", "args": [{"sym": "M"}, {"sym": "N"}]}]}]}
   conditions:
     math:
@@ -1058,6 +1108,7 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     - symbol: x
       meaning: 待ち時間
       range: 0以上
@@ -1084,6 +1135,7 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     - symbol: x
       meaning: 待ち時間
       range: 0以上
@@ -1110,6 +1162,7 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "lambda"}]}]}
   - tex: 'V(X)=\frac{1}{\lambda^2}'
     label: 分散
@@ -1127,6 +1180,7 @@
       range: 0より大きい
       key: lambda
       kind: param
+      domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"num": 1}, {"op": "pow", "args": [{"sym": "lambda"}, {"num": 2}]}]}]}
   conditions:
     math:
