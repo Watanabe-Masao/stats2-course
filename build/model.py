@@ -89,6 +89,7 @@ class Course:
     figures: dict        # fig id -> content/assets.yaml の項目
     units: dict = field(default_factory=dict)      # id -> unit dict (+ bodies, problems)
     errors: list = field(default_factory=list)
+    formula_marks: dict = field(default_factory=dict)   # 式 ID → 記号どうしの条件・未検証・レビュー前（#118）
 
     @property
     def stage_ids(self):
@@ -112,8 +113,11 @@ def load_course() -> Course:
             raise FileNotFoundError(f"{fid}: 図のファイル {f['file']} がない")
     c = Course(stages, powers, shared, terms, index, labs, figures)
     # 式の原本を整える（#118）：ref を元の式に、木から TeX を作る、契約を確かめる
-    from formulas import CONTRACTS, prepare
-    c.errors += prepare(terms, load_yaml(CONTRACTS) if CONTRACTS.exists() else None)
+    from formulas import CONTRACTS, REVIEWS, marks, prepare, review_errors
+    contracts = load_yaml(CONTRACTS) if CONTRACTS.exists() else None
+    reviews = (load_yaml(REVIEWS) or {}).get("reviews") if REVIEWS.exists() else []
+    c.errors += prepare(terms, contracts) + review_errors(contracts, reviews)
+    c.formula_marks = marks(contracts, reviews)   # 公開の JSON に出す条件と印（#118 単位 C）
     for uid, meta in index.items():
         if not meta.get("migrated"):
             continue

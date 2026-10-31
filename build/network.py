@@ -495,7 +495,8 @@ def export_network(c: Course, target: dict) -> dict:
             if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
                 e["formulas"] = [{**f, **({"symbols": [{**s, **({"concept": g(s["concept"])} if s.get("concept") else {})}
                                                        for s in f["symbols"]]} if f.get("symbols") else {}),
-                                  **({"defined_in": g(f["defined_in"])} if f.get("defined_in") else {})} for f in t["formulas"]]
+                                  **({"defined_in": g(f["defined_in"])} if f.get("defined_in") else {}),
+                                  **c.formula_marks.get(f.get("id"), {})} for f in t["formulas"]]
             if labs(t.get("labs")):
                 e["labs"] = labs(t.get("labs"))
             if figs(t.get("figures")):
