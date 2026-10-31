@@ -149,7 +149,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 説明ありの概念：
   - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。
   - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
-  - 任意：`formulas`（式ごとに `tex` と `symbols`：記号・意味・値の範囲）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
+  - 任意：`formulas`（式ごとに `id`・`tree`・`symbols`：記号・意味・値の範囲。tex は build が木から作る）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
   - 説明に数があれば `checks`。
 - 関係は content/relations.yaml（REL-…、`version` 必須）。8種類（前提・導出・一般化・特殊化・変換・対比・統合・応用）。登録の前に relation-types.yaml の定義・矢印の読み方・該当例・該当しない例を確かめる。
   - 前提には `premise`（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）。
@@ -202,7 +202,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ```yaml
   formulas:
-  - tex: 'Z=\dfrac{X-\mu}{\sigma}'
+  - id: F-std-def                 # 式 ID（F-…。変えない・消さない。#118 D1）。tex は書かない（build が木から作る）
     symbols:
     - {symbol: Z, meaning: 標準化した値, key: Z, kind: rv}
     - {symbol: X, meaning: 確率変数, key: X, kind: rv}
@@ -215,7 +215,9 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - `fn` の `name` は、その式の symbols の key（E・V・P・Cov・comb・fact など。記号に `concept` を書けば、その概念の式へ開く）か、記号に書かなくてよい共通の関数（exp・log・gt・ge・lt・le・between）。比べる式（X＞x・a≦X≦b）を gt・between で書くのは仮の形で、#72 で型として決め直す。
 - 記号の `kind`：value（1つの値）・data（データの一覧）・rv（確率変数）・param（母数）・index（添え字）・const（定数）。
 - build が止めるもの：symbols の key にない葉・関数・動かす記号、記号の `concept` が用語にない、知らない演算。
-- **#72 で木から TeX を作るまでは、tex と tree を両方持つ。式を直すときは両方を直し、同じ式になっているかを自分で読み合わせる**（今は build が一致を確かめない）。単元の「式の構造」の表も手書きのままなので、記号を概念に合わせる。
+- **式の元は木だけ**（#118 単位 A、2026-11-01）。原本に `tex` を書かない。公開の JSON の tex は build が math-lab の `toTex` で木から作る（build/formula_tex.mjs が docs/math-lab/formula.mjs の写しを読む。写しは型と同じく `python3 build/sync_schema.py --update` で取り込む）。木と tex の食い違い（M1）はこれで起きない。単元の「式の構造」の表は手書きのままなので、記号を概念に合わせる。
+- 同じ式を2つの概念に出すときは、元でない側に `- {ref: F-…}` だけを書く（build が元の式を写し、`defined_in` を付ける。#118 D2）。
+- **式ごとの検証の契約**は content/formula-contracts.yaml（#118 D6）：種類（kinds）・主張する性質（properties）・代表（representative）・記号どうしの条件（conditions：1つの端の domain で書けないもの。比べる式の木）・レビューの観点（review）。全部の式に1つずつ（ないと build が「未分類」で止める）。1つの記号の範囲は domain に、文の条件は概念の conditions.math に書き、契約には書かない。
 - build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。
 
 ## 実験室（content/experiments.yaml。#102）

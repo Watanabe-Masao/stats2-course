@@ -1,0 +1,159 @@
+# 式ごとの検証の契約（#118 D6。2026-11-01 渡辺さんの決定で別ファイル）。
+# 式の元は content/terms.yaml（木）。ここは「その式が何の式で、何を主張し、何を確かめるか」だけを書く。同じことを2か所に書かない：
+# - 1つの記号の範囲は terms.yaml の記号の domain（#109）。ここには、1つの端で書けない記号どうしの条件（conditions）だけ
+# - 文の条件は概念の conditions.math。ここからは参照しない（レビューの観点に書く）
+# 全部の式に1つずつ（ない式は build が「未分類」で止める。#118 C6）。分類の元は docs/formula-correctness/classification.md の 3
+#
+# kinds：式の種類（1つ以上）。properties：式が主張する性質（テストの選び方は classification.md の 2.1）
+# representative：代表の式（P6 の前に正常・異常・わざと入れた誤りを確かめる。#118）
+# conditions：記号どうしの条件。text（読む文）と tree（比べる式の木：le・lt・ge・gt・between。記号は同じ式の key）
+# review：数で保証できない観点（個別の数学のレビュー）
+vocab:
+  kinds: [定義, 恒等式, 変換, 確率モデル, 推定, 近似, 判定]
+  properties: [非負, 正規化, 線形, 対称, 不変, 単調, 有界, 同値, 再現, 収束, 単位の整合, 条件しだい]
+contracts:
+- formula: F-comb-def
+  kinds: [定義]
+  properties: [非負, 対称, 条件しだい]
+- formula: F-fact-def
+  kinds: [定義]
+  properties: [非負, 単調, 条件しだい]
+- formula: F-var-def
+  kinds: [定義, 恒等式]
+  properties: [非負, 同値, 不変, 単位の整合]
+  representative: true
+  review: [単位（元の単位の2乗）, 前提（2乗の期待値が有限）]
+- formula: F-var-linear
+  kinds: [恒等式, 変換]
+  properties: [同値, 不変, 対称]
+  representative: true
+  review: [導き方]
+- formula: F-sd-def
+  kinds: [定義]
+  properties: [非負, 単位の整合]
+  review: [単位]
+- formula: F-std-def
+  kinds: [定義, 変換]
+  properties: [線形, 不変, 単位の整合, 条件しだい]
+  representative: true
+  review: [別の集団の μ・σ で割らない（conditions.data）]
+- formula: F-std-mean
+  kinds: [恒等式]
+  properties: [正規化, 条件しだい]
+  representative: true
+- formula: F-std-var
+  kinds: [恒等式]
+  properties: [正規化, 条件しだい]
+  representative: true
+- formula: F-normal-pdf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 対称, 有界, 単位の整合]
+  review: [μ・σ が X の期待値・標準偏差（of。D7）]
+- formula: F-expect-def
+  kinds: [定義]
+  properties: [線形, 有界, 単位の整合]
+  representative: true
+  review: [無限の台で和が収束する前提]
+- formula: F-expect-mu
+  kinds: [定義]
+  properties: [同値]
+  representative: true
+- formula: F-expect-linear
+  kinds: [恒等式, 変換]
+  properties: [線形, 同値]
+  representative: true
+- formula: F-indep-def
+  kinds: [定義, 判定]
+  properties: [対称, 有界, 条件しだい]
+  review: [「独立の定義」か「判定」かの書き分け]
+- formula: F-rv-pmf
+  kinds: [定義]
+  properties: [非負, 有界]
+- formula: F-dist-sum
+  kinds: [恒等式]
+  properties: [正規化]
+  note: 確率変数（TERM-rv）にも同じ式を出す（ref。D2）
+- formula: F-cov-def
+  kinds: [定義, 恒等式]
+  properties: [対称, 同値]
+  review: [μ_X・μ_Y の所属（of）]
+- formula: F-cov-varsum
+  kinds: [恒等式]
+  properties: [対称, 同値, 条件しだい]
+- formula: F-binom-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 対称, 有界, 条件しだい]
+  representative: true
+  review: [モデルの仮定（独立・同じ p）と反例の実験の言い分]
+- formula: F-binom-mean
+  kinds: [恒等式]
+  properties: [同値, 単調, 有界]
+  representative: true
+- formula: F-binom-var
+  kinds: [恒等式]
+  properties: [同値, 非負, 対称, 有界]
+  representative: true
+- formula: F-poisson-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 条件しだい, 収束]
+  review: [収束は REL-binom-poisson で]
+- formula: F-poisson-moments
+  kinds: [恒等式]
+  properties: [同値]
+- formula: F-geom-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 単調, 条件しだい]
+- formula: F-geom-mean
+  kinds: [恒等式]
+  properties: [同値, 単調, 条件しだい]
+- formula: F-geom-var
+  kinds: [恒等式]
+  properties: [同値, 非負]
+- formula: F-negbinom-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 条件しだい]
+  conditions:
+  - text: r ≦ k（r 回目の成功は r 回目より前には起きない）
+    tree: {"op": "fn", "name": "le", "args": [{"sym": "r"}, {"sym": "k"}]}
+- formula: F-hyper-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 対称, 条件しだい]
+  conditions:
+  - text: k ≦ M（当たりの数より多くは引けない）
+    tree: {"op": "fn", "name": "le", "args": [{"sym": "k"}, {"sym": "M"}]}
+  - text: n−(N−M) ≦ k（外れを全部引いても足りない分は当たり）
+    tree: {"op": "fn", "name": "ge", "args": [{"sym": "k"}, {"op": "sub", "args": [{"sym": "n"}, {"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}]}]}
+- formula: F-hyper-mean
+  kinds: [恒等式]
+  properties: [同値]
+- formula: F-expo-pdf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 単調, 単位の整合]
+  review: [単位（λ は 1/時間）]
+- formula: F-expo-surv
+  kinds: [恒等式]
+  properties: [有界, 単調, 同値, 不変]
+- formula: F-expo-mean
+  kinds: [恒等式]
+  properties: [同値, 単位の整合]
+- formula: F-expo-var
+  kinds: [恒等式]
+  properties: [同値, 非負]
+- formula: F-pdf-interval
+  kinds: [定義]
+  properties: [非負, 有界, 単調]
+  conditions:
+  - text: a ≦ b
+    tree: {"op": "fn", "name": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
+- formula: F-pdf-total
+  kinds: [恒等式]
+  properties: [正規化]
+- formula: F-uniform-pdf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 条件しだい]
+- formula: F-uniform-mean
+  kinds: [恒等式]
+  properties: [対称, 線形, 同値]
+- formula: F-uniform-var
+  kinds: [恒等式]
+  properties: [非負, 不変, 同値]

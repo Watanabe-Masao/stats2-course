@@ -12,7 +12,7 @@
   version: 1
   principle: n 個を1列に並べる n! 通りのうち、選んだ k 個の中の並び（k! 通り）と、残した n−k 個の中の並び（(n−k)! 通り）は区別しないので、その分で割る。
   formulas:
-  - tex: '{}_{n}\mathrm{C}_{k}=\dfrac{n!}{k!\,(n-k)!}'
+  - id: F-comb-def
     label: 階乗で表す
     symbols:
     - symbol: ₙCₖ
@@ -74,7 +74,7 @@
   version: 1
   principle: n 個のものを1列に並べる並べ方の数。先頭は n 通り、次は n−1 通り……と1つずつ減るので、それを全部掛け合わせる。
   formulas:
-  - tex: 'n!=\prod_{i=1}^{n} i'
+  - id: F-fact-def
     label: 1 から n までの積
     symbols:
     - symbol: n!
@@ -232,7 +232,7 @@
   - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
   principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
   formulas:
-  - tex: 'V(X)=E\big[(X-\mu)^2\big]=E(X^2)-\{E(X)\}^2'
+  - id: F-var-def
     symbols:
     - symbol: V( )
       meaning: 分散（ずれの2乗の期待値）
@@ -253,7 +253,7 @@
       kind: param
       of: X
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"num": 2}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "pow", "args": [{"sym": "X"}, {"num": 2}]}], "name": "E"}, {"op": "pow", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"num": 2}]}]}]}
-  - tex: 'V(aX+b)=a^2V(X)'
+  - id: F-var-linear
     label: 1次式の分散
     symbols:
     - symbol: V( )
@@ -307,7 +307,7 @@
   - {id: LAB-z, preset: s1-sigma, purpose: 標準偏差が広がると、同じ値の z得点がどう変わるかを見る}
   principle: 分散は単位が2乗になるので、平方根をとって元の単位に戻す。期待値（平均）からの典型的なずれの大きさの目安。
   formulas:
-  - tex: '\sigma=\sqrt{V(X)}'
+  - id: F-sd-def
     symbols:
     - symbol: σ
       meaning: 標準偏差
@@ -362,7 +362,7 @@
   - {id: LAB-z, preset: s1-z, purpose: 単位や散らばりの違うものを z得点でそろえて比べる}
   principle: 1次の変換なので分布の形は変わらない。単位や大きさの違う値を「平均から標準偏差いくつ分か」で比べられる。正規分布なら標準正規分布 N(0, 1) になり、1つの表で確率が読める。
   formulas:
-  - tex: 'Z=\dfrac{X-\mu}{\sigma}'
+  - id: F-std-def
     symbols:
     - symbol: Z
       meaning: 標準化した値（平均から標準偏差いくつ分か）
@@ -387,7 +387,7 @@
       of: X
       domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"sym": "Z"}, {"op": "div", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"sym": "sigma"}]}]}
-  - tex: 'E(Z)=0'
+  - id: F-std-mean
     label: 標準化した値の期待値
     symbols:
     - symbol: E( )
@@ -399,7 +399,7 @@
       key: Z
       kind: rv
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "Z"}], "name": "E"}, {"num": 0}]}
-  - tex: 'V(Z)=1'
+  - id: F-std-var
     label: 標準化した値の分散
     symbols:
     - symbol: V( )
@@ -447,7 +447,7 @@
   - {id: LAB-cont, preset: s1-norm, purpose: 平均と標準偏差から、区間の確率を面積で読む}
   principle: 小さな独立の要因がたくさん足し合わさると、この形に近づく（中心極限定理）。μ と σ の2つで形が決まり、μ±σ に約68%、μ±2σ に約95% が入る。
   formulas:
-  - tex: 'f(x)=\dfrac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big(-\dfrac{(x-\mu)^2}{2\sigma^2}\Big)'
+  - id: F-normal-pdf
     symbols:
     - symbol: f(x)
       meaning: 確率密度（高さ。面積が確率）
@@ -457,17 +457,23 @@
       meaning: 値
       key: x
       kind: value
+    - symbol: X
+      meaning: この密度に従う確率変数（μ・σ は X の期待値・標準偏差。#118 D7）
+      key: X
+      kind: rv
     - symbol: μ
       meaning: 平均（山の中心）
       key: mu
       concept: TERM-expect
       kind: param
+      of: X
     - symbol: σ
       meaning: 標準偏差（山の広がり）
       range: 0より大きい
       key: sigma
       concept: TERM-sd
       kind: param
+      of: X
       domain: {min: 0, minOpen: true}
     - symbol: π
       meaning: 円周率
@@ -510,7 +516,7 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 期待値が分布の重心になることを、予想してから確かめる}
   principle: 値×確率の和。同じ試行を何度もくり返したときの平均の行き着く先になる（大数の法則）。和の期待値は期待値の和（線形性）。
   formulas:
-  - tex: 'E(X)=\sum_x x\,p(x)'
+  - id: F-expect-def
     symbols:
     - symbol: E( )
       meaning: 期待値（値×確率を足す）
@@ -530,7 +536,7 @@
       key: p
       concept: TERM-dist
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "sum", "args": [{"op": "mul", "args": [{"sym": "x"}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}], "var": "x"}]}
-  - tex: '\mu=E(X)'
+  - id: F-expect-mu
     label: 記号 μ
     symbols:
     - symbol: μ
@@ -547,7 +553,7 @@
       key: X
       kind: rv
     tree: {"op": "eq", "args": [{"sym": "mu"}, {"op": "fn", "args": [{"sym": "X"}], "name": "E"}]}
-  - tex: 'E(aX+b)=aE(X)+b'
+  - id: F-expect-linear
     label: 線形性
     symbols:
     - symbol: E( )
@@ -624,7 +630,7 @@
   - {id: LAB-expect, preset: s5-free, purpose: P(両方)＝P(X)P(Y) のときに共分散が0になるのを見る}
   principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
   formulas:
-  - tex: 'P(A\cap B)=P(A)\,P(B)'
+  - id: F-indep-def
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -688,7 +694,7 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を動かして、確率変数が「値の出方の規則」を持つことを見る}
   principle: 起こりうる値と、その確率の組（確率分布）で性質が決まる。1つの記録された値ではなく、記録する前の「値の出方」を扱う。
   formulas:
-  - tex: 'P(X=x)=p(x)'
+  - id: F-rv-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -708,18 +714,7 @@
       key: p
       concept: TERM-dist
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "x"}]}], "name": "P"}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}
-  - tex: '\sum_x p(x)=1'
-    label: 確率の合計
-    symbols:
-    - symbol: p(x)
-      meaning: X が x になる確率
-      key: p
-      concept: TERM-dist
-    - symbol: x
-      meaning: X がとる値
-      key: x
-      kind: index
-    tree: {"op": "eq", "args": [{"op": "sum", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "p"}], "var": "x"}, {"num": 1}]}
+  - {ref: F-dist-sum}   # 同じ式 Σp(x)=1 の元は確率分布（TERM-dist）。build が元の式を写し、defined_in を付ける（#118 D2）
   conditions:
     math:
     - 起こりうる値の範囲が決まっている
@@ -747,7 +742,7 @@
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を変えると、期待値（重心）がどう動くかを見る}
   principle: 起こりうる値を全部挙げ、確率を割り振ったもの。確率は0以上で、合計（連続なら面積）が1。期待値や分散は、分布を1つの数に要約したもの。
   formulas:
-  - tex: '\sum_x p(x)=1'
+  - id: F-dist-sum
     label: 確率の合計は1
     symbols:
     - symbol: p(x)
@@ -786,7 +781,7 @@
   - {id: LAB-expect, preset: s5-free, purpose: 同時分布で共分散を0にすると独立になる場合を確かめる}
   principle: (X−μ_X)(Y−μ_Y) の期待値。同じ向きのずれが多いと正、逆向きが多いと負。和の分散に 2Cov として効く。
   formulas:
-  - tex: '\mathrm{Cov}(X,Y)=E\big[(X-\mu_X)(Y-\mu_Y)\big]=E(XY)-E(X)E(Y)'
+  - id: F-cov-def
     symbols:
     - symbol: Cov(X, Y)
       meaning: X と Y の共分散
@@ -816,7 +811,7 @@
       kind: param
       of: Y
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "Y"}], "name": "Cov"}, {"op": "fn", "args": [{"op": "mul", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "muX"}]}, {"op": "sub", "args": [{"sym": "Y"}, {"sym": "muY"}]}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "mul", "args": [{"sym": "X"}, {"sym": "Y"}]}], "name": "E"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "Y"}], "name": "E"}]}]}]}
-  - tex: 'V(X+Y)=V(X)+V(Y)+2\,\mathrm{Cov}(X,Y)'
+  - id: F-cov-varsum
     label: 和の分散
     symbols:
     - symbol: V( )
@@ -865,7 +860,7 @@
   - {id: LAB-binom, preset: s1-path, purpose: 並び方の数×1つの並びの確率を、予想してから確かめる}
   principle: 「どの k 回が成功か」の組合せ ₙCₖ と、その1通りの確率 pᵏ(1−p)ⁿ⁻ᵏ の積。成功回数は n 個の「成功1・失敗0」の和なので、期待値と分散が和から求まる。
   formulas:
-  - tex: 'P(X=k)={}_nC_k\,p^k(1-p)^{n-k}'
+  - id: F-binom-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -908,7 +903,7 @@
     - path: [1, 2]
       name: 失敗が n−k 回の確率
       meaning: 1回の失敗確率 1−p を、失敗の回数 n−k だけ掛け合わせる
-  - tex: 'E(X)=np'
+  - id: F-binom-mean
     label: 期待値
     symbols:
     - symbol: E( )
@@ -932,7 +927,7 @@
       kind: param
       domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}]}]}
-  - tex: 'V(X)=np(1-p)'
+  - id: F-binom-var
     label: 分散
     symbols:
     - symbol: V( )
@@ -985,7 +980,7 @@
   - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
   formulas:
-  - tex: 'P(X=k)=\dfrac{e^{-\lambda}\lambda^k}{k!}'
+  - id: F-poisson-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -1016,7 +1011,7 @@
       key: fact
       concept: TERM-fact
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "div", "args": [{"op": "mul", "args": [{"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"sym": "lambda"}]}]}, {"op": "pow", "args": [{"sym": "lambda"}, {"sym": "k"}]}]}, {"op": "fn", "args": [{"sym": "k"}], "name": "fact"}]}]}
-  - tex: 'E(X)=V(X)=\lambda'
+  - id: F-poisson-moments
     label: 期待値と分散
     symbols:
     - symbol: E( )
@@ -1065,7 +1060,7 @@
   - {id: LAB-pois, preset: s3-free, purpose: 「成功するまで」のモードで、初めて成功する回の確率と平均を見る}
   principle: k−1 回続けて失敗してから成功する確率なので (1−p)^(k−1)p。毎回の確率が同じで独立なので、それまでの失敗は次の確率を変えない（無記憶性）。
   formulas:
-  - tex: 'P(X=k)=(1-p)^{k-1}p\quad(k=1,2,\dots)'
+  - id: F-geom-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -1086,9 +1081,9 @@
       range: 0より大きく1以下
       key: p
       kind: param
-      domain: {min: 0, max: 1}
+      domain: {min: 0, max: 1, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "k"}, {"num": 1}]}]}, {"sym": "p"}]}]}
-  - tex: 'E(X)=\frac{1}{p}'
+  - id: F-geom-mean
     label: 期待値
     symbols:
     - symbol: E( )
@@ -1104,9 +1099,9 @@
       range: 0より大きく1以下
       key: p
       kind: param
-      domain: {min: 0, max: 1}
+      domain: {min: 0, max: 1, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "p"}]}]}
-  - tex: 'V(X)=\frac{1-p}{p^2}'
+  - id: F-geom-var
     label: 分散
     symbols:
     - symbol: V( )
@@ -1122,7 +1117,7 @@
       range: 0より大きく1以下
       key: p
       kind: param
-      domain: {min: 0, max: 1}
+      domain: {min: 0, max: 1, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "pow", "args": [{"sym": "p"}, {"num": 2}]}]}]}
   conditions:
     math:
@@ -1153,7 +1148,7 @@
   - {id: LAB-pois, preset: s3-free, purpose: 「成功するまで」のモードで r を増やし、r＝1 の幾何分布から形が変わるのを見る}
   principle: k 回目に r 回目の成功が起きるのは、それまでの k−1 回にちょうど r−1 回成功し、k 回目に成功するとき。並び方の数 ₖ₋₁C_{r−1} を掛ける。r＝1 なら幾何分布。
   formulas:
-  - tex: 'P(X=k)={}_{k-1}C_{r-1}\,p^r(1-p)^{k-r}\quad(k=r,r+1,\dots)'
+  - id: F-negbinom-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -1206,7 +1201,7 @@
   - {id: LAB-pois, preset: rel-hyper, purpose: 戻さず取り出す確率を、戻す場合（二項分布）と比べる}
   principle: 取り出し方の組合せの数の比。戻さないので、1個取るたびに残りの当たりの割合が変わる（各回は独立ではない）。
   formulas:
-  - tex: 'P(X=k)=\frac{\binom{M}{k}\binom{N-M}{n-k}}{\binom{N}{n}}'
+  - id: F-hyper-pmf
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -1225,23 +1220,23 @@
       meaning: 集団の中の当たりの個数
       key: M
       kind: param
-      domain: {min: 0, integer: true}
+      domain: {min: 0, max: N, integer: true}
     - symbol: n
       meaning: 取り出す個数
       key: n
       kind: param
-      domain: {min: 1, integer: true}
+      domain: {min: 1, max: N, integer: true}
     - symbol: k
       meaning: 取り出した中の当たりの個数
       key: k
       kind: value
-      domain: {min: 0, integer: true}
+      domain: {min: 0, max: n, integer: true}
     - symbol: C( , )
       meaning: 組合せの数
       key: comb
       concept: TERM-comb
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "div", "args": [{"op": "mul", "args": [{"op": "fn", "args": [{"sym": "M"}, {"sym": "k"}], "name": "comb"}, {"op": "fn", "args": [{"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}, {"op": "sub", "args": [{"sym": "n"}, {"sym": "k"}]}], "name": "comb"}]}, {"op": "fn", "args": [{"sym": "N"}, {"sym": "n"}], "name": "comb"}]}]}
-  - tex: 'E(X)=n\frac{M}{N}'
+  - id: F-hyper-mean
     label: 期待値
     symbols:
     - symbol: E( )
@@ -1256,12 +1251,12 @@
       meaning: 取り出す個数
       key: n
       kind: param
-      domain: {min: 1, integer: true}
+      domain: {min: 1, max: N, integer: true}
     - symbol: M
       meaning: 集団の中の当たりの個数
       key: M
       kind: param
-      domain: {min: 0, integer: true}
+      domain: {min: 0, max: N, integer: true}
     - symbol: N
       meaning: 集団の個数
       key: N
@@ -1295,7 +1290,7 @@
   - {id: LAB-cont, preset: s5-free, purpose: すでに待った時間を動かしても、その先の確率が変わらないのを見る}
   principle: 密度 λe^(−λx)。待つほど密度が下がる、右に裾の長い形。すでに待った時間は残りの待ち時間を変えない（無記憶性）。ポアソン分布で数える出来事の間隔にあたる。
   formulas:
-  - tex: 'f(x)=\lambda e^{-\lambda x}\quad(x\ge 0)'
+  - id: F-expo-pdf
     symbols:
     - symbol: f(x)
       meaning: 確率密度（高さ。面積が確率）
@@ -1317,7 +1312,7 @@
       key: e
       kind: const
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "mul", "args": [{"sym": "lambda"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}]}
-  - tex: 'P(X>x)=e^{-\lambda x}'
+  - id: F-expo-surv
     label: 待ち時間が x を超える確率
     symbols:
     - symbol: P( )
@@ -1344,7 +1339,7 @@
       key: e
       kind: const
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "x"}], "name": "gt"}], "name": "P"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}
-  - tex: 'E(X)=\frac{1}{\lambda}'
+  - id: F-expo-mean
     label: 期待値
     symbols:
     - symbol: E( )
@@ -1362,7 +1357,7 @@
       kind: param
       domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"num": 1}, {"sym": "lambda"}]}]}
-  - tex: 'V(X)=\frac{1}{\lambda^2}'
+  - id: F-expo-var
     label: 分散
     symbols:
     - symbol: V( )
@@ -1407,7 +1402,7 @@
   - {id: LAB-cont, preset: s1-dens, purpose: 密度の高さは1を超えても、面積は1のままなのを見る}
   principle: 連続では1点の確率は0で、確率は面積（積分）で決まる。高さ f(x) は「その付近の出やすさの密度」。
   formulas:
-  - tex: 'P(a\le X\le b)=\int_a^b f(x)\,dx'
+  - id: F-pdf-interval
     symbols:
     - symbol: P( )
       meaning: 確率
@@ -1434,7 +1429,7 @@
       key: b
       kind: value
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "a"}, {"sym": "X"}, {"sym": "b"}], "name": "between"}], "name": "P"}, {"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x", "lower": {"sym": "a"}, "upper": {"sym": "b"}}]}
-  - tex: '\int_{-\infty}^{\infty} f(x)\,dx=1'
+  - id: F-pdf-total
     label: 全体の面積は1
     symbols:
     - symbol: f(x)
@@ -1471,7 +1466,7 @@
   - {id: LAB-cont, preset: s3-free, purpose: 「一様分布」のモードで、確率が区間の長さに比例するのを見る}
   principle: 密度は 1/(b−a) で一定なので、確率は区間の長さに比例する。
   formulas:
-  - tex: 'f(x)=\frac{1}{b-a}\quad(a\le x\le b)'
+  - id: F-uniform-pdf
     symbols:
     - symbol: f(x)
       meaning: 確率密度（高さ。面積が確率）
@@ -1489,9 +1484,10 @@
       meaning: 値のとりうる範囲の右端
       range: a より大きい
       key: b
+      domain: {min: a, minOpen: true}
       kind: param
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "div", "args": [{"num": 1}, {"op": "sub", "args": [{"sym": "b"}, {"sym": "a"}]}]}]}
-  - tex: 'E(X)=\frac{a+b}{2}'
+  - id: F-uniform-mean
     label: 期待値
     symbols:
     - symbol: E( )
@@ -1510,9 +1506,10 @@
       meaning: 値のとりうる範囲の右端
       range: a より大きい
       key: b
+      domain: {min: a, minOpen: true}
       kind: param
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "div", "args": [{"op": "add", "args": [{"sym": "a"}, {"sym": "b"}]}, {"num": 2}]}]}
-  - tex: 'V(X)=\frac{(b-a)^2}{12}'
+  - id: F-uniform-var
     label: 分散
     symbols:
     - symbol: V( )
@@ -1531,6 +1528,7 @@
       meaning: 値のとりうる範囲の右端
       range: a より大きい
       key: b
+      domain: {min: a, minOpen: true}
       kind: param
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "b"}, {"sym": "a"}]}, {"num": 2}]}, {"num": 12}]}]}
   conditions:

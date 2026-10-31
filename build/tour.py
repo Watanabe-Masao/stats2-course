@@ -34,14 +34,28 @@ def states(tour: dict) -> list[dict]:
     return out
 
 
+_GISTS: dict | None = None
+
+
+def _gists() -> dict:
+    """(ラボ, 版) → 関係の gist。relations.yaml は1回だけ読む（版ごとに読み直すと build が数分遅くなっていた。#129）"""
+    global _GISTS
+    if _GISTS is None:
+        from network import load_network
+        rels, _ = load_network()
+        _GISTS = {}
+        for r in rels:
+            for lab in r.get("labs") or []:
+                if r.get("gist"):
+                    _GISTS.setdefault((lab.get("id"), lab.get("preset")), r["gist"])
+    return _GISTS
+
+
 def with_gist(lid: str, name: str, preset: dict) -> dict:
     """関係の labs からこの版を開くとき、最後に「つまり」の段を足す（文は関係の gist。2か所に書かない。#95）。"""
     if not preset.get("tour"):
         return preset
-    from network import load_network
-    rels, _ = load_network()
-    gist = next((r["gist"] for r in rels if r.get("gist") and any(
-        lab.get("id") == lid and lab.get("preset") == name for lab in r.get("labs") or [])), None)
+    gist = _gists().get((lid, name))
     if not gist:
         return preset
     steps = [*preset["tour"]["steps"], {"title": "つまり", "text": f"💡 {gist}", "gist": True}]

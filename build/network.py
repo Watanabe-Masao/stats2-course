@@ -258,8 +258,6 @@ def validate_network(c: Course) -> list[str]:
         if cond is not None and not (isinstance(cond, dict) and cond.get("math")):
             err.append(f"{tid}: conditions は math（数学的な条件）と data（データに当てはめるときの条件）に分けて書く")
         for f in t.get("formulas", []):
-            if not f.get("tex"):
-                err.append(f"{tid}: formulas に tex（式）がない")
             for s in f.get("symbols", []):
                 if not (s.get("symbol") and s.get("meaning")):
                     err.append(f"{tid}: 記号には symbol と meaning を書く")
@@ -285,16 +283,16 @@ def validate_network(c: Course) -> list[str]:
                         if isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and not lo <= hi:
                             err.append(f"{tid}: 記号 {s.get('symbol')} の domain は min ≦ max")
             if f.get("tree"):
-                err += [f"{tid}: 式 {f['tex']} の木：{e}" for e in tree_errors(f["tree"], {s.get("key") for s in f.get("symbols", []) if s.get("key")})]
+                err += [f"{tid}: 式 {f.get('id')} の木：{e}" for e in tree_errors(f["tree"], {s.get("key") for s in f.get("symbols", []) if s.get("key")})]
             # 意味のかたまり（#110）：path は木の中の節を指す
             for part in f.get("parts", []):
                 node = f.get("tree")
                 for i in part.get("path", []):
                     node = (node or {}).get("args", [None] * (i + 1))[i] if isinstance(node, dict) and i < len(node.get("args", [])) else None
                 if not (part.get("name") and part.get("meaning")):
-                    err.append(f"{tid}: 式 {f['tex']} の parts には path・name・meaning を書く")
+                    err.append(f"{tid}: 式 {f.get('id')} の parts には path・name・meaning を書く")
                 if not isinstance(node, dict) or not part.get("path"):
-                    err.append(f"{tid}: 式 {f['tex']} の parts の path {part.get('path')} が木の中の節を指していない")
+                    err.append(f"{tid}: 式 {f.get('id')} の parts の path {part.get('path')} が木の中の節を指していない")
         # 式の作業台（#110）：主役の式・動かす記号（定義域つき）・横軸の記号（上限つき）・期待値の式
         ws = t.get("workspace")
         if ws:
@@ -496,7 +494,8 @@ def export_network(c: Course, target: dict) -> dict:
                     e[k] = t[k]
             if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
                 e["formulas"] = [{**f, **({"symbols": [{**s, **({"concept": g(s["concept"])} if s.get("concept") else {})}
-                                                       for s in f["symbols"]]} if f.get("symbols") else {})} for f in t["formulas"]]
+                                                       for s in f["symbols"]]} if f.get("symbols") else {}),
+                                  **({"defined_in": g(f["defined_in"])} if f.get("defined_in") else {})} for f in t["formulas"]]
             if labs(t.get("labs")):
                 e["labs"] = labs(t.get("labs"))
             if figs(t.get("figures")):
