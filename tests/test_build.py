@@ -543,6 +543,20 @@ class TestNetwork(unittest.TestCase):
                      "契約がない式（未分類）：F-geom-var", "vocab にない語 美しい", "F-hyper-pmf：組の条件：記号 Q が symbols にない"):
             self.assertTrue(any(want in e for e in err), want)
 
+    def test_formula_marks(self):
+        # 確かめる対象：公開の JSON に出す式の印と条件（#118 単位 C・D4）。想定する故障：見本で確かめた式に「未検証」が付く／
+        # レビューの記録があるのに「レビュー前」が残る／記号どうしの条件が書き出されない。見つけ方：見本にある式・ない式、記録の有無で marks を見る
+        from formulas import CONTRACTS, marks
+        from model import load_yaml as _ly
+        k = _ly(CONTRACTS)
+        m = marks(k, [])
+        self.assertNotIn("unverified", m["F-binom-pmf"])                       # 独立な見本で確かめた
+        self.assertTrue(m["F-geom-var"].get("unverified"))                       # 見本にない
+        self.assertTrue(m["F-binom-pmf"].get("review_pending"))                  # 契約に review があり、記録がない
+        self.assertEqual([c["text"][:5] for c in m["F-hyper-pmf"]["conditions"]], ["k ≦ M", "n−(N−"])
+        rec = [{"formula": "F-binom-pmf", "points": next(x for x in k["contracts"] if x["formula"] == "F-binom-pmf")["review"], "judgement": "j", "date": "2026-11-01"}]
+        self.assertNotIn("review_pending", marks(k, rec)["F-binom-pmf"])
+
     def test_mu_definition(self):
         # μ＝E(X)：μ を押して期待値の定義で開けるように（#109）
         c = course()

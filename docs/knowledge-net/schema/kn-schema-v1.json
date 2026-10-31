@@ -1021,6 +1021,34 @@
                       }
                     }
                   }
+                },
+                "conditions": {
+                  "type": "array",
+                  "description": "記号どうしの条件（1つの記号の domain で書けないもの：超幾何の k ≦ M など）。tree は比べる式（le・lt・ge・gt・between）。画面は値がこれを満たさないとき計算せず text を出す。#118",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "text",
+                      "tree"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "tree": {
+                        "$ref": "#/$defs/formulaNode"
+                      }
+                    }
+                  }
+                },
+                "unverified": {
+                  "type": "boolean",
+                  "description": "独立な見本でまだ値を確かめていない式（true のときだけ書く）。画面は「未検証」の印を出す。#118 D4"
+                },
+                "review_pending": {
+                  "type": "boolean",
+                  "description": "数で保証できない観点の個別レビューが済んでいない式（true のときだけ書く）。画面は「レビュー前」の印を出す。#118 D4"
                 }
               }
             }
@@ -1405,5 +1433,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 13
+  "x-revision": 14
 }

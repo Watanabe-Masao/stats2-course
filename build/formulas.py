@@ -114,3 +114,51 @@ def contract_summary(contracts: dict | None) -> dict:
     """契約の数：代表の式・レビューの観点のある式（進み具合・C6 の知らせ用）"""
     ks = (contracts or {}).get("contracts") or []
     return {"contracts": len(ks), "representative": sum(1 for k in ks if k.get("representative")), "review": sum(1 for k in ks if k.get("review"))}
+
+
+REVIEWS = ROOT / "content" / "formula-reviews.yaml"
+REFERENCE = ROOT / "docs" / "formula-correctness" / "reference.json"
+
+
+def marks(contracts: dict | None, reviews: list | None) -> dict:
+    """公開の JSON に出す式ごとのもの（#118 単位 C・D4）：記号どうしの条件、未検証・レビュー前の印。
+    - 未検証：独立な見本（reference.json の formula_ids）に出てこない式
+    - レビュー前：契約に review（数で保証できない観点）があり、formula-reviews.yaml にその全部の記録がない式
+    """
+    covered = set()
+    if REFERENCE.exists():
+        ref = json.loads(REFERENCE.read_text(encoding="utf-8"))
+        for c in ref.get("cases", []):
+            covered.update(c.get("formula_ids") or [])
+    done: dict[str, set] = {}
+    for r in reviews or []:
+        done.setdefault(r.get("formula"), set()).update(r.get("points") or [])
+    out = {}
+    for k in (contracts or {}).get("contracts") or []:
+        fid = k["formula"]
+        m = {}
+        if k.get("conditions"):
+            m["conditions"] = [{"text": c["text"], "tree": c["tree"]} for c in k["conditions"]]
+        if fid not in covered:
+            m["unverified"] = True
+        if set(k.get("review") or []) - done.get(fid, set()):
+            m["review_pending"] = True
+        out[fid] = m
+    return out
+
+
+def review_errors(contracts: dict | None, reviews: list | None) -> list[str]:
+    """レビューの記録：契約にある式・観点だけ、日付と判断を書く"""
+    err = []
+    ks = {k["formula"]: k for k in (contracts or {}).get("contracts") or []}
+    for r in reviews or []:
+        k = ks.get(r.get("formula"))
+        if not k:
+            err.append(f"レビュー：式 {r.get('formula')} に契約がない")
+            continue
+        extra = set(r.get("points") or []) - set(k.get("review") or [])
+        if extra:
+            err.append(f"レビュー {r['formula']}：契約の review にない観点 {'・'.join(sorted(extra))}")
+        if not (r.get("date") and r.get("judgement")):
+            err.append(f"レビュー {r['formula']}：date（日付）と judgement（判断と根拠）を書く")
+    return err
