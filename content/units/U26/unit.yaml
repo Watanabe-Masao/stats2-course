@@ -7,7 +7,7 @@ prev: U25
 next: U27
 prereq: [U14, U20, U24]
 used_by: [U27, U32]
-terms: [TERM-ratio, TERM-pool, TERM-chi2, TERM-f, TERM-test-stat, TERM-pvalue]
+terms: [TERM-ratio, TERM-pool, TERM-chi2, TERM-f, TERM-test-stat, TERM-pvalue, TERM-sample-prop]
 labs: [LAB-ptest]
 goal: 1つの比率・2つの比率の差・母分散・分散の比の検定を、H₀ の値で SE や統計量を作り（比率は p₀・合わせた比率、ばらつきは χ²・F）、正規近似や正規母集団の前提を確かめて判断できる。
 stage_goals:

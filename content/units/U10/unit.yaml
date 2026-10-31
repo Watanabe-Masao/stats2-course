@@ -7,7 +7,7 @@ prev: U09
 next: U11
 prereq: [U09, U01]
 used_by: [U11, U12, U13, U14, U17]
-terms: [TERM-sample-space, TERM-event, TERM-complement, TERM-exclusive, TERM-indep]
+terms: [TERM-sample-space, TERM-event, TERM-complement, TERM-exclusive, TERM-indep, TERM-prob, TERM-addition]
 labs: [LAB-prob]
 goal: 「AまたはB」「少なくとも1回」の確率を、**重なりを二重に数えずに求められ**、排反と独立の違いを言える。
 stage_goals:

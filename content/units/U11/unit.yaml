@@ -7,7 +7,7 @@ prev: U10
 next: U12
 prereq: [U10]
 used_by: [U12, U13, U14, U27]
-terms: [TERM-cond, TERM-indep, TERM-exclusive, TERM-event]
+terms: [TERM-cond, TERM-indep, TERM-exclusive, TERM-event, TERM-multiplication]
 labs: [LAB-prob]
 goal: 「〇〇だと分かったうえで」の確率を、**分母が変わることから求められ**、続けて起こる確率を掛け継いで計算し、2つの出来事が独立かどうか判定できる。
 stage_goals:

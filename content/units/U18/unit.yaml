@@ -7,7 +7,7 @@ prev: U17
 next: U19
 prereq: [U13, U17, U07]
 used_by: [U19, U20, U21, U22, U24, U31]
-terms: [TERM-sampdist, TERM-se, TERM-statistic, TERM-unbvar, TERM-var]
+terms: [TERM-sampdist, TERM-se, TERM-statistic, TERM-unbvar, TERM-var, TERM-sample-mean]
 labs: [LAB-xbar]
 goal: n 個の平均や比率が、取り直すたびにどれくらいぶれるか（**標準誤差 σ÷√n・√(p(1−p)÷n)**）を出し、1個ずつのばらつき（標準偏差）と区別できる。母分散の推定に n−1 で割る理由を説明できる。
 stage_goals:

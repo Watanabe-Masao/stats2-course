@@ -139,7 +139,11 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。関係の種類の定義は relation-types.yaml。
 
-- 概念＝用語（content/terms.yaml）。`definition` を書いた用語が概念になる。
+- **1つの概念にするかの判断**（渡辺さん 2026-10-31、#105）：その語が固有の意味・役割・操作・確かめ方を持つかで決める。次の3つは別々に持つ。
+  - 概念の同一性（本当に同じ意味か）→ 用語（点）を分けるか。2つの意味が入った語は分ける（例：事前確率と事後確率）。対で初めて意味を持つ語は1つでよい（例：片側検定・両側検定）。
+  - 概念の関係性（何がどうつながるか）→ 関係（線）。重なって見える語はまとめず、対比などの関係でつなぐ（例：偏差と残差、標本誤差と標準誤差）。
+  - 学習上のまとまり（どれを一緒に学ぶと分かりやすいか）→ 単元・分類・画面。データの形では分け、学ぶ画面では必要に応じて一緒に見せる。
+- 概念＝用語（content/terms.yaml。129語）。`definition` を書いた用語が概念になる。
   - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。
   - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
   - 任意：`formulas`（式ごとに `tex` と `symbols`：記号・意味・値の範囲）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。

@@ -7,7 +7,7 @@ prev: U18
 next: U20
 prereq: [U14, U16, U18]
 used_by: [U20, U22, U25, U26]
-terms: [TERM-lln, TERM-clt, TERM-cc, TERM-binom, TERM-normal]
+terms: [TERM-lln, TERM-clt, TERM-cc, TERM-binom, TERM-normal, TERM-sample-mean]
 labs: [LAB-clt]
 goal: 「平均の値が μ に近づく」（**大数の法則**）と「平均の分布の形が正規に近づく」（**中心極限定理**）を区別し、二項分布の確率を連続修正つきの正規近似で求め、近似してよい条件を確かめられる。
 stage_goals:
