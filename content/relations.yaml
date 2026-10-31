@@ -455,3 +455,474 @@ relations:
     gist: データを見る前の見込みを、データの起こりやすさで重み付けし直したのが、データを見たあとの見込み。
     conditions: [尤度（各原因のもとで結果が起こる確率）が分かっている, 結果が起こる確率が0でない]
     basis: {units: [U12]}
+  # ---- P1 骨格：W3（U17〜U23 標本分布・推定）。#105
+  - id: REL-population-sample
+    from: TERM-population
+    to: TERM-sample
+    type: 前提
+    premise: learning
+    description: 標本は母集団の一部。何の一部か（母集団）を先に決めないと、標本から何を言うのかが決まらない。
+    basis:
+      units:
+      - U03
+      - U17
+    version: 1
+  - id: REL-sample-random
+    from: TERM-sample
+    to: TERM-random-sampling
+    type: 前提
+    premise: learning
+    description: 無作為抽出は、標本の選び方の1つ。標本とは何かを知ってから、選び方の違いを学ぶ。
+    basis:
+      units:
+      - U17
+    version: 1
+  - id: REL-frame-random
+    from: TERM-frame
+    to: TERM-random-sampling
+    type: 前提
+    premise: mathematical
+    description: 無作為抽出は、抽出枠（名簿）の中からくじ引きで選ぶ。枠がないと選べない。
+    basis:
+      units:
+      - U17
+      - U31
+    version: 1
+  - id: REL-frame-bias
+    from: TERM-frame
+    to: TERM-bias
+    type: 前提
+    premise: learning
+    description: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏る。偏りが生まれる場所の1つ。
+    basis:
+      units:
+      - U17
+      - U31
+    version: 1
+  - id: REL-sample-statistic
+    from: TERM-sample
+    to: TERM-statistic
+    type: 前提
+    premise: mathematical
+    description: 統計量は標本のデータから計算する値。
+    basis:
+      units:
+      - U03
+      - U18
+    version: 1
+  - id: REL-sample-samplemean
+    from: TERM-sample
+    to: TERM-sample-mean
+    type: 前提
+    premise: mathematical
+    description: 標本平均は標本のデータの平均。
+    basis:
+      units:
+      - U18
+    version: 1
+  - id: REL-statistic-sampdist
+    from: TERM-statistic
+    to: TERM-sampdist
+    type: 前提
+    premise: mathematical
+    description: 標本分布は、標本を取り直したときに統計量がとる値の分布。
+    basis:
+      units:
+      - U17
+      - U18
+    version: 1
+  - id: REL-dist-sampdist
+    from: TERM-dist
+    to: TERM-sampdist
+    type: 前提
+    premise: learning
+    description: 標本分布も確率分布の1つ。統計量を確率変数として見る。
+    basis:
+      units:
+      - U17
+      - U18
+    version: 1
+  - id: REL-sampdist-se
+    from: TERM-sampdist
+    to: TERM-se
+    type: 前提
+    premise: mathematical
+    description: 標準誤差は、推定量の標本分布の標準偏差。
+    basis:
+      units:
+      - U18
+      - U20
+    version: 1
+  - id: REL-sd-se
+    from: TERM-sd
+    to: TERM-se
+    type: 前提
+    premise: mathematical
+    description: 標準誤差は標準偏差の一種（標本分布の標準偏差）。平均の標準誤差は σ÷√n。
+    basis:
+      units:
+      - U18
+      - U20
+    version: 1
+  - id: REL-samplemean-lln
+    from: TERM-sample-mean
+    to: TERM-lln
+    type: 前提
+    premise: mathematical
+    description: 大数の法則は、標本平均が母平均に近づくという主張。
+    basis:
+      units:
+      - U19
+    version: 1
+  - id: REL-samplemean-clt
+    from: TERM-sample-mean
+    to: TERM-clt
+    type: 前提
+    premise: mathematical
+    description: 中心極限定理は、標本平均の分布の形についての主張。
+    basis:
+      units:
+      - U19
+    version: 1
+  - id: REL-lln-clt
+    from: TERM-lln
+    to: TERM-clt
+    type: 前提
+    premise: learning
+    description: 大数の法則（平均が母平均に近づく）を知ってから、近づくときのぶれの形（正規分布）を学ぶ。
+    basis:
+      units:
+      - U19
+    version: 1
+  - id: REL-binom-cc
+    from: TERM-binom
+    to: TERM-cc
+    type: 前提
+    premise: learning
+    description: 連続修正は、二項分布を正規分布で近似するときに使う。離散の棒を連続の幅に置き換える考え。
+    basis:
+      units:
+      - U19
+    version: 1
+  - id: REL-var-unbvar
+    from: TERM-var
+    to: TERM-unbvar
+    type: 前提
+    premise: mathematical
+    description: 不偏分散は分散の計算で割る数を n から n−1 にしたもの。
+    basis:
+      units:
+      - U07
+      - U18
+    version: 1
+  - id: REL-unbvar-df
+    from: TERM-unbvar
+    to: TERM-df
+    type: 前提
+    premise: learning
+    description: 不偏分散で n−1 で割るのは、平均を使った分だけ自由に動ける値が1つ減るから。自由度の考えの入口。
+    basis:
+      units:
+      - U18
+      - U20
+    version: 1
+  - id: REL-normal-chi2
+    from: TERM-normal
+    to: TERM-chi2
+    type: 前提
+    premise: mathematical
+    description: カイ二乗分布は、標準正規分布の確率変数の2乗の和の分布。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-df-chi2
+    from: TERM-df
+    to: TERM-chi2
+    type: 前提
+    premise: mathematical
+    description: カイ二乗分布の形は自由度で決まる。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-chi2-t
+    from: TERM-chi2
+    to: TERM-t
+    type: 前提
+    premise: mathematical
+    description: t 分布は、標準正規分布の確率変数を、カイ二乗分布の確率変数を自由度で割った値の平方根で割った分布。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-chi2-f
+    from: TERM-chi2
+    to: TERM-f
+    type: 前提
+    premise: mathematical
+    description: F 分布は、2つのカイ二乗分布の確率変数をそれぞれ自由度で割った比の分布。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-df-t
+    from: TERM-df
+    to: TERM-t
+    type: 前提
+    premise: mathematical
+    description: t 分布の形は自由度で決まる。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-df-f
+    from: TERM-df
+    to: TERM-f
+    type: 前提
+    premise: mathematical
+    description: F 分布の形は2つの自由度で決まる。
+    basis:
+      units:
+      - U20
+    version: 1
+  - id: REL-t-normal
+    from: TERM-t
+    to: TERM-normal
+    type: 変換
+    mode: limit
+    description: 自由度を大きくすると、t 分布は標準正規分布に近づく。
+    gist: データが多いと、不偏分散で σ を置き換えたぶれがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
+    conditions:
+    - 自由度を大きくする
+    basis:
+      units:
+      - U20
+      - U22
+    version: 1
+  - id: REL-estimator-statistic
+    from: TERM-estimator
+    to: TERM-statistic
+    type: 一般化
+    description: 推定量は、母数を推定する目的で使う統計量。統計量は推定量を含む、より広いもの（検定統計量なども統計量）。
+    gist: 標本から計算する値はみな統計量。そのうち「母数を当てる」ために使うと決めたものが推定量。
+    basis:
+      units:
+      - U18
+      - U21
+    version: 1
+  - id: REL-estimator-pointest
+    from: TERM-estimator
+    to: TERM-point-est
+    type: 応用
+    description: 点推定は、推定量に標本の値を入れて1つの値を出すこと。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-estimator-unbiased
+    from: TERM-estimator
+    to: TERM-unbiased
+    type: 前提
+    premise: mathematical
+    description: 不偏性は推定量の性質。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-estimator-consistency
+    from: TERM-estimator
+    to: TERM-consistency
+    type: 前提
+    premise: mathematical
+    description: 一致性は推定量の性質。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-estimator-efficiency
+    from: TERM-estimator
+    to: TERM-efficiency
+    type: 前提
+    premise: mathematical
+    description: 有効性は推定量どうしを分散で比べる性質。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-bias-unbiased
+    from: TERM-bias
+    to: TERM-unbiased
+    type: 前提
+    premise: mathematical
+    description: 不偏性は、推定量の偏り（期待値と母数の差）が0であること。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-unbiased-efficiency
+    from: TERM-unbiased
+    to: TERM-efficiency
+    type: 前提
+    premise: learning
+    description: 有効性は、不偏な推定量の中で比べる。まず不偏性を知る。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-unbiased-unbvar
+    from: TERM-unbiased
+    to: TERM-unbvar
+    type: 応用
+    description: 不偏分散は、不偏性をもつように割る数を n−1 にした分散の推定量。
+    basis:
+      units:
+      - U18
+      - U21
+    version: 1
+  - id: REL-lln-consistency
+    from: TERM-lln
+    to: TERM-consistency
+    type: 前提
+    premise: learning
+    description: 標本平均の一致性は大数の法則そのもの。一致性は、大数の法則を推定量一般に広げた考え。
+    basis:
+      units:
+      - U19
+      - U21
+    version: 1
+  - id: REL-bias-mse
+    from: TERM-bias
+    to: TERM-mse
+    type: 前提
+    premise: mathematical
+    description: 平均二乗誤差は、推定量の分散と偏りの2乗の和。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-var-mse
+    from: TERM-var
+    to: TERM-mse
+    type: 前提
+    premise: mathematical
+    description: 平均二乗誤差は、推定量の分散と偏りの2乗の和。
+    basis:
+      units:
+      - U21
+    version: 1
+  - id: REL-point-interval-contrast
+    from: TERM-point-est
+    to: TERM-interval-est
+    type: 対比
+    description: 点推定は1つの値で、区間推定は幅をもった区間で母数を推定する。区間推定は、推定がどれだけぶれるか（標準誤差）を幅で示す。
+    gist: 「たぶん50」と1つの値で言うのが点推定、「45〜55のどこか」と幅で言うのが区間推定。幅があると、推定の確かさまで伝わる。
+    basis:
+      units:
+      - U21
+      - U22
+    version: 1
+  - id: REL-intervalest-ci
+    from: TERM-interval-est
+    to: TERM-ci
+    type: 前提
+    premise: mathematical
+    description: 信頼区間は、区間推定で求める区間。
+    basis:
+      units:
+      - U22
+    version: 1
+  - id: REL-conflevel-ci
+    from: TERM-conf-level
+    to: TERM-ci
+    type: 前提
+    premise: mathematical
+    description: 信頼区間の幅は、信頼係数（95%など）を決めてから決まる。
+    basis:
+      units:
+      - U22
+    version: 1
+  - id: REL-se-ci
+    from: TERM-se
+    to: TERM-ci
+    type: 前提
+    premise: mathematical
+    description: 平均の信頼区間は、推定値 ± 係数 × 標準誤差 で作る。
+    basis:
+      units:
+      - U22
+    version: 1
+  - id: REL-clt-ci
+    from: TERM-clt
+    to: TERM-ci
+    type: 前提
+    premise: learning
+    description: 母集団の分布が正規分布でなくても平均の信頼区間で正規分布を使えるのは、中心極限定理があるから。
+    basis:
+      units:
+      - U19
+      - U22
+    version: 1
+  - id: REL-t-ci
+    from: TERM-t
+    to: TERM-ci
+    type: 前提
+    premise: mathematical
+    description: 母分散が分からないときの平均の信頼区間は、t 分布の値で作る。
+    basis:
+      units:
+      - U22
+    version: 1
+  - id: REL-ratio-sampleprop
+    from: TERM-ratio
+    to: TERM-sample-prop
+    type: 前提
+    premise: mathematical
+    description: 標本比率は、標本の中での割合。
+    basis:
+      units:
+      - U22
+      - U26
+    version: 1
+  - id: REL-sampleprop-ci
+    from: TERM-sample-prop
+    to: TERM-ci
+    type: 応用
+    description: 割合の信頼区間は、標本比率と、その標準誤差 √(p̂(1−p̂)÷n) から作る。
+    basis:
+      units:
+      - U22
+    version: 1
+  - id: REL-t-pairedt
+    from: TERM-t
+    to: TERM-paired-t
+    type: 前提
+    premise: mathematical
+    description: 対応のある t 検定は、差の平均を t 分布で調べる。
+    basis:
+      units:
+      - U23
+      - U25
+    version: 1
+  - id: REL-t-welch
+    from: TERM-t
+    to: TERM-welch
+    type: 前提
+    premise: mathematical
+    description: ウェルチの t 検定は、2群の平均の差を t 分布（自由度を近似で決める）で調べる。
+    basis:
+      units:
+      - U23
+      - U25
+    version: 1
+  - id: REL-pairedt-welch-contrast
+    from: TERM-paired-t
+    to: TERM-welch
+    type: 対比
+    description: どちらも2つの平均の差を t 分布で調べる。対応のある t 検定は同じ対象の前後の差を1つの列として扱い、ウェルチの t 検定は別々の2群を、分散が違ってもよいとして比べる。
+    gist: 同じ人の前と後なら、差を1人ずつ取って比べる（対応あり）。別の人たちの2群なら、群ごとのばらつきの違いも込みで比べる（ウェルチ）。データの取り方で方法が決まる。
+    basis:
+      units:
+      - U23
+      - U25
+    version: 1
