@@ -588,6 +588,30 @@ class TestNetwork(unittest.TestCase):
         self.assertNotIn("expect", json.dumps(e["themes"]))   # 予想の答えは書かない
         self.assertFalse(network.schema_errors(d))
 
+    def test_skeleton(self):
+        # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
+        import network
+        c = course()
+        c.terms["TERM-perm"]["short"] = "区別できるものを並べる並べ方の数"
+        c.terms["TERM-clt"]["short"] = "独立に同じ分布から取った平均は、n が大きいと正規分布に近づく"
+        self.assertFalse([e for e in network.skeleton_errors(c)])
+        d = network.export_network(c, {"site_base_url": ""})
+        e = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-perm")
+        self.assertEqual((e["status"], e["category"]), ("skeleton", "数学の道具"))
+        self.assertFalse(network.schema_errors(d))
+        c.terms["TERM-perm"]["short"] = "並べ方の数。順番を区別する"
+        c.terms["TERM-clt"]["category"] = "その他"
+        c.terms["TERM-cc"].update({"short": "連続で近似するときに 0.5 ずらす", "category": None})
+        err = network.skeleton_errors(c)
+        for want in ("TERM-perm: short は1文で書く", "TERM-clt: category「その他」", "TERM-cc: 骨格（short）には category"):
+            self.assertTrue(any(want in x for x in err), want)
+        c2 = course()
+        c2.shared["skeleton_required"] = True
+        err2 = network.skeleton_errors(c2)
+        self.assertTrue(any("定義1文（short）か説明（definition）がない" in x for x in err2))
+        g = network.skeleton_gaps(course())
+        self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not t.get("definition")))
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},

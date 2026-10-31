@@ -798,9 +798,10 @@
           "status": {
             "enum": [
               "filled",
+              "skeleton",
               "stub"
             ],
-            "description": "stub：関係から指されているが、説明がまだない概念"
+            "description": "filled：説明あり。skeleton：骨格（定義1文と分類だけ。肉付けは段階ごとに）。stub：関係から指されているが、骨格もまだない概念"
           },
           "definition": {
             "$ref": "#/$defs/text"
@@ -1078,24 +1079,51 @@
                 "minimum": 0
               }
             }
+          },
+          "short": {
+            "$ref": "#/$defs/text",
+            "description": "定義1文（骨格の段から持つ。説明ありの概念にもあってよい）"
+          },
+          "category": {
+            "$ref": "#/$defs/text",
+            "description": "分類（分布・統計量・手法・性質など。教材が決める言葉）"
           }
         },
-        "if": {
-          "properties": {
-            "status": {
-              "const": "filled"
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "filled"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "definition",
+                "principle",
+                "conditions",
+                "example",
+                "counterexample"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "skeleton"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "short",
+                "category"
+              ]
             }
           }
-        },
-        "then": {
-          "required": [
-            "definition",
-            "principle",
-            "conditions",
-            "example",
-            "counterexample"
-          ]
-        }
+        ]
       }
     },
     "relations": {
@@ -1340,5 +1368,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 10
+  "x-revision": 11
 }
