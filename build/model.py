@@ -111,6 +111,9 @@ def load_course() -> Course:
         if not (ROOT / f["file"]).exists():
             raise FileNotFoundError(f"{fid}: 図のファイル {f['file']} がない")
     c = Course(stages, powers, shared, terms, index, labs, figures)
+    # 式の原本を整える（#118）：ref を元の式に、木から TeX を作る、契約を確かめる
+    from formulas import CONTRACTS, prepare
+    c.errors += prepare(terms, load_yaml(CONTRACTS) if CONTRACTS.exists() else None)
     for uid, meta in index.items():
         if not meta.get("migrated"):
             continue

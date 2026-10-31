@@ -882,6 +882,15 @@
               ],
               "additionalProperties": false,
               "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^F-[a-z0-9]+(-[a-z0-9]+)*$",
+                  "description": "式の ID（教材の中で変えない・消さない。要らなくなった式は残す）。#118 D1"
+                },
+                "defined_in": {
+                  "type": "string",
+                  "description": "この式の元がある概念の id（同じ式を2つの概念に出すとき、元でない側に書く。式の ID は元と同じ）。#118 D2"
+                },
                 "tex": {
                   "$ref": "#/$defs/text"
                 },
@@ -1396,5 +1405,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 12
+  "x-revision": 13
 }

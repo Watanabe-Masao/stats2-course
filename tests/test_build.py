@@ -514,6 +514,35 @@ class TestNetwork(unittest.TestCase):
         mu["domain"] = {"lo": 0}
         self.assertTrue(any("domain は min・max・minOpen・maxOpen・integer・nonzero だけ" in e for e in self._validate(c)))
 
+    def test_formula_source_and_contracts(self):
+        # 確かめる対象：式の原本の決まり（#118 単位 A：D1・D2・D6、M1 を起きない形に）。
+        # 想定する故障：原本に tex が戻り木と食い違う（M1）・式 ID の重複や欠け・ref の元がない・契約のない（未分類の）式・語彙にない性質・
+        # 組の条件が式にない記号を使う。見つけ方：原本を読み込んだ形にわざと誤りを入れて prepare の誤りを見る。
+        # 既存のテストとの違い：test_formula_tree は木の形だけ、ここは式の ID・写し・TeX の出どころ・契約
+        import copy as _copy
+        from formulas import prepare
+        from model import load_yaml as _ly
+        from formulas import CONTRACTS
+        c = course()
+        self.assertFalse([e for e in c.errors if "式" in e or "契約" in e])
+        rv = c.terms["TERM-rv"]["formulas"][1]                       # ref は元の式の写しになる（D2）
+        self.assertEqual((rv["id"], rv["defined_in"], rv["tex"]), ("F-dist-sum", "TERM-dist", c.terms["TERM-dist"]["formulas"][0]["tex"]))
+        self.assertEqual(c.terms["TERM-std"]["formulas"][0]["tex"], r"Z=\dfrac{X-\mu}{\sigma}")   # TeX は木から作る
+        raw = {t["id"]: t for t in _ly(Path(__file__).resolve().parent.parent / "content" / "terms.yaml")}
+        k = _ly(CONTRACTS)
+        bad = _copy.deepcopy(raw)
+        bad["TERM-std"]["formulas"][0]["tex"] = "Z=X"                 # M1：原本に tex を書く
+        bad["TERM-binom"]["formulas"][1]["id"] = "F-binom-pmf"        # ID の重複
+        bad["TERM-rv"]["formulas"][1] = {"ref": "F-nothing"}          # 元がない
+        kk = _copy.deepcopy(k)
+        kk["contracts"] = [x for x in kk["contracts"] if x["formula"] != "F-geom-var"]   # 未分類
+        next(x for x in kk["contracts"] if x["formula"] == "F-std-def")["properties"].append("美しい")
+        next(x for x in kk["contracts"] if x["formula"] == "F-hyper-pmf")["conditions"][0]["tree"]["args"][1] = {"sym": "Q"}
+        err = prepare(bad, kk)
+        for want in ("式 F-std-def に tex を書かない", "式 ID F-binom-pmf が2か所", "{ref: F-nothing} の元の式がない",
+                     "契約がない式（未分類）：F-geom-var", "vocab にない語 美しい", "F-hyper-pmf：組の条件：記号 Q が symbols にない"):
+            self.assertTrue(any(want in e for e in err), want)
+
     def test_mu_definition(self):
         # μ＝E(X)：μ を押して期待値の定義で開けるように（#109）
         c = course()
