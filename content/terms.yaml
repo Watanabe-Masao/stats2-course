@@ -1720,94 +1720,117 @@
   name: 散布図
   en: scatter plot
   category: 図表
+  short: 2つの量的変数の値の組を、横軸と縦軸の座標の点で表した図
 - id: TERM-partial-corr
   name: 偏相関係数
   en: partial correlation coefficient
   category: 相関・回帰
+  short: 第3の変数の影響を取り除いたあとの、2つの変数の相関係数
 - id: TERM-spurious
   name: 擬相関
   en: spurious correlation
   category: 相関・回帰
+  short: 2つの変数に直接の関係がないのに、共通の第3の変数などのために見かけ上あらわれる相関
 - id: TERM-ols
   name: 最小二乗法
   en: least squares method
   category: 相関・回帰
+  short: 残差の2乗の和が最小になるように、回帰式の係数を決める方法
 - id: TERM-regcoef
   name: 回帰係数
   en: regression coefficient
   category: 相関・回帰
+  short: 回帰式で、説明変数が1増えたときに目的変数がどれだけ変わると見込むかを表す係数
 - id: TERM-resid
   name: 残差
   en: residual
   category: 相関・回帰
+  short: 観測した値から、回帰式で予測した値を引いた値
 - id: TERM-r2
   name: 決定係数
   en: coefficient of determination
   category: 相関・回帰
+  short: 目的変数のばらつきのうち、回帰式で説明できる割合（0〜1）
 - id: TERM-extrap
   name: 外挿
   en: extrapolation
   category: 相関・回帰
+  short: 回帰式を、データのある範囲の外の説明変数の値に当てはめて予測すること
 - id: TERM-mreg
   name: 重回帰分析
   en: multiple regression analysis
   category: 相関・回帰
+  short: 2つ以上の説明変数で目的変数を表す式を求める分析
 - id: TERM-dummy
   name: ダミー変数
   en: dummy variable
   category: 相関・回帰
+  short: 質的変数を回帰分析で使うため、当てはまれば1・当てはまらなければ0とした変数
 - id: TERM-adjr2
   name: 自由度調整済み決定係数
   en: adjusted coefficient of determination
   category: 相関・回帰
+  short: 説明変数を増やすだけでは大きくならないように、自由度で補正した決定係数
 - id: TERM-ms
   name: 平均平方
   en: mean square
   category: 検定
+  short: 平方和をその自由度で割った値で、分散分析や回帰でばらつきの大きさを比べるのに使う
 - id: TERM-multicol
   name: 多重共線性
   en: multicollinearity
   category: 相関・回帰
+  short: 重回帰分析で、説明変数どうしの相関が強く、回帰係数の推定が不安定になること
 - id: TERM-strat-sampling
   name: 層化抽出
   en: stratified sampling
   category: 調査・実験
+  short: 母集団をいくつかの層に分け、各層から無作為に標本を選ぶ方法
 - id: TERM-cluster-sampling
   name: 集落抽出
   en: cluster sampling
   category: 調査・実験
+  short: 母集団を集落（学校・地区など）に分け、無作為に選んだ集落の全員を調べる方法
 - id: TERM-systematic-sampling
   name: 系統抽出
   en: systematic sampling
   category: 調査・実験
+  short: 名簿の最初の1人を無作為に選び、そこから一定の間隔で選んでいく方法
 - id: TERM-multistage-sampling
   name: 多段抽出
   en: multistage sampling
   category: 調査・実験
+  short: 大きな単位から順に、何段階かに分けて無作為に選んでいく方法
 - id: TERM-sampling-error
   name: 標本誤差
   en: sampling error
   category: 調査・実験
+  short: 母集団の一部（標本）だけを調べることで生じる、結果と真の値のずれ
 - id: TERM-nonsampling-error
   name: 非標本誤差
   en: non-sampling error
   category: 調査・実験
+  short: 回答の誤り・無回答・抽出枠の不備など、標本を選ぶこと以外で生じるずれ
 - id: TERM-randomize
   name: 無作為化
   en: randomization
   category: 調査・実験
+  short: 実験で、対象をくじ引きのように処理の群へ割り当てること
 - id: TERM-confound
   name: 交絡
   en: confounding
   category: 調査・実験
+  short: 調べたい要因と結果の両方に関係する別の要因があり、その効果を区別できなくなること
 - id: TERM-anova
   name: 分散分析
   en: analysis of variance
   category: 検定
+  short: 3つ以上の群の平均に差があるかを、群の間と群の中のばらつきの比（F 分布）で調べる方法
 - id: TERM-multcomp
   name: 多重比較
   en: multiple comparisons
   category: 検定
+  short: 多くの群の組を検定するとき、全体として誤る確率が大きくならないように調整して比べる方法
 - id: TERM-posterior
   name: 事後確率
   en: posterior probability
@@ -1842,6 +1865,7 @@
   name: ベルヌーイ分布
   en: Bernoulli distribution
   category: 確率分布
+  short: 1回の試行で、成功（1）を確率 p、失敗（0）を確率 1−p でとる分布
 - id: TERM-sample-mean
   name: 標本平均
   en: sample mean
@@ -1876,3 +1900,4 @@
   name: 単回帰
   en: simple linear regression
   category: 相関・回帰
+  short: 1つの説明変数で目的変数を表す直線の式（回帰直線）を求める分析

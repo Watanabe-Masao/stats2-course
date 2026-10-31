@@ -24,8 +24,8 @@ total_units: 32
 
 # 概念の分類（骨格の段。#105・P1）。terms.yaml の category はこの中から選ぶ。地図のまとまりにも使う
 concept_categories: [数学の道具, データと変数, 要約（代表値・散らばり）, 図表, 時系列, 確率, 確率分布, 標本分布・極限, 推定, 検定, 相関・回帰, 調査・実験]
-# 骨格の完了の条件を build で止めるか（P1 の途中は false：数えて警告だけ。P1 を閉じるときに true にする）
-skeleton_required: false
+# 骨格の完了の条件を build で止めるか（129語の骨格がそろったので true：定義1文・分類がない語や孤立した語が出たら build が止める）
+skeleton_required: true
 
 # 原本の外にある参照先（表示名）。リンク先は公開先ごとに publish/*.yaml の refs で決める。
 # 旧版の確認問題・本番形式問題は、問題を原本へ取り込んだら refs から外す。

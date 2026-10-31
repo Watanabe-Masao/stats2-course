@@ -612,6 +612,7 @@ class TestNetwork(unittest.TestCase):
             self.assertTrue(any(want in x for x in err), want)
         c2 = course()
         c2.shared["skeleton_required"] = True
+        c2.terms["TERM-perm"].pop("short", None)   # 1語だけ定義1文を外す
         err2 = network.skeleton_errors(c2)
         self.assertTrue(any("定義1文（short）か説明（definition）がない" in x for x in err2))
         g = network.skeleton_gaps(course())

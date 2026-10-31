@@ -1526,3 +1526,409 @@ relations:
       units:
       - U05T
     version: 1
+  # ---- P1 骨格：W5（U28〜U32 相関・回帰・調査・実験）と U14 のベルヌーイ分布。#105
+  - id: REL-rv-bernoulli
+    from: TERM-rv
+    to: TERM-bernoulli
+    type: 前提
+    premise: mathematical
+    description: ベルヌーイ分布は、0か1をとる確率変数の分布。
+    basis:
+      units:
+      - U14
+    version: 1
+  - id: REL-bernoulli-binom
+    from: TERM-bernoulli
+    to: TERM-binom
+    figures: [FIG-U14-concept]
+    type: 一般化
+    description: 二項分布は、独立なベルヌーイ試行を n 回くり返したときの成功の数の分布。n＝1 の二項分布がベルヌーイ分布。
+    gist: 1回の当たり外れがベルヌーイ分布。それを n 回くり返して当たりの数を数えると二項分布になる。
+    basis:
+      units:
+      - U14
+    version: 1
+  - id: REL-quant-scatter
+    from: TERM-quant
+    to: TERM-scatter
+    type: 前提
+    premise: mathematical
+    description: 散布図は2つの量的変数の組を点で表す。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-scatter-corr
+    from: TERM-scatter
+    to: TERM-corr
+    type: 前提
+    premise: learning
+    description: 相関係数は、散布図の点が直線のまわりにどれだけ集まっているかを1つの数にしたもの。まず散布図で見る。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-corr-partialcorr
+    from: TERM-corr
+    to: TERM-partial-corr
+    type: 前提
+    premise: mathematical
+    description: 偏相関係数は、3つの変数の相関係数から計算する。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-corr-spurious
+    from: TERM-corr
+    to: TERM-spurious
+    type: 前提
+    premise: learning
+    description: 擬相関は「相関があっても直接の関係とは限らない」という、相関の読み方の注意。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-partialcorr-spurious
+    from: TERM-partial-corr
+    to: TERM-spurious
+    type: 応用
+    description: 偏相関係数で第3の変数の影響を取り除くと、擬相関かどうかの手掛かりになる。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-scatter-slr
+    from: TERM-scatter
+    to: TERM-slr
+    type: 前提
+    premise: learning
+    description: 単回帰は、散布図の点にいちばん合う直線を引くこと。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-slr-resid
+    from: TERM-slr
+    to: TERM-resid
+    type: 前提
+    premise: mathematical
+    description: 残差は、回帰式の予測からのずれ。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-resid-ols
+    from: TERM-resid
+    to: TERM-ols
+    type: 前提
+    premise: mathematical
+    description: 最小二乗法は、残差の2乗の和を最小にする。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-ols-regcoef
+    from: TERM-ols
+    to: TERM-regcoef
+    type: 前提
+    premise: mathematical
+    description: 回帰係数は最小二乗法で求める。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-dev-resid-contrast
+    from: TERM-dev
+    to: TERM-resid
+    type: 対比
+    description: どちらも観測値から何かを引いたずれ。偏差は平均を、残差は回帰式の予測値を引く。回帰式が使えると、残差は偏差より小さくなる（その減り方が決定係数）。
+    gist: 偏差は「みんなの平均」からのずれ、残差は「その人の条件から見込んだ値」からのずれ。見込みが当たるほど残差は小さい。
+    basis:
+      units:
+      - U07
+      - U29
+    version: 1
+  - id: REL-resid-r2
+    from: TERM-resid
+    to: TERM-r2
+    type: 前提
+    premise: mathematical
+    description: 決定係数は、1から（残差の2乗和÷偏差の2乗和）を引いたもの。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-slr-extrap
+    from: TERM-slr
+    to: TERM-extrap
+    type: 前提
+    premise: learning
+    description: 外挿は、回帰式をデータの範囲の外に使うこと。回帰式を知ってから、その使ってよい範囲を学ぶ。
+    basis:
+      units:
+      - U29
+    version: 1
+  - id: REL-slr-mreg
+    from: TERM-slr
+    to: TERM-mreg
+    type: 一般化
+    description: 重回帰分析は、単回帰の説明変数を2つ以上に広げたもの。説明変数が1つの重回帰が単回帰。
+    gist: 身長だけで体重を見込むのが単回帰、身長と年齢と運動量で見込むのが重回帰。手掛かりを増やしても、考え方（残差を小さく）は同じ。
+    basis:
+      units:
+      - U29
+      - U30
+    version: 1
+  - id: REL-qual-dummy
+    from: TERM-qual
+    to: TERM-dummy
+    type: 前提
+    premise: mathematical
+    description: ダミー変数は、質的変数を0と1の数にしたもの。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-dummy-mreg
+    from: TERM-dummy
+    to: TERM-mreg
+    type: 応用
+    description: ダミー変数を使うと、質的変数も重回帰分析の説明変数に入れられる。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-r2-adjr2
+    from: TERM-r2
+    to: TERM-adjr2
+    type: 前提
+    premise: mathematical
+    description: 自由度調整済み決定係数は、決定係数を自由度で補正したもの。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-df-adjr2
+    from: TERM-df
+    to: TERM-adjr2
+    type: 前提
+    premise: mathematical
+    description: 補正には、残差と全体の自由度を使う。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-mreg-adjr2
+    from: TERM-mreg
+    to: TERM-adjr2
+    type: 前提
+    premise: learning
+    description: 説明変数の数が違う重回帰の式どうしを比べるときに使う。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-mreg-multicol
+    from: TERM-mreg
+    to: TERM-multicol
+    type: 前提
+    premise: mathematical
+    description: 多重共線性は、重回帰分析の説明変数どうしの関係で起こる。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-corr-multicol
+    from: TERM-corr
+    to: TERM-multicol
+    type: 前提
+    premise: learning
+    description: 説明変数どうしの相関係数が大きいと、多重共線性を疑う。
+    basis:
+      units:
+      - U30
+    version: 1
+  - id: REL-df-ms
+    from: TERM-df
+    to: TERM-ms
+    type: 前提
+    premise: mathematical
+    description: 平均平方は、平方和を自由度で割ったもの。
+    basis:
+      units:
+      - U30
+      - U32
+    version: 1
+  - id: REL-ms-anova
+    from: TERM-ms
+    to: TERM-anova
+    type: 前提
+    premise: mathematical
+    description: 分散分析の F 値は、群間の平均平方を群内の平均平方で割ったもの。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-f-anova
+    from: TERM-f
+    to: TERM-anova
+    type: 前提
+    premise: mathematical
+    description: 分散分析の F 値は、帰無仮説のもとで F 分布に従う。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-test-anova
+    from: TERM-test
+    to: TERM-anova
+    type: 前提
+    premise: learning
+    description: 分散分析は、仮説検定の手順を3つ以上の群の平均に当てはめたもの。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-anova-multcomp
+    from: TERM-anova
+    to: TERM-multcomp
+    type: 前提
+    premise: learning
+    description: 分散分析で「どこかに差がある」と分かったあと、どの群の間かを調べるのが多重比較。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-type1-multcomp
+    from: TERM-type1
+    to: TERM-multcomp
+    type: 前提
+    premise: mathematical
+    description: 検定をくり返すと、どれかで第1種の過誤が起こる確率が大きくなる。多重比較はそれを抑える調整。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-random-strat
+    from: TERM-random-sampling
+    to: TERM-strat-sampling
+    type: 前提
+    premise: mathematical
+    description: 層化抽出は、層の中で無作為抽出を行う。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-random-cluster
+    from: TERM-random-sampling
+    to: TERM-cluster-sampling
+    type: 前提
+    premise: mathematical
+    description: 集落抽出は、集落を無作為に選ぶ。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-random-systematic
+    from: TERM-random-sampling
+    to: TERM-systematic-sampling
+    type: 前提
+    premise: mathematical
+    description: 系統抽出は、最初の1人を無作為に選ぶ。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-random-multistage
+    from: TERM-random-sampling
+    to: TERM-multistage-sampling
+    type: 前提
+    premise: mathematical
+    description: 多段抽出は、各段で無作為抽出を行う。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-strat-cluster-contrast
+    from: TERM-strat-sampling
+    to: TERM-cluster-sampling
+    type: 対比
+    description: どちらも母集団をグループに分ける。層化抽出はすべての層から少しずつ選び、集落抽出は選んだ集落の全員を調べる。層は中が似た者どうし、集落は中にいろいろな人がいる分け方がよい。
+    gist: 層化は「どのグループからも少しずつ」、集落は「選んだグループは全員」。層化は精度を上げる工夫、集落は手間を減らす工夫。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-sample-samplingerror
+    from: TERM-sample
+    to: TERM-sampling-error
+    type: 前提
+    premise: mathematical
+    description: 標本誤差は、一部だけを調べることで生じるずれ。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-samplingerror-se-contrast
+    from: TERM-sampling-error
+    to: TERM-se
+    type: 対比
+    description: 標本誤差は、標本を選ぶことで結果が真の値からずれる現象そのもの。標準誤差は、そのずれがくり返しでどれくらいの大きさになるかを測る数（推定量の標準偏差）。
+    gist: 標本誤差は「一部だけ見たせいで起きるずれ」、標準誤差は「そのずれのふつうの大きさ」。標準誤差で標本誤差の大きさを見積もる。
+    basis:
+      units:
+      - U18
+      - U31
+    version: 1
+  - id: REL-sampling-nonsampling-contrast
+    from: TERM-sampling-error
+    to: TERM-nonsampling-error
+    type: 対比
+    description: 標本誤差は標本を大きくすると小さくなる。非標本誤差（無回答・回答の誤り・枠の不備）は標本を大きくしても減らず、偏りになりやすい。
+    gist: 人数を増やせば減るずれ（標本誤差）と、人数を増やしても減らないずれ（非標本誤差）がある。後ろのほうは調べ方を変えないと直らない。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-frame-nonsampling
+    from: TERM-frame
+    to: TERM-nonsampling-error
+    type: 前提
+    premise: learning
+    description: 抽出枠の不備は、非標本誤差の代表的な原因の1つ。
+    basis:
+      units:
+      - U31
+    version: 1
+  - id: REL-random-randomize-contrast
+    from: TERM-random-sampling
+    to: TERM-randomize
+    type: 対比
+    description: 無作為抽出は「誰を調べるか」をくじで選ぶ（結果を母集団に広げるため）。無作為化は「誰にどの処理をするか」をくじで割り当てる（処理の効果を他の要因と分けるため）。
+    gist: 無作為抽出は「調べる人を選ぶくじ」、無作為化は「調べる人を組に分けるくじ」。前者で一般化でき、後者で因果を言える。
+    basis:
+      units:
+      - U17
+      - U32
+    version: 1
+  - id: REL-confound-randomize
+    from: TERM-confound
+    to: TERM-randomize
+    type: 前提
+    premise: learning
+    description: 無作為化は、交絡する要因を群の間でそろえるために行う。交絡を知ってから、その断ち方を学ぶ。
+    basis:
+      units:
+      - U32
+    version: 1
+  - id: REL-confound-spurious
+    from: TERM-confound
+    to: TERM-spurious
+    type: 前提
+    premise: learning
+    description: 擬相関の多くは、交絡する第3の要因から生まれる。
+    basis:
+      units:
+      - U28
+      - U32
+    version: 1
