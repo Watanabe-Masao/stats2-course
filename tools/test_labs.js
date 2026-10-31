@@ -12,14 +12,18 @@ const ROOT=path.resolve(__dirname,'..');
    if(!O&&!A)return true;
    return (O&&O.split(',').some(o=>v.asset===o||v.asset.startsWith(o+'@')))||(A&&A.split(',').includes(v.asset));});
  // SHARD=k/n：版を n 組に分けて k 組目だけ（GitHub で別々の機械に分けて並行に走らせる。1台の中では同時に2つ走らせない）
+ // 分け方は tools/lab_shard.js：tools/lab_times.json の時間で合計がそろうように分ける（#129）
+ const SH=require('./lab_shard.js');
  if(process.env.SHARD){const [k,n]=process.env.SHARD.split('/').map(Number);if(!(n>=1&&k>=1&&k<=n)){console.log('❌ SHARD は k/n（1≤k≤n）');process.exit(1);}
-   const all=man.length;man.splice(0,all,...man.filter((_,i)=>i%n===k-1));console.log(`組 ${k}/${n}：${man.length}/${all} 版`);}
+   const all=man.length,{groups,load}=SH.assign(man.map(SH.key),n,SH.loadTimes());const mine=groups[k-1].map(i=>man[i]);
+   man.splice(0,all,...mine);console.log(`組 ${k}/${n}：${man.length}/${all} 版（記録からの見積もり ${load[k-1]}秒）`);}
  if(!man.length){console.log('❌ 絞り込みに合う版がない');process.exit(1);}
  const shots=process.argv[2];const b=await chromium.launch();let fail=0;const embedH=[];
  const GH=!!process.env.GITHUB_ACTIONS;   // GitHub では失敗を注釈にも出す（ログを読めない環境でも API で原因が見える）
  const bad=(m)=>{console.log('❌ '+m);if(GH)console.log('::error::'+String(m).replace(/\n/g,' '));fail++;};
  process.on('unhandledRejection',e=>{if(GH)console.log('::error::止まった：'+String(e&&e.message||e).split('\n')[0]);console.log(e);process.exit(1);});
- for(const v of man){for(const scheme of ['light','dark']){
+ // 版ごとの時間を「⏱ 秒 版の名前」で出す（build/lab_times.py が GitHub のログから tools/lab_times.json を作り直す）
+ for(const v of man){const t0=Date.now();for(const scheme of ['light','dark']){
   const p=await b.newPage({viewport:{width:380,height:900},colorScheme:scheme});
   const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
   await p.goto('file://'+path.join(ROOT,v.file)+(v.query||''));
@@ -120,5 +124,5 @@ const ROOT=path.resolve(__dirname,'..');
       const fo=v.cfg.tour.steps[i].focus;   // 注目する場所（強調で囲む所）が、埋め込みでも枠の中に見える
       if(fo&&!(await p.evaluate(([fo,W])=>{const es=[...document.querySelectorAll('.lk-hl')];return es.length>0&&es.every(e=>{const r=e.getBoundingClientRect();return e.offsetParent!==null&&r.height>0&&r.bottom<=320&&r.right<=W+4;});},[fo,W])))bad(`${tag}: ${where}で注目する場所（${fo}）が見えない`);}}}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
-  await p.close();}
+  await p.close();console.log(`⏱ ${((Date.now()-t0)/1000).toFixed(1)} ${SH.key(v)}`);}
  await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();

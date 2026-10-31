@@ -376,6 +376,42 @@ class TestCheckChanged(unittest.TestCase):
             self.assertEqual([x for x in a if x not in have], [], u)
 
 
+class TestLabShard(unittest.TestCase):
+    """ラボの版を時間で組に分ける（tools/lab_shard.js。#129）。漏れ・重なり・入力しだいで変わる組を見逃さない。"""
+
+    def shard(self, items, n, times):
+        import subprocess
+        js = ("const S=require('./tools/lab_shard.js');const a=JSON.parse(process.argv[1]);"
+              "console.log(JSON.stringify(S.assign(a.items,a.n,a.times)));")
+        out = subprocess.run(["node", "-e", js, json.dumps({"items": items, "n": n, "times": times})],
+                             cwd=Path(__file__).resolve().parent.parent, capture_output=True, text=True, check=True)
+        return json.loads(out.stdout)
+
+    def test_every_item_once_and_balanced(self):
+        items = [f"LAB-x@p{i}" for i in range(40)] + [f"site:LAB-x@p{i}" for i in range(40)]
+        times = {k: float(1 + (i * 7) % 23) for i, k in enumerate(items) if i % 5}   # 5つに1つは記録なし
+        r = self.shard(items, 6, times)
+        flat = sorted(i for g in r["groups"] for i in g)
+        self.assertEqual(flat, list(range(len(items))))
+        self.assertLessEqual(max(r["load"]) - min(r["load"]), 23)   # 差は最も長い1版まで
+        for g in r["groups"]:
+            self.assertEqual(g, sorted(g))   # 組の中は元の並び順
+        self.assertEqual(r, self.shard(items, 6, times))   # 同じ入力なら同じ組
+
+    def test_no_record_splits_by_count(self):
+        r = self.shard([f"a{i}" for i in range(13)], 6, {})
+        self.assertEqual(sorted(len(g) for g in r["groups"]), [2, 2, 2, 2, 2, 3])
+
+    def test_long_items_spread(self):
+        r = self.shard(["a", "b", "c", "d"], 2, {"a": 10, "b": 9, "c": 1, "d": 1})
+        self.assertEqual(r["load"], [11, 10])
+
+    def test_record_is_readable(self):
+        rec = Path(__file__).resolve().parent.parent / "tools" / "lab_times.json"
+        times = json.loads(rec.read_text(encoding="utf-8"))
+        self.assertTrue(all(isinstance(v, (int, float)) and v > 0 for v in times.values()))
+
+
 class TestUnitLinks(unittest.TestCase):
     def test_prereq_needs_used_by(self):
         c = course()

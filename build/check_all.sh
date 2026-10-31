@@ -23,7 +23,10 @@ lap() {   # lap 次の段の名前（引数なしで最後の段を閉じる）
   [ -n "$LAST" ] && echo "== $LAST"
   return 0
 }
-[ -n "${GITHUB_STEP_SUMMARY:-}" ] && printf '### %s の時間\n\n| 段 | 秒 |\n| --- | ---: |\n' "${PART}${SHARD:+ $SHARD}" >> "$GITHUB_STEP_SUMMARY"
+# 機械の速さで時間が大きく変わる（同じ組でも約1.7倍）ので、CPU も残す
+CPU="$(LC_ALL=C lscpu 2>/dev/null | sed -n 's/^Model name: *//p' | head -1)・$(nproc 2>/dev/null)コア"
+echo "   （機械：$CPU）"
+[ -n "${GITHUB_STEP_SUMMARY:-}" ] && printf '### %s の時間\n\n機械：%s\n\n| 段 | 秒 |\n| --- | ---: |\n' "${PART}${SHARD:+ $SHARD}" "$CPU" >> "$GITHUB_STEP_SUMMARY"
 if [ "$PART" != labs ]; then
   lap "1. 単体テスト"; python3 -m unittest discover -s tests -q
   lap "1b. 型と見た目の値の写し"; python3 build/sync_schema.py
