@@ -1,9 +1,9 @@
 {
- "format": "oracle-prototype/0",
- "status": "試作（隔離）。build・CI・math-lab のテストはまだ読まない",
+ "format": "oracle/1",
+ "status": "check_all が --check で古くないかを確かめ、math-lab のテストが写して engine と照らす",
  "generated_by": {
-  "script": "research/oracle/oracle.py",
-  "script_sha256": "ad8f505fe4544b89f17b256cb1c1453943fd6d14e7f616e9af29423617893ad5",
+  "script": "build/oracle.py",
+  "script_sha256": "ae22793f5c814a08880aea0bcd9549781e0485057e0f5af0bba1a0ab129ea538",
   "libraries": [
    "math",
    "fractions",
@@ -13,7 +13,7 @@
   "random": "使わない（入力は固定の表）",
   "independence": "教材の式（tex・tree）と math-lab の engine を読まない。定義（数え上げ・期待値の和・正規方程式）から求める"
  },
- "formula_id_scheme": "仮の式 ID：<概念ID>#<式の番号>（terms.yaml の formulas の並び。README 参照。正式な形はフェーズ0で決める）",
+ "formula_id_scheme": "式 ID（terms.yaml の formulas[].id。F-…。#118 D1）",
  "tolerance": {
   "exact": {
    "rel": 1e-12,
@@ -35,9 +35,9 @@
   {
    "id": "binom-n1-p0_1",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -87,9 +87,9 @@
   {
    "id": "binom-n1-p1_1",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -139,9 +139,9 @@
   {
    "id": "binom-n1-p1_2",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -191,9 +191,9 @@
   {
    "id": "binom-n4-p1_4",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -255,9 +255,9 @@
   {
    "id": "binom-n5-p1_2",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -323,9 +323,9 @@
   {
    "id": "binom-n6-p1_3",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -395,9 +395,9 @@
   {
    "id": "binom-n10-p3_10",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -483,9 +483,9 @@
   {
    "id": "binom-n10-p0_1",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -571,9 +571,9 @@
   {
    "id": "binom-n10-p1_1",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -659,9 +659,9 @@
   {
    "id": "binom-n12-p2_3",
    "formula_ids": [
-    "TERM-binom#0",
-    "TERM-binom#1",
-    "TERM-binom#2"
+    "F-binom-pmf",
+    "F-binom-mean",
+    "F-binom-var"
    ],
    "representative": "二項分布",
    "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
@@ -755,14 +755,14 @@
   {
    "id": "table-die",
    "formula_ids": [
-    "TERM-expect#0",
-    "TERM-expect#1",
-    "TERM-expect#2",
-    "TERM-var#0",
-    "TERM-var#1",
-    "TERM-std#0",
-    "TERM-std#1",
-    "TERM-std#2"
+    "F-expect-def",
+    "F-expect-mu",
+    "F-expect-linear",
+    "F-var-def",
+    "F-var-linear",
+    "F-std-def",
+    "F-std-mean",
+    "F-std-var"
    ],
    "representative": "期待値・分散・標準化",
    "method": "値の表から定義の和（Σ x p(x)・Σ (x−μ)² p(x)）で求める。aX+b は表の値を置き換えた別の表で求める（線形の式を使わない）",
@@ -1017,14 +1017,14 @@
   {
    "id": "table-skew",
    "formula_ids": [
-    "TERM-expect#0",
-    "TERM-expect#1",
-    "TERM-expect#2",
-    "TERM-var#0",
-    "TERM-var#1",
-    "TERM-std#0",
-    "TERM-std#1",
-    "TERM-std#2"
+    "F-expect-def",
+    "F-expect-mu",
+    "F-expect-linear",
+    "F-var-def",
+    "F-var-linear",
+    "F-std-def",
+    "F-std-mean",
+    "F-std-var"
    ],
    "representative": "期待値・分散・標準化",
    "method": "値の表から定義の和（Σ x p(x)・Σ (x−μ)² p(x)）で求める。aX+b は表の値を置き換えた別の表で求める（線形の式を使わない）",
@@ -1253,14 +1253,14 @@
   {
    "id": "table-two-point",
    "formula_ids": [
-    "TERM-expect#0",
-    "TERM-expect#1",
-    "TERM-expect#2",
-    "TERM-var#0",
-    "TERM-var#1",
-    "TERM-std#0",
-    "TERM-std#1",
-    "TERM-std#2"
+    "F-expect-def",
+    "F-expect-mu",
+    "F-expect-linear",
+    "F-var-def",
+    "F-var-linear",
+    "F-std-def",
+    "F-std-mean",
+    "F-std-var"
    ],
    "representative": "期待値・分散・標準化",
    "method": "値の表から定義の和（Σ x p(x)・Σ (x−μ)² p(x)）で求める。aX+b は表の値を置き換えた別の表で求める（線形の式を使わない）",
@@ -1681,7 +1681,7 @@
   {
    "id": "std-sigma-zero",
    "formula_ids": [
-    "TERM-std#0"
+    "F-std-def"
    ],
    "inputs": {
     "rows": [
@@ -1693,12 +1693,12 @@
    },
    "expect": "計算しない",
    "reason": "σ＝0（標準偏差が0でない、が崩れる）",
-   "domain_ref": "TERM-std#0 の sigma の domain（min 0・minOpen）"
+   "domain_ref": "F-std-def の sigma の domain（min 0・minOpen）"
   },
   {
    "id": "binom-p-out",
    "formula_ids": [
-    "TERM-binom#0"
+    "F-binom-pmf"
    ],
    "inputs": {
     "n": 5,
@@ -1707,12 +1707,12 @@
    },
    "expect": "計算しない",
    "reason": "p は 0以上1以下",
-   "domain_ref": "TERM-binom#0 の p の domain"
+   "domain_ref": "F-binom-pmf の p の domain"
   },
   {
    "id": "binom-k-over-n",
    "formula_ids": [
-    "TERM-binom#0"
+    "F-binom-pmf"
    ],
    "inputs": {
     "n": 5,
@@ -1721,12 +1721,12 @@
    },
    "expect": "計算しない",
    "reason": "k は 0以上 n 以下の整数",
-   "domain_ref": "TERM-binom#0 の k の domain（max: n）"
+   "domain_ref": "F-binom-pmf の k の domain（max: n）"
   },
   {
    "id": "binom-k-noninteger",
    "formula_ids": [
-    "TERM-binom#0"
+    "F-binom-pmf"
    ],
    "inputs": {
     "n": 5,
@@ -1735,7 +1735,68 @@
    },
    "expect": "計算しない",
    "reason": "k は整数",
-   "domain_ref": "TERM-binom#0 の k の domain（integer）"
+   "domain_ref": "F-binom-pmf の k の domain（integer）"
+  },
+  {
+   "id": "geom-p-zero",
+   "formula_ids": [
+    "F-geom-pmf",
+    "F-geom-mean",
+    "F-geom-var"
+   ],
+   "inputs": {
+    "k": 1,
+    "p": 0
+   },
+   "expect": "計算しない",
+   "reason": "p は 0 より大きい（p＝0 だと E＝1/p が無限）",
+   "domain_ref": "F-geom-* の p の domain（min 0・minOpen）"
+  },
+  {
+   "id": "uniform-a-eq-b",
+   "formula_ids": [
+    "F-uniform-pdf",
+    "F-uniform-mean",
+    "F-uniform-var"
+   ],
+   "inputs": {
+    "x": 2,
+    "a": 2,
+    "b": 2
+   },
+   "expect": "計算しない",
+   "reason": "a＜b（a＝b だと 1/(b−a) が無限）",
+   "domain_ref": "F-uniform-* の b の domain（min: a・minOpen）"
+  },
+  {
+   "id": "hyper-k-over-M",
+   "formula_ids": [
+    "F-hyper-pmf"
+   ],
+   "inputs": {
+    "N": 10,
+    "M": 3,
+    "n": 5,
+    "k": 4
+   },
+   "expect": "計算しない",
+   "reason": "k ≦ M（当たりは3個しかない）",
+   "domain_ref": "F-hyper-pmf の契約の conditions（k ≦ M）"
+  },
+  {
+   "id": "hyper-k-too-small",
+   "formula_ids": [
+    "F-hyper-pmf"
+   ],
+   "inputs": {
+    "N": 10,
+    "M": 8,
+    "n": 5,
+    "k": 2
+   },
+   "expect": "計算しない",
+   "reason": "n−(N−M) ≦ k（外れは2個しかないので、5個引けば当たりは3個以上）",
+   "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"
   },
   {
    "id": "ols-sxx-zero",

@@ -17,7 +17,7 @@ README の 0「テストの有効性と最小十分性」に従う。各テス�
 
 ## 2. 代表の式ごとのテスト
 
-「既存」は今ある、「足す」は統合で足す、「レビュー」は数で保証しない観点。見本は research/oracle/reference.json の case id。
+「既存」は今ある、「足す」は統合で足す、「レビュー」は数で保証しない観点。見本は docs/formula-correctness/reference.json の case id。
 
 ### 2.1 二項分布（TERM-binom#0〜2）
 

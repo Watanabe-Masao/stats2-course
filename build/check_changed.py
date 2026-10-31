@@ -104,6 +104,8 @@ def main() -> None:
         return
     run("単体テスト", [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-q"])
     run("生成（検証・検算・生成物の検査）", [sys.executable, "build/build.py"])
+    run("式の見本（#118 C5）", [sys.executable, "build/formula_fixture.py", "--check"])
+    run("独立な見本（#118）", [sys.executable, "build/oracle.py", "--check"])
     for u in sorted(units):
         if os.path.exists(os.path.join(ROOT, "migration", "old", f"{u}.md")):
             run(f"旧版との突き合わせ {u}", [sys.executable, "build/audit.py", u])

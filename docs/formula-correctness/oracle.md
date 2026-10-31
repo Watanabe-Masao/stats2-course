@@ -1,6 +1,6 @@
-# 独立な見本（オラクル）の試作（#118）
+# 独立な見本（オラクル）（#118）
 
-**試作で、隔離している**。build・`build/check_all.sh`・CI（.github/workflows）・math-lab のテストはこのフォルダを読まない。設計は docs/formula-correctness/（README・test-plan.md の 5）。
+2026-11-01（単位 B）に試作から build へ移した：script は build/oracle.py、見本は docs/formula-correctness/reference.json（コミットする）。`build/check_all.sh` が `--check` で古くないかを確かめ、math-lab は写し（版を固定。scripts/sync-stats2.mjs）を engine の値と照らす。設計は docs/formula-correctness/（README・test-plan.md の 5）。
 
 ## 何をするか
 
@@ -19,8 +19,8 @@
 ## 使い方
 
 ```sh
-python3 research/oracle/oracle.py          # reference.json を書き直す
-python3 research/oracle/oracle.py --check  # 書き直さず一致だけ確かめる（不一致なら終了コード 1）
+python3 build/oracle.py          # reference.json を書き直す
+python3 build/oracle.py --check  # 書き直さず一致だけ確かめる（不一致なら終了コード 1）
 ```
 
 乱数は使わない。同じ版の script なら出力は1バイトも変わらない（時刻・Python の版は書かない。script の sha256 を書く）。

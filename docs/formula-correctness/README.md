@@ -8,7 +8,7 @@
 | [inventory.md](inventory.md) | 今あるものの棚卸し（math-lab・knowledge-net の型・教材の build と原本）。#109 の項目ごとに 実装済み／一部／未実装 |
 | [classification.md](classification.md) | 式の種類と性質の定義、性質ごとの確かめ方と限界、教材の38式の分類 |
 | [test-plan.md](test-plan.md) | 代表の式ごとのテスト、わざと入れた誤り（M1〜M9）と止める層 |
-| [../../research/oracle/](../../research/oracle/README.md) | 独立な見本（オラクル）の試作。build・CI は読まない |
+| [oracle.md](oracle.md) | 独立な見本（オラクル）：build/oracle.py が reference.json を書く。check_all が古くないかを止め、math-lab が写して engine と照らす |
 
 ## 0. テストの有効性と最小十分性（渡辺さん 2026-10-31）
 
@@ -91,7 +91,7 @@ TERM-binom#0   レビュー：条件  —   個別レビュー 未完了 —
 | 成り立つ条件 | **新しく書かない**。記号の `domain`（#109）と概念の `conditions.math` を参照する。記号どうしの条件（k ≦ M・a＜b など、今の domain で書けないもの）だけを足す | 同じことを2か所に書かない |
 | 式ごとの検証の契約 | content/formula-contracts.yaml（式 ID・種類・性質・参照する条件・共通テスト・性質のテスト・レビューの要否・根拠） | 契約は原本（人が決める）。テストの自動選択はこれを読む |
 | 個別レビューの記録 | content/formula-reviews.yaml（対象の式 ID と式の版・観点・根拠・判断・担当・日付） | 式の版が変わったらレビューは「やり直し」になる |
-| 独立な見本 | stats2-course の build が書き出し（今は research/oracle/ の試作）、math-lab の test/fixtures/ に写す | #118 の「層1の独立な見本は stats2 の build で書き出し、math-lab のテストで読む」 |
+| 独立な見本 | stats2-course の build/oracle.py が docs/formula-correctness/reference.json に書き出し（コミット）、math-lab の test/fixtures/ に写す（版を固定） | #118 の「層1の独立な見本は stats2 の build で書き出し、math-lab のテストで読む」 |
 | 検証の結果 | out/verify/（生成物） | 原本に結果を書かない |
 
 どの案でも、型（kn-schema）を変えるのは「画面に出すもの」（成り立つ条件・未検証の印・式の id）だけにし、契約やレビューの記録は教材の中で持つ（knowledge-net は他の教材でも使う土台なので、検証の運用まで型に入れない）。

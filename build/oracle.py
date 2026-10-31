@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""独立な見本（オラクル）の試作（stats2-course #118。隔離した試作で、build・CI は使わない）。
+"""独立な見本（オラクル）（stats2-course #118 単位 B。2026-11-01 に試作から build へ移した）。
 
 代表の5つ（二項分布・期待値・分散・標準化・回帰）の見本の値を、math-lab の engine とも教材の式の木とも別に、
 Python の標準ライブラリ（math・fractions・itertools）だけで求め、生成の条件と誤差の決まりを添えて JSON に書く。
@@ -11,8 +11,10 @@ Python の標準ライブラリ（math・fractions・itertools）だけで求め
 - 乱数を使わない（入力は下の表で固定）。同じ版の script なら出力は1バイトも変わらない（--check で確かめる）
 
 使い方
-  python3 research/oracle/oracle.py          # research/oracle/reference.json を書き直す
-  python3 research/oracle/oracle.py --check  # 書き直さず、今のファイルと一致するかだけ確かめる（不一致なら終了コード 1）
+  python3 build/oracle.py          # docs/formula-correctness/reference.json を書き直す
+  python3 build/oracle.py --check  # 書き直さず、今のファイルと一致するかだけ確かめる（不一致なら終了コード 1。check_all が呼ぶ）
+
+math-lab は reference.json を写して engine の値と照らす（math-lab の scripts/sync-stats2.mjs。写しの版を固定する。#118 C5）。
 """
 from __future__ import annotations
 
@@ -24,9 +26,9 @@ import sys
 from fractions import Fraction as F
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-OUT = HERE / "reference.json"
-FORMAT = "oracle-prototype/0"
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "docs" / "formula-correctness" / "reference.json"
+FORMAT = "oracle/1"
 
 # 誤差の決まり（README の「誤差の決まり」と同じ）。exact は有理数で正確な値、derived は √ などで無理数になる値
 TOLERANCE = {
@@ -77,7 +79,7 @@ def binom_cases() -> list[dict]:
         assert all(pmf[k] == math.comb(n, k) * p**k * (1 - p) ** (n - k) for k in range(n + 1)), (n, p)
         out.append({
             "id": f"binom-n{n}-p{p.numerator}_{p.denominator}",
-            "formula_ids": ["TERM-binom#0", "TERM-binom#1", "TERM-binom#2"],
+            "formula_ids": ["F-binom-pmf", "F-binom-mean", "F-binom-var"],
             "representative": "二項分布",
             "method": "n 回の並び 2^n 通りを数え上げ、成功の数ごとに並びの確率を足す（式を使わない）",
             "inputs": {"n": n, "p": frac(p)},
@@ -148,7 +150,7 @@ def table_cases() -> list[dict]:
             }
         out.append({
             "id": f"table-{t['id']}",
-            "formula_ids": ["TERM-expect#0", "TERM-expect#1", "TERM-expect#2", "TERM-var#0", "TERM-var#1", "TERM-std#0", "TERM-std#1", "TERM-std#2"],
+            "formula_ids": ["F-expect-def", "F-expect-mu", "F-expect-linear", "F-var-def", "F-var-linear", "F-std-def", "F-std-mean", "F-std-var"],
             "representative": "期待値・分散・標準化",
             "method": "値の表から定義の和（Σ x p(x)・Σ (x−μ)² p(x)）で求める。aX+b は表の値を置き換えた別の表で求める（線形の式を使わない）",
             "note": t["note"],
@@ -241,14 +243,23 @@ def precondition_cases() -> list[dict]:
     assert E(degenerate, lambda x: (x - E(degenerate)) ** 2) == 0
     assert ols([F(2), F(2), F(2)], [F(1), F(2), F(3)]) is None
     return [
-        {"id": "std-sigma-zero", "formula_ids": ["TERM-std#0"], "inputs": {"rows": [{"x": 4, "weight": 1}]},
-         "expect": "計算しない", "reason": "σ＝0（標準偏差が0でない、が崩れる）", "domain_ref": "TERM-std#0 の sigma の domain（min 0・minOpen）"},
-        {"id": "binom-p-out", "formula_ids": ["TERM-binom#0"], "inputs": {"n": 5, "k": 2, "p": 1.5},
-         "expect": "計算しない", "reason": "p は 0以上1以下", "domain_ref": "TERM-binom#0 の p の domain"},
-        {"id": "binom-k-over-n", "formula_ids": ["TERM-binom#0"], "inputs": {"n": 5, "k": 10, "p": 0.5},
-         "expect": "計算しない", "reason": "k は 0以上 n 以下の整数", "domain_ref": "TERM-binom#0 の k の domain（max: n）"},
-        {"id": "binom-k-noninteger", "formula_ids": ["TERM-binom#0"], "inputs": {"n": 5, "k": 2.5, "p": 0.5},
-         "expect": "計算しない", "reason": "k は整数", "domain_ref": "TERM-binom#0 の k の domain（integer）"},
+        {"id": "std-sigma-zero", "formula_ids": ["F-std-def"], "inputs": {"rows": [{"x": 4, "weight": 1}]},
+         "expect": "計算しない", "reason": "σ＝0（標準偏差が0でない、が崩れる）", "domain_ref": "F-std-def の sigma の domain（min 0・minOpen）"},
+        {"id": "binom-p-out", "formula_ids": ["F-binom-pmf"], "inputs": {"n": 5, "k": 2, "p": 1.5},
+         "expect": "計算しない", "reason": "p は 0以上1以下", "domain_ref": "F-binom-pmf の p の domain"},
+        {"id": "binom-k-over-n", "formula_ids": ["F-binom-pmf"], "inputs": {"n": 5, "k": 10, "p": 0.5},
+         "expect": "計算しない", "reason": "k は 0以上 n 以下の整数", "domain_ref": "F-binom-pmf の k の domain（max: n）"},
+        {"id": "binom-k-noninteger", "formula_ids": ["F-binom-pmf"], "inputs": {"n": 5, "k": 2.5, "p": 0.5},
+         "expect": "計算しない", "reason": "k は整数", "domain_ref": "F-binom-pmf の k の domain（integer）"},
+        # 定義域の直し（#118 D5）と記号どうしの条件（契約の conditions）で止まるべき入力
+        {"id": "geom-p-zero", "formula_ids": ["F-geom-pmf", "F-geom-mean", "F-geom-var"], "inputs": {"k": 1, "p": 0},
+         "expect": "計算しない", "reason": "p は 0 より大きい（p＝0 だと E＝1/p が無限）", "domain_ref": "F-geom-* の p の domain（min 0・minOpen）"},
+        {"id": "uniform-a-eq-b", "formula_ids": ["F-uniform-pdf", "F-uniform-mean", "F-uniform-var"], "inputs": {"x": 2, "a": 2, "b": 2},
+         "expect": "計算しない", "reason": "a＜b（a＝b だと 1/(b−a) が無限）", "domain_ref": "F-uniform-* の b の domain（min: a・minOpen）"},
+        {"id": "hyper-k-over-M", "formula_ids": ["F-hyper-pmf"], "inputs": {"N": 10, "M": 3, "n": 5, "k": 4},
+         "expect": "計算しない", "reason": "k ≦ M（当たりは3個しかない）", "domain_ref": "F-hyper-pmf の契約の conditions（k ≦ M）"},
+        {"id": "hyper-k-too-small", "formula_ids": ["F-hyper-pmf"], "inputs": {"N": 10, "M": 8, "n": 5, "k": 2},
+         "expect": "計算しない", "reason": "n−(N−M) ≦ k（外れは2個しかないので、5個引けば当たりは3個以上）", "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"},
         {"id": "ols-sxx-zero", "formula_ids": [], "inputs": {"x": [2, 2, 2], "y": [1, 2, 3]},
          "expect": "計算しない", "reason": "x のばらつきが0（傾きが決まらない）", "domain_ref": "まだない（回帰の式と条件が原本にない）"},
     ]
@@ -258,16 +269,16 @@ def build() -> dict:
     src = Path(__file__).read_bytes()
     return {
         "format": FORMAT,
-        "status": "試作（隔離）。build・CI・math-lab のテストはまだ読まない",
+        "status": "check_all が --check で古くないかを確かめ、math-lab のテストが写して engine と照らす",
         "generated_by": {
-            "script": "research/oracle/oracle.py",
+            "script": "build/oracle.py",
             "script_sha256": hashlib.sha256(src).hexdigest(),
             "libraries": ["math", "fractions", "itertools"],
             "python_min": "3.10",
             "random": "使わない（入力は固定の表）",
             "independence": "教材の式（tex・tree）と math-lab の engine を読まない。定義（数え上げ・期待値の和・正規方程式）から求める",
         },
-        "formula_id_scheme": "仮の式 ID：<概念ID>#<式の番号>（terms.yaml の formulas の並び。README 参照。正式な形はフェーズ0で決める）",
+        "formula_id_scheme": "式 ID（terms.yaml の formulas[].id。F-…。#118 D1）",
         "tolerance": TOLERANCE,
         "cases": binom_cases() + table_cases() + reg_cases(),
         "preconditions": precondition_cases(),
@@ -283,13 +294,13 @@ def main(argv: list[str]) -> int:
     if "--check" in argv:
         now = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
         if now != text:
-            print("❌ reference.json が script と食い違う（python3 research/oracle/oracle.py で書き直す）")
+            print("❌ reference.json が script と食い違う（python3 build/oracle.py で書き直す）")
             return 1
         print("✅ reference.json は script と一致")
         return 0
     OUT.write_text(text, encoding="utf-8")
     d = json.loads(text)
-    print(f"書いた：{OUT.relative_to(HERE.parent.parent)}（見本 {len(d['cases'])} 件・前提の崩れ {len(d['preconditions'])} 件）")
+    print(f"書いた：{OUT.relative_to(ROOT)}（見本 {len(d['cases'])} 件・前提の崩れ {len(d['preconditions'])} 件）")
     return 0
 
 
