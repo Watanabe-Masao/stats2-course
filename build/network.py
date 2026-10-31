@@ -60,6 +60,13 @@ def course_id(c: Course) -> str:
     return c.shared.get("course", {}).get("id", "stats2")
 
 
+def _first(prompt: str, limit: int = 120) -> str:
+    """問題文の始め（一覧に出す1行）。記法の印と改行を落とし、長ければ … で切る"""
+    t = re.sub(r"\$\$?|\*\*|\{\{[^}]*\}\}|^\s*[-^>]\s*", "", prompt.strip().split("\n\n")[0], flags=re.M)
+    t = re.sub(r"\s*\n\s*", " ", t).strip()
+    return t if len(t) <= limit else t[: limit - 1] + "…"
+
+
 def load_network() -> tuple[list[dict], list[dict]]:
     rel = (load_yaml(CONTENT / "relations.yaml") or {}).get("relations", []) if (CONTENT / "relations.yaml").exists() else []
     der = (load_yaml(CONTENT / "derivations.yaml") or {}).get("derivations", []) if (CONTENT / "derivations.yaml").exists() else []
@@ -500,11 +507,20 @@ def export_network(c: Course, target: dict) -> dict:
                                  **({"url": url[s["source"]]} if url.get(s["source"]) else {})} for s in t["sources"]]
         concepts.append(e)
     pages = target.get("units") or {}
+    stage_name = {st["id"]: st["name"] for st in c.stages}
     units = []
     for uid, meta in c.index.items():
         e = {"id": g(uid), "number": str(meta["number"]), "title": c.units[uid]["title"]}
         if pages.get(uid):
             e["url"] = f"https://app.notion.com/p/{pages[uid]}"
+        # 学習・問題集のタブ（knowledge-net 型の改訂12。#42）：まとまり（領域の名前）と問題の一覧（id・段階・問題文の始め）
+        dom = (c.shared.get("domains") or {}).get(c.units[uid].get("domain"), {}).get("name")
+        if dom:
+            e["group"] = re.sub(r"^[①-⑳]\s*", "", dom)
+        probs = [{"id": g(qid), "stage": stage_name.get(q.get("stage"), q.get("stage") or ""), "prompt": _first(q.get("prompt") or "")}
+                 for qid, q in c.units[uid]["problems"].items() if not q.get("retired")]
+        if probs:
+            e["problems"] = probs
         units.append(e)
     relations = []
     for r in rels:

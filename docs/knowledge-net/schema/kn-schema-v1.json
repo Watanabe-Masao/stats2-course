@@ -767,6 +767,34 @@
               "url": {
                 "type": "string",
                 "format": "uri"
+              },
+              "group": {
+                "$ref": "#/$defs/text",
+                "description": "単元のまとまり（学習・問題集のタブで分ける。stats2-course #42）"
+              },
+              "problems": {
+                "type": "array",
+                "description": "単元の問題（問題集のタブの一覧。解いた記録は持たない）",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "stage",
+                    "prompt"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/gid"
+                    },
+                    "stage": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "prompt": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
               }
             }
           }
@@ -1368,5 +1396,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 11
+  "x-revision": 12
 }
