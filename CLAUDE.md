@@ -149,7 +149,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 説明ありの概念：
   - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。
   - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
-  - 任意：`formulas`（式ごとに `tex` と `symbols`：記号・意味・値の範囲）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
+  - 任意：`formulas`（式ごとに `id`・`tree`・`symbols`：記号・意味・値の範囲。tex は build が木から作る）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
   - 説明に数があれば `checks`。
 - 関係は content/relations.yaml（REL-…、`version` 必須）。8種類（前提・導出・一般化・特殊化・変換・対比・統合・応用）。登録の前に relation-types.yaml の定義・矢印の読み方・該当例・該当しない例を確かめる。
   - 前提には `premise`（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）。
