@@ -282,3 +282,176 @@ relations:
       - {id: LAB-pois, preset: s5-free, purpose: p・r・k を自分で動かし、幾何（r＝1）と負の二項を比べる}
     figures: [FIG-LAB-pois-rel-negbinom-tour-1, FIG-LAB-pois-rel-negbinom-tour-2]
     basis: {units: [U15]}
+  # ---- P1 骨格：W1（U09〜U12 数え上げ・確率）。#105
+  - id: REL-fact-perm
+    from: TERM-fact
+    to: TERM-perm
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: n 個から k 個を並べる順列の数は、階乗で n!÷(n−k)! と書ける。
+    basis: {units: [U09]}
+  - id: REL-perm-comb-contrast
+    from: TERM-perm
+    to: TERM-comb
+    version: 1
+    type: 対比
+    description: どちらも n 個から k 個を取り出す数。順列は並べる順番を区別し、組合せは区別しない。組合せの数は、順列の数を k 個の並べ替え k! で割ったもの。
+    gist: 順番が意味を持つ（1位・2位）なら順列、持たない（選ぶだけ）なら組合せ。同じ k 個の選び方が、順列では k! 通りに数えられる。
+    basis: {units: [U09]}
+  - id: REL-ss-event
+    from: TERM-sample-space
+    to: TERM-event
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 事象は標本空間の部分集合として決める。まず起こりうる結果の全体を決める。
+    basis: {units: [U10]}
+  - id: REL-event-complement
+    from: TERM-event
+    to: TERM-complement
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 余事象は、事象を標本空間の中で裏返したもの。
+    basis: {units: [U10]}
+  - id: REL-event-exclusive
+    from: TERM-event
+    to: TERM-exclusive
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 排反は2つの事象の関係（共通部分がない）として決める。
+    basis: {units: [U10, U11]}
+  - id: REL-event-prob
+    from: TERM-event
+    to: TERM-prob
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 確率は事象ごとに決める数。何についての確率か（事象）がないと決められない。
+    basis: {units: [U10]}
+  - id: REL-prob-addition
+    from: TERM-prob
+    to: TERM-addition
+    version: 1
+    type: 導出
+    description: 確率の公理（排反なら足せる）から、重なりのある2つの事象でも、重なりを1回引けば和の確率が出る。
+    gist: 2つの円が重なっているとき、面積を足すと重なりを2回数えてしまう。だから重なりを1回引く。
+    conditions: [確率の公理（全体は1・排反な事象の確率は足せる）]
+    basis: {units: [U10]}
+  - id: REL-exclusive-addition
+    from: TERM-exclusive
+    to: TERM-addition
+    version: 1
+    type: 前提
+    premise: learning
+    description: 排反なら重なりが0なので、加法定理は単に足すだけになる。まず排反の場合で足し算を理解する。
+    basis: {units: [U10]}
+  - id: REL-prob-cond
+    from: TERM-prob
+    to: TERM-cond
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 条件付き確率は、両方が起こる確率を、条件の事象の確率で割って決める。
+    basis: {units: [U11]}
+  - id: REL-cond-multiplication
+    from: TERM-cond
+    to: TERM-multiplication
+    version: 1
+    type: 導出
+    description: 条件付き確率の定義 P(B|A)＝P(A∩B)÷P(A) の両辺に P(A) を掛けると、P(A∩B)＝P(A)×P(B|A) になる。
+    gist: 両方起こる確率は「まず A が起こり、そのうえで B も起こる」と2段に分けて掛ければよい。
+    conditions: [P(A)＞0]
+    basis: {units: [U11]}
+  - id: REL-cond-indep
+    from: TERM-cond
+    to: TERM-indep
+    version: 1
+    type: 前提
+    premise: learning
+    description: 独立は「A が起きたと知っても B の確率が変わらない」こと。条件付き確率で読むと意味が分かる。
+    basis: {units: [U11]}
+  - id: REL-exclusive-indep-contrast
+    from: TERM-exclusive
+    to: TERM-indep
+    version: 1
+    type: 対比
+    description: 排反は同時に起こらないこと、独立は互いの確率に影響しないこと。確率が0でない2つの事象が排反なら、一方が起きると他方は起こらないので、独立ではない。
+    gist: 「同時に起きない」と「影響しない」は別のこと。むしろ排反なら、一方が起きたと分かれば他方は起きないと分かるので、強く影響し合っている。
+    basis: {units: [U10, U11]}
+  - id: REL-multiplication-total
+    from: TERM-multiplication
+    to: TERM-total-prob
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 全確率の公式の各項は、乗法定理で「場合の確率×その場合の条件付き確率」と書いたもの。
+    basis: {units: [U12]}
+  - id: REL-exclusive-total
+    from: TERM-exclusive
+    to: TERM-total-prob
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 起こり方を、重なりのない（排反な）場合に分けるから、各場合の確率を足して全体が出る。
+    basis: {units: [U12]}
+  - id: REL-total-bayes
+    from: TERM-total-prob
+    to: TERM-bayes
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。
+    basis: {units: [U12]}
+  - id: REL-cond-bayes
+    from: TERM-cond
+    to: TERM-bayes
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。
+    basis: {units: [U12]}
+  - id: REL-cond-likelihood
+    from: TERM-cond
+    to: TERM-likelihood
+    version: 1
+    type: 前提
+    premise: learning
+    description: 尤度は「その原因のもとで、この結果が起こる条件付き確率」として読む。
+    basis: {units: [U12]}
+  - id: REL-prior-bayes
+    from: TERM-prior
+    to: TERM-bayes
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: ベイズの定理は、事前確率に尤度を掛けて更新する。事前確率がないと始められない。
+    basis: {units: [U12]}
+  - id: REL-likelihood-bayes
+    from: TERM-likelihood
+    to: TERM-bayes
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 尤度は、データが原因の確率をどれだけ動かすかを決める。
+    basis: {units: [U12]}
+  - id: REL-bayes-posterior
+    from: TERM-bayes
+    to: TERM-posterior
+    version: 1
+    type: 前提
+    premise: mathematical
+    description: 事後確率はベイズの定理で求める確率。
+    basis: {units: [U12]}
+  - id: REL-prior-posterior
+    from: TERM-prior
+    to: TERM-posterior
+    version: 1
+    type: 変換
+    mode: exact
+    description: 事前確率に尤度を掛け、結果が起こる全体の確率（全確率）で割ると、事後確率になる。
+    gist: データを見る前の見込みを、データの起こりやすさで重み付けし直したのが、データを見たあとの見込み。
+    conditions: [尤度（各原因のもとで結果が起こる確率）が分かっている, 結果が起こる確率が0でない]
+    basis: {units: [U12]}

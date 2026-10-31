@@ -250,7 +250,12 @@ class TestLabs(unittest.TestCase):
     def test_tour_relation_visuals_batch2(self):
         import tour
         from network import relations_without_figures
-        self.assertEqual(relations_without_figures(), [])   # 変換・対比・導出・一般化の全部に図がある（#95）
+        # 変換・対比・導出・一般化のうち、完成見本の単元（U13〜U16）の関係には全部図がある（#95）。
+        # 骨格（P1）で足した関係の図は、その単元の肉付け（P7 以降）で付ける（build が警告で数える）
+        import yaml
+        rels = {r["id"]: r for r in yaml.safe_load((Path(__file__).resolve().parent.parent / "content" / "relations.yaml").read_text(encoding="utf-8"))["relations"]}
+        done = {"U13", "U14", "U15", "U16"}
+        self.assertEqual([i for i in relations_without_figures() if set(rels[i].get("basis", {}).get("units", [])) <= done], [])
         figs = tour.figure_specs(COURSE)
         ex = tour.expect("LAB-expect", COURSE.labs["LAB-expect"]["presets"]["rel-indep-tour"])
         self.assertEqual([round(e[0]["cov"], 9) for e in ex], [0, 0.1, -0.1])   # 独立→正→負（周辺は同じ）
@@ -610,7 +615,7 @@ class TestNetwork(unittest.TestCase):
         err2 = network.skeleton_errors(c2)
         self.assertTrue(any("定義1文（short）か説明（definition）がない" in x for x in err2))
         g = network.skeleton_gaps(course())
-        self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not t.get("definition")))
+        self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short"))))
 
     def test_lab_refs(self):
         c = course()
@@ -683,10 +688,10 @@ class TestNetwork(unittest.TestCase):
 
     def test_isolated_concept_and_missing_fields(self):
         c = course()
-        c.terms["TERM-perm"]["definition"] = "並べ方の数"
+        c.terms["TERM-kurt"]["definition"] = "分布のとがり具合"   # どの関係にもつながっていない語
         err = self._validate(c=c)
-        self.assertTrue(any("TERM-perm: 説明のある概念なのに" in e for e in err))
-        self.assertTrue(any("TERM-perm: 概念の説明に" in e for e in err))
+        self.assertTrue(any("TERM-kurt: 説明のある概念なのに" in e for e in err))
+        self.assertTrue(any("TERM-kurt: 概念の説明に" in e for e in err))
 
     def test_numbers_need_checks(self):
         c = course()

@@ -3,6 +3,7 @@
   name: 順列
   en: permutation
   category: 数学の道具
+  short: 異なるものから順番を区別して並べる並べ方と、その数
 - id: TERM-comb
   name: 組合せ
   en: combination
@@ -125,10 +126,12 @@
   name: 標本空間
   en: sample space
   category: 確率
+  short: 1回の試行で起こりうる結果を、すべて集めた集合
 - id: TERM-event
   name: 事象
   en: event
   category: 確率
+  short: 標本空間の中で、注目する結果を集めた部分集合
 - id: TERM-frame
   name: 抽出枠
   en: sampling frame
@@ -574,10 +577,12 @@
   name: 余事象
   en: complement
   category: 確率
+  short: ある事象が起こらないという事象で、標本空間からその事象を除いた残り
 - id: TERM-exclusive
   name: 排反
   en: mutually exclusive
   category: 確率
+  short: 2つの事象が同時には起こらないこと（共通部分がない）
 - id: TERM-indep
   name: 独立
   en: independence
@@ -626,18 +631,22 @@
   name: 条件付き確率
   en: conditional probability
   category: 確率
+  short: ある事象が起きたと分かったうえで、別の事象が起こる確率
 - id: TERM-bayes
   name: ベイズの定理
   en: Bayes' theorem
   category: 確率
+  short: 結果が分かったときに、その原因の確率を、条件付き確率を逆向きにして求める式
 - id: TERM-prior
   name: 事前確率
   en: prior probability
   category: 確率
+  short: データ（結果）を見る前に、原因や仮説について持っている確率
 - id: TERM-likelihood
   name: 尤度
   en: likelihood
   category: 確率
+  short: ある原因や仮説のもとで、実際に得られた結果が起こる確率
 - id: TERM-rv
   name: 確率変数
   en: random variable
@@ -1739,6 +1748,7 @@
   name: 事後確率
   en: posterior probability
   category: 確率
+  short: データ（結果）を見たあとで、ベイズの定理で更新した原因や仮説の確率
 - id: TERM-mean
   name: 平均（算術平均）
   en: arithmetic mean
@@ -1747,18 +1757,22 @@
   name: 確率（確率の公理）
   en: probability (axioms)
   category: 確率
+  short: 事象の起こりやすさを0〜1の数で表したもので、全体は1、排反な事象では確率を足せる
 - id: TERM-addition
   name: 加法定理
   en: addition rule
   category: 確率
+  short: 2つの事象のどちらかが起こる確率は、それぞれの確率の和から両方が起こる確率を引いたもの
 - id: TERM-multiplication
   name: 乗法定理
   en: multiplication rule
   category: 確率
+  short: 2つの事象が両方起こる確率は、一方の確率と、それが起きたときの他方の条件付き確率の積
 - id: TERM-total-prob
   name: 全確率の公式
   en: law of total probability
   category: 確率
+  short: 起こり方を排反な場合に分け、場合ごとの確率×条件付き確率を足して全体の確率を求める式
 - id: TERM-bernoulli
   name: ベルヌーイ分布
   en: Bernoulli distribution
