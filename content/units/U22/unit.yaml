@@ -7,7 +7,7 @@ prev: U21
 next: U23
 prereq: [U16, U18, U20, U21]
 used_by: [U23, U24, U26, U31]
-terms: [TERM-ci, TERM-conf-level, TERM-se, TERM-t, TERM-ratio]
+terms: [TERM-ci, TERM-conf-level, TERM-se, TERM-t, TERM-ratio, TERM-sample-prop, TERM-interval-est]
 labs: [LAB-ci]
 goal: 母平均・母比率の信頼区間を **推定値 ± 確率点 × 標準誤差** で作り（σ が分からなければ t）、95%の意味を「作り方の性質」として正しく言い、必要な人数を誤差幅から逆算できる。
 stage_goals:

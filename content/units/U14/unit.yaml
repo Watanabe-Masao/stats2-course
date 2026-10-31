@@ -7,7 +7,7 @@ prev: U13
 next: U15
 prereq: [U09, U11, U13]
 used_by: [U15, U16, U19, U22, U26]
-terms: [TERM-binom, TERM-indep, TERM-rv, TERM-expect, TERM-var]
+terms: [TERM-binom, TERM-indep, TERM-rv, TERM-expect, TERM-var, TERM-bernoulli]
 labs: [LAB-binom]
 goal: 「n 人のうちちょうど k 人が買う確率は？」を**二項分布で求め**、平均 np・分散 np(1−p) が言え、二項分布が使える4つの条件を確かめられる。
 stage_goals:

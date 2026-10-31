@@ -585,8 +585,8 @@
   name: ベイズの定理
   en: Bayes' theorem
 - id: TERM-prior
-  name: 事前確率・事後確率
-  en: prior / posterior probability
+  name: 事前確率
+  en: prior probability
 - id: TERM-likelihood
   name: 尤度
   en: likelihood
@@ -1620,3 +1620,45 @@
 - id: TERM-multcomp
   name: 多重比較
   en: multiple comparisons
+- id: TERM-posterior
+  name: 事後確率
+  en: posterior probability
+- id: TERM-mean
+  name: 平均（算術平均）
+  en: arithmetic mean
+- id: TERM-prob
+  name: 確率（確率の公理）
+  en: probability (axioms)
+- id: TERM-addition
+  name: 加法定理
+  en: addition rule
+- id: TERM-multiplication
+  name: 乗法定理
+  en: multiplication rule
+- id: TERM-total-prob
+  name: 全確率の公式
+  en: law of total probability
+- id: TERM-bernoulli
+  name: ベルヌーイ分布
+  en: Bernoulli distribution
+- id: TERM-sample-mean
+  name: 標本平均
+  en: sample mean
+- id: TERM-sample-prop
+  name: 標本比率
+  en: sample proportion
+- id: TERM-interval-est
+  name: 区間推定
+  en: interval estimation
+- id: TERM-test
+  name: 仮説検定
+  en: hypothesis testing
+- id: TERM-quantile
+  name: 分位点
+  en: quantile
+- id: TERM-range
+  name: 範囲
+  en: range
+- id: TERM-slr
+  name: 単回帰
+  en: simple linear regression

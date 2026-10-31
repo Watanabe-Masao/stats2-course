@@ -7,7 +7,7 @@ prev: U28
 next: U30
 prereq: [U02, U07, U28]
 used_by: [U30, U32]
-terms: [TERM-ols, TERM-regcoef, TERM-resid, TERM-r2, TERM-extrap]
+terms: [TERM-ols, TERM-regcoef, TERM-resid, TERM-r2, TERM-extrap, TERM-slr]
 labs: [LAB-reg]
 goal: 散布図に最小二乗で回帰直線を引き（残差の2乗の合計を最小にする）、傾き・切片・予測値・残差・決定係数 R² を求めて読み、外挿・残差の形・回帰の向きの落とし穴を、点を動かして確かめながら説明できる。
 stage_goals:

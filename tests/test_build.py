@@ -691,7 +691,8 @@ class TestProgress(unittest.TestCase):
         from progress import notion_page, unit_row
         c = course()
         r = unit_row(c, "U14", TARGET)
-        self.assertEqual(r["concepts"][0], r["concepts"][1])   # W0a で U14 の用語は全部説明あり
+        terms = c.units["U14"]["terms"]   # 原本の用語のうち、説明のある語の数と合う（#105 でベルヌーイ分布を足したので全部ではない）
+        self.assertEqual(list(r["concepts"][:2]), [sum(1 for t in terms if c.terms[t].get("definition")), len(terms)])
         c.terms["TERM-binom"].pop("definition")
         self.assertLess(unit_row(c, "U14", TARGET)["concepts"][0], r["concepts"][1])
         md = notion_page(course(), TARGET)

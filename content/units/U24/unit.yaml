@@ -7,7 +7,7 @@ prev: U23
 next: U25
 prereq: [U16, U18, U22]
 used_by: [U25, U26, U27, U30, U32]
-terms: [TERM-h0, TERM-h1, TERM-test-stat, TERM-pvalue, TERM-alpha, TERM-reject, TERM-sides, TERM-type1, TERM-type2, TERM-power]
+terms: [TERM-h0, TERM-h1, TERM-test-stat, TERM-pvalue, TERM-alpha, TERM-reject, TERM-sides, TERM-type1, TERM-type2, TERM-power, TERM-test]
 labs: [LAB-test]
 goal: 「差がないと仮定したら今回の結果はどれくらい珍しいか」で判断する検定の手順（仮説・α・両側／片側→統計量→p 値→結論）を踏み、p 値・2種類の過誤・検出力を正しく読める。
 stage_goals:

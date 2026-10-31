@@ -7,7 +7,7 @@ prev: U11
 next: U13
 prereq: [U11, U10]
 used_by: [U13]
-terms: [TERM-bayes, TERM-prior, TERM-likelihood, TERM-cond]
+terms: [TERM-bayes, TERM-prior, TERM-likelihood, TERM-cond, TERM-posterior, TERM-total-prob]
 labs: [LAB-prob]
 goal: 「検品で引っかかった品が本当に不良である確率は？」のように、結果から原因を逆にたどる確率を、**全確率で分母を作って求められ**、元の割合（事前確率）が結果を大きく変えることを説明できる。
 stage_goals:

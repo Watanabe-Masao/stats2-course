@@ -7,7 +7,7 @@ prev: U05T
 next: U07
 prereq: [U05, U05T]
 used_by: [U07, U13]
-terms: [TERM-median, TERM-mode, TERM-quartile, TERM-outlier, TERM-geomean, TERM-expect]
+terms: [TERM-median, TERM-mode, TERM-quartile, TERM-outlier, TERM-geomean, TERM-expect, TERM-mean, TERM-quantile]
 labs: [LAB-center]
 goal: 「代表的な値はいくつ？」と聞かれたとき、**分布の形と目的（典型的な値か、合計か）に合わせて平均・中央値・最頻値を選び**、件数の違うグループは重み付き平均でまとめられる。
 stage_goals:

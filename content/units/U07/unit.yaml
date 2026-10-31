@@ -7,7 +7,7 @@ prev: U06
 next: U08
 prereq: [U06, U02]
 used_by: [U08, U13, U18, U21, U28, U29, U32]
-terms: [TERM-dev, TERM-var, TERM-unbvar, TERM-sd, TERM-cv, TERM-iqr]
+terms: [TERM-dev, TERM-var, TERM-unbvar, TERM-sd, TERM-cv, TERM-iqr, TERM-mean, TERM-range]
 labs: [LAB-spread]
 goal: 「どちらが安定している？」と聞かれたとき、**分散・標準偏差で散らばりを数で示し、平均の大きさが違うものは変動係数で比べられる**。n で割るか n−1 で割るかを目的で選べる。
 stage_goals:
