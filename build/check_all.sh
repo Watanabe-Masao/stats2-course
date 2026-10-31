@@ -27,6 +27,7 @@ lap() {   # lap 次の段の名前（引数なしで最後の段を閉じる）
 if [ "$PART" != labs ]; then
   lap "1. 単体テスト"; python3 -m unittest discover -s tests -q
   lap "1b. 型と見た目の値の写し"; python3 build/sync_schema.py
+  lap "1c. 式の見本（独立な見本と式の写しの元。#118 C5）"; python3 build/oracle.py --check; python3 build/formula_fixture.py --check
 fi
 lap "2. 生成"; python3 build/build.py
 if [ "$PART" != labs ]; then
