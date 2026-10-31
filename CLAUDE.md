@@ -137,7 +137,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 概念・関係・導出（知識ネットワークのデータ）
 
-型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（違うと check_all が止まる）。関係の種類の定義は relation-types.yaml。
+型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（取り込んだ元の版は docs/sync-lock.json に固定する。写しが固定した版と違うと check_all が止まる。元の main が先に進んでも止まらず、知らせるだけ）。関係の種類の定義は relation-types.yaml。
 
 - **1つの概念にするかの判断**（渡辺さん 2026-10-31、#105）：その語が固有の意味・役割・操作・確かめ方を持つかで決める。次の3つは別々に持つ。
   - 概念の同一性（本当に同じ意味か）→ 用語（点）を分けるか。2つの意味が入った語は分ける（例：事前確率と事後確率）。対で初めて意味を持つ語は1つでよい（例：片側検定・両側検定）。
@@ -264,6 +264,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 作業は必ずブランチを切って行い、全部の確認はマージの前に1回だけかける。
 
 - **ブランチの途中のコミット**：`python3 build/check_changed.py` で、変えたものに合わせた範囲だけ確かめる（origin/main からの差分を見て、下の表のとおりに選ぶ）。
+- **依存の固定**：npm は package-lock.json と `npm ci`（playwright の版を変えるときは lock も直す）。CI は pip・npm・ブラウザをキャッシュし、段ごとの時間を各ジョブの概要に出す。
 - **マージの前（PR を「マージしてよい」と伝える前）**：PR を作ると GitHub が全部（`build/check_all.sh` を base と labs の6組に分けて並行）を走らせる（.github/workflows/check.yml。PR と main への取り込みでだけ走る）。その結果が成功であることを `gh api repos/{owner}/{repo}/actions/runs` で確かめてから伝える。手元で全部を走らせるのは、GitHub で落ちた原因を調べるときだけ。
 - **公開**：公開サイトの更新（deploy_site.sh）と Notion への公開は、全部が通った main から行う。
 
