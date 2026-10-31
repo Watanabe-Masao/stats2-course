@@ -1623,62 +1623,77 @@
   name: 帰無仮説
   en: null hypothesis
   category: 検定
+  short: 検定で「差がない・効果がない」などとして立て、データで退けられるかを調べる仮説
 - id: TERM-h1
   name: 対立仮説
   en: alternative hypothesis
   category: 検定
+  short: 帰無仮説を退けたときに採る仮説で、調べたい差や効果があるとするもの
 - id: TERM-test-stat
   name: 検定統計量
   en: test statistic
   category: 検定
+  short: 帰無仮説のもとでの分布が分かるように作った統計量で、データのずれの大きさを1つの数にしたもの
 - id: TERM-pvalue
   name: p値
   en: p-value
   category: 検定
+  short: 帰無仮説が正しいとしたとき、観測した値か、それより極端な値が出る確率
 - id: TERM-alpha
   name: 有意水準
   en: significance level
   category: 検定
+  short: 帰無仮説を退ける基準の確率で、正しい帰無仮説を誤って退ける確率の上限（5%など）
 - id: TERM-reject
   name: 棄却域
   en: rejection region
   category: 検定
+  short: 検定統計量がその範囲に入ったら帰無仮説を退けると、前もって決めた範囲
 - id: TERM-sides
   name: 片側検定・両側検定
   en: one-sided and two-sided tests
   category: 検定
+  short: 対立仮説の向きによって、棄却域を分布の片方の端だけに置くか、両端に置くかの違い
 - id: TERM-type1
   name: 第1種の過誤
   en: type I error
   category: 検定
+  short: 帰無仮説が正しいのに、誤って退けてしまう誤り
 - id: TERM-type2
   name: 第2種の過誤
   en: type II error
   category: 検定
+  short: 帰無仮説が誤っているのに、退けられない誤り
 - id: TERM-power
   name: 検出力
   en: power
   category: 検定
+  short: 帰無仮説が誤っているときに、正しく退けられる確率（1−第2種の過誤の確率）
 - id: TERM-pool
   name: プールした比率
   en: pooled proportion
   category: 検定
+  short: 2群の割合の差を検定するとき、帰無仮説（割合が等しい）のもとで2群を合わせて求めた割合
 - id: TERM-expected
   name: 期待度数
   en: expected frequency
   category: 検定
+  short: 帰無仮説（独立・決めた割合どおり）が正しいとしたとき、各欄に入ると見込まれる度数
 - id: TERM-indep-test
   name: 独立性検定
   en: test of independence
   category: 検定
+  short: クロス集計表の2つの変数が独立かどうかを、期待度数とのずれからカイ二乗分布で調べる検定
 - id: TERM-gof
   name: 適合度検定
   en: goodness-of-fit test
   category: 検定
+  short: 観測した度数が、決めた理論の割合に合っているかを、カイ二乗分布で調べる検定
 - id: TERM-crosstab
   name: クロス集計表
   en: cross tabulation
   category: 図表
+  short: 2つの質的変数の組合せごとに度数を数えて並べた表
 - id: TERM-scatter
   name: 散布図
   en: scatter plot
@@ -1823,6 +1838,7 @@
   name: 仮説検定
   en: hypothesis testing
   category: 検定
+  short: 母集団についての仮説を立て、その仮説のもとでデータが起こりにくいかどうかで、仮説を退けるかを決める方法
 - id: TERM-quantile
   name: 分位点
   en: quantile
