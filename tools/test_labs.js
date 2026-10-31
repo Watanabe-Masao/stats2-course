@@ -23,6 +23,8 @@ const ROOT=path.resolve(__dirname,'..');
  const bad=(m)=>{console.log('❌ '+m);if(GH)console.log('::error::'+String(m).replace(/\n/g,' '));fail++;};
  process.on('unhandledRejection',e=>{if(GH)console.log('::error::止まった：'+String(e&&e.message||e).split('\n')[0]);console.log(e);process.exit(1);});
  // 版ごとの時間を「⏱ 秒 版の名前」で出す（build/lab_times.py が GitHub のログから tools/lab_times.json を作り直す）
+ // GitHub ではログを外から読めない環境もあるので、組の全部の時間を1つの notice（注釈）にも入れる（check-runs の annotations で読める）
+ const took={};
  for(const v of man){const t0=Date.now();for(const scheme of ['light','dark']){
   const p=await b.newPage({viewport:{width:380,height:900},colorScheme:scheme});
   const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
@@ -124,5 +126,8 @@ const ROOT=path.resolve(__dirname,'..');
       const fo=v.cfg.tour.steps[i].focus;   // 注目する場所（強調で囲む所）が、埋め込みでも枠の中に見える
       if(fo&&!(await p.evaluate(([fo,W])=>{const es=[...document.querySelectorAll('.lk-hl')];return es.length>0&&es.every(e=>{const r=e.getBoundingClientRect();return e.offsetParent!==null&&r.height>0&&r.bottom<=320&&r.right<=W+4;});},[fo,W])))bad(`${tag}: ${where}で注目する場所（${fo}）が見えない`);}}}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
-  await p.close();console.log(`⏱ ${((Date.now()-t0)/1000).toFixed(1)} ${SH.key(v)}`);}
+  await p.close();took[SH.key(v)]=Math.round((Date.now()-t0)/100)/10;console.log(`⏱ ${took[SH.key(v)]} ${SH.key(v)}`);}
+ if(GH&&process.env.SHARD){const c=require('os').cpus(),cpu=`${(c[0]&&c[0].model||'?').replace(/[:,]/g,' ')}・${c.length}コア`;   // 注釈は長いと切れるので約3000字ずつ（1つの段の notice は10個まで）
+  const parts=[{}];for(const [k,x] of Object.entries(took)){if(JSON.stringify(parts[parts.length-1]).length>3000)parts.push({});parts[parts.length-1][k]=x;}
+  parts.forEach((o,i)=>console.log(`::notice title=ラボの版の時間 ${process.env.SHARD}（${cpu}）${i+1}／${parts.length}::${JSON.stringify(o)}`));}
  await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();

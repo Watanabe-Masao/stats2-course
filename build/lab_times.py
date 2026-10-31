@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""ラボの版ごとの時間の記録（tools/lab_times.json）を GitHub の実行のログから作り直す（#129）。
+"""ラボの版ごとの時間の記録（tools/lab_times.json）を GitHub の実行から作り直す（#129）。
 
 使い方: python3 build/lab_times.py <実行の ID> [<実行の ID> …]
-  - 各実行の labs のジョブのログから、tools/test_labs.js が出す「⏱ 秒 版の名前」の行を集める
+  - 各実行の labs のジョブから、tools/test_labs.js が出す組の時間を集める。注釈（notice「ラボの版の時間」の JSON。
+    check-runs の annotations で読める）を先に見て、なければログの「⏱ 秒 版の名前」の行を読む
   - 同じ版が複数の実行にあれば平均する（機械の速さの差をならすため、2回以上の実行を渡すとよい）
   - 今の記録にあって、渡した実行に出なかった版は消す（なくなった版を残さない）
   - tools/lab_shard.js がこの記録で SHARD=k/n の組を時間でそろえる。記録のない版は中央値で見積もるので、
@@ -36,6 +37,19 @@ def parse(log: str) -> dict[str, float]:
     return times
 
 
+def from_notice(job_id: int) -> dict[str, float]:
+    """注釈「ラボの版の時間 k/n（機械）i／m」の JSON を合わせる。機械の名前も出す（速さの差を見るため）。"""
+    times: dict[str, float] = {}
+    title = ""
+    for a in json.loads(gh(f"repos/{REPO}/check-runs/{job_id}/annotations?per_page=100")):
+        if (a.get("title") or "").startswith("ラボの版の時間"):
+            times.update({k: float(v) for k, v in json.loads(a["message"]).items()})
+            title = a["title"].rsplit("）", 1)[0] + "）"
+    if times:
+        print(f"  {title}：{len(times)} 版・{sum(times.values()):.0f}秒")
+    return times
+
+
 def collect(run_ids: list[str]) -> dict[str, list[float]]:
     seen: dict[str, list[float]] = {}
     for run in run_ids:
@@ -46,9 +60,9 @@ def collect(run_ids: list[str]) -> dict[str, list[float]]:
         for job in labs:
             if job["conclusion"] != "success":
                 raise SystemExit(f"実行 {run} の {job['name']} が {job['conclusion']}（成功した実行だけを使う）")
-            found = parse(gh(f"repos/{REPO}/actions/jobs/{job['id']}/logs"))
+            found = from_notice(job["id"]) or parse(gh(f"repos/{REPO}/actions/jobs/{job['id']}/logs"))
             if not found:
-                raise SystemExit(f"実行 {run} の {job['name']} のログに ⏱ の行がない（時間を出す前の版の実行？）")
+                raise SystemExit(f"実行 {run} の {job['name']} に時間の記録がない（時間を出す前の版の実行？）")
             for key, sec in found.items():
                 seen.setdefault(key, []).append(sec)
     return seen

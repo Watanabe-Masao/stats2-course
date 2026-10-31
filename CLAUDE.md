@@ -277,6 +277,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 - 終了コードをログに残して判定する：`… > ログ 2>&1; echo "EXIT=$?" >> ログ`。「✅ 範囲内 OK」または「✅ 全部 OK」と `EXIT=0` の両方を見てから次へ進む（`tail` などの終了コードで判定しない）。
 - ラボのテストを同時に2つ走らせない（ブラウザが落ちて誤った結果になる）。
+- **6組の時間をそろえる**（#129）：labs の組分けは tools/lab_shard.js が tools/lab_times.json（版ごとの秒）で合計をそろえる。記録のない版は中央値で見積もるので、版が増えても組は壊れない。組の時間の差が目立ってきたら、成功した実行の ID を渡して `python3 build/lab_times.py <ID> <ID>`（各組が出す注釈「ラボの版の時間」の平均。機械の差をならすため2回以上）で作り直し、PR に入れる。今の見積もりは `node tools/lab_shard.js`（build のあと）。
 - 個別には `ONLY=LAB-x,LAB-y node tools/test_labs.js`（そのラボの全部の版）、`ASSETS=LAB-prob@s6-free,… node tools/test_labs.js`（その版だけ）。
 
 ## 見た目と手触り（#42）
