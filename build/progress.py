@@ -42,6 +42,8 @@ def unit_row(c, uid: str, target: dict) -> dict:
     return {
         "unit": uid,
         "concepts": (sum(1 for t in terms if c.terms.get(t, {}).get("definition")), len(terms)),
+        # 骨格（#105）：定義1文か説明があり、分類がある語
+        "skeleton": (sum(1 for t in terms if (c.terms.get(t, {}).get("short") or c.terms.get(t, {}).get("definition")) and c.terms.get(t, {}).get("category")), len(terms)),
         "problems": (sum(1 for p in probs.values() if p.get("concepts")), len(probs)),
         "figure": "{{fig:" in s1,
         "model": model,
@@ -88,6 +90,7 @@ def notion_page(c=None, target: dict | None = None) -> str:
     lines = ['<callout icon="📊" color="gray_bg">\n原本から自動で数えた進み具合（公開のたびに入れ直す）。'
              "作業の一覧は GitHub の issue（最終ゴール #55）。\n</callout>", "",
              "## 最終ゴールごと", "",
+             f"- 骨格（定義1文と分類）：{sum(1 for t in c.terms.values() if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(c.terms)} 語",
              f"- 概念の説明：{sum(1 for t in c.terms.values() if t.get('definition'))}/{len(c.terms)} 語",
              f"- 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
              f"- 旧版を指す用語リンク：{legacy_term_count(c, target)}（0 で完了）",
@@ -99,7 +102,7 @@ def notion_page(c=None, target: dict | None = None) -> str:
         for uid in units:
             r = rows[uid]
             m = lambda v: mark(v).replace("・", "未")  # noqa: E731（区切りの「・」と見分けるため）
-            lines.append(f"- {uid}：概念 {m(r['concepts'])}／問題 {m(r['problems'])}／概念図 {m(r['figure'])}"
+            lines.append(f"- {uid}：骨格 {m(r['skeleton'])}／概念 {m(r['concepts'])}／問題 {m(r['problems'])}／概念図 {m(r['figure'])}"
                          f"／手本 {m(r['model'])}／発展 {m(r['hatten'])}／創造 {m(r['sozo'])}／用語 {m(r['legacy_terms'])}")
         lines.append("")
     lines.append('<span color="gray">✓＝済み　未＝まだ　数字＝済み/全体（用語は旧版を指している残りの数）</span>')
@@ -112,15 +115,16 @@ def report() -> str:
     rows = [unit_row(c, uid, target) for uid in c.index]
     lines = ["# 進み具合（原本から自動で数えた値）", "",
              "✓＝済み　・＝まだ　数字＝済み/全体（用語は旧版を指している残りの数）", "",
-             "| 単元 | 概念 | 問題→概念 | 概念図 | 手本 | 発展 | 創造 | 用語 |",
-             "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+             "| 単元 | 骨格 | 概念 | 問題→概念 | 概念図 | 手本 | 発展 | 創造 | 用語 |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for r in rows:
-        lines.append(f"| {r['unit']} | {mark(r['concepts'])} | {mark(r['problems'])} | {mark(r['figure'])} | "
+        lines.append(f"| {r['unit']} | {mark(r['skeleton'])} | {mark(r['concepts'])} | {mark(r['problems'])} | {mark(r['figure'])} | "
                      f"{mark(r['model'])} | {mark(r['hatten'])} | {mark(r['sozo'])} | {mark(r['legacy_terms'])} |")
     n = len(rows)
     filled = sum(1 for t in c.terms.values() if t.get("definition"))
     probs = [p for u in c.units.values() for p in u["problems"].values()]
     lines += ["", "## 最終ゴールごと（#55）", "",
+              f"- 0 骨格（P1）：定義1文と分類 {sum(1 for t in c.terms.values() if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(c.terms)} 語",
               f"- 1 概念の説明：{filled}/{len(c.terms)} 語",
               f"- 3 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
               f"- 4 用語リンクの切り替え：旧版を指す用語 {legacy_term_count(c, target)}（0 で完了）",

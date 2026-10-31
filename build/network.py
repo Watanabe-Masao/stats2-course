@@ -168,6 +168,53 @@ def filled(t: dict) -> bool:
     return bool(t.get("definition"))
 
 
+def skeleton(t: dict) -> bool:
+    """骨格：定義1文（short）だけあり、説明（definition）はまだ（#105・P1）"""
+    return bool(t.get("short")) and not filled(t)
+
+
+def linked_terms() -> set:
+    rels, ders = load_network()
+    linked = {r.get(k) for r in rels for k in ("from", "to")}
+    return linked | {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
+
+
+def skeleton_gaps(c: Course) -> dict:
+    """骨格の完了の条件（#105）で数えるもの：定義1文がない語・分類がない語・どの関係にもつながっていない語"""
+    linked = linked_terms()
+    return {
+        "no_short": [tid for tid, t in c.terms.items() if not (t.get("short") or filled(t))],
+        "no_category": [tid for tid, t in c.terms.items() if not t.get("category")],
+        "isolated": [tid for tid, t in c.terms.items() if (t.get("short") or filled(t)) and tid not in linked],
+    }
+
+
+def skeleton_errors(c: Course) -> list[str]:
+    """定義1文と分類の書き方。skeleton_required のときは、完了の条件（全語に定義1文と分類・孤立0）も止める"""
+    err: list[str] = []
+    cats = c.shared.get("concept_categories") or []
+    for tid, t in c.terms.items():
+        s = t.get("short")
+        if s is not None:
+            s = str(s).strip()
+            if not s:
+                err.append(f"{tid}: short（定義1文）が空")
+            elif "。" in s.rstrip("。"):
+                err.append(f"{tid}: short は1文で書く（途中に「。」がある）：{s}")
+            elif len(s) > 80:
+                err.append(f"{tid}: short は80字まで（{len(s)}字）")
+        if t.get("category") is not None and t["category"] not in cats:
+            err.append(f"{tid}: category「{t['category']}」が shared.yaml の concept_categories にない")
+        if s and not t.get("category"):
+            err.append(f"{tid}: 骨格（short）には category（分類）も書く")
+    if c.shared.get("skeleton_required"):
+        g = skeleton_gaps(c)
+        err += [f"{tid}: 定義1文（short）か説明（definition）がない（骨格の完了の条件）" for tid in g["no_short"]]
+        err += [f"{tid}: category（分類）がない（骨格の完了の条件）" for tid in g["no_category"]]
+        err += [f"{tid}: どの関係・導出にもつながっていない（骨格の完了の条件：孤立0）" for tid in g["isolated"]]
+    return err
+
+
 # 図とラボで補う関係の種類（#95）。gist は必須、図がなければ build が警告する
 VISUAL_TYPES = ("変換", "対比", "導出", "一般化")
 
@@ -377,6 +424,7 @@ def validate_network(c: Course) -> list[str]:
         if filled(t) and tid not in linked:
             err.append(f"{tid}: 説明のある概念なのに、関係・導出のどれにもつながっていない")
     err += experiment_errors(c, rel_ids, {d["id"] for d in ders})
+    err += skeleton_errors(c)
     return err
 
 
@@ -428,12 +476,13 @@ def export_network(c: Course, target: dict) -> dict:
     referenced = {r[k] for r in rels for k in ("from", "to")} | {p for d in ders for p in d["premises"]} | {d["conclusion"] for d in ders}
     concepts = []
     for tid, t in c.terms.items():
-        if not (filled(t) or tid in referenced):
+        if not (filled(t) or skeleton(t) or tid in referenced):
             continue
-        e = {"id": g(tid), "name": t["name"], "status": "filled" if filled(t) else "stub", "version": t.get("version", 1),
+        e = {"id": g(tid), "name": t["name"], "status": "filled" if filled(t) else "skeleton" if skeleton(t) else "stub", "version": t.get("version", 1),
              "units": units_of.get(tid, []), "problems": problems_of.get(tid, [])}
-        if t.get("en"):
-            e["en"] = t["en"]
+        for k in ("en", "short", "category"):
+            if t.get(k):
+                e[k] = t[k]
         if filled(t):
             for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace"):
                 if t.get(k):

@@ -53,6 +53,11 @@ def main(argv: list[str]) -> int:
     nofig = relations_without_figures()
     if nofig:
         print(f"⚠ 図のない関係（変換・対比・導出・一般化）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
+    from network import skeleton_gaps
+    sk = skeleton_gaps(course)
+    if any(sk.values()):
+        print(f"⚠ 骨格（#105）：定義1文がない語 {len(sk['no_short'])}・分類がない語 {len(sk['no_category'])}・孤立した語 {len(sk['isolated'])}"
+              f"（P1 を閉じるとき shared.yaml の skeleton_required を true にして 0 にする）")
     if "--check" in argv:
         return 0
 
