@@ -688,10 +688,10 @@ class TestNetwork(unittest.TestCase):
 
     def test_isolated_concept_and_missing_fields(self):
         c = course()
-        c.terms["TERM-kurt"]["definition"] = "分布のとがり具合"   # どの関係にもつながっていない語
+        c.terms["TERM-zz-test"] = {"id": "TERM-zz-test", "name": "試し", "en": "test", "definition": "どの関係にもつながっていない語"}
         err = self._validate(c=c)
-        self.assertTrue(any("TERM-kurt: 説明のある概念なのに" in e for e in err))
-        self.assertTrue(any("TERM-kurt: 概念の説明に" in e for e in err))
+        self.assertTrue(any("TERM-zz-test: 説明のある概念なのに" in e for e in err))
+        self.assertTrue(any("TERM-zz-test: 概念の説明に" in e for e in err))
 
     def test_numbers_need_checks(self):
         c = course()

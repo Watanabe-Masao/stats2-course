@@ -1182,3 +1182,347 @@ relations:
       units:
       - U27
     version: 1
+  # ---- P1 骨格：W2（U01〜U08・U05T 記述統計）。#105
+  - id: REL-ratio-point
+    from: TERM-ratio
+    to: TERM-point
+    type: 前提
+    premise: mathematical
+    description: パーセントポイントは、2つの割合（%）の差。割合が分かってから、その差の言い方として学ぶ。
+    basis:
+      units:
+      - U01
+      - U05T
+    version: 1
+  - id: REL-population-parameter
+    from: TERM-population
+    to: TERM-parameter
+    type: 前提
+    premise: mathematical
+    description: 母数は母集団の性質を表す値。
+    basis:
+      units:
+      - U03
+    version: 1
+  - id: REL-parameter-statistic-contrast
+    from: TERM-parameter
+    to: TERM-statistic
+    type: 対比
+    description: 母数は母集団の値でふつうは分からない。統計量は標本から計算する値で、標本を取り直すたびに変わる。統計量で母数を推定する。
+    gist: 母数は「本当の値（分からない）」、統計量は「手元のデータから出した値（取り直すと変わる）」。手元の値から本当の値を推し量るのが推定。
+    basis:
+      units:
+      - U03
+    version: 1
+  - id: REL-parameter-estimator
+    from: TERM-parameter
+    to: TERM-estimator
+    type: 前提
+    premise: learning
+    description: 推定量は、母数を推定するためのもの。何を推定するか（母数）を先に知る。
+    basis:
+      units:
+      - U03
+      - U21
+    version: 1
+  - id: REL-scale-qual
+    from: TERM-scale
+    to: TERM-qual
+    type: 前提
+    premise: learning
+    description: 名義尺度・順序尺度のデータが質的変数になる。
+    basis:
+      units:
+      - U04
+    version: 1
+  - id: REL-scale-quant
+    from: TERM-scale
+    to: TERM-quant
+    type: 前提
+    premise: learning
+    description: 間隔尺度・比例尺度のデータが量的変数になる。
+    basis:
+      units:
+      - U04
+    version: 1
+  - id: REL-qual-quant-contrast
+    from: TERM-qual
+    to: TERM-quant
+    type: 対比
+    description: 質的変数は分類を、量的変数は数量を表す。量的変数は平均や分散を計算できるが、質的変数は度数や割合で要約する。
+    gist: 「何の種類か」を表すのが質的、「どれだけか」を表すのが量的。数字で書いてあっても、背番号のように分類なら質的。
+    basis:
+      units:
+      - U04
+    version: 1
+  - id: REL-sigma-mean
+    from: TERM-sigma
+    to: TERM-mean
+    type: 前提
+    premise: mathematical
+    description: 平均は総和記号で（1/n）Σ xᵢ と書く。
+    basis:
+      units:
+      - U02
+      - U06
+    version: 1
+  - id: REL-quant-mean
+    from: TERM-quant
+    to: TERM-mean
+    type: 前提
+    premise: mathematical
+    description: 平均は値を足して求めるので、量的変数で使う。
+    basis:
+      units:
+      - U04
+      - U06
+    version: 1
+  - id: REL-quant-median
+    from: TERM-quant
+    to: TERM-median
+    type: 前提
+    premise: mathematical
+    description: 中央値は値を小さい順に並べて求めるので、順序のある値で使う。
+    basis:
+      units:
+      - U04
+      - U06
+    version: 1
+  - id: REL-freqtable-mode
+    from: TERM-freqtable
+    to: TERM-mode
+    type: 前提
+    premise: learning
+    description: 度数分布では、度数が最大の階級の値（階級値）を最頻値とする。
+    basis:
+      units:
+      - U04
+      - U06
+    version: 1
+  - id: REL-median-mean-contrast
+    from: TERM-median
+    to: TERM-mean
+    type: 対比
+    description: どちらもデータの中心を表す。平均はすべての値を足すので外れ値に引っ張られ、中央値は並び順だけで決まるので外れ値の影響を受けにくい。右に裾が長い分布では平均が中央値より大きくなる。
+    gist: 年収のように一部にとても大きな値があると、平均は上に引っ張られる。「ふつうの人」に近いのは中央値のほう。
+    basis:
+      units:
+      - U06
+    version: 1
+  - id: REL-mean-expect
+    from: TERM-mean
+    to: TERM-expect
+    type: 一般化
+    description: 期待値は、データの平均を確率の重みの平均に広げたもの。データの平均は、各値に「出た割合」の重みを付けた期待値と見られる。
+    gist: データの平均は「出た値を出た割合で重み付けした平均」。期待値はその割合を確率に置き換えたもので、何度もくり返したときの平均の行き先。
+    basis:
+      units:
+      - U06
+      - U13
+    version: 1
+  - id: REL-mean-dev
+    from: TERM-mean
+    to: TERM-dev
+    type: 前提
+    premise: mathematical
+    description: 偏差は値から平均を引いたもの。
+    basis:
+      units:
+      - U02
+      - U07
+    version: 1
+  - id: REL-dev-var
+    from: TERM-dev
+    to: TERM-var
+    type: 前提
+    premise: mathematical
+    description: 分散は偏差の2乗の平均。
+    basis:
+      units:
+      - U07
+    version: 1
+  - id: REL-median-quantile
+    from: TERM-median
+    to: TERM-quantile
+    type: 前提
+    premise: learning
+    description: 分位点は、中央値（真ん中＝50%の位置）を、ほかの割合の位置に広げたもの。
+    basis:
+      units:
+      - U06
+    version: 1
+  - id: REL-quantile-quartile
+    from: TERM-quantile
+    to: TERM-quartile
+    type: 前提
+    premise: mathematical
+    description: 四分位数は、25%・50%・75%の位置の分位点。
+    basis:
+      units:
+      - U05
+      - U06
+    version: 1
+  - id: REL-quartile-iqr
+    from: TERM-quartile
+    to: TERM-iqr
+    type: 前提
+    premise: mathematical
+    description: 四分位範囲は、第3四分位数と第1四分位数の差。
+    basis:
+      units:
+      - U05
+      - U07
+    version: 1
+  - id: REL-quartile-boxplot
+    from: TERM-quartile
+    to: TERM-boxplot
+    type: 前提
+    premise: mathematical
+    description: 箱ひげ図の箱は、第1四分位数から第3四分位数まで。
+    basis:
+      units:
+      - U05
+    version: 1
+  - id: REL-median-boxplot
+    from: TERM-median
+    to: TERM-boxplot
+    type: 前提
+    premise: mathematical
+    description: 箱ひげ図の箱の中の線は中央値。
+    basis:
+      units:
+      - U05
+    version: 1
+  - id: REL-iqr-outlier
+    from: TERM-iqr
+    to: TERM-outlier
+    type: 前提
+    premise: mathematical
+    description: 箱ひげ図では、箱から四分位範囲の1.5倍より外の値を外れ値の目安にする。
+    basis:
+      units:
+      - U05
+      - U08
+    version: 1
+  - id: REL-range-iqr-contrast
+    from: TERM-range
+    to: TERM-iqr
+    type: 対比
+    description: どちらもデータの広がり。範囲は最大値と最小値だけで決まるので外れ値1つで大きく変わる。四分位範囲は真ん中の半分の広がりなので、外れ値の影響を受けにくい。
+    gist: 範囲は「いちばん端どうしの距離」、四分位範囲は「真ん中の半分の幅」。極端な1人がいると範囲だけが大きく変わる。
+    basis:
+      units:
+      - U07
+    version: 1
+  - id: REL-freqtable-hist
+    from: TERM-freqtable
+    to: TERM-hist
+    type: 前提
+    premise: mathematical
+    description: ヒストグラムは度数分布表を図にしたもの。
+    basis:
+      units:
+      - U05
+    version: 1
+  - id: REL-sd-cv
+    from: TERM-sd
+    to: TERM-cv
+    type: 前提
+    premise: mathematical
+    description: 変動係数は標準偏差を平均で割ったもの。
+    basis:
+      units:
+      - U07
+    version: 1
+  - id: REL-mean-cv
+    from: TERM-mean
+    to: TERM-cv
+    type: 前提
+    premise: mathematical
+    description: 変動係数は標準偏差を平均で割ったもの。
+    basis:
+      units:
+      - U07
+    version: 1
+  - id: REL-std-outlier
+    from: TERM-std
+    to: TERM-outlier
+    type: 前提
+    premise: learning
+    description: 標準化した値（z）の大きさで、外れ値かどうかの目安を立てることもある。
+    basis:
+      units:
+      - U08
+    version: 1
+  - id: REL-sd-skew
+    from: TERM-sd
+    to: TERM-skew
+    type: 前提
+    premise: mathematical
+    description: 歪度は、偏差を標準偏差で割った値の3乗の平均。
+    basis:
+      units:
+      - U08
+    version: 1
+  - id: REL-sd-kurt
+    from: TERM-sd
+    to: TERM-kurt
+    type: 前提
+    premise: mathematical
+    description: 尖度は、偏差を標準偏差で割った値の4乗の平均（から3を引くこともある）。
+    basis:
+      units:
+      - U08
+    version: 1
+  - id: REL-mean-geomean-contrast
+    from: TERM-mean
+    to: TERM-geomean
+    type: 対比
+    description: 算術平均は値を足して個数で割り、幾何平均は値を掛けて個数の乗根をとる。伸び率のように掛け算で積み重なる量の平均は、幾何平均で求める。
+    gist: 1年目に2倍、2年目に半分になったら、元に戻っている。足し算の平均（1.25倍）では合わず、掛け算の平均（1倍）が合う。
+    basis:
+      units:
+      - U05T
+      - U06
+    version: 1
+  - id: REL-mean-ma
+    from: TERM-mean
+    to: TERM-ma
+    type: 前提
+    premise: mathematical
+    description: 移動平均は、期間をずらしながら求める平均。
+    basis:
+      units:
+      - U05T
+    version: 1
+  - id: REL-cov-corr
+    from: TERM-cov
+    to: TERM-corr
+    type: 前提
+    premise: mathematical
+    description: 相関係数は、共分散をそれぞれの標準偏差で割ったもの。
+    basis:
+      units:
+      - U05T
+      - U28
+    version: 1
+  - id: REL-sd-corr
+    from: TERM-sd
+    to: TERM-corr
+    type: 前提
+    premise: mathematical
+    description: 相関係数は、共分散をそれぞれの標準偏差で割ったもの。
+    basis:
+      units:
+      - U28
+    version: 1
+  - id: REL-corr-acf
+    from: TERM-corr
+    to: TERM-acf
+    type: 前提
+    premise: mathematical
+    description: 自己相関は、同じ時系列の値とずらした値との相関係数。
+    basis:
+      units:
+      - U05T
+    version: 1

@@ -65,6 +65,7 @@
   name: 総和記号（Σ）
   en: summation
   category: 数学の道具
+  short: 添え字を1つずつ変えながら、項をすべて足し合わせることを表す記号
 - id: TERM-fact
   name: 階乗
   en: factorial
@@ -120,6 +121,7 @@
   name: 母数
   en: parameter
   category: データと変数
+  short: 母集団の性質を表す値（母平均・母分散など）で、ふつうは分からないので標本から推定する
 - id: TERM-statistic
   name: 統計量
   en: statistic
@@ -154,46 +156,57 @@
   name: 質的変数
   en: qualitative variable
   category: データと変数
+  short: 値が分類（性別・血液型など）を表し、そのままでは足したり平均したりできない変数
 - id: TERM-quant
   name: 量的変数
   en: quantitative variable
   category: データと変数
+  short: 値が数量（長さ・金額など）を表し、足したり平均したりできる変数
 - id: TERM-scale
   name: 尺度
   en: level of measurement
   category: データと変数
+  short: データの値がもつ情報の段階で、名義・順序・間隔・比例の4つがある
 - id: TERM-mode
   name: 最頻値
   en: mode
   category: 要約（代表値・散らばり）
+  short: データの中でいちばん多く現れる値（度数分布では度数が最大の階級の値）
 - id: TERM-median
   name: 中央値
   en: median
   category: 要約（代表値・散らばり）
+  short: データを小さい順に並べたとき、真ん中にくる値
 - id: TERM-freqtable
   name: 度数分布表
   en: frequency table
   category: 図表
+  short: データを階級に分け、各階級に入るデータの個数（度数）を並べた表
 - id: TERM-hist
   name: ヒストグラム
   en: histogram
   category: 図表
+  short: 度数分布表の各階級の度数を、隙間のない柱の面積で表した図
 - id: TERM-boxplot
   name: 箱ひげ図
   en: box plot
   category: 図表
+  short: 最小値・第1四分位数・中央値・第3四分位数・最大値で、分布の位置と広がりを表した図
 - id: TERM-quartile
   name: 四分位数
   en: quartile
   category: 要約（代表値・散らばり）
+  short: データを小さい順に並べて4等分する位置の値（第1・第2・第3四分位数）
 - id: TERM-iqr
   name: 四分位範囲
   en: interquartile range
   category: 要約（代表値・散らばり）
+  short: 第3四分位数から第1四分位数を引いた値で、真ん中の半分のデータの広がり
 - id: TERM-outlier
   name: 外れ値
   en: outlier
   category: 要約（代表値・散らばり）
+  short: ほかのデータから大きく離れた値（箱ひげ図では、箱から四分位範囲の1.5倍より外の値など）
 - id: TERM-ratio
   name: 割合
   en: ratio
@@ -203,10 +216,12 @@
   name: パーセントポイント
   en: percentage point
   category: データと変数
+  short: 2つの割合（%）の差を、%どうしの引き算で表した単位
 - id: TERM-dev
   name: 偏差
   en: deviation
   category: 要約（代表値・散らばり）
+  short: 1つのデータの値から平均を引いた値（平均からのずれ）
 - id: TERM-var
   name: 分散
   en: variance
@@ -331,6 +346,7 @@
   name: 変動係数
   en: coefficient of variation
   category: 要約（代表値・散らばり）
+  short: 標準偏差を平均で割った値で、平均の大きさが違うデータどうしのばらつきを比べるのに使う
 - id: TERM-unbiased
   name: 不偏性
   en: unbiasedness
@@ -414,10 +430,12 @@
   name: 歪度
   en: skewness
   category: 要約（代表値・散らばり）
+  short: 分布の左右の非対称さを表す値で、右に裾が長いと正になる
 - id: TERM-kurt
   name: 尖度
   en: kurtosis
   category: 要約（代表値・散らばり）
+  short: 分布の山のとがり具合と、裾の重さを表す値
 - id: TERM-normal
   name: 正規分布
   en: normal distribution
@@ -570,18 +588,22 @@
   name: 幾何平均
   en: geometric mean
   category: 要約（代表値・散らばり）
+  short: n 個の正の値を掛け合わせて n 乗根をとった値で、伸び率の平均に使う
 - id: TERM-ma
   name: 移動平均
   en: moving average
   category: 時系列
+  short: 時系列で、一定期間の値の平均を1期ずつずらして求め、細かい変動をならしたもの
 - id: TERM-acf
   name: 自己相関
   en: autocorrelation
   category: 時系列
+  short: 時系列で、ある時点の値と、その一定期間前の値との相関
 - id: TERM-corr
   name: 相関係数
   en: correlation coefficient
   category: 相関・回帰
+  short: 2つの量的変数の直線的な関係の強さと向きを、−1から1の数で表した値
 - id: TERM-complement
   name: 余事象
   en: complement
@@ -1795,6 +1817,7 @@
   name: 平均（算術平均）
   en: arithmetic mean
   category: 要約（代表値・散らばり）
+  short: データの値をすべて足し、データの個数で割った値
 - id: TERM-prob
   name: 確率（確率の公理）
   en: probability (axioms)
@@ -1843,10 +1866,12 @@
   name: 分位点
   en: quantile
   category: 要約（代表値・散らばり）
+  short: データを小さい順に並べ、決めた割合の位置にくる値（下から10%の位置など）
 - id: TERM-range
   name: 範囲
   en: range
   category: 要約（代表値・散らばり）
+  short: データの最大値から最小値を引いた値
 - id: TERM-slr
   name: 単回帰
   en: simple linear regression
