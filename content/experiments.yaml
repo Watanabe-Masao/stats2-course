@@ -88,6 +88,53 @@ experiments:
         question: 10 回中 5 回以上になるセットの割合。セットを 100 倍にすると、理論とのずれの目安は？
         set: {n: 10, p: 0.5}
         events: [{op: ge, k: 5}]
+    # テーマ体系（#163。渡辺さんの企画書「二項分布実験室」の 4. 実験テーマ体系）：まとまり（A〜F）の下に問い。
+    # 問いの id は 概念-まとまり-番号（binom-A-01。企画書の B01〜B24 を置き換えた。変えない・消さない）。公開では教材名が付く（stats2:binom-A-01）。
+    # concept は主概念（1つ）、related は関連概念（その問いを理解するのに実際に使う概念）。open は開く入口（shift・questions の id・break:反例の id）。
+    # open のない問いは作成中（入口に並べるだけ）。finds は主な発見（予想の前には出さない）
+    catalog:
+      - id: A
+        title: 分布の形と仕組み
+        items:
+          - {id: binom-A-01, title: 成功確率を変えると分布はどう動く？, finds: 成功確率と分布の形の関係, concept: TERM-binom, open: shift}
+          - {id: binom-A-02, title: 試行回数を増やすと分布はどう変わる？, finds: 成功回数と成功割合の散らばり, concept: TERM-binom, related: [TERM-sd], open: spread}
+          - {id: binom-A-03, title: なぜ中央付近の成功回数が起こりやすい？, finds: 組合せ数と確率の関係, concept: TERM-binom, related: [TERM-comb]}
+          - {id: binom-A-04, title: 成功確率 50% なら必ず左右対称？, finds: 対称性と非対称性, concept: TERM-binom}
+      - id: B
+        title: 事象と確率計算
+        items:
+          - {id: binom-B-01, title: ちょうど k 回成功する確率を調べる, finds: 確率質量関数, concept: TERM-binom, related: [TERM-comb], open: exact}
+          - {id: binom-B-02, title: k 回以上・以下の確率を調べる, finds: 累積確率と事象の範囲, concept: TERM-binom, open: exact}
+          - {id: binom-B-03, title: 補集合を使うと計算が簡単になる？, finds: 補集合と確率の和, concept: TERM-binom, related: [TERM-complement]}
+          - {id: binom-B-04, title: 珍しい結果はどのくらい起こる？, finds: 裾確率と稀な事象, concept: TERM-binom, open: rare}
+      - id: C
+        title: 理論と実験
+        items:
+          - {id: binom-C-01, title: 理論分布と実験結果は一致する？, finds: 理論確率と実測割合, concept: TERM-binom, open: conv}
+          - {id: binom-C-02, title: 実験セット数を増やすと誤差はどう変わる？, finds: 大数の法則, concept: TERM-binom, related: [TERM-lln], open: conv}
+          - {id: binom-C-03, title: 同じ実験を繰り返すと同じ結果になる？, finds: 標本変動, concept: TERM-binom}
+          - {id: binom-C-04, title: 珍しい結果を何セット試せば観察できる？, finds: 少なくとも1回発生する確率, concept: TERM-binom, related: [TERM-complement, TERM-indep]}
+      - id: D
+        title: 期待値・分散との接続
+        items:
+          - {id: binom-D-01, title: 成功回数の期待値はどこにある？, finds: 'E(X)＝np', concept: TERM-binom, related: [TERM-expect]}
+          - {id: binom-D-02, title: 成功回数のばらつきは何で決まる？, finds: 'V(X)＝np(1−p)', concept: TERM-binom, related: [TERM-var, TERM-indep]}
+          - {id: binom-D-03, title: 期待値が同じでも分布は違う？, finds: 期待値だけでは分布を特定できない, concept: TERM-expect, related: [TERM-binom, TERM-var]}
+          - {id: binom-D-04, title: 成功回数と成功割合では何が違う？, finds: 個数と割合の分散の違い, concept: TERM-binom, related: [TERM-var], open: spread}
+      - id: E
+        title: 前提条件と反例
+        items:
+          - {id: binom-E-01, title: 成功確率が毎回違っても二項分布になる？, finds: 成功確率一定の条件, concept: TERM-binom, open: 'break:fatigue'}
+          - {id: binom-E-02, title: 前回の結果が次回に影響すると？, finds: 独立性の重要性, concept: TERM-binom, related: [TERM-indep], open: 'break:streak'}
+          - {id: binom-E-03, title: 戻さずに抽出するとどうなる？, finds: 超幾何分布との違い, concept: TERM-binom, related: [TERM-hyper], open: 'break:urn'}
+          - {id: binom-E-04, title: 同じ平均成功確率でも結果は同じ？, finds: 確率の異質性と分布の広がり, concept: TERM-binom, open: 'break:mix'}
+      - id: F
+        title: 応用・発展
+        items:
+          - {id: binom-F-01, title: 購入人数を確率から予測できる？, finds: 二項モデルによる人数の予測, concept: TERM-binom, related: [TERM-expect]}
+          - {id: binom-F-02, title: 不良品が一定数以上出る確率は？, finds: 閾値とリスク評価, concept: TERM-binom}
+          - {id: binom-F-03, title: 観測した成功回数から成功確率を推定する, finds: 母比率の推定, concept: TERM-binom, related: [TERM-sample-prop]}
+          - {id: binom-F-04, title: 観測結果は偶然だけで説明できる？, finds: 二項検定と p 値, concept: TERM-binom, related: [TERM-test]}
     next:
       - {question: 成功確率を 20% に下げると、山の中心はどこ？ 形はどうなる？, set: {p: 0.2}}
       - {question: 回数を 30 回に増やすと、山の形はどうなる？, set: {n: 30}}

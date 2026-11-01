@@ -760,6 +760,45 @@ class TestNetwork(unittest.TestCase):
         self.assertNotIn("expect", json.dumps(e["themes"]))   # 予想の答えは書かない
         self.assertFalse(network.schema_errors(d))
 
+    def test_catalog(self):
+        # 確かめる対象：テーマ体系（#163）。想定する故障：開く問い（open）が問い・反例にない（入口で押すと何も開かない）、
+        # 主概念の書き誤り（概念のページ・実験室のタブで問いが出ない）、まだ説明のない概念を主にした問いを開ける、同じ id が2つ、id の形（概念-まとまり-番号）の崩れ。
+        # 見つけ方：本物の定義は通り、1つずつ崩した定義がそれぞれの理由で止まる。書き出しは id に教材名が付き、型に合う。既存との違い：テーマ体系は初めて
+        import network
+        c = course()
+        rel_ids = {r["id"] for r in network.load_network()[0]}
+        der_ids = {d["id"] for d in network.load_network()[1]}
+        orig = network.load_experiments
+        x = dict(next(e for e in orig() if e.get("catalog")))
+        self.assertEqual(sum(len(g["items"]) for g in x["catalog"]), 24)
+        def errs(cat):
+            try:
+                network.load_experiments = lambda: [{**x, "catalog": cat}]
+                return network.experiment_errors(c, rel_ids, der_ids)
+            finally:
+                network.load_experiments = orig
+        self.assertFalse([e for e in errs(x["catalog"]) if "テーマ体系" in e or " の open " in e or " の概念 " in e])
+        one = lambda **kw: [{"id": "A", "title": "t", "items": [{"id": "binom-A-01", "title": "t", "concept": "TERM-binom", **kw}]}]
+        self.assertTrue(any("open break:nothing が問い・反例にない" in e for e in errs(one(open="break:nothing"))))
+        self.assertTrue(any("open nothing が問い・反例にない" in e for e in errs(one(open="nothing"))))
+        self.assertTrue(any("概念 TERM-binon が用語にない" in e for e in errs(one(concept="TERM-binon"))))
+        self.assertTrue(any("主概念 TERM-perm を先に説明のある概念に" in e for e in errs(one(concept="TERM-perm", open="shift"))))
+        self.assertFalse(errs(one(concept="TERM-perm")) and any("TERM-perm" in e for e in errs(one(concept="TERM-perm"))))   # 作成中なら骨格の概念でよい
+        # id の形：概念-まとまり-番号（企画書の番号 B01 のままや、まとまりの取り違えを止める）
+        bad = lambda iid: [{"id": "A", "title": "t", "items": [{"id": iid, "title": "t", "concept": "TERM-binom"}]}]
+        for iid in ("B01", "binom-B-01", "binom-A-1"):
+            self.assertTrue(any(f"テーマ体系の {iid} は 概念-まとまり-番号" in e for e in errs(bad(iid))), iid)
+        self.assertFalse(any("テーマ体系の" in e for e in errs(bad("binom-A-01"))))
+        dup = [{"id": "A", "title": "t", "items": one()[0]["items"] * 2}]
+        self.assertTrue(any("binom-A-01 が重なっている" in e for e in errs(dup)))
+        d = network.export_network(c, {"site_base_url": ""})
+        e = next(e for e in d["experiments"] if e.get("catalog"))
+        it = {i["id"]: i for g in e["catalog"] for i in g["items"]}
+        self.assertEqual((it["stats2:binom-D-01"]["concept"], it["stats2:binom-D-01"]["related"]), ("stats2:TERM-binom", ["stats2:TERM-expect"]))
+        self.assertEqual(it["stats2:binom-E-01"]["open"], "break:fatigue")
+        self.assertNotIn("open", it["stats2:binom-A-03"])
+        self.assertFalse(network.schema_errors(d))
+
     def test_skeleton(self):
         # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
         import network
