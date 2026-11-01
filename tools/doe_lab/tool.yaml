@@ -105,7 +105,7 @@ presets:
 used_by: [U32]
 tests:
   - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
-  - node tools/doe_lab/check.js          # 本文の値（16・6・F＝4・9.552、各3店の F＝6.75、割り当て方の偏り、3群の t 検定のくり返し約0.12）
+  - node tools/doe_lab/check.js          # 本文の値（16・6・F＝4・9.552、各3店の F＝6.75、割り当て方の偏り、3群の t 検定のくり返し約0.13（理論約0.12））
 checked:
   browser_380px: 2026-10-29
   notion_iphone: null
