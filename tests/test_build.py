@@ -612,6 +612,21 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(f["tree"]["args"][1], {"op": "fn", "name": "E", "args": [{"sym": "X"}]})
         self.assertEqual(next(s for s in f["symbols"] if s["key"] == "mu")["of"], "X")
 
+    def test_table_workspace(self):
+        # 対象：表と式の接続。故障：別の式番号、全重み0、呼び名のずれ、重複値で公開する。
+        # 既存のworkspace検査は二項分布だけ。engineで解釈できない表を原本の段階で止める。
+        c = course()
+        w = c.terms["TERM-expect"]["table_workspace"]
+        self.assertFalse(self._validate(c))
+        w["formula"] = -1
+        w["linear"] = 999
+        w["tables"][0]["weights"] = [0] * 6
+        w["tables"][0]["labels"] = ["不足"]
+        w["tables"][1]["values"][1] = w["tables"][1]["values"][0]
+        err = "\n".join(self._validate(c))
+        for part in ["table_workspace の formula", "table_workspace の linear", "table_workspace の weights", "table_workspace の labels", "table_workspace の values"]:
+            self.assertIn(part, err)
+
     def test_workspace_and_parts(self):
         # 式の作業台と意味のかたまり（#110）
         c = course()
