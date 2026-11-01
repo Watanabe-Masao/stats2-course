@@ -25,6 +25,8 @@ FILES = (
     ("math-lab", "packages/ui/tokens.json", ROOT / "docs" / "math-lab" / "tokens.json"),
     # 式の計算の束（木から TeX を作る・木を検査する。build/formula_tex.mjs が読む。#118）
     ("math-lab", "packages/engine/dist/formula.mjs", ROOT / "docs" / "math-lab" / "formula.mjs"),
+    # ラボの乱数の束（種つき乱数・正規分布・並べ替え。labkit の前に差し込み、LK.rng で使う。#144 P6）
+    ("math-lab", "packages/engine/dist/random.js", ROOT / "docs" / "math-lab" / "random.js"),
 )
 
 

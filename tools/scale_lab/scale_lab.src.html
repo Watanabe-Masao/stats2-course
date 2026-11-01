@@ -94,7 +94,9 @@ const ITEMS=[
  ["来店客数",3,"0人は「来ていない」。数え上げる量（離散型）"]];
 const QS=["区別するためのラベルだけ？","順番に意味はあるが、間隔はそろっていない？","差に同じ意味があるが、0が「無い」ではない？","0が「無い」を表し、何倍と言える？"];
 let jOrder=[],jPos=-1,jStep=0,jDone=false,jRight=0,jTotal=0,jQueue=[],jSet=0;
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// 並べ替えは math-lab の種つき乱数（同じ種なら同じ並び。issue 144 の P6）。開くたびに同じ並びから始まり、押すたびに次の並び
+const R=LK.rng(LK.cfg.seed??1);
+function shuffle(a){return R.shuffle(a);}
 // 場面で決めたデータ（set.item／set.items）を先に順番どおり出し、そのあとは全部をまぜて出す
 function jNext(){if(jQueue.length){jOrder=[jQueue.shift()];jPos=0;}
  else if(jPos<0||jPos>=jOrder.length-1){jOrder=shuffle([...ITEMS.keys()]);jPos=0;}else jPos++;jStep=0;jDone=false;jRender();}
