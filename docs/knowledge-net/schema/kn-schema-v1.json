@@ -664,6 +664,81 @@
             "exclusiveMinimum": 0,
             "exclusiveMaximum": 1
           }
+        },
+        "catalog": {
+          "type": "array",
+          "minItems": 1,
+          "description": "テーマ体系（stats2-course #163）：まとまり（A〜F）の下に問い（B01〜）を並べる。問いは主概念（concept）と関連概念（related）を持ち、サイトの実験室のタブで概念から問いを絞る。open は開く入口（shift＝最初の問い・questions の id・break:反例の id）。open のない問いは「作成中」として並べるだけ",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title",
+              "items"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Z]$"
+              },
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "title",
+                    "concept"
+                  ],
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/gid",
+                      "description": "問いの id：教材名:概念-まとまり-番号（stats2:binom-A-01）。教材をまたいでつなぐため、頭に教材名を置く。変えない・消さない"
+                    },
+                    "title": {
+                      "$ref": "#/$defs/text",
+                      "description": "一覧に出す問いの名前"
+                    },
+                    "finds": {
+                      "$ref": "#/$defs/text",
+                      "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
+                    },
+                    "predict": {
+                      "$ref": "#/$defs/text",
+                      "description": "何を予想するか（開ける問いは必ず書く）"
+                    },
+                    "operate": {
+                      "$ref": "#/$defs/text",
+                      "description": "何を操作するか"
+                    },
+                    "judge": {
+                      "$ref": "#/$defs/text",
+                      "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
+                    },
+                    "open": {
+                      "type": "string",
+                      "pattern": "^(shift|break:[a-z][a-z0-9-]*|[a-z][a-z0-9-]*)$",
+                      "description": "開く入口。ないものは作成中"
+                    },
+                    "concept": {
+                      "$ref": "#/$defs/gid",
+                      "description": "主概念（この問いで理解させるもの。1つ）"
+                    },
+                    "related": {
+                      "$ref": "#/$defs/gids",
+                      "description": "関連概念（この問いを理解するのに実際に使う概念）"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -1719,5 +1794,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 18
+  "x-revision": 19
 }

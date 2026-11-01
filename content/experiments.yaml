@@ -76,6 +76,12 @@ experiments:
         question: 結果を自分で選び、その確率を桁で予想する
         set: {n: 10, p: 0.7}
         events: [{op: eq, k: 10}]
+      - id: pmf
+        form: prob
+        title: ちょうど k 回成功する確率を調べる
+        question: 成功確率 30% で 10 回。「ちょうど 3 回」になる確率は？
+        set: {n: 10, p: 0.3}
+        events: [{op: eq, k: 3}]
       - id: exact
         form: prob
         title: ちょうど k 回と k 回以上を比べる
@@ -88,6 +94,185 @@ experiments:
         question: 10 回中 5 回以上になるセットの割合。セットを 100 倍にすると、理論とのずれの目安は？
         set: {n: 10, p: 0.5}
         events: [{op: ge, k: 5}]
+    # テーマ体系（#163。渡辺さんの企画書「二項分布実験室」の 4. 実験テーマ体系）：まとまり（A〜F）の下に問い。
+    # 問いの id は 概念-まとまり-番号（binom-A-01。企画書の B01〜B24 を置き換えた。変えない・消さない）。公開では教材名が付く（stats2:binom-A-01）。
+    # concept は主概念（1つ）、related は関連概念（その問いを理解するのに実際に使う概念）。open は開く入口（shift・questions の id・break:反例の id）。
+    # open のない問いは作成中（入口に並べるだけ）。finds は主な発見（予想の前には出さない）。
+    # 開ける問いは predict（何を予想するか）・operate（何を操作するか）・judge（理解判定：何ができれば理解したとするか）を書く。
+    # 実験の仕組み（問いの形）は共有してよいが、開く先（open）は問いごとに1つ。同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）。
+    # 主概念は実験室の所属ではなく、発見させたい性質で決める
+    catalog:
+      - id: A
+        title: 分布の形と仕組み
+        items:
+          - id: binom-A-01
+            title: 成功確率を変えると分布はどう動く？
+            finds: 成功確率と分布の形の関係
+            concept: TERM-binom
+            predict: 成功確率を上げたとき、成功回数の山の頂点がどこへ動くか
+            operate: 成功確率 p
+            judge: 別の n・p で、山の頂点と平均が n×p のあたりに来ることを説明できる
+            open: 'shift'
+          - id: binom-A-02
+            title: 試行回数を増やすと分布はどう変わる？
+            finds: 成功回数と成功割合の散らばり
+            concept: TERM-binom
+            related: [TERM-sd]
+            predict: 試行回数を増やしたとき、成功回数と成功割合の散らばりがどうなるか
+            operate: 試行回数 n
+            judge: 回数の散らばりは √n 倍に増え、割合の散らばりは 1/√n 倍に減ることを、別の n で説明できる
+            open: 'spread'
+          - id: binom-A-03
+            title: なぜ中央付近の成功回数が起こりやすい？
+            finds: 組合せ数と確率の関係
+            concept: TERM-binom
+            related: [TERM-comb]
+          - id: binom-A-04
+            title: 成功確率 50% なら必ず左右対称？
+            finds: 対称性と非対称性
+            concept: TERM-binom
+      - id: B
+        title: 事象と確率計算
+        items:
+          - id: binom-B-01
+            title: ちょうど k 回成功する確率を調べる
+            finds: 確率質量関数
+            concept: TERM-binom
+            related: [TERM-comb]
+            predict: ちょうど k 回になる確率の桁
+            operate: 成功回数 k
+            judge: 別の n・p・k で、ちょうど k 回の確率を 並びの数 × pᵏ(1−p)ⁿ⁻ᵏ から見積もれる
+            open: 'pmf'
+          - id: binom-B-02
+            title: k 回以上・以下の確率を調べる
+            finds: 累積確率と事象の範囲
+            concept: TERM-binom
+            predict: 「ちょうど k 回」と「k 回以上」の確率の桁
+            operate: 事象の範囲（ちょうど・以上・以下）
+            judge: 以上・以下の確率は、ちょうどの確率の足し合わせで、境目を含むかで値が変わることを説明できる
+            open: 'exact'
+          - id: binom-B-03
+            title: 補集合を使うと計算が簡単になる？
+            finds: 補集合と確率の和
+            concept: TERM-binom
+            related: [TERM-complement]
+          - id: binom-B-04
+            title: 珍しい結果はどのくらい起こる？
+            finds: 裾確率と稀な事象
+            concept: TERM-binom
+            predict: 自分で選んだ結果の確率の桁
+            operate: 結果（k と、ちょうど・以上・以下）
+            judge: 何セットに1回起きるかで、結果の珍しさを見積もれる
+            open: 'rare'
+      - id: C
+        title: 理論と実験
+        items:
+          - id: binom-C-01
+            title: 理論分布と実験結果は一致する？
+            finds: 理論確率と実測割合
+            concept: TERM-binom
+          - id: binom-C-02
+            title: 実験セット数を増やすと誤差はどう変わる？
+            finds: 大数の法則
+            concept: TERM-binom
+            related: [TERM-lln]
+            predict: セットを 100 倍にしたとき、理論とのずれの目安が何分の1になるか
+            operate: 実験のセット数
+            judge: ずれの目安はセット数の平方根に反比例して小さくなる（毎回必ず減るのではない）ことを説明できる
+            open: 'conv'
+          - id: binom-C-03
+            title: 同じ実験を繰り返すと同じ結果になる？
+            finds: 標本変動
+            concept: TERM-binom
+          - id: binom-C-04
+            title: 珍しい結果を何セット試せば観察できる？
+            finds: 少なくとも1回発生する確率
+            concept: TERM-binom
+            related: [TERM-complement, TERM-indep]
+      - id: D
+        title: 期待値・分散との接続
+        items:
+          - id: binom-D-01
+            title: 成功回数の期待値はどこにある？
+            finds: E(X)＝np
+            concept: TERM-binom
+            related: [TERM-expect]
+          - id: binom-D-02
+            title: 成功回数のばらつきは何で決まる？
+            finds: V(X)＝np(1−p)
+            concept: TERM-binom
+            related: [TERM-var, TERM-indep]
+          - id: binom-D-03
+            title: 期待値が同じでも分布は違う？
+            finds: 期待値だけでは分布を特定できない
+            concept: TERM-expect   # 期待値という1つの数で何が消えるかを発見させる（二項分布は題材。渡辺さん 2026-11-02）
+            related: [TERM-var, TERM-dist, TERM-binom]
+            predict: 期待値が同じ2つの分布の形の違い
+            operate: n と p（n×p を同じに保つ）
+          - id: binom-D-04
+            title: 成功回数と成功割合では何が違う？
+            finds: 個数と割合の分散の違い
+            concept: TERM-binom
+            related: [TERM-var]
+      - id: E
+        title: 前提条件と反例
+        items:
+          - id: binom-E-01
+            title: 成功確率が毎回違っても二項分布になる？
+            finds: 成功確率一定の条件
+            concept: TERM-binom
+            predict: 回を追って確率が下がるとき、二項分布と比べた山の広がり
+            operate: 起き方（回を追って確率が下がる）
+            judge: 成功確率が回ごとに違うと二項分布にならず、散らばりが np(1−p) より小さくなることを、別の下がり方で説明できる
+            open: 'break:fatigue'
+          - id: binom-E-02
+            title: 前回の結果が次回に影響すると？
+            finds: 独立性の重要性
+            concept: TERM-binom
+            related: [TERM-indep]
+            predict: 前の結果に引きずられるとき、二項分布と比べた山の広がり
+            operate: 起き方（前の結果に引きずられる）
+            judge: 独立が崩れると、平均は同じでも散らばりが大きくなることを説明できる
+            open: 'break:streak'
+          - id: binom-E-03
+            title: 戻さずに抽出するとどうなる？
+            finds: 超幾何分布との違い
+            concept: TERM-binom
+            related: [TERM-hyper]
+            predict: 戻さずに取るとき、二項分布と比べた山の広がり
+            operate: 起き方（箱から戻さずに取る）
+            judge: 戻さずに取ると超幾何分布になり、散らばりが小さくなることを、箱の大きさを変えて説明できる
+            open: 'break:urn'
+          - id: binom-E-04
+            title: 同じ平均成功確率でも結果は同じ？
+            finds: 確率の異質性と分布の広がり
+            concept: TERM-binom
+            predict: 日によって確率が違うとき、二項分布と比べた山の広がり
+            operate: 起き方（日や時間で確率が違う）
+            judge: 平均の成功確率が同じでも、確率のずれがセットの中で共通だと散らばりが大きくなることを説明できる
+            open: 'break:mix'
+      - id: F
+        title: 応用・発展
+        items:
+          - id: binom-F-01
+            title: 購入人数を確率から予測できる？
+            finds: 二項モデルによる人数の予測
+            concept: TERM-binom
+            related: [TERM-expect]
+          - id: binom-F-02
+            title: 不良品が一定数以上出る確率は？
+            finds: 閾値とリスク評価
+            concept: TERM-binom
+          - id: binom-F-03
+            title: 観測した成功回数から成功確率を推定する
+            finds: 母比率の推定
+            concept: TERM-binom
+            related: [TERM-sample-prop]
+          - id: binom-F-04
+            title: 観測結果は偶然だけで説明できる？
+            finds: 二項検定と p 値
+            concept: TERM-binom
+            related: [TERM-test]
     next:
       - {question: 成功確率を 20% に下げると、山の中心はどこ？ 形はどうなる？, set: {p: 0.2}}
       - {question: 回数を 30 回に増やすと、山の形はどうなる？, set: {n: 30}}

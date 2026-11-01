@@ -153,6 +153,40 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
         for ref in links.get("relations") or []:
             if ref not in rel_ids and ref not in der_ids:
                 err.append(f"{eid}: links.relations の {ref} が関係・導出にない")
+        # テーマ体系（#163）：まとまりの下の問い。主概念・関連概念は用語にあること、開く問い（open）は説明のある主概念を持ち、
+        # 開く先（shift・questions の id・break:反例の id）があること。open のない問いは作成中
+        qids = {q.get("id") for q in x.get("questions") or []}
+        cxids = {b.get("id") for b in x.get("counterexamples") or []}
+        seen_items: set = set()
+        opened: dict = {}
+        for grp in x.get("catalog") or []:
+            for it in grp.get("items") or []:
+                iid = it.get("id")
+                m = re.fullmatch(r"([a-z][a-z0-9]*)-([A-Z])-(\d{2})", str(iid))
+                if not m or m.group(2) != grp.get("id"):
+                    err.append(f"{eid}: テーマ体系の {iid} は 概念-まとまり-番号（例 binom-{grp.get('id')}-01）で、まとまりは {grp.get('id')}")
+                elif m.group(1) != str((x.get("catalog") or [{}])[0].get("items", [{}])[0].get("id", "")).split("-")[0]:
+                    err.append(f"{eid}: テーマ体系の {iid} の概念の部分が、ほかの問いとそろっていない")
+                if iid in seen_items:
+                    err.append(f"{eid}: テーマ体系の {iid} が重なっている")
+                seen_items.add(iid)
+                for ref in [it.get("concept")] + list(it.get("related") or []):
+                    if ref not in c.terms:
+                        err.append(f"{eid}: {iid} の概念 {ref} が用語にない")
+                op = it.get("open")
+                if op:
+                    # 実験の仕組みは共有してよいが、同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）
+                    if op in opened:
+                        err.append(f"{eid}: {iid} の open {op} は {opened[op]} と同じ。問いごとに予測・初期表示の違う入口を作るか、作成中にする")
+                    opened.setdefault(op, iid)
+                    for need in ("predict", "operate", "judge"):
+                        if not it.get(need):
+                            err.append(f"{eid}: {iid} は開ける問いなので {need}（予測・操作・理解判定）を書く")
+                    if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
+                        err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
+                    ok = op == "shift" or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    if not ok:
+                        err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}
         for where in ("start", "compare"):
             for k, v in (x.get(where) or {}).items():
@@ -612,6 +646,8 @@ def export_network(c: Course, target: dict) -> dict:
         e["links"] = {k: [g(r) for r in v] for k, v in (x.get("links") or {}).items() if v}
         if x.get("reason"):
             e["reason"] = {**x["reason"], **({"concept": g(x["reason"]["concept"])} if x["reason"].get("concept") else {})}
+        if x.get("catalog"):
+            e["catalog"] = [{**grp, "items": [{**it, "id": g(it["id"]), "concept": g(it["concept"]), **({"related": [g(r) for r in it["related"]]} if it.get("related") else {})} for it in grp["items"]]} for grp in x["catalog"]]
         if x.get("counterexamples"):
             # effect（言い分の向き）は予想の答えになるので公開の JSON に出さない（画面は engine の mechanismMoments から求める）
             e["counterexamples"] = [{**{k: v for k, v in b.items() if k != "effect"}, **({"concept": g(b["concept"])} if b.get("concept") else {})} for b in x["counterexamples"]]
