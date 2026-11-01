@@ -511,6 +511,14 @@
   category: 要約（代表値・散らばり）
   definition: 確率変数がとる値を、その確率で重み付けした平均。
   version: 1
+  table_workspace:
+    formula: 0
+    linear: 2
+    tables:   # 表は実験室のテーマを指す（値・重みを2か所に書かない。build が写す。#119）
+    - {experiment: EXP-expect-table, theme: dice, use: start}
+    - {experiment: EXP-expect-table, theme: dice, use: compare}
+    - {experiment: EXP-expect-table, theme: basket, use: start}
+    - {experiment: EXP-expect-table, theme: lottery, use: start}
   figures: [FIG-U13-concept]
   labs:
   - {id: LAB-expect, preset: s1-dist, purpose: 期待値が分布の重心になることを、予想してから確かめる}

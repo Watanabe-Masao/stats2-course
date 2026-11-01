@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+import math
 
 from model import CONTENT, ROOT, Course, load_yaml, run_check
 from effects import effect_errors
@@ -101,6 +102,36 @@ def table_errors(eid: str, x: dict) -> list[str]:
         one(f"反例 {b.get('id')}", b.get("values") or [], {"weights": b.get("weights") or []}, b.get("labels"))
     return err
 
+
+
+def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:
+    """値の表の作業台の表を、実験室のテーマから作る（#119：同じ表を2か所に書かない）。
+    原本は {experiment: EXP-…, theme: テーマ id, use: start か compare} だけを書き、値・重み・呼び名・単位はテーマから写す。
+    公開の JSON は型の valueTable（id・name・values・weights …）。compare の表の id は「テーマ id-compare」"""
+    err: list[str] = []
+    exps = {x.get("id"): x for x in load_experiments()}
+    out = []
+    for ref in tw.get("tables") or []:
+        x = exps.get(ref.get("experiment"))
+        th = next((t for t in (x or {}).get("themes") or [] if t.get("id") == ref.get("theme")), None)
+        use = ref.get("use", "start")
+        if set(ref) - {"experiment", "theme", "use"}:
+            err.append(f"table_workspace の表は experiment・theme・use だけで書く（値・重みは実験室のテーマから写す）：{ref}")
+            continue
+        if not x or x.get("model") != "table" or not th:
+            err.append(f"table_workspace の表 {ref.get('experiment')}・{ref.get('theme')} が値の表の実験室のテーマにない")
+            continue
+        if use not in ("start", "compare"):
+            err.append(f"table_workspace の表 {ref.get('theme')} の use は start か compare")
+            continue
+        tb = {"id": th["id"] if use == "start" else f"{th['id']}-compare",
+              "name": th["name"] if use == "start" else f"{th['name']}（{th.get('change', '変えたあと')}）",
+              "values": list(th["values"]), "weights": list(th[use])}
+        for k in ("icon", "unit", "labels"):
+            if th.get(k) is not None:
+                tb[k] = th[k]
+        out.append(tb)
+    return {**{k: v for k, v in tw.items() if k != "tables"}, "tables": out}, err
 
 def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
     """実験の定義を確かめる：id・つなぐ概念と線・条件の範囲・テーマ・反例（崩す条件は概念の成り立つ条件の言葉で）。予想の答えは書かない（画面がモデルから求める）"""
@@ -312,6 +343,34 @@ def validate_network(c: Course) -> list[str]:
                     err.append(f"{tid}: workspace の over {ws.get('over')} は主役の式の、上限のある整数の記号（棒を並べるため）")
             if "mean" in ws and not (isinstance(ws["mean"], int) and ws["mean"] < len(fs) and fs[ws["mean"]].get("tree")):
                 err.append(f"{tid}: workspace の mean {ws.get('mean')} が木のある式を指していない")
+        tw = t.get("table_workspace")
+        if tw is not None:
+            tw, terr = resolve_table_workspace(tw)
+            err += [f"{tid}: {e}" for e in terr]
+            fs = t.get("formulas") or []
+            for field in ("formula", "linear"):
+                if field == "linear" and field not in tw:
+                    continue
+                i = tw.get(field)
+                if type(i) is not int or not 0 <= i < len(fs) or not fs[i].get("tree"):
+                    err.append(f"{tid}: table_workspace の {field} は木のある式の番号")
+            tables = tw.get("tables") or []
+            if not tables:
+                err.append(f"{tid}: table_workspace の tables は1つ以上")
+            ids = set()
+            for tb in tables:
+                bid = tb.get("id")
+                if bid in ids:
+                    err.append(f"{tid}: table_workspace の表の id {bid} が重複")
+                ids.add(bid)
+                vals, ws = tb.get("values") or [], tb.get("weights") or []
+                finite = lambda vs: all(type(v) in (int, float) and math.isfinite(v) for v in vs)
+                if not vals or not finite(vals) or any(b <= a for a, b in zip(vals, vals[1:])):
+                    err.append(f"{tid}: table_workspace の values は有限の数を小さい順で重ならずに書く")
+                if len(ws) != len(vals) or not finite(ws) or any(w < 0 for w in ws) or not 0 < sum(ws) < float('inf'):
+                    err.append(f"{tid}: table_workspace の weights は values と同じ数で0以上、合計は正の有限値")
+                if "labels" in tb and len(tb["labels"]) != len(vals):
+                    err.append(f"{tid}: table_workspace の labels は values と同じ数")
         for m in t.get("misconceptions", []):
             if not (m.get("misconception") and m.get("correction")):
                 err.append(f"{tid}: よくある誤解には misconception と correction を書く")
@@ -491,9 +550,11 @@ def export_network(c: Course, target: dict) -> dict:
             if t.get(k):
                 e[k] = t[k]
         if filled(t):
-            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace"):
+            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace"):
                 if t.get(k):
                     e[k] = t[k]
+            if t.get("table_workspace"):
+                e["table_workspace"] = resolve_table_workspace(t["table_workspace"])[0]   # 表は実験室のテーマから写す
             if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
                 e["formulas"] = [{**f, **({"symbols": [{**s, **({"concept": g(s["concept"])} if s.get("concept") else {})}
                                                        for s in f["symbols"]]} if f.get("symbols") else {}),

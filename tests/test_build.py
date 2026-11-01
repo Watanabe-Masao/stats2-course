@@ -612,6 +612,35 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(f["tree"]["args"][1], {"op": "fn", "name": "E", "args": [{"sym": "X"}]})
         self.assertEqual(next(s for s in f["symbols"] if s["key"] == "mu")["of"], "X")
 
+    def test_table_workspace(self):
+        # 対象：作業台の表と実験室のテーマのつながり（#119：同じ表を2か所に書かない）。
+        # 故障：作業台と実験室で同じテーマの値・重み・期待値がずれる／ないテーマ・ない式番号・値を直書きした表で公開する。
+        # 見つけ方：公開の JSON の表を、実験室のテーマの値・重み（start・compare）と、分数で求めた期待値で照らす。壊した参照で止まる。
+        # 既存との違い：前は作業台が表を直書きしていて、実験室のテーマとの一致を確かめていなかった
+        from fractions import Fraction as F
+        import network
+        c = course()
+        self.assertFalse(self._validate(c))
+        d = network.export_network(c, {"site_base_url": ""})
+        tw = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-expect")["table_workspace"]
+        exp = next(x for x in network.load_experiments() if x["id"] == "EXP-expect-table")
+        themes = {t["id"]: t for t in exp["themes"]}
+        mean = lambda vs, ws: sum(F(v) * w for v, w in zip(vs, ws)) / sum(ws)
+        for tb in tw["tables"]:
+            tid, use = (tb["id"][:-8], "compare") if tb["id"].endswith("-compare") else (tb["id"], "start")
+            th = themes[tid]
+            self.assertEqual((tb["values"], tb["weights"], tb.get("labels")), (th["values"], th[use], th.get("labels")), tb["id"])
+            self.assertEqual(mean(tb["values"], tb["weights"]), mean(th["values"], th[use]))
+        self.assertIn("dice-compare", [tb["id"] for tb in tw["tables"]])
+        w = c.terms["TERM-expect"]["table_workspace"]
+        w["formula"] = -1
+        w["linear"] = 999
+        w["tables"] = [{"experiment": "EXP-expect-table", "theme": "nothing"}, {"experiment": "EXP-expect-table", "theme": "dice", "use": "later"},
+                       {"experiment": "EXP-expect-table", "theme": "dice", "values": [1]}]
+        err = "\n".join(self._validate(c))
+        for part in ["table_workspace の formula", "table_workspace の linear", "値の表の実験室のテーマにない", "use は start か compare", "experiment・theme・use だけで書く"]:
+            self.assertIn(part, err)
+
     def test_workspace_and_parts(self):
         # 式の作業台と意味のかたまり（#110）
         c = course()
