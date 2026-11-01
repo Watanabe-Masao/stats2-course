@@ -61,7 +61,8 @@ const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return Stri
 function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
 const Phi=z=>z<-9?0:z>9?1:0.5*(1+erf(z/Math.SQRT2));
 const dn=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
-function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）。r() は 0〜1、r.normal() は標準正規
+function rng(s){return LK.rng(s);}
 function lnC(n,k){if(k<0||k>n)return -Infinity;let s=0;for(let i=1;i<=k;i++)s+=Math.log(n-k+i)-Math.log(i);return s;}
 const binom=(n,p,k)=>k<0||k>n?0:Math.exp(lnC(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));
 
@@ -71,7 +72,7 @@ const SH={expo:{name:"待ち時間（平均5分）",mu:()=>5,sd:()=>5,g1:()=>2,l
  bimodal:{name:"山が2つ（2と8）",mu:()=>5,sd:()=>Math.sqrt(10),g1:()=>0,lo:-1,hi:11},
  bern:{name:"0か1",mu:p=>p,sd:p=>Math.sqrt(p*(1-p)),g1:p=>(1-2*p)/Math.sqrt(p*(1-p)),lo:-0.05,hi:1.05}};
 function draw(shape,p,r){if(shape==="expo")return -5*Math.log(1-r());if(shape==="unif")return 10*r();
- if(shape==="bimodal"){const c=r()<0.5?2:8,u=r()||1e-12,v=r();return c+Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}return r()<p?1:0;}
+ if(shape==="bimodal"){const c=r()<0.5?2:8;return c+r.normal();}return r()<p?1:0;}
 let cCache={};
 function cSim(shape,n,p){const key=shape+n+p;if(cCache.key===key)return cCache.m;const r=rng(17),m=[];for(let t=0;t<2000;t++){let s=0;for(let i=0;i<n;i++)s+=draw(shape,p,r);m.push(s/n);}cCache={key,m};return m;}
 function cVals(){const shape=$("cshape").value,n=+$("cn").value,p=+$("cp").value,S=SH[shape];

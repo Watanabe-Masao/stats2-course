@@ -69,8 +69,9 @@ const fCdf=(x,a,b)=>x<=0?0:ibeta(a/2,b/2,a*x/(a*x+b));
 function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
 const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
 const r3=v=>Math.round(v*1000)/1000;
-function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
-function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）。r() は 0〜1、r.normal() は標準正規
+function rng(s){return LK.rng(s);}
+function gauss(r){return r.normal();}
 const COL=["var(--acc)","var(--acc2)","var(--data-3)","var(--data-hi)","var(--ink-3)","var(--mut)"];
 const NAMES="ABCDEF";
 

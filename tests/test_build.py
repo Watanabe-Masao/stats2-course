@@ -566,7 +566,7 @@ class TestNetwork(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             src = Path(d) / t["src"]
             shutil.copy(t["dir"] / t["src"], src)
-            src.write_text(src.read_text(encoding="utf-8") + "\n<script>const x=Math.random();function rng(s){return ()=>s;}</script>", encoding="utf-8")
+            src.write_text(src.read_text(encoding="utf-8") + "\n<script>const x=Math.random();let sd=1;const rnd=()=>{sd=(sd*16807)%2147483647;return sd;};</script>", encoding="utf-8")
             t["dir"] = Path(d)
             err = " / ".join(validate_labs(c))
         self.assertIn("LAB-count: Math.random は使わない", err)

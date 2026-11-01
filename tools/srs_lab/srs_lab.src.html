@@ -56,7 +56,8 @@ const f=(v,d=4)=>{if(!isFinite(v))return "—";if(Math.abs(v)>=1e7){const [m,e]=
 function lnC(n,k){if(k<0||k>n)return -Infinity;let s=0;for(let i=1;i<=k;i++)s+=Math.log(n-k+i)-Math.log(i);return s;}
 const C=(n,k)=>Math.exp(lnC(n,k));
 // 固定の乱数（抽選ボタン用）
-let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）
+let R=LK.rng(7);const rnd=()=>R();
 
 // ---- 包含確率
 let picked=[];

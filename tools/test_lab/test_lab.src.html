@@ -56,7 +56,8 @@ function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.5*x);const y=t*Mat
 const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
 const dn=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
 const ZQ={two:{"0.1":1.645,"0.05":1.96,"0.01":2.576},one:{"0.1":1.282,"0.05":1.645,"0.01":2.326}};   // 2級の数表の値
-function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）。r() は 0〜1、r.normal() は標準正規
+function rng(s){return LK.rng(s);}
 // 標準正規の曲線と塗り
 function curve(shade,lines,label,curves){const H=150,L=12,R=W-12,base=H-26,top=26,x0=-4.5,x1=4.5,X=x=>L+(x-x0)/(x1-x0)*(R-L),cs=curves||[{m:0,col:"var(--acc)"}],mx=dn(0)*1.1,Y=y=>base-y/mx*(base-top);
  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="${esc(label)}">`;

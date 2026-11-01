@@ -35,8 +35,9 @@ const $=LK.$,esc=LK.esc;
 const f=(v,d=1)=>{if(typeof v!=="number"||!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
 const W=340;
 // ---- データ（固定の乱数で毎回同じ。架空）
-function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
-function normal(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）。r() は 0〜1、r.normal() は標準正規
+function rng(s){return LK.rng(s);}
+function normal(r){return r.normal();}
 const DAYS=(()=>{const r=rng(20261029),out=[];
  for(const st of ["A","B"])for(let d=0;d<120;d++){const wk=(d%7===5||d%7===6),u=r(),weather=u<0.6?"晴れ":u<0.85?"曇り":"雨",camp=r()<(wk?0.6:0.15);
   let cust=(st==="A"?620:450)+(wk?160:0)+(weather==="晴れ"?40:weather==="雨"?-110:0)+(camp?45:0)+(st==="B"&&d>=60?90:0)+normal(r)*45;
