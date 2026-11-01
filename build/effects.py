@@ -16,6 +16,7 @@ effect は公開の JSON に出さない（予想の答えになるため。画�
 - urn：箱 total 個（n より小さければ n 個）、当たり success 個（省くと round(p×total)。JS の Math.round と同じ丸め）
 - streak：最初は p、成功のあとは p＋carry(1−p)、失敗のあとは p−carry·p
 - mix：ずれ幅 d＝min(spread, p, 1−p)。各セットの開始時に p−d か p＋d を等確率で選び、セットの中は同じ確率
+- fatigue：ずれ幅 d＝min(drop, p, 1−p)。i 回目（0 から）の確率 p＋d(1−2i/(n−1))、各回は独立（n＝1 なら p）
 """
 from __future__ import annotations
 
@@ -82,6 +83,17 @@ def mechanism_all(m: dict, N: int, p: F) -> list[list[F]]:
         return [[(x + y) / 2 for x, y in zip(a, b)] for a, b in zip(_binom_all(N, p - d), _binom_all(N, p + d))]
     if kind == "streak":
         return _streak_all(N, p, _frac(m["carry"]))
+    if kind == "fatigue":
+        # 各回が独立で確率だけ違う：1回ずつ足して k の分布を作る（定義から。閉じた式を使わない）
+        out = []
+        for n in range(1, N + 1):
+            d = max(F(0), min(_frac(m["drop"]), p, 1 - p))
+            pmf = [F(1)]
+            for i in range(n):
+                q = p + d * (1 - F(2 * i, n - 1)) if n > 1 else p
+                pmf = [(pmf[k] if k < len(pmf) else 0) * (1 - q) + (pmf[k - 1] * q if k else 0) for k in range(len(pmf) + 1)]
+            out.append(pmf)
+        return out
     if kind == "urn":
         out = []
         for n in range(1, N + 1):
@@ -163,6 +175,17 @@ def question_errors(eid: str, x: dict, margin: F = F(1, 10)) -> list[str]:
             r = vary.get(key)
             if r and not (_frac(r["min"]) <= v <= _frac(r["max"])):
                 err.append(f"{eid}: 問い {qid} の {key}＝{v} が vary の範囲の外")
+        if q.get("form") == "spread":
+            to = int((q.get("to") or {}).get("n", 0))
+            if not n < to <= 100:
+                err.append(f"{eid}: 問い {qid} の to.n＝{to} は n＝{n} より大きく 100 以下")
+            continue
+        if q.get("form") == "conv":
+            if len(q.get("events") or []) != 1:
+                err.append(f"{eid}: 問い {qid}（理論と実測）の events は1つ")
+            continue
+        if q.get("form") == "prob" and q.get("free") and len(q.get("events") or []) != 1:
+            err.append(f"{eid}: 問い {qid}（自分で選ぶ）の events は1つ（最初の結果）")
         if q.get("form") == "prob":
             if not scale:
                 err.append(f"{eid}: 確率の値の問い {qid} があるのに prob_scale がない")

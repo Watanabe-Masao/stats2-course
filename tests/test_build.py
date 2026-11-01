@@ -724,9 +724,13 @@ class TestNetwork(unittest.TestCase):
         x = network.load_experiments()[0]
         self.assertEqual(effects.question_errors("E", x), [])
         self.assertEqual(effects.event_prob(10, F(1, 2), "ge", 9), F(11, 1024))
-        near = {**x, "questions": [{**x["questions"][0], "set": {"n": 10, "p": 0.5}, "events": [{"op": "ge", "k": 9}]}]}
+        pq = next(q for q in x["questions"] if q["form"] == "prob" and not q.get("free"))
+        near = {**x, "questions": [{**pq, "set": {"n": 10, "p": 0.5}, "events": [{"op": "ge", "k": 9}]}]}
         self.assertTrue(any("境目 0.01 に近い" in e for e in effects.question_errors("E", near)))
-        out = {**x, "questions": [{**x["questions"][0], "events": [{"op": "ge", "k": 11}]}]}
+        out = {**x, "questions": [{**pq, "events": [{"op": "ge", "k": 11}]}]}
+        # 広がりの問い：変えたあとの n が前より大きくない
+        sq = next(q for q in x["questions"] if q["form"] == "spread")
+        self.assertTrue(any("to.n" in e for e in effects.question_errors("E", {**x, "questions": [{**sq, "to": {"n": 10}}]})))
         self.assertTrue(any("0〜n＝10 の外" in e for e in effects.question_errors("E", out)))
         self.assertTrue(any("大きい順" in e for e in effects.question_errors("E", {**x, "prob_scale": [0.01, 0.5]})))
 
