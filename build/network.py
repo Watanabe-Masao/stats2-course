@@ -10,6 +10,7 @@ import json
 import re
 
 from model import CONTENT, ROOT, Course, load_yaml, run_check
+from effects import effect_errors
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
@@ -158,6 +159,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                     err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念の成り立つ条件にない")
         if x.get("model") == "table":
             err += table_errors(eid, x)
+        err += effect_errors(eid, x)   # 反例の言い分（effect）を厳密な計算で確かめる（#118 層3）
         rs = x.get("reason") or {}
         if rs.get("concept"):
             t = c.terms.get(rs["concept"])
@@ -547,7 +549,8 @@ def export_network(c: Course, target: dict) -> dict:
         if x.get("reason"):
             e["reason"] = {**x["reason"], **({"concept": g(x["reason"]["concept"])} if x["reason"].get("concept") else {})}
         if x.get("counterexamples"):
-            e["counterexamples"] = [{**b, **({"concept": g(b["concept"])} if b.get("concept") else {})} for b in x["counterexamples"]]
+            # effect（言い分の向き）は予想の答えになるので公開の JSON に出さない（画面は engine の mechanismMoments から求める）
+            e["counterexamples"] = [{**{k: v for k, v in b.items() if k != "effect"}, **({"concept": g(b["concept"])} if b.get("concept") else {})} for b in x["counterexamples"]]
         experiments.append(e)
     revision = json.loads(SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision,

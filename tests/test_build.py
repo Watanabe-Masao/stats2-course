@@ -625,6 +625,31 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(e["reason"]["concept"], "stats2:TERM-binom")
         self.assertFalse(network.schema_errors(d))
 
+    def test_counterexample_effect(self):
+        # 確かめる対象：反例の言い分（effect）が、起き方の定義から求めた分布と合うか（#118 層3、M7）。
+        # 想定する故障：文と effect の向きの取り違え・端で言い分が外れる起き方（混ざるの切り詰め・戻さずに取るの割合の丸め）・effect の書き忘れ。
+        # 見つけ方：本物の定義は通り、向きを逆にした effect・比べる条件をそろえない比較（戻さずに取るを p の二項分布と比べる）・
+        # effect のない反例で、それぞれ止まるか。effect は公開の JSON に出ない。
+        # 既存との違い：今までは文の言い分を確かめる仕組みがなかった
+        import effects
+        import network
+        x = network.load_experiments()[0]
+        self.assertEqual(effects.effect_errors("E", x), [])
+        flip = {**x, "counterexamples": [{**b, "effect": {**b["effect"], "spread": "smaller" if b["effect"]["spread"] == "larger" else "larger"}} for b in x["counterexamples"]]}
+        err = effects.effect_errors("E", flip)
+        self.assertEqual(len(err), len(x["counterexamples"]), err)   # 3つとも止まる
+        # 比べる条件をそろえない（戻さずに取るを p の二項分布と比べる）と、丸めた割合で外れる所が見つかる
+        orig = effects.base_ratio
+        try:
+            effects.base_ratio = lambda m, n, p: p
+            self.assertTrue(any("反例 urn の effect が計算と合わない" in e for e in effects.effect_errors("E", x)))
+        finally:
+            effects.base_ratio = orig
+        none = {**x, "counterexamples": [{k: v for k, v in b.items() if k != "effect"} for b in x["counterexamples"]]}
+        self.assertTrue(any("effect（平均・散らばりの向き）がない" in e for e in effects.effect_errors("E", none)))
+        d = network.export_network(course(), {"site_base_url": ""})
+        self.assertFalse(any("effect" in b for e in d["experiments"] for b in e.get("counterexamples") or []))
+
     def test_experiment_table(self):
         # 値の表の実験（#119）：値と重み・呼び名の数がそろい、重みが正。前と変えた重みが同じなら問いにならない。書き出しは型（改訂10）に合う
         import network
