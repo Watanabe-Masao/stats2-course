@@ -709,6 +709,18 @@
                       "$ref": "#/$defs/text",
                       "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
                     },
+                    "predict": {
+                      "$ref": "#/$defs/text",
+                      "description": "何を予想するか（開ける問いは必ず書く）"
+                    },
+                    "operate": {
+                      "$ref": "#/$defs/text",
+                      "description": "何を操作するか"
+                    },
+                    "judge": {
+                      "$ref": "#/$defs/text",
+                      "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
+                    },
                     "open": {
                       "type": "string",
                       "pattern": "^(shift|break:[a-z][a-z0-9-]*|[a-z][a-z0-9-]*)$",

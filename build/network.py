@@ -158,6 +158,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
         qids = {q.get("id") for q in x.get("questions") or []}
         cxids = {b.get("id") for b in x.get("counterexamples") or []}
         seen_items: set = set()
+        opened: dict = {}
         for grp in x.get("catalog") or []:
             for it in grp.get("items") or []:
                 iid = it.get("id")
@@ -174,6 +175,13 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                         err.append(f"{eid}: {iid} の概念 {ref} が用語にない")
                 op = it.get("open")
                 if op:
+                    # 実験の仕組みは共有してよいが、同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）
+                    if op in opened:
+                        err.append(f"{eid}: {iid} の open {op} は {opened[op]} と同じ。問いごとに予測・初期表示の違う入口を作るか、作成中にする")
+                    opened.setdefault(op, iid)
+                    for need in ("predict", "operate", "judge"):
+                        if not it.get(need):
+                            err.append(f"{eid}: {iid} は開ける問いなので {need}（予測・操作・理解判定）を書く")
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
                     ok = op == "shift" or op in qids or (op.startswith("break:") and op[6:] in cxids)

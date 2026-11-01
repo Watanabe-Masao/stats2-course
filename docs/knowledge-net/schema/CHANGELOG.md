@@ -24,4 +24,4 @@
 | 16 | 2026-11-01 | 式の作業台（workspace）に任意の `linear`（E(aX＋b) の式の番号）。作業台の型（stats2-course #156）で、どの作業台にも変換の欄を出すため。任意 |
 | 17 | 2026-11-01 | 二項分布の実験室に任意の `questions`（入口「何を確かめたい？」に並べる問い：id・form〔問いの形。今は prob＝確率の値〕・title・question・set〔n・p〕・events〔eq／ge／le と k。1〜2個〕）と `prob_scale`（確率の値の予想の目盛り）（stats2-course #161）。任意 |
 | 18 | 2026-11-02 | 二項分布の実験室の `questions` の form に spread（広がり：to.n）・conv（理論と実測）を足し、prob に任意の free（学習者が結果を選ぶ）。反例の起き方に fatigue（回を追って確率が変わる：drop）（stats2-course #161）。任意 |
-| 19 | 2026-11-02 | 二項分布の実験室に任意の `catalog`（テーマ体系：まとまり id・title と、その下の問い id〔教材名:概念-まとまり-番号。stats2:binom-A-01〕・title・finds〔主な発見〕・open〔開く入口。ないものは作成中〕・concept〔主概念〕・related〔関連概念〕）。サイトの実験室のタブで概念から問いを絞る（stats2-course #163）。任意 |
+| 19 | 2026-11-02 | 二項分布の実験室に任意の `catalog`（テーマ体系：まとまり id・title と、その下の問い id〔教材名:概念-まとまり-番号。stats2:binom-A-01〕・title・finds〔主な発見〕・predict〔何を予想するか〕・operate〔何を操作するか〕・judge〔理解判定〕・open〔開く入口。ないものは作成中〕・concept〔主概念〕・related〔関連概念〕）。サイトの実験室のタブで概念から問いを絞る（stats2-course #163）。任意 |
