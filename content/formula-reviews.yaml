@@ -7,4 +7,46 @@
 #     date: 2026-11-01
 #     by: 渡辺さん
 # 式を直したら、その式の記録は見直す（中身が変わればレビューはやり直し）。
-reviews: []
+reviews:
+- formula: F-var-def
+  points:
+  - 単位（元の単位の2乗）
+  judgement: 'E((X−μ)²)・E(X²)・(E(X))² はどれも X の単位の2乗で、引き算の両側がそろう。μ は of: X で X と同じ単位。概念の principle と誤解の訂正に「単位は元の単位の2乗」とある（『統計学入門』5章、Casella & Berger Def. 2.3.2）。記号の表に単位の項目はないので、型では保証しておらず本文の記述で確かめた'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: 12d172441ee0eff3
+- formula: F-var-def
+  points:
+  - 前提（2乗の期待値が有限）
+  judgement: conditions.math は期待値と2乗の期待値が有限。2つ目の等号 E((X−μ)²)＝E(X²)−μ² は展開と線形性で、E(X²) が有限でないと ∞−∞ になるので、この前提が要る（Casella & Berger Thm 2.3.4）
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: 12d172441ee0eff3
+- formula: F-var-linear
+  points:
+  - 導き方
+  judgement: DER-var-linear の3段（期待値の線形性で E(aX＋b)＝aμ＋b → ずれが a(X−μ) になり b が消える → 2乗の期待値で a² が外に出る）は Casella & Berger Thm 2.3.4 の証明と一致する。前提は V(X) が有限・a・b が定数で、導出の conditions に書いてある。前提は期待値と、分散の定義（REL-expect-var）で、結論の概念を前提に入れない
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: a6f16b4a51cd03f8
+- formula: F-std-def
+  points:
+  - 別の集団の μ・σ で割らない（conditions.data）
+  judgement: 'μ・σ は of: X・concept TERM-expect・TERM-sd で X 自身の値に縛られ、σ の domain は σ＞0。conditions.data はこれを現実のデータの言葉で言い、基準集団の μ₀・σ₀ を使うと平均 (μ−μ₀)/σ₀・標準偏差 σ/σ₀ になり 0・1 にならないことも書いてある。conditions.math は分散が有限で標準偏差が0でない'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: bb2a09050b19c8cd
+- formula: F-expect-def
+  points:
+  - 無限の台で和が収束する前提
+  judgement: conditions.math は絶対収束 Σ|x|p(x)＜∞（連続なら ∫|x|f(x)dx＜∞）を求め、Casella & Berger Def. 2.2.1 の存在の条件と一致する。「足す順序で値が変わらない」は実数の級数で絶対収束と同値（リーマンの再配列定理）で、条件収束する台を除ける。実験室の倍々のくじはこの条件を崩して +∞ に発散する例
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: b9afc8b21c3bade6
+- formula: F-binom-pmf
+  points:
+  - モデルの仮定（独立・同じ p）と反例の実験の言い分
+  judgement: 式は ₙCₖpᵏ(1−p)ⁿ⁻ᵏ（『統計学入門』6章、Casella & Berger (3.2.3)）、仮定は独立同分布のベルヌーイ試行（回数が固定・2値・p が同じ・独立）。反例の言い分は build/effects.py の厳密計算と一致：戻さずに取るは独立だけを崩し周辺確率は同じで散らばりが小さい。引きずられる・日や時間で p が違うは平均 np のまま n≧2・0＜p＜1 で散らばりが大きい。客ごとに独立に p が違うだけなら逆に小さい（ポアソン二項分布）ことも書き分けてある
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-01'
+  fingerprint: 677d1e4b51735e44

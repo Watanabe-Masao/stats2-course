@@ -218,6 +218,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - **式の元は木だけ**（#118 単位 A、2026-11-01）。原本に `tex` を書かない。公開の JSON の tex は build が math-lab の `toTex` で木から作る（build/formula_tex.mjs が docs/math-lab/formula.mjs の写しを読む。写しは型と同じく `python3 build/sync_schema.py --update` で取り込む）。木と tex の食い違い（M1）はこれで起きない。単元の「式の構造」の表は手書きのままなので、記号を概念に合わせる。
 - 同じ式を2つの概念に出すときは、元でない側に `- {ref: F-…}` だけを書く（build が元の式を写し、`defined_in` を付ける。#118 D2）。
 - **式ごとの検証の契約**は content/formula-contracts.yaml（#118 D6）：種類（kinds）・主張する性質（properties）・代表（representative）・記号どうしの条件（conditions：1つの端の domain で書けないもの。比べる式の木）・レビューの観点（review）。全部の式に1つずつ（ないと build が「未分類」で止める）。1つの記号の範囲は domain に、文の条件は概念の conditions.math に書き、契約には書かない。
+- **式の個別のレビュー**（#118 M9、渡辺さん 2026-11-01）：契約の `review`（数で保証できない観点）は content/formula-reviews.yaml に記録する（formula・points・judgement・by・date・fingerprint）。fingerprint はレビューした版（式の木・記号の表・契約の組の条件・概念の成り立つ条件）で、`python3 build/formulas.py --fingerprint F-…` で出す。どれかが変われば古い記録では通らない。ふだんの build は「レビュー前」の印を出すだけで止めない。公開の前（build/deploy_site.sh）に `python3 build/formulas.py --publish-check` が、公開する代表の式（representative）に今の版のレビューがなければ止める。レビューは式を書いた側でなく、別のエージェント（独立なレビュー）が行い、PR で渡辺さんが確かめる
 - build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。
 
 ## 実験室（content/experiments.yaml。#102）

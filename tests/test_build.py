@@ -557,6 +557,39 @@ class TestNetwork(unittest.TestCase):
         rec = [{"formula": "F-binom-pmf", "points": next(x for x in k["contracts"] if x["formula"] == "F-binom-pmf")["review"], "judgement": "j", "date": "2026-11-01"}]
         self.assertNotIn("review_pending", marks(k, rec)["F-binom-pmf"])
 
+    def test_review_version_and_publish_gate(self):
+        # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
+        # 想定する故障：レビューのあとに記号の of・domain や概念の条件を変えても、古い記録で「レビュー済み」のまま公開される／
+        # 同じ内容の作り直しで要らないやり直しを求める／記録のない代表の式が公開される。
+        # 見つけ方：今の版の記録は通り、記号の domain・概念の条件を変えると止まり、同じ原本から作り直した版は同じ値になる。
+        # 既存との違い：test_formula_marks は記録の有無だけで、版を見ていなかった
+        import copy
+        from formulas import CONTRACTS, current_fingerprints, publish_errors
+        from model import load_yaml as _ly
+        k, c = _ly(CONTRACTS), course()
+        prints = current_fingerprints(c.terms, k)
+        self.assertEqual(prints, current_fingerprints(course().terms, k))   # 同じ原本からは同じ版
+        reps = [x for x in k["contracts"] if x.get("representative") and x.get("review")]
+        rec = [{"formula": x["formula"], "points": x["review"], "fingerprint": prints[x["formula"]], "by": "b", "judgement": "j", "date": "d"} for x in reps]
+        self.assertEqual(publish_errors(k, rec, prints), [])
+        self.assertTrue(publish_errors(k, [], prints))                       # 記録がなければ止まる
+        terms = copy.deepcopy(c.terms)
+        sym = next(s for s in next(f for f in terms["TERM-std"]["formulas"] if f.get("id") == "F-std-def")["symbols"] if s["key"] == "sigma")
+        sym["domain"] = {"min": 0}                                            # σ＝0 を許す（M4 と同じ形の変更）
+        terms["TERM-binom"]["conditions"]["math"] = terms["TERM-binom"]["conditions"]["math"][:-1]   # 条件を1つ落とす
+        err = publish_errors(k, rec, current_fingerprints(terms, k))
+        self.assertTrue(any("F-std-def" in e and "変わった" in e for e in err), err)
+        self.assertTrue(any("F-binom-pmf" in e and "変わった" in e for e in err), err)
+        # 観点の根拠（契約の review_refs：導出・実験室の反例）を変えても止まる（独立なレビューの指摘 2026-11-01）
+        import formulas
+        orig = formulas.evidence
+        try:
+            formulas.evidence = lambda: {**orig(), "DER-var-linear": {**orig()["DER-var-linear"], "steps": ["書き換えた"]}}
+            err = publish_errors(k, rec, current_fingerprints(c.terms, k))
+        finally:
+            formulas.evidence = orig
+        self.assertEqual([e.split("：")[0] for e in err], ["代表の式 F-var-linear"], err)   # 根拠を指す式だけがやり直し
+
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
         # 移したラボに自前の rng が戻る。見つけ方：移したラボ（count）の原本に Math.random と function rng を足すと validate_labs が止める
