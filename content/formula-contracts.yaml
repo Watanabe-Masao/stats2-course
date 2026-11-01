@@ -28,6 +28,7 @@ contracts:
   properties: [同値, 不変, 対称]
   representative: true
   review: [導き方]
+  review_refs: [DER-var-linear]   # 観点の根拠。中身が変わればレビューはやり直し（fingerprint に入る）
 - formula: F-sd-def
   kinds: [定義]
   properties: [非負, 単位の整合]
@@ -86,6 +87,7 @@ contracts:
   properties: [非負, 正規化, 対称, 有界, 条件しだい]
   representative: true
   review: [モデルの仮定（独立・同じ p）と反例の実験の言い分]
+  review_refs: [EXP-binom-p]   # 反例の実験（counterexamples・contrasts）
   note: p＝0・k＝0 や p＝1・k＝n で 0⁰ が出る。0⁰＝1 の約束（engine の evaluate も Math.pow(0, 0)＝1）
 - formula: F-binom-mean
   kinds: [恒等式]

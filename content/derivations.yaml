@@ -16,7 +16,7 @@ derivations:
     basis: {units: [U14]}
   - id: DER-var-linear
     version: 1
-    premises: [TERM-expect, TERM-var]
+    premises: [TERM-expect, REL-expect-var]   # 使うのは期待値の線形性と、分散＝ずれの2乗の期待値という定義（結論の概念を前提に入れない）
     conclusion: TERM-var
     statement: 1次変換 aX＋b の分散は a²V(X)。b は散らばりを変えない。
     steps:

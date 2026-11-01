@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONTRACTS = ROOT / "content" / "formula-contracts.yaml"
 FID = re.compile(r"^F-[a-z0-9]+(-[a-z0-9]+)*$")
-CONTRACT_KEYS = {"formula", "kinds", "properties", "representative", "conditions", "review", "note"}
+CONTRACT_KEYS = {"formula", "kinds", "properties", "representative", "conditions", "review", "review_refs", "note"}
 
 
 def originals(terms: dict) -> dict:
@@ -84,6 +84,9 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
             for c in k.get("conditions") or []:
                 if not (isinstance(c, dict) and c.get("text") and isinstance(c.get("tree"), dict)):
                     err.append(f"契約 {fid}：conditions は text と tree（比べる式の木）で書く")
+            for r in k.get("review_refs") or []:
+                if r not in evidence():
+                    err.append(f"契約 {fid}：review_refs の {r} が導出・実験室にない")
             checks[fid] = [c["tree"] for c in k.get("conditions") or [] if isinstance(c, dict) and isinstance(c.get("tree"), dict)]
         missing = sorted(set(by_id) - seen)
         if missing:
@@ -120,23 +123,41 @@ REVIEWS = ROOT / "content" / "formula-reviews.yaml"
 REFERENCE = ROOT / "docs" / "formula-correctness" / "reference.json"
 
 
-def fingerprint(term: dict, formula: dict, contract: dict | None) -> str:
-    """レビューの対象の版（#118 M9）：式の木・記号の表（of・domain・concept・意味）・契約の組の条件・概念の成り立つ条件。
-    この中の何かが変われば値が変わり、古いレビューの記録では通らない。TeX は木から作るので入れない。同じ内容の作り直しでは変わらない"""
+def evidence() -> dict:
+    """レビューの観点の根拠になる原本（契約の review_refs で指す）：導出 DER-… と、実験室 EXP-… の反例（counterexamples・contrasts）"""
+    out = {}
+    der = ROOT / "content" / "derivations.yaml"
+    exp = ROOT / "content" / "experiments.yaml"
+    from model import load_yaml   # build の中から呼ぶ（循環を避けて関数の中で読む）
+    for d in ((load_yaml(der) or {}).get("derivations") or []) if der.exists() else []:
+        out[d["id"]] = d
+    for x in ((load_yaml(exp) or {}).get("experiments") or []) if exp.exists() else []:
+        out[x["id"]] = {"counterexamples": x.get("counterexamples") or [], "contrasts": x.get("contrasts") or []}
+    return out
+
+
+def fingerprint(term: dict, formula: dict, contract: dict | None, refs: dict | None = None) -> str:
+    """レビューの対象の版（#118 M9）：式の木・記号の表（of・domain・concept・意味）・契約の組の条件・概念の成り立つ条件と反例・誤解、
+    契約の review_refs が指す根拠（導出・実験室の反例）。この中の何かが変われば値が変わり、古いレビューの記録では通らない。
+    TeX は木から作るので入れない。同じ内容の作り直しでは変わらない"""
     import hashlib
+    refs = refs or {}
     body = {"tree": formula.get("tree"), "symbols": formula.get("symbols") or [],
-            "contract_conditions": (contract or {}).get("conditions") or [], "term_conditions": term.get("conditions") or {}}
+            "contract_conditions": (contract or {}).get("conditions") or [], "term_conditions": term.get("conditions") or {},
+            "term_counterexample": term.get("counterexample"), "term_misconceptions": term.get("misconceptions") or [],
+            "evidence": {r: refs.get(r) for r in (contract or {}).get("review_refs") or []}}
     return hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()[:16]
 
 
 def current_fingerprints(terms: dict, contracts: dict | None) -> dict:
     """式 ID → 今の fingerprint（元の式だけ）"""
     ks = {k["formula"]: k for k in (contracts or {}).get("contracts") or []}
+    refs = evidence()
     out = {}
     for tid, t in terms.items():
         for f in t.get("formulas") or []:
             if isinstance(f, dict) and f.get("id") and "ref" not in f and not f.get("defined_in"):   # 写した式（defined_in）は元の概念で数える
-                out.setdefault(f["id"], fingerprint(t, f, ks.get(f["id"])))
+                out.setdefault(f["id"], fingerprint(t, f, ks.get(f["id"]), refs))
     return out
 
 

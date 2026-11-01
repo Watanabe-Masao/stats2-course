@@ -580,6 +580,15 @@ class TestNetwork(unittest.TestCase):
         err = publish_errors(k, rec, current_fingerprints(terms, k))
         self.assertTrue(any("F-std-def" in e and "変わった" in e for e in err), err)
         self.assertTrue(any("F-binom-pmf" in e and "変わった" in e for e in err), err)
+        # 観点の根拠（契約の review_refs：導出・実験室の反例）を変えても止まる（独立なレビューの指摘 2026-11-01）
+        import formulas
+        orig = formulas.evidence
+        try:
+            formulas.evidence = lambda: {**orig(), "DER-var-linear": {**orig()["DER-var-linear"], "steps": ["書き換えた"]}}
+            err = publish_errors(k, rec, current_fingerprints(c.terms, k))
+        finally:
+            formulas.evidence = orig
+        self.assertEqual([e.split("：")[0] for e in err], ["代表の式 F-var-linear"], err)   # 根拠を指す式だけがやり直し
 
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
