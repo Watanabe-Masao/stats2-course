@@ -714,6 +714,22 @@ class TestNetwork(unittest.TestCase):
         d = network.export_network(course(), {"site_base_url": ""})
         self.assertFalse(any("effect" in b for e in d["experiments"] for b in e.get("counterexamples") or []))
 
+    def test_question_prob_scale(self):
+        # 確かめる対象：入口の確率の値の問い（#161）。想定する故障：答えが目盛りの境目のすぐそば（10 回中 9 回以上・p＝0.5 は 1.07%、境目 1%）で、
+        # ほぼ当たった予想が「違った」になる（#158 A4 と同じ種類）・k が n の外・目盛りの順が逆。見つけ方：本物の定義は通り、
+        # それぞれを崩した定義が止まる。期待値は手で求めた値（10 回中 9 回以上・p＝0.5：(10＋1)÷1024）。既存との違い：問いの答えの位置を確かめるのは初めて
+        import effects
+        import network
+        from fractions import Fraction as F
+        x = network.load_experiments()[0]
+        self.assertEqual(effects.question_errors("E", x), [])
+        self.assertEqual(effects.event_prob(10, F(1, 2), "ge", 9), F(11, 1024))
+        near = {**x, "questions": [{**x["questions"][0], "set": {"n": 10, "p": 0.5}, "events": [{"op": "ge", "k": 9}]}]}
+        self.assertTrue(any("境目 0.01 に近い" in e for e in effects.question_errors("E", near)))
+        out = {**x, "questions": [{**x["questions"][0], "events": [{"op": "ge", "k": 11}]}]}
+        self.assertTrue(any("0〜n＝10 の外" in e for e in effects.question_errors("E", out)))
+        self.assertTrue(any("大きい順" in e for e in effects.question_errors("E", {**x, "prob_scale": [0.01, 0.5]})))
+
     def test_experiment_table(self):
         # 値の表の実験（#119）：値と重み・呼び名の数がそろい、重みが正。前と変えた重みが同じなら問いにならない。書き出しは型（改訂10）に合う
         import network

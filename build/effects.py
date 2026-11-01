@@ -135,3 +135,44 @@ def effect_errors(eid: str, x: dict) -> list[str]:
         if bad:
             err.append(f"{eid}: 反例 {b.get('id')} の effect が計算と合わない：{bad}")
     return err
+
+
+def event_prob(n: int, p: F, op: str, k: int) -> F:
+    """二項分布 B(n, p) の事象の確率（分数で厳密に）。eq：ちょうど k、ge：k 以上、le：k 以下"""
+    pmf = [comb(n, j) * p ** j * (1 - p) ** (n - j) for j in range(n + 1)]
+    ks = [k] if op == "eq" else range(k, n + 1) if op == "ge" else range(0, k + 1)
+    return sum((pmf[j] for j in ks if 0 <= j <= n), F(0))
+
+
+def question_errors(eid: str, x: dict, margin: F = F(1, 10)) -> list[str]:
+    """入口の問い（#161）を確かめる。確率の値の問いは、答え（理論の確率）が目盛りの境目から離れていること
+    （境目の近くでは、ほぼ当たった予想が「違った」になる。#158 A4 と同じ種類の故障）。離れ方は境目の値に対する比で margin 以上"""
+    err: list[str] = []
+    qs = x.get("questions") or []
+    ids = [q.get("id") for q in qs]
+    if len(set(ids)) != len(ids):
+        err.append(f"{eid}: 問いの id が重なっている")
+    scale = [_frac(v) for v in x.get("prob_scale") or []]
+    if scale and any(a <= b for a, b in zip(scale, scale[1:])):
+        err.append(f"{eid}: prob_scale は大きい順に書く")
+    vary = x.get("vary") or {}
+    for q in qs:
+        qid, st = q.get("id"), q.get("set") or {}
+        n, p = int(st.get("n", 0)), _frac(st.get("p", 0))
+        for key, v in (("n", n), ("p", p)):
+            r = vary.get(key)
+            if r and not (_frac(r["min"]) <= v <= _frac(r["max"])):
+                err.append(f"{eid}: 問い {qid} の {key}＝{v} が vary の範囲の外")
+        if q.get("form") == "prob":
+            if not scale:
+                err.append(f"{eid}: 確率の値の問い {qid} があるのに prob_scale がない")
+                continue
+            for e in q.get("events") or []:
+                if not 0 <= int(e["k"]) <= n:
+                    err.append(f"{eid}: 問い {qid} の k＝{e['k']} が 0〜n＝{n} の外")
+                    continue
+                pr = event_prob(n, p, e["op"], int(e["k"]))
+                near = [b for b in scale if abs(pr - b) < b * margin]
+                if near:
+                    err.append(f"{eid}: 問い {qid} の答え {float(pr):.4f}（{e['op']} {e['k']}）が目盛りの境目 {float(near[0]):g} に近い（予想が境目で割れる）。条件か k を変える")
+    return err
