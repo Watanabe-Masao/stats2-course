@@ -69,7 +69,9 @@ const MU=POP.reduce((s,x)=>s+x,0)/100;
 const fmt=x=>x.toFixed(2)+"%";
 const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
 const NEAR=0.05;   // μ との差がこれ以下なら「ほぼ μ」
-function pick(idx,n,r=Math.random){const a=idx.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+// 種のない引き方（無作為・枠・無回答）は math-lab の種つき乱数（issue 144 の P6 組 A）。種つきの抽出（rng）は組 C で移す
+const RA=LK.rng(LK.cfg.seed??1);
+function pick(idx,n,r=RA){const a=idx.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
 
 function grid(state){ // state: i -> "sel"|"off"|""
  const s=22,W=10*s+4;let h=`<svg viewBox="0 0 ${W} ${W}" width="${W}" role="img" aria-label="100店">`;
@@ -134,7 +136,7 @@ function qRender(){const k=+$("qk").value;const st={};qLast.forEach(i=>st[i]="se
   if(k===0)t+='<div class="mut">偏りの強さ 0：返事のしやすさが廃棄率と無関係なので、ずれはほぼ消える。</div>';}
  else t='<span class="mut">「20回続けて」を押す。偏りの強さを0にして比べる。</span>';
  $("qsum").innerHTML=t;$("qstrip").innerHTML=strip(qHist,MU,true,"回答の平均の履歴");}
-function qDraw(times){const k=+$("qk").value;for(let t=0;t<times;t++){qLast=[...POP.keys()].filter(i=>Math.random()<respProb(POP[i],k));if(!qLast.length)qLast=[0];qHist.push(mean(qLast.map(i=>POP[i])));qN.push(qLast.length);}qRender();}
+function qDraw(times){const k=+$("qk").value;for(let t=0;t<times;t++){qLast=[...POP.keys()].filter(i=>RA()<respProb(POP[i],k));if(!qLast.length)qLast=[0];qHist.push(mean(qLast.map(i=>POP[i])));qN.push(qLast.length);}qRender();}
 LK.register("resp",{name:"自分から回答",
  init(){const reset=()=>{qHist=[];qN=[];qLast=[];qRender();};LK.stepper($("qk"),reset);$("qreset").onclick=reset;$("qdraw").onclick=()=>qDraw(1);$("qx20").onclick=()=>qDraw(20);qRender();},
  apply(s){if(s.k!==undefined)LK.setRange("qk",s.k);qHist=[];qN=[];qLast=[];qRender();},

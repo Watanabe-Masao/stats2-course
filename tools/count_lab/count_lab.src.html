@@ -96,7 +96,9 @@ const cc=(n,r)=>`${sub(n)}C${sub(r)}`,pp=(n,r)=>`${sub(n)}P${sub(r)}`;
 function C(n,r){if(r<0||r>n)return 0;r=Math.min(r,n-r);let x=1;for(let i=1;i<=r;i++)x=x*(n-r+i)/i;return Math.round(x);}
 function fact(n){let x=1;for(let i=2;i<=n;i++)x*=i;return x;}
 const fmt=x=>x.toLocaleString("ja-JP");
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// 並べ替えは math-lab の種つき乱数（同じ種なら同じ並び。issue 144 の P6）。開くたびに同じ並びから始まり、押すたびに次の並び
+const R=LK.rng(LK.cfg.seed??1);
+function shuffle(a){return R.shuffle(a);}
 
 // ---- 並べて数える
 function perms(arr,r){const out=[],used=arr.map(()=>false),cur=[];(function rec(){if(cur.length===r){out.push(cur.slice());return;}

@@ -84,6 +84,9 @@ def variants(course: Course) -> dict[str, dict]:
     return out
 
 
+RANDOM = TOOLS.parent / "docs" / "math-lab" / "random.js"
+
+
 def _drop_head_comment(src: str) -> str:
     """先頭の説明コメント（/* … */）は版に入れない（説明は原本で読む）。"""
     src = src.lstrip()
@@ -118,7 +121,9 @@ def lab_url(base: str, course: Course, aid: str) -> str:
 
 def _assemble(t: dict, cfg_js: str) -> str:
     kit_css = tokens.css() + _drop_head_comment((TOOLS / "labkit" / "labkit.css").read_text(encoding="utf-8"))   # 値（knowledge-net と共通）→ ラボの見た目
-    kit_js = _drop_head_comment((TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8"))
+    # ラボの乱数は math-lab の束（docs/math-lab/random.js。写し）を labkit の前に置き、LK.rng(seed) で使う（#144 P6）
+    rand_js = "\n".join(l for l in RANDOM.read_text(encoding="utf-8").splitlines() if not l.startswith("//"))
+    kit_js = rand_js + "\n" + _drop_head_comment((TOOLS / "labkit" / "labkit.js").read_text(encoding="utf-8"))
     src = (t["dir"] / t["src"]).read_text(encoding="utf-8")
     html = (src.replace("/*@LABKIT_CSS@*/", kit_css)
                .replace("/*@LABKIT_JS@*/", kit_js)
@@ -190,6 +195,10 @@ def build_labs(course: Course) -> list[dict]:
     return manifest
 
 
+# 自前の乱数がまだ残っているラボ（#144 P6 の組 B・C で移し、ここから外す。空になったらこの一覧を消す）
+RNG_PENDING = {"LAB-ci", "LAB-clt", "LAB-doe", "LAB-est", "LAB-explore", "LAB-mreg", "LAB-srs", "LAB-survey", "LAB-test", "LAB-xbar", "LAB-sample", "LAB-ts"}
+
+
 def validate_labs(course: Course) -> list[str]:
     err = []
     for lid, t in course.labs.items():
@@ -206,6 +215,13 @@ def validate_labs(course: Course) -> list[str]:
                 if m.group(0).lower() not in ("#fff", "#ffffff"):
                     err.append(f"{lid}: 色の値 {m.group(0)} は書かない（var(--data-1) などの変数で。値は docs/math-lab/tokens.json）")
                     break
+        if t.get("src") and (t["dir"] / t["src"]).exists():
+            # 乱数はラボの中に書かない（math-lab の種つき乱数を LK.rng で。#144 P6）。自前の rng は移すまでの間だけ RNG_PENDING に
+            body = (t["dir"] / t["src"]).read_text(encoding="utf-8")
+            if "Math.random" in body:
+                err.append(f"{lid}: Math.random は使わない（LK.rng(種) で。同じ種なら同じ結果）")
+            if re.search(r"function rng\(", body) and lid not in RNG_PENDING:
+                err.append(f"{lid}: 自前の乱数（function rng）は使わない（LK.rng(種) で。#144）")
         if not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
             err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")
         for name, p in (t.get("presets") or {}).items():

@@ -557,6 +557,21 @@ class TestNetwork(unittest.TestCase):
         rec = [{"formula": "F-binom-pmf", "points": next(x for x in k["contracts"] if x["formula"] == "F-binom-pmf")["review"], "judgement": "j", "date": "2026-11-01"}]
         self.assertNotIn("review_pending", marks(k, rec)["F-binom-pmf"])
 
+    def test_lab_random_rule(self):
+        # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
+        # 移したラボに自前の rng が戻る。見つけ方：移したラボ（count）の原本に Math.random と function rng を足すと validate_labs が止める
+        import tempfile, shutil
+        c = course()
+        t = c.labs["LAB-count"]
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / t["src"]
+            shutil.copy(t["dir"] / t["src"], src)
+            src.write_text(src.read_text(encoding="utf-8") + "\n<script>const x=Math.random();function rng(s){return ()=>s;}</script>", encoding="utf-8")
+            t["dir"] = Path(d)
+            err = " / ".join(validate_labs(c))
+        self.assertIn("LAB-count: Math.random は使わない", err)
+        self.assertIn("LAB-count: 自前の乱数（function rng）は使わない", err)
+
     def test_mu_definition(self):
         # μ＝E(X)：μ を押して期待値の定義で開けるように（#109）
         c = course()
