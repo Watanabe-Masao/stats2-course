@@ -54,8 +54,9 @@ const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return Stri
 function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
 const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
 const dn=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
-let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
-const gauss=()=>{const u=rnd()||1e-12,v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）
+let R=LK.rng(11);const rnd=()=>R();
+const gauss=()=>R.normal();
 
 // ---- 平均のぶれ
 let sims=null;
@@ -82,7 +83,7 @@ function sRender(){const S=sVals(),lo=S.mu-4*S.sd,hi=S.mu+4*S.sd,H=170,L=12,R=W-
  $("stab").innerHTML=`<table><tr><th>n</th><th>SE＝σ÷√n</th></tr>${[1,4,9,16,25,36,100,400].map(k=>`<tr><td>${k}</td><td>${f(S.sd/Math.sqrt(k))}</td></tr>`).join("")}</table>`;}
 LK.register("se",{name:"平均のぶれ",
  init(){["sm","ss","sn"].forEach(id=>LK.stepper($(id),()=>{sims=null;sRender();}));
-  $("ssim").onclick=()=>{const S=sVals();seed=11;sims=[];for(let r=0;r<200;r++){let t=0;for(let i=0;i<S.n;i++)t+=S.mu+S.sd*gauss();sims.push(t/S.n);}sRender();};sRender();},
+  $("ssim").onclick=()=>{const S=sVals();R=LK.rng(11);sims=[];for(let r=0;r<200;r++){let t=0;for(let i=0;i<S.n;i++)t+=S.mu+S.sd*gauss();sims.push(t/S.n);}sRender();};sRender();},
  apply(s){if(s.mu!==undefined)LK.setRange("sm",s.mu);if(s.sd!==undefined)LK.setRange("ss",s.sd);if(s.n!==undefined)LK.setRange("sn",s.n);sims=null;sRender();},
  render:sRender,
  value(key){const S=sVals(),v=S[key];return {v,text:f(v)};}});

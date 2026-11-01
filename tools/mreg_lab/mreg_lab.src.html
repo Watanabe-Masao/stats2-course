@@ -105,8 +105,9 @@ function ols(X,y){const n=y.length,p=X[0].length,A=[];for(let i=0;i<p;i++){A.pus
  const yb=y.reduce((s,v)=>s+v,0)/n,e=y.map((v,r)=>v-X[r].reduce((s,x,j)=>s+x*b[j],0)),sse=e.reduce((s,v)=>s+v*v,0),sst=y.reduce((s,v)=>s+(v-yb)**2,0),k=p-1,df=n-k-1,mse=df>0?sse/df:NaN;
  return {b,se:Ai.map((row,i)=>Math.sqrt(Math.max(0,row[i]*mse))),e,sse,sst,ssr:sst-sse,r2:sst>0?1-sse/sst:NaN,adj:sst>0&&df>0?1-(sse/df)/(sst/(n-1)):NaN,n,k,df,mse};}
 const corr=(a,b)=>{const n=a.length,ma=a.reduce((s,v)=>s+v,0)/n,mb=b.reduce((s,v)=>s+v,0)/n;let sab=0,saa=0,sbb=0;for(let i=0;i<n;i++){sab+=(a[i]-ma)*(b[i]-mb);saa+=(a[i]-ma)**2;sbb+=(b[i]-mb)**2;}return sab/Math.sqrt(saa*sbb);};
-function rng(s){let seed=s;return ()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};}
-function gauss(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+// 乱数は math-lab の種つき乱数（同じ種なら同じ結果。issue 144 の P6 組 B）。r() は 0〜1、r.normal() は標準正規
+function rng(s){return LK.rng(s);}
+function gauss(r){return r.normal();}
 
 // ---- 散布図（reg ラボと同じ形）。opts.drag で点を動かせる
 function niceStep(span){const raw=span/5,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}

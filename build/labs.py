@@ -196,7 +196,7 @@ def build_labs(course: Course) -> list[dict]:
 
 
 # 自前の乱数がまだ残っているラボ（#144 P6 の組 B・C で移し、ここから外す。空になったらこの一覧を消す）
-RNG_PENDING = {"LAB-ci", "LAB-clt", "LAB-doe", "LAB-est", "LAB-explore", "LAB-mreg", "LAB-srs", "LAB-survey", "LAB-test", "LAB-xbar", "LAB-sample", "LAB-ts"}
+RNG_PENDING = {"LAB-sample", "LAB-ts"}
 
 
 def validate_labs(course: Course) -> list[str]:
@@ -220,7 +220,8 @@ def validate_labs(course: Course) -> list[str]:
             body = (t["dir"] / t["src"]).read_text(encoding="utf-8")
             if "Math.random" in body:
                 err.append(f"{lid}: Math.random は使わない（LK.rng(種) で。同じ種なら同じ結果）")
-            if re.search(r"function rng\(", body) and lid not in RNG_PENDING:
+            # 自前の乱数：中身（Park–Miller の 16807・mulberry32 の 0x6D2B79F5）で見る（function rng でない書き方も捕まえる）
+            if re.search(r"16807|0x6D2B79F5", body, re.I) and lid not in RNG_PENDING:
                 err.append(f"{lid}: 自前の乱数（function rng）は使わない（LK.rng(種) で。#144）")
         if not re.fullmatch(r"[a-z0-9-]+", str(t.get("slug", ""))):
             err.append(f"{lid}: 公開先のフォルダ名 slug（英小文字・数字・-）がない")
