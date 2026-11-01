@@ -223,9 +223,13 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ## 実験室（content/experiments.yaml。#102）
 
+### 作業台の型（#156）
+
+作業台は math-lab の型1つ（欄の順：見出し → 式 → 帯 → 結果 → 計算過程 → 入力 → 図 → 変換 → 実験）。入力と図の棒の操作は分布がどう決まるか（モデルの種類）で決まる：式で決まる分布＝概念の `workspace`（formula・vary・over・mean・任意の `linear`）、表で決まる分布＝概念の `table_workspace`（下）。変換の欄（aX＋b）はどちらにも出す（`linear` に E(aX＋b) の式。ほかの概念の式は `{ref: F-expect-linear}` で写す）。新しい要素は型に足して全部の作業台に出す。
+
 ### 値の表の作業台
 
-概念の `table_workspace`（型の改訂15、#119）は `formula`（期待値の定義の式の番号）、任意の `linear`（E(aX＋b)の式の番号）、`tables`（実験室の値の表のテーマを指す：`{experiment: EXP-…, theme: テーマ id, use: start か compare}`。値・重みを2か所に書かない）を持つ。build がテーマから値・重み・呼び名・単位を写して公開の JSON（型の valueTable）にし、式の参照・テーマの有無・値・重みを検査する。同じテーマなら作業台と実験室で値・重み・期待値が一致する。既存の二項分布の `workspace` は変えない。
+概念の `table_workspace`（型の改訂15、#119）は `formula`（期待値の定義の式の番号）、任意の `linear`（E(aX＋b)の式の番号）、`tables`（実験室の値の表のテーマを指す：`{experiment: EXP-…, theme: テーマ id, use: start か compare}`。値・重みを2か所に書かない）を持つ。build がテーマから値・重み・呼び名・単位を写して公開の JSON（型の valueTable）にし、式の参照・テーマの有無・値・重みを検査する。同じテーマなら作業台と実験室で値・重み・期待値が一致する。
 
 実験室の定義をデータで書き、画面（knowledge-net の実験室：予測→実験→観察→理由→応用→比べる を1画面ずつ）は読むだけ。型は kn-schema の `experiments`。
 
