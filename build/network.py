@@ -11,7 +11,7 @@ import re
 import math
 
 from model import CONTENT, ROOT, Course, load_yaml, run_check
-from effects import effect_errors
+from effects import effect_errors, question_errors
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
@@ -191,6 +191,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
         if x.get("model") == "table":
             err += table_errors(eid, x)
         err += effect_errors(eid, x)   # 反例の言い分（effect）を厳密な計算で確かめる（#118 層3）
+        err += question_errors(eid, x)   # 入口の問い：確率の値の答えが目盛りの境目から離れているか（#161）
         rs = x.get("reason") or {}
         if rs.get("concept"):
             t = c.terms.get(rs["concept"])

@@ -16,6 +16,7 @@ effect は公開の JSON に出さない（予想の答えになるため。画�
 - urn：箱 total 個（n より小さければ n 個）、当たり success 個（省くと round(p×total)。JS の Math.round と同じ丸め）
 - streak：最初は p、成功のあとは p＋carry(1−p)、失敗のあとは p−carry·p
 - mix：ずれ幅 d＝min(spread, p, 1−p)。各セットの開始時に p−d か p＋d を等確率で選び、セットの中は同じ確率
+- fatigue：ずれ幅 d＝min(drop, p, 1−p)。i 回目（0 から）の確率 p＋d(1−2i/(n−1))、各回は独立（n＝1 なら p）
 """
 from __future__ import annotations
 
@@ -82,6 +83,17 @@ def mechanism_all(m: dict, N: int, p: F) -> list[list[F]]:
         return [[(x + y) / 2 for x, y in zip(a, b)] for a, b in zip(_binom_all(N, p - d), _binom_all(N, p + d))]
     if kind == "streak":
         return _streak_all(N, p, _frac(m["carry"]))
+    if kind == "fatigue":
+        # 各回が独立で確率だけ違う：1回ずつ足して k の分布を作る（定義から。閉じた式を使わない）
+        out = []
+        for n in range(1, N + 1):
+            d = max(F(0), min(_frac(m["drop"]), p, 1 - p))
+            pmf = [F(1)]
+            for i in range(n):
+                q = p + d * (1 - F(2 * i, n - 1)) if n > 1 else p
+                pmf = [(pmf[k] if k < len(pmf) else 0) * (1 - q) + (pmf[k - 1] * q if k else 0) for k in range(len(pmf) + 1)]
+            out.append(pmf)
+        return out
     if kind == "urn":
         out = []
         for n in range(1, N + 1):
@@ -134,4 +146,56 @@ def effect_errors(eid: str, x: dict) -> list[str]:
                 break
         if bad:
             err.append(f"{eid}: 反例 {b.get('id')} の effect が計算と合わない：{bad}")
+    return err
+
+
+def event_prob(n: int, p: F, op: str, k: int) -> F:
+    """二項分布 B(n, p) の事象の確率（分数で厳密に）。eq：ちょうど k、ge：k 以上、le：k 以下"""
+    pmf = [comb(n, j) * p ** j * (1 - p) ** (n - j) for j in range(n + 1)]
+    ks = [k] if op == "eq" else range(k, n + 1) if op == "ge" else range(0, k + 1)
+    return sum((pmf[j] for j in ks if 0 <= j <= n), F(0))
+
+
+def question_errors(eid: str, x: dict, margin: F = F(1, 10)) -> list[str]:
+    """入口の問い（#161）を確かめる。確率の値の問いは、答え（理論の確率）が目盛りの境目から離れていること
+    （境目の近くでは、ほぼ当たった予想が「違った」になる。#158 A4 と同じ種類の故障）。離れ方は境目の値に対する比で margin 以上"""
+    err: list[str] = []
+    qs = x.get("questions") or []
+    ids = [q.get("id") for q in qs]
+    if len(set(ids)) != len(ids):
+        err.append(f"{eid}: 問いの id が重なっている")
+    scale = [_frac(v) for v in x.get("prob_scale") or []]
+    if scale and any(a <= b for a, b in zip(scale, scale[1:])):
+        err.append(f"{eid}: prob_scale は大きい順に書く")
+    vary = x.get("vary") or {}
+    for q in qs:
+        qid, st = q.get("id"), q.get("set") or {}
+        n, p = int(st.get("n", 0)), _frac(st.get("p", 0))
+        for key, v in (("n", n), ("p", p)):
+            r = vary.get(key)
+            if r and not (_frac(r["min"]) <= v <= _frac(r["max"])):
+                err.append(f"{eid}: 問い {qid} の {key}＝{v} が vary の範囲の外")
+        if q.get("form") == "spread":
+            to = int((q.get("to") or {}).get("n", 0))
+            if not n < to <= 100:
+                err.append(f"{eid}: 問い {qid} の to.n＝{to} は n＝{n} より大きく 100 以下")
+            continue
+        if q.get("form") == "conv":
+            if len(q.get("events") or []) != 1:
+                err.append(f"{eid}: 問い {qid}（理論と実測）の events は1つ")
+            continue
+        if q.get("form") == "prob" and q.get("free") and len(q.get("events") or []) != 1:
+            err.append(f"{eid}: 問い {qid}（自分で選ぶ）の events は1つ（最初の結果）")
+        if q.get("form") == "prob":
+            if not scale:
+                err.append(f"{eid}: 確率の値の問い {qid} があるのに prob_scale がない")
+                continue
+            for e in q.get("events") or []:
+                if not 0 <= int(e["k"]) <= n:
+                    err.append(f"{eid}: 問い {qid} の k＝{e['k']} が 0〜n＝{n} の外")
+                    continue
+                pr = event_prob(n, p, e["op"], int(e["k"]))
+                near = [b for b in scale if abs(pr - b) < b * margin]
+                if near:
+                    err.append(f"{eid}: 問い {qid} の答え {float(pr):.4f}（{e['op']} {e['k']}）が目盛りの境目 {float(near[0]):g} に近い（予想が境目で割れる）。条件か k を変える")
     return err

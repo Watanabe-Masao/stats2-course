@@ -475,7 +475,8 @@
                     "enum": [
                       "urn",
                       "streak",
-                      "mix"
+                      "mix",
+                      "fatigue"
                     ]
                   },
                   "total": {
@@ -495,6 +496,12 @@
                     "type": "number",
                     "minimum": 0,
                     "maximum": 1
+                  },
+                  "drop": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "fatigue：最初 p＋d から最後 p−d へ下がる幅（d＝min(drop, p, 1−p)）"
                   }
                 }
               },
@@ -509,6 +516,153 @@
                 "description": "崩した成り立つ条件（概念の conditions の言葉で）"
               }
             }
+          }
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "description": "実験室の入口「何を確かめたい？」に並べる問い（stats2-course #161）。最初の問い（question・start・compare：位置）と反例（counterexamples：前提崩し）に加えて並べる。form は問いの形（予測と観察の部品の組）。予想の答えは書かない",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "form",
+              "title",
+              "question",
+              "set"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "form": {
+                "enum": [
+                  "prob",
+                  "spread",
+                  "conv"
+                ],
+                "description": "問いの形：prob（確率の値：事象の確率を桁の目盛りで予想）・spread（広がり：n を変えたとき、回数と割合の散らばりの向きを予想）・conv（理論と実測：セットを増やしたとき、理論とのずれの目安が何分の1になるかを予想）"
+              },
+              "title": {
+                "$ref": "#/$defs/text",
+                "description": "入口の一覧に出す短い名前"
+              },
+              "question": {
+                "$ref": "#/$defs/text",
+                "description": "今回の問い（毎画面の上に出す）"
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "n",
+                  "p"
+                ],
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              },
+              "events": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2,
+                "description": "確率を予想する事象（prob は1〜2個、conv は1個）",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "op",
+                    "k"
+                  ],
+                  "properties": {
+                    "op": {
+                      "enum": [
+                        "eq",
+                        "ge",
+                        "le"
+                      ],
+                      "description": "eq：ちょうど k 回、ge：k 回以上、le：k 回以下"
+                    },
+                    "k": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "free": {
+                "type": "boolean",
+                "description": "prob で、学習者が n・p・ちょうど／以上／以下・k を選ぶ（珍しい結果を調べる）"
+              },
+              "to": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "n"
+                ],
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "description": "spread の変えたあとの回数"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "enum": [
+                        "prob",
+                        "conv"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "events"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "spread"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "to"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "prob_scale": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "description": "確率の値の問いで予想に使う目盛り（大きい順の境目。例 0.5・0.2・0.05・0.01 → 50%以上／20〜50%／…／1%未満）。境目の近くに答えがある問いは教材の build が止める",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
           }
         }
       }
@@ -1565,5 +1719,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 16
+  "x-revision": 18
 }
