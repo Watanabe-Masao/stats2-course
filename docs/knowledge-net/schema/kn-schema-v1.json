@@ -1243,6 +1243,11 @@
               "mean": {
                 "type": "integer",
                 "minimum": 0
+              },
+              "linear": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "E(aX＋b) の式の番号（任意。あれば作業台に変換の欄を出す。stats2-course #156）"
               }
             }
           },
@@ -1560,5 +1565,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 15
+  "x-revision": 16
 }

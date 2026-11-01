@@ -343,6 +343,8 @@ def validate_network(c: Course) -> list[str]:
                     err.append(f"{tid}: workspace の over {ws.get('over')} は主役の式の、上限のある整数の記号（棒を並べるため）")
             if "mean" in ws and not (isinstance(ws["mean"], int) and ws["mean"] < len(fs) and fs[ws["mean"]].get("tree")):
                 err.append(f"{tid}: workspace の mean {ws.get('mean')} が木のある式を指していない")
+            if "linear" in ws and not (isinstance(ws["linear"], int) and ws["linear"] < len(fs) and (fs[ws["linear"]].get("tree") or fs[ws["linear"]].get("ref"))):
+                err.append(f"{tid}: workspace の linear {ws.get('linear')} が木のある式を指していない（変換の欄の E(aX＋b)。#156）")
         tw = t.get("table_workspace")
         if tw is not None:
             tw, terr = resolve_table_workspace(tw)
