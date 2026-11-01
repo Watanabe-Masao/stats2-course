@@ -239,7 +239,7 @@
       key: V
       concept: TERM-var
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -315,7 +315,7 @@
       key: sigma
       kind: param
       of: X
-      domain: {min: 0, minOpen: true}
+      domain: {min: 0}   # σ＝√V(X) は0になりうる（0で割る式の側〔F-std-def〕が σ＞0 を持つ）
     - symbol: V( )
       meaning: 分散（ずれの2乗の期待値）
       key: V
@@ -391,7 +391,7 @@
     label: 標準化した値の期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: Z
@@ -413,9 +413,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "Z"}], "name": "V"}, {"num": 1}]}
   conditions:
     math:
-    - 標準偏差が0でない
+    - 分散が有限で、標準偏差が0でない
     data:
-    - 平均と標準偏差を、比べたい集団から出しているか（別の集団の値で割らない）
+    - 平均と標準偏差を、比べたい集団から出しているか（別の集団の値で割らない。偏差値のように基準集団の値を使うと、平均0・標準偏差1 にはならない）
   example: 平均60点・標準偏差10点のテストで、80点は z＝2。
   counterexample: 標準化しても分布の形は変わらない。右に裾の長いデータを標準化しても、正規分布にはならない。
   misconceptions:
@@ -519,7 +519,7 @@
   - id: F-expect-def
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -545,7 +545,7 @@
       kind: param
       of: X
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -557,7 +557,7 @@
     label: 線形性
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -575,7 +575,7 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "E"}, {"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"op": "fn", "args": [{"sym": "X"}], "name": "E"}]}, {"sym": "b"}]}]}
   conditions:
     math:
-    - 和（連続なら積分）が有限の値になる
+    - 値の大きさ×確率の和（連続なら積分）が有限の値になる（絶対収束：足す順序で値が変わらない）
     data:
     - くり返しの平均として読むには、同じ条件の試行がくり返せること
   example: さいころの目の期待値は (1＋2＋…＋6)÷6＝3.5。
@@ -787,7 +787,7 @@
       meaning: X と Y の共分散
       key: Cov
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -907,7 +907,7 @@
     label: 期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -960,7 +960,7 @@
     data:
     - 客ごとの購入のように、互いに影響しない（口コミや連れ立ちがない）か、p が客や時間でほぼ同じかを確かめる
   example: 来店客10人がそれぞれ確率 0.3 で買う（互いに独立）なら、買う人数は B(10, 0.3)。期待値は3人、分散は2.1。
-  counterexample: 箱から戻さずに取り出すと、各回の確率が変わり独立でもないので二項分布ではない（超幾何分布）。
+  counterexample: 箱から戻さずに取り出すと、前に何が出たかで次の当たりの確率が変わる（独立でない）ので二項分布ではない（超幾何分布）。前の結果を知らなければ、どの回も当たりの確率は同じ。
   misconceptions:
   - misconception: ちょうど期待値 np 回になる確率が高い
     correction: np 回はいちばん起きやすい付近だが、その確率自体は小さいことが多い（n が大きいほど小さい）
@@ -1015,7 +1015,7 @@
     label: 期待値と分散
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: V( )
@@ -1087,7 +1087,7 @@
     label: 期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -1240,7 +1240,7 @@
     label: 期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -1343,7 +1343,7 @@
     label: 期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X
@@ -1491,7 +1491,7 @@
     label: 期待値
     symbols:
     - symbol: E( )
-      meaning: 期待値（値×確率を足す）
+      meaning: 期待値（値×確率を足す。連続なら密度で重み付けして積分）
       key: E
       concept: TERM-expect
     - symbol: X

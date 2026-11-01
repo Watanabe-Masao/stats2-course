@@ -54,6 +54,7 @@ contracts:
   properties: [線形, 有界, 単位の整合]
   representative: true
   review: [無限の台で和が収束する前提]
+  note: 有界の性質（最小≦E≦最大）は台が有界なときだけ。テストの範囲は有界な台
 - formula: F-expect-mu
   kinds: [定義]
   properties: [同値]
@@ -85,6 +86,7 @@ contracts:
   properties: [非負, 正規化, 対称, 有界, 条件しだい]
   representative: true
   review: [モデルの仮定（独立・同じ p）と反例の実験の言い分]
+  note: p＝0・k＝0 や p＝1・k＝n で 0⁰ が出る。0⁰＝1 の約束（engine の evaluate も Math.pow(0, 0)＝1）
 - formula: F-binom-mean
   kinds: [恒等式]
   properties: [同値, 単調, 有界]

@@ -113,11 +113,11 @@ def load_course() -> Course:
             raise FileNotFoundError(f"{fid}: 図のファイル {f['file']} がない")
     c = Course(stages, powers, shared, terms, index, labs, figures)
     # 式の原本を整える（#118）：ref を元の式に、木から TeX を作る、契約を確かめる
-    from formulas import CONTRACTS, REVIEWS, marks, prepare, review_errors
+    from formulas import CONTRACTS, REVIEWS, current_fingerprints, marks, prepare, review_errors
     contracts = load_yaml(CONTRACTS) if CONTRACTS.exists() else None
     reviews = (load_yaml(REVIEWS) or {}).get("reviews") if REVIEWS.exists() else []
     c.errors += prepare(terms, contracts) + review_errors(contracts, reviews)
-    c.formula_marks = marks(contracts, reviews)   # 公開の JSON に出す条件と印（#118 単位 C）
+    c.formula_marks = marks(contracts, reviews, current_fingerprints(terms, contracts))   # 公開の JSON に出す条件と印（#118 単位 C）。レビューは今の版（M9）
     for uid, meta in index.items():
         if not meta.get("migrated"):
             continue

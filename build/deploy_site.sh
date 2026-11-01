@@ -7,6 +7,8 @@ cd "$(dirname "$0")/.."
 dest="${1:?公開用リポジトリの手元のパスを指定する}"
 [ -d "$dest/.git" ] || { echo "❌ $dest は git の作業フォルダではない"; exit 1; }
 [ -f out/site/index.html ] || { echo "❌ out/site がない（python3 build/build.py を先に）"; exit 1; }
+# 公開の前の検査（#118 M9）：公開する代表の式は、今の版でレビュー済みでなければ止める
+python3 build/formulas.py --publish-check
 find "$dest" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp -a out/site/. "$dest/"
 cd "$dest"
