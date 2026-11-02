@@ -728,11 +728,15 @@
                     },
                     "concept": {
                       "$ref": "#/$defs/gid",
-                      "description": "主概念（この問いで理解させるもの。1つ）"
+                      "description": "主（この問いで理解させるもの。1つ）：概念か、2つの概念のつながりが主の問いなら関係（REL-…）。関係なら両端の概念から問いが引ける"
                     },
                     "related": {
                       "$ref": "#/$defs/gids",
                       "description": "関連概念（この問いを理解するのに実際に使う概念）"
+                    },
+                    "retired": {
+                      "type": "boolean",
+                      "description": "使わない印（重複などで外した問い。id は消さず、入口・一覧に並べない。open を持たない）"
                     }
                   }
                 }
@@ -1794,5 +1798,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 19
+  "x-revision": 20
 }
