@@ -110,6 +110,7 @@ APPLY_METHODS = {
     "expected-observers": ["n", "p", "event", "people"], "sets-for-error": ["n", "p", "event", "err"], "binom-judge": ["mechanism"],
     "max-strength": ["mechanism", "param", "min", "max", "step", "ratio"], "min-total": ["n", "ratio"], "solve-spread": ["n", "p", "variance"],
 }
+APPLY_OPTIONAL = {"sets-for-error": ["unit"], "min-total": ["step"]}   # 実験室の道具の刻みに合わせる（省くと1）
 APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
 
 
@@ -200,7 +201,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                         err.append(f"{eid}: {iid} の apply の method {sv.get('method')} を engine が知らない（{'・'.join(APPLY_METHODS)}）")
                     else:
                         miss = [k for k in need if k not in sv]
-                        extra = [k for k in sv if k != "method" and k not in need]
+                        extra = [k for k in sv if k != "method" and k not in need and k not in APPLY_OPTIONAL.get(sv["method"], [])]
                         if miss or extra:
                             err.append(f"{eid}: {iid} の apply（{sv['method']}）の条件：足りない {miss}・余分 {extra}")
                     an = ap.get("answer") or {}
