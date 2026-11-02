@@ -118,7 +118,7 @@ experiments:
               kind: 逆算
               task: 20 回の挑戦で、成功の回数の平均を 6 回にしたい。1回の成功確率 p を何 % にすればよい？
               solve: {method: mean-to-p, n: 20, mean: 6}
-              answer: {type: number, unit: '%', percent: true, tol: {abs: 1}}
+              answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: ほしい平均（中心）が決まっていれば、平均＝回数×確率から、確率を逆に決められる。
           - id: binom-A-02
             title: 試行回数を増やすと分布はどう変わる？
@@ -133,7 +133,7 @@ experiments:
               kind: 設計
               task: 成功確率 30% の調査で、成功の割合の標準偏差を 0.08 以下にしたい。回数 n は最低いくつ要る？
               solve: {method: min-n-share-sd, p: 0.3, sd: 0.08}
-              answer: {type: number, unit: 回, tol: {rel: 0.05}}
+              answer: {type: number, unit: 回, tol: {abs: 0}}
               why: 割合のぶれは回数の平方根に反比例する。ぶれを半分にするには、回数を4倍にする。
           - id: binom-A-03
             title: なぜ中央付近の成功回数が起こりやすい？
@@ -176,7 +176,7 @@ experiments:
               kind: 評価
               task: 成功確率 30% で 10 回。報告に「3 回より多くなる確率」と書くはずが「3 回以上」の値を使っていた。確率は何 % 多く見積もられた？
               solve: {method: boundary, n: 10, p: 0.3, k: 3}
-              answer: {type: number, unit: '%', percent: true, tol: {abs: 1}}
+              answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: 「以上」と「より多い」の差は境目の棒1本。境目が山の高い所なら、取り違えると大きくずれる。
           - id: binom-B-03
             title: 補集合を使うと計算が簡単になる？
@@ -195,7 +195,7 @@ experiments:
               kind: 評価
               task: 成功確率 50% の挑戦を 10 回して、10 回とも成功した人がいた。同じ挑戦を 1000 人がしたら、10 回とも成功する人は平均で何人？
               solve: {method: expected-observers, n: 10, p: 0.5, event: {op: ge, k: 10}, people: 1000}
-              answer: {type: number, unit: 人, tol: {abs: 0.3}}
+              answer: {type: number, unit: 人, tol: {abs: 0.03}}
               why: 1人では珍しいことも、たくさんの人や回数の中では起きるのがふつう。全体で何回起きうるかを見てから「珍しい」と言う。
       - id: C
         title: 理論と実験
@@ -218,7 +218,7 @@ experiments:
               kind: 設計
               task: 成功確率 30% で 10 回の実験を何セットも行い、「4 回以上」になるセットの割合を理論と比べたい。ずれの目安（±2SE）を ±1% 以内にするには、何セット要る？
               solve: {method: sets-for-error, n: 10, p: 0.3, event: {op: ge, k: 4}, err: 0.01}
-              answer: {type: number, unit: セット, tol: {rel: 0.1}}
+              answer: {type: number, unit: セット, tol: {abs: 0}}
               why: 理論とのずれの目安はセット数の平方根に反比例する。ほしい精度から、要るセット数を決められる。
           - id: binom-C-03
             title: 同じ実験を繰り返すと同じ結果になる？
@@ -286,7 +286,7 @@ experiments:
               kind: 評価
               task: 10 回・成功確率 50%。前の結果に引きずられるとき、分散が二項分布の 1.1 倍以内なら二項分布で近似してよいとする。引きずる強さはどこまで許される？（0.01 刻み）
               solve: {method: max-strength, mechanism: {kind: streak, n: 10, p: 0.5, carry: 0}, param: carry, min: 0, max: 0.6, step: 0.01, ratio: 1.1}
-              answer: {type: number, tol: {abs: 0.005}}
+              answer: {type: number, tol: {abs: 0}}
               why: 小さな引きずりでも、隣どうしの相関が積み重なって分散が増える。近似してよいかは、許すずれを先に決めてから判断する。
           - id: binom-E-03
             title: 戻さずに抽出するとどうなる？
@@ -300,7 +300,7 @@ experiments:
               kind: 変換
               task: 箱から戻さずに 10 個取る。分散の減り方を二項分布（戻して取る）の2割以内（0.8 倍以上）にしたい。箱の数は最低いくつ要る？
               solve: {method: min-total, n: 10, ratio: 0.8}
-              answer: {type: number, unit: 個, tol: {abs: 1}}
+              answer: {type: number, unit: 個, tol: {abs: 0}}
               why: 取る数が箱に比べて小さいほど、戻さずに取っても二項分布に近い。どこまで近ければよいかを決めれば、要る箱の大きさが決まる。
           - id: binom-E-04
             title: 同じ平均成功確率でも結果は同じ？
@@ -314,7 +314,7 @@ experiments:
               kind: 逆算
               task: 10 回・平均の成功確率 50%。日によって確率が p−d か p＋d に変わり、成功の回数の分散は 3.4 だった（二項分布なら 2.5）。ずれ幅 d はいくつ？
               solve: {method: solve-spread, n: 10, p: 0.5, variance: 3.4}
-              answer: {type: number, tol: {abs: 0.01}}
+              answer: {type: number, tol: {abs: 0}}
               why: 二項分布より広がった分から、確率のばらつきの大きさを逆に求められる。
       - id: F
         title: 応用・発展
