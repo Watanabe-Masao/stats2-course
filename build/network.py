@@ -170,10 +170,15 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                 if iid in seen_items:
                     err.append(f"{eid}: テーマ体系の {iid} が重なっている")
                 seen_items.add(iid)
-                for ref in [it.get("concept")] + list(it.get("related") or []):
+                # 主（concept）は概念か関係（REL-…。2つの概念のつながりが主の問い。#169）。関連（related）は概念
+                if it.get("concept") not in c.terms and it.get("concept") not in rel_ids:
+                    err.append(f"{eid}: {iid} の主 {it.get('concept')} が用語にも関係にもない")
+                for ref in list(it.get("related") or []):
                     if ref not in c.terms:
-                        err.append(f"{eid}: {iid} の概念 {ref} が用語にない")
+                        err.append(f"{eid}: {iid} の関連 {ref} が用語にない")
                 op = it.get("open")
+                if it.get("retired") and op:
+                    err.append(f"{eid}: {iid} は使わない印（retired）なので open を書かない")
                 if op:
                     # 実験の仕組みは共有してよいが、同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）
                     if op in opened:

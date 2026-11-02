@@ -782,7 +782,10 @@ class TestNetwork(unittest.TestCase):
         ok = dict(predict="p", operate="o", judge="j")
         self.assertTrue(any("open break:nothing が問い・反例にない" in e for e in errs(one(open="break:nothing", **ok))))
         self.assertTrue(any("open nothing が問い・反例にない" in e for e in errs(one(open="nothing", **ok))))
-        self.assertTrue(any("概念 TERM-binon が用語にない" in e for e in errs(one(concept="TERM-binon"))))
+        self.assertTrue(any("主 TERM-binon が用語にも関係にもない" in e for e in errs(one(concept="TERM-binon"))))
+        self.assertFalse(any("binom-A-01" in e for e in errs(one(concept="REL-binom-hyper-contrast"))))   # 関係を主にできる（#169）
+        self.assertTrue(any("関連 REL-binom-hyper-contrast が用語にない" in e for e in errs(one(related=["REL-binom-hyper-contrast"]))))
+        self.assertTrue(any("retired）なので open を書かない" in e for e in errs(one(retired=True, open="shift", **ok))))
         self.assertTrue(any("主概念 TERM-perm を先に説明のある概念に" in e for e in errs(one(concept="TERM-perm", open="shift", **ok))))
         self.assertFalse(errs(one(concept="TERM-perm")) and any("TERM-perm" in e for e in errs(one(concept="TERM-perm"))))   # 作成中なら骨格の概念でよい
         # id の形：概念-まとまり-番号（企画書の番号 B01 のままや、まとまりの取り違えを止める）
@@ -801,6 +804,8 @@ class TestNetwork(unittest.TestCase):
         it = {i["id"]: i for g in e["catalog"] for i in g["items"]}
         self.assertEqual((it["stats2:binom-D-01"]["concept"], it["stats2:binom-D-01"]["related"]), ("stats2:TERM-binom", ["stats2:TERM-expect"]))
         self.assertEqual(it["stats2:binom-E-01"]["open"], "break:fatigue")
+        self.assertEqual(it["stats2:binom-E-03"]["concept"], "stats2:REL-binom-hyper-contrast")   # 関係が主
+        self.assertTrue(it["stats2:binom-C-03"]["retired"])
         self.assertEqual((it["stats2:binom-D-03"]["concept"], it["stats2:binom-D-03"]["related"]), ("stats2:TERM-expect", ["stats2:TERM-var", "stats2:TERM-dist", "stats2:TERM-binom"]))   # 主概念は実験室の所属でなく、発見させたい性質で決める
         self.assertNotIn("open", it["stats2:binom-A-03"])
         self.assertFalse(network.schema_errors(d))

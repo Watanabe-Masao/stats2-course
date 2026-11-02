@@ -100,7 +100,8 @@ experiments:
     # open のない問いは作成中（入口に並べるだけ）。finds は主な発見（予想の前には出さない）。
     # 開ける問いは predict（何を予想するか）・operate（何を操作するか）・judge（理解判定：何ができれば理解したとするか）を書く。
     # 実験の仕組み（問いの形）は共有してよいが、開く先（open）は問いごとに1つ。同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）。
-    # 主概念は実験室の所属ではなく、発見させたい性質で決める
+    # 主概念は実験室の所属ではなく、発見させたい性質で決める。2つの概念のつながりが主の問いは、関係（REL-…）を主にする（両端の概念から引ける）。
+    # retired：重複などで使わない問い（id は消さず、入口に並べない。#169）
     catalog:
       - id: A
         title: 分布の形と仕組み
@@ -131,6 +132,7 @@ experiments:
             title: 成功確率 50% なら必ず左右対称？
             finds: 対称性と非対称性
             concept: TERM-binom
+            related: [TERM-comb]
       - id: B
         title: 事象と確率計算
         items:
@@ -146,7 +148,8 @@ experiments:
           - id: binom-B-02
             title: k 回以上・以下の確率を調べる
             finds: 累積確率と事象の範囲
-            concept: TERM-binom
+            concept: TERM-dist
+            related: [TERM-binom]
             predict: 「ちょうど k 回」と「k 回以上」の確率の桁
             operate: 事象の範囲（ちょうど・以上・以下）
             judge: 以上・以下の確率は、ちょうどの確率の足し合わせで、境目を含むかで値が変わることを説明できる
@@ -154,8 +157,8 @@ experiments:
           - id: binom-B-03
             title: 補集合を使うと計算が簡単になる？
             finds: 補集合と確率の和
-            concept: TERM-binom
-            related: [TERM-complement]
+            concept: TERM-complement
+            related: [TERM-binom]
           - id: binom-B-04
             title: 珍しい結果はどのくらい起こる？
             finds: 裾確率と稀な事象
@@ -170,12 +173,13 @@ experiments:
           - id: binom-C-01
             title: 理論分布と実験結果は一致する？
             finds: 理論確率と実測割合
-            concept: TERM-binom
+            concept: REL-samplingerror-se-contrast
+            related: [TERM-binom]
           - id: binom-C-02
             title: 実験セット数を増やすと誤差はどう変わる？
             finds: 大数の法則
-            concept: TERM-binom
-            related: [TERM-lln]
+            concept: TERM-binom   # 発見は大数の法則（ずれの目安が √m に反比例）。大数の法則に説明を書いたら主を TERM-lln に移す（#169）
+            related: [TERM-lln, TERM-se]
             predict: セットを 100 倍にしたとき、理論とのずれの目安が何分の1になるか
             operate: 実験のセット数
             judge: ずれの目安はセット数の平方根に反比例して小さくなる（毎回必ず減るのではない）ことを説明できる
@@ -184,11 +188,12 @@ experiments:
             title: 同じ実験を繰り返すと同じ結果になる？
             finds: 標本変動
             concept: TERM-binom
+            retired: true   # C-01 と同じ発見（同じ条件でも実験ごとにゆれる）。C-01 の観察で扱う（#169）
           - id: binom-C-04
             title: 珍しい結果を何セット試せば観察できる？
             finds: 少なくとも1回発生する確率
-            concept: TERM-binom
-            related: [TERM-complement, TERM-indep]
+            concept: TERM-complement
+            related: [TERM-indep, TERM-binom]
       - id: D
         title: 期待値・分散との接続
         items:
@@ -213,6 +218,7 @@ experiments:
             title: 成功回数と成功割合では何が違う？
             finds: 個数と割合の分散の違い
             concept: TERM-binom
+            retired: true   # A-02 と同じ発見（回数と割合の散らばり）。A-02 の観察で扱う（#169）
             related: [TERM-var]
       - id: E
         title: 前提条件と反例
@@ -229,7 +235,7 @@ experiments:
             title: 前回の結果が次回に影響すると？
             finds: 独立性の重要性
             concept: TERM-binom
-            related: [TERM-indep]
+            related: [TERM-indep, TERM-var]
             predict: 前の結果に引きずられるとき、二項分布と比べた山の広がり
             operate: 起き方（前の結果に引きずられる）
             judge: 独立が崩れると、平均は同じでも散らばりが大きくなることを説明できる
@@ -237,8 +243,7 @@ experiments:
           - id: binom-E-03
             title: 戻さずに抽出するとどうなる？
             finds: 超幾何分布との違い
-            concept: TERM-binom
-            related: [TERM-hyper]
+            concept: REL-binom-hyper-contrast
             predict: 戻さずに取るとき、二項分布と比べた山の広がり
             operate: 起き方（箱から戻さずに取る）
             judge: 戻さずに取ると超幾何分布になり、散らばりが小さくなることを、箱の大きさを変えて説明できる
@@ -255,24 +260,25 @@ experiments:
         title: 応用・発展
         items:
           - id: binom-F-01
-            title: 購入人数を確率から予測できる？
-            finds: 二項モデルによる人数の予測
+            title: 購入人数はどのくらいの範囲に収まる？
+            finds: 平均と散らばりから人数の範囲を見積もる
             concept: TERM-binom
-            related: [TERM-expect]
+            related: [TERM-expect, TERM-sd]
           - id: binom-F-02
-            title: 不良品が一定数以上出る確率は？
-            finds: 閾値とリスク評価
+            title: 不良品が一定数以上になる確率を 5% 以下にするには？
+            finds: 確率の基準から閾値を決める
             concept: TERM-binom
+            related: [TERM-dist]
           - id: binom-F-03
             title: 観測した成功回数から成功確率を推定する
             finds: 母比率の推定
-            concept: TERM-binom
-            related: [TERM-sample-prop]
+            concept: TERM-sample-prop
+            related: [TERM-binom]
           - id: binom-F-04
             title: 観測結果は偶然だけで説明できる？
             finds: 二項検定と p 値
-            concept: TERM-binom
-            related: [TERM-test]
+            concept: TERM-test
+            related: [TERM-binom]
     next:
       - {question: 成功確率を 20% に下げると、山の中心はどこ？ 形はどうなる？, set: {p: 0.2}}
       - {question: 回数を 30 回に増やすと、山の形はどうなる？, set: {n: 30}}
