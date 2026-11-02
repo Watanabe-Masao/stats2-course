@@ -737,6 +737,138 @@
                     "retired": {
                       "type": "boolean",
                       "description": "使わない印（重複などで外した問い。id は消さず、入口・一覧に並べない。open を持たない）"
+                    },
+                    "apply": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "task",
+                        "solve",
+                        "answer",
+                        "why"
+                      ],
+                      "description": "応用の課題（stats2-course #171）：予測〜理由で練習したのとは別の考え方を求める。答えは書かず、画面が engine の solveApply で solve から求めて照らす。open のある問いにだけ書く",
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "逆算",
+                            "設計",
+                            "反証",
+                            "評価",
+                            "変換",
+                            "モデル選択"
+                          ],
+                          "description": "求める考え方"
+                        },
+                        "task": {
+                          "$ref": "#/$defs/text",
+                          "description": "課題の文"
+                        },
+                        "solve": {
+                          "type": "object",
+                          "required": [
+                            "method"
+                          ],
+                          "description": "答えの求め方（math-lab engine の ApplySolve。method ごとの条件は engine が確かめ、理由を言って止まる）",
+                          "properties": {
+                            "method": {
+                              "enum": [
+                                "mean-to-p",
+                                "min-n-share-sd",
+                                "compare-eq",
+                                "boundary",
+                                "expected-observers",
+                                "sets-for-error",
+                                "binom-judge",
+                                "max-strength",
+                                "min-total",
+                                "solve-spread"
+                              ]
+                            }
+                          }
+                        },
+                        "answer": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type"
+                          ],
+                          "properties": {
+                            "type": {
+                              "enum": [
+                                "number",
+                                "choice"
+                              ]
+                            },
+                            "unit": {
+                              "type": "string",
+                              "description": "答えの単位（回・人・セット・個・%）"
+                            },
+                            "percent": {
+                              "type": "boolean",
+                              "description": "0〜1 の答えを % で入力・表示する"
+                            },
+                            "tol": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "description": "合っているとする幅（abs：差・rel：比。どちらか）",
+                              "properties": {
+                                "abs": {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "rel": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              }
+                            },
+                            "options": {
+                              "type": "array",
+                              "minItems": 2,
+                              "items": {
+                                "$ref": "#/$defs/text"
+                              },
+                              "description": "選ぶ答え（solve の answer が番号）"
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "type": {
+                                    "const": "choice"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "required": [
+                                  "options"
+                                ]
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "type": {
+                                    "const": "number"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "required": [
+                                  "tol"
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "why": {
+                          "$ref": "#/$defs/text",
+                          "description": "答えのあとの一言（なぜそうなるか）"
+                        }
+                      }
                     }
                   }
                 }
@@ -1798,5 +1930,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 20
+  "x-revision": 21
 }
