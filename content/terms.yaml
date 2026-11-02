@@ -859,6 +859,7 @@
   name: 二項分布
   en: binomial distribution
   category: 確率分布
+  short: 同じ条件で成功・失敗をくり返したとき、成功回数がどのような確率で現れるかを表す分布   # 一言（地図・実験室の入口に出す。渡辺さん 2026-11-02）
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
   version: 1
   workspace: {formula: 0, vary: [n, p], over: k, mean: 1, linear: 3}   # 式の作業台（#110）。linear：変換の欄の式（#156）
