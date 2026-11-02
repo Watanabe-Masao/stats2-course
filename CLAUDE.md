@@ -20,49 +20,15 @@
 5. **数値は検算式を書く**。問題には `checks`、本文の数値は unit.yaml の `checks` に書き、build が通ってから公開する。
 6. **スマホ前提**。表は2〜3列まで。冒頭は「ナビ＋ゴール＋タブ」だけ。説明はガイドへ。
 
-## 本文の記法（content/units/*/S*.md）
 
-| 書き方 | 意味 |
-| --- | --- |
-| `::: task` 〜 `:::` | 問題文の枠（他に ask・key・summary・pattern・warn・info） |
-| `::: toggle 題名` 〜 `:::` | 開閉する欄（答えなど） |
-| `{{problem:Q-U09-001}}` | 問題を差し込む（番号・難度・答えの開閉は自動） |
-| `{{lab:LAB-count}}` | ラボを埋め込む（自由に動かす版） |
-| `{{lab:LAB-scale@s1-temp}}` | 場面ごとの版（最初のモード・数値・課題・予想を tool.yaml の presets に書く） |
-| `{{fig:FIG-U03-population}}` | 図を入れる（説明文は content/assets.yaml） |
-| `{{ref:REF-PQ-DB}}` | 旧版の問題集などへのリンク（shared.yaml の refs） |
-| `{{unit:U14}}` `{{term:TERM-perm}}` | 単元・用語へのリンク（ID で書く。番号や名前を直接書かない） |
-| `{{power:P3}}` `{{icon:lab}}` `{{stage:S2}}` | 力・補助・段階の印 |
-| `{{shared:explain_pattern}}` | 共通文言 |
-| `^ 文` | 灰色の補足行 |
-| `**太字**` `$$数式$$` 表・リスト | そのまま |
-
-## 問題の答えに「ラボで確かめる」を付ける
-
-問題に `lab:` を書くと、答えの中にその問題の数値が入ったラボが入る。
-
-```yaml
-  lab:
-    id: LAB-scale
-    mode: unit                      # 最初に開くモード
-    set: {kind: temp, a: 10, b: 15} # 問題の数値
-    task: 課題の文（ラボの上に出る）
-    predict: {type: number, key: "ratio:1", label: "K で B÷A", unit: "倍"}   # 予想するまで結果を隠す
-    expect: 1.018                   # 予想の答え。テストでラボの計算値と照合する（HTML には入れない）
-    why: 結果のあとに出す一言
-```
-
-場面の版はタブを1つ（mode）に絞る。複数見せるときは presets に `modes: [judge, bin]`。予想のある版では `set` で決めた選択欄（`data-key` の select）は文字になり、選べない。
-Notion の埋め込み（高さ約320pxで固定）では小さい表示になる：予想の前は課題カードだけ、結果のあとは要点と操作だけ、表・式は「くわしく」、広く使うときは「大きく開く ↗」。`build/check_all.sh` が 360×320 で予想の前が枠に収まるかを調べる。
-
-答えに問題文にない数が出るのに `checks` がないと build が止まる。計算した数でなければ `no_checks: 理由` を書く。
+書くときの形（記法・YAML の例・項目の一覧・build が止めるもの・図の型・公開の手順）は docs/authoring.md にある。この文書は決まりを書く。
 
 ## 段階の定義（問い・問題・ラボの形はここから決める）
 
 | 段階 | 身に付ける力と形 |
 | --- | --- |
 | 初学・復習 | 意味と手順。1つの場面で予想→確かめる（課題1つ・予想1回）。分かりやすさを優先 |
-| 応用・転用 | 統計検定2級の範囲の全部。ばらつき・外れ値・混ざりのあるデータを要約・検定・区間でシンプルにする。「法則を見つける」（下の steps）もここ |
+| 応用・転用 | 統計検定2級の範囲の全部。ばらつき・外れ値・混ざりのあるデータを要約・検定・区間でシンプルにする。「法則を見つける」（steps。書き方は docs/authoring.md）もここ |
 | 発展 | 統計を理解する力。なぜその形か・1つの数で何が消えるか・前提が崩れると何が揺れるか・他の単元とのつながり |
 | 創造 | 統計で考え、統計の外と切り分ける力。要因の混ざったデータで自分で問いを立て、統計で言えることと解釈を分ける |
 
@@ -95,45 +61,9 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
   - 解釈には正解を書かない。「1つの考え方の例」は統計の結果と解釈を分け、筋の通った読み方を2つ以上並べてもよい。
   - きれいに説明できない複雑なデータも載せ、統計でどこまで整理でき、どこからが解釈かを見せる。
 
-法則を見つける（tool.yaml の presets、または問題の lab。応用・転用で使う）：
-
-```yaml
-  s3-rule:
-    mode: power
-    steps:                       # 2段以上。各段で予想する
-      - label: n＝25             # 記録の表に出る条件の名前
-        set: {n: 25}             # その段で変える値（前の段からの差分でよい）
-        task: 課題の文
-        predict: {type: number, key: power, label: "検出力"}
-        expect: 0.516            # テストで照合（HTML には入れない）
-        why: 結果のあとの一言
-    law: {title: 式で説明する, lines: [式…], text: 説明, limit: この式で言えないこと}
-```
-
-解説付き再生（tour。#90、試作は LAB-pois@rel-approx-tour）：同じ段階データから「図で解説」（段ごとの静止図）・「アニメで解説」（ラボの再生）・「自分で触る」を作る。関係（変換・対比・導出）の説明に使う。予想は置かない。
-
-```yaml
-  rel-approx-tour:
-    mode: approx
-    tour:
-      kmax: 10          # 棒を出す範囲。ラボと静止図で共有する
-      decimals: 3       # 丸め。ラボと静止図で共有する
-      steps:            # 2段以上
-        - title: λ を決める
-          text: 二項分布で **n×p＝λ** を一定に保つ。   # **…** を強調。埋め込み（360×320）に収まる長さ（2行まで）
-          set: {n: 10, lam: 3, k: 3}                     # 段の始め＝前の段の終わり＋set
-          focus: np                                      # 囲む場所（ラボの data-focus）
-        - title: n を大きく
-          text: '**n を大きく**すると p＝λ÷n は小さくなる。'
-          frames: [{n: 15}, {n: 20}, {n: 30}]            # 再生で順に渡す値。補間しない（整数は整数で書く）
-          ms: 900                                        # 1つの frame の時間（省略 900）
-```
+法則を見つける（steps と law）と解説付き再生（tour）の書き方は docs/authoring.md。解説の使い所：
 
 - **使い所と切り分け**（#90）：「ラボで解説」（tour。答えを見せる）と「ラボで確かめる」（予想・法則・自由に動かす）を分ける。解説は**定義の説明**（概念の labs と、単元の初学「式の構造を読む」）と**つながり**（関係の labs と、発展「ほかでは？」）に置く。同じページで予想させる数を解説で先に見せない（別の数・場面にする）。問題の答えの中・創造には置かない。1つの概念・関係に解説は1つ。区別は書き足さない（版に tour があれば解説。ネットワークの kind と Notion の見出し「▶ ラボで解説」は build が付ける）。
-- 再生は今の段だけ動かして止まる（自動で次へ進めない）。操作は「前へ／再生／次へ」。「自分で動かす」で解説を止め、「解説に戻る」で値・説明・強調を止めた frame に戻す。
-- 静止図は build が set か frames のある段ごとに作る（図ID `FIG-<ラボ>-<版>-<段>`）。関係の `figures:` に書くとネットワークに出る。
-- 状態から静止図と照合する数を作る計算は build/tour.py の MODES に、ラボのモードごとに書く（今は LAB-pois の approx・geom・hyper・pois、LAB-binom の path・pmf、LAB-expect の joint）。段に `mode:` を書くと別のモードへ移る（値は持ち越さない。対比で2つの分布を段ごとに並べるときに使う）。テスト（test_labs.js）が段と frame ごとにラボの値と照合し、再生・戻る・埋め込みの収まりを確かめる。
-- build が止めるもの：tour と predict・steps・task の同居、2段未満、text がない・`**` が閉じない、モードの set にない値、整数の値を小数で書く、MODES にないモード。
 
 ## 概念・関係・導出（知識ネットワークのデータ）
 
@@ -162,64 +92,15 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 自分の教材の id は教材名を付けずに書く。別の教材の概念は `math:CON-…` のように教材名を付ける（ネットワークでは自分の id も `stats2:TERM-…` になる）。
 - 説明のある概念は、どれかの関係か導出につながっていること（孤立させない）。build が止める。
 
-### 問題 → 確かめる概念（`concepts:`）
+### 問題・式の決まり
 
-問題に、その問題を**解く・解説を理解するのに必要な**概念か関係を書く。選択肢や文中に名前が出るだけの概念は書かない。
-
-```yaml
-- id: Q-U13-021
-  stage: S3
-  concepts: [TERM-expect, TERM-var, TERM-sd, TERM-indep]   # 用語（説明のある概念）か REL-… の id
-```
-
-- unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に `concepts:` を書く。
-- build が止めるもの：用語・関係にない id、まだ説明のない用語（先に概念にする）、`concepts_linked` の単元で `concepts:` のない問題。
-- 書いた概念は、ネットワークの概念の「確かめる問題」に出る。
-
-### 概念・関係からラボを開く（`labs:`）
-
-```yaml
-  labs:
-  - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
-```
-
-- 概念（terms.yaml）と関係（relations.yaml）に書ける。書けるのは id・preset・purpose だけ。URL は build が `site_base_url` から作る（配布先で空なら出さない）。
-- build が止めるもの：ないラボ、そのラボにない場面の版（tool.yaml の presets）、id・preset・purpose 以外の項目。
-
-### 概念・関係に図を出す（`figures:`）
-
-```yaml
-  figures: [FIG-U14-concept]
-```
-
-- 概念と関係に書ける。書けるのは図の id だけ（unit.yaml の figures か content/assets.yaml にある図）。説明と URL は build が図の定義と `site_base_url` から作る（配布先で空なら出さない）。
-- ネットワークの概念の詳細・関係の説明に出る（#88）。図の要らない線（前提など）には書かない。
-- build が止めるもの：ない図、id 以外の書き方。
-
-### 式の分解の木（`formulas[].tree`）
-
-式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。
-
-```yaml
-  formulas:
-  - id: F-std-def                 # 式 ID（F-…。変えない・消さない。#118 D1）。tex は書かない（build が木から作る）
-    symbols:
-    - {symbol: Z, meaning: 標準化した値, key: Z, kind: rv}
-    - {symbol: X, meaning: 確率変数, key: X, kind: rv}
-    - {symbol: μ, meaning: X の期待値, key: mu, concept: TERM-expect, kind: param}
-    - {symbol: σ, meaning: X の標準偏差, key: sigma, concept: TERM-sd, kind: param}
-    tree: {"op": "eq", "args": [{"sym": "Z"}, {"op": "div", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"sym": "sigma"}]}]}
-```
-
-- 葉は `{"sym": key}` か `{"num": 数}`。演算は eq・add・sub・mul・div・pow・neg・sqrt・abs・sum・prod・int・fn（kn-schema の formulaNode）。sum・prod・int は `var`（動かす記号）と `lower`・`upper`。
-- `fn` の `name` は、その式の symbols の key（E・V・P・Cov・comb・fact など。記号に `concept` を書けば、その概念の式へ開く）か、記号に書かなくてよい共通の関数（exp・log・gt・ge・lt・le・between）。比べる式（X＞x・a≦X≦b）を gt・between で書くのは仮の形で、#72 で型として決め直す。
-- 記号の `kind`：value（1つの値）・data（データの一覧）・rv（確率変数）・param（母数）・index（添え字）・const（定数）。
-- build が止めるもの：symbols の key にない葉・関数・動かす記号、記号の `concept` が用語にない、知らない演算。
+- 問題の `concepts:` には、その問題を**解く・解説を理解するのに必要な**概念か関係を書く。選択肢や文中に名前が出るだけの概念は書かない。unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に書く。
+- 概念・関係に書けるのは、ラボへの参照（`labs:`。id・preset・purpose）と図の id（`figures:`）だけ。URL・説明は build が作る。
+- 式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。
 - **式の元は木だけ**（#118 単位 A、2026-11-01）。原本に `tex` を書かない。公開の JSON の tex は build が math-lab の `toTex` で木から作る（build/formula_tex.mjs が docs/math-lab/formula.mjs の写しを読む。写しは型と同じく `python3 build/sync_schema.py --update` で取り込む）。木と tex の食い違い（M1）はこれで起きない。単元の「式の構造」の表は手書きのままなので、記号を概念に合わせる。
 - 同じ式を2つの概念に出すときは、元でない側に `- {ref: F-…}` だけを書く（build が元の式を写し、`defined_in` を付ける。#118 D2）。
 - **式ごとの検証の契約**は content/formula-contracts.yaml（#118 D6）：種類（kinds）・主張する性質（properties）・代表（representative）・記号どうしの条件（conditions：1つの端の domain で書けないもの。比べる式の木）・レビューの観点（review）。全部の式に1つずつ（ないと build が「未分類」で止める）。1つの記号の範囲は domain に、文の条件は概念の conditions.math に書き、契約には書かない。
 - **式の個別のレビュー**（#118 M9、渡辺さん 2026-11-01）：契約の `review`（数で保証できない観点）は content/formula-reviews.yaml に記録する（formula・points・judgement・by・date・fingerprint）。fingerprint はレビューした版（式の木・記号の表・契約の組の条件・概念の成り立つ条件）で、`python3 build/formulas.py --fingerprint F-…` で出す。どれかが変われば古い記録では通らない。ふだんの build は「レビュー前」の印を出すだけで止めない。公開の前（build/deploy_site.sh）に `python3 build/formulas.py --publish-check` が、公開する代表の式（representative）に今の版のレビューがなければ止める。レビューは式を書いた側でなく、別のエージェント（独立なレビュー）が行い、PR で渡辺さんが確かめる
-- build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。
 
 ## 実験室（content/experiments.yaml。#102）
 
@@ -242,32 +123,23 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 ### 作業台の型（#156）
 
-作業台は math-lab の型1つ（欄の順：見出し → 式 → 帯 → 結果 → 計算過程 → 入力 → 図 → 変換 → 実験）。入力と図の棒の操作は分布がどう決まるか（モデルの種類）で決まる：式で決まる分布＝概念の `workspace`（formula・vary・over・mean・任意の `linear`）、表で決まる分布＝概念の `table_workspace`（下）。変換の欄（aX＋b）はどちらにも出す（`linear` に E(aX＋b) の式。ほかの概念の式は `{ref: F-expect-linear}` で写す）。新しい要素は型に足して全部の作業台に出す。
+作業台は math-lab の型1つ（欄の順：見出し → 式 → 帯 → 結果 → 計算過程 → 入力 → 図 → 変換 → 実験）。入力と図の棒の操作は分布がどう決まるか（モデルの種類）で決まる：式で決まる分布＝概念の `workspace`（formula・vary・over・mean・任意の `linear`）、表で決まる分布＝概念の `table_workspace`（実験室の値の表のテーマを指す。書き方は docs/authoring.md）。変換の欄（aX＋b）はどちらにも出す（`linear` に E(aX＋b) の式。ほかの概念の式は `{ref: F-expect-linear}` で写す）。新しい要素は型に足して全部の作業台に出す。
 
-### 値の表の作業台
-
-概念の `table_workspace`（型の改訂15、#119）は `formula`（期待値の定義の式の番号）、任意の `linear`（E(aX＋b)の式の番号）、`tables`（実験室の値の表のテーマを指す：`{experiment: EXP-…, theme: テーマ id, use: start か compare}`。値・重みを2か所に書かない）を持つ。build がテーマから値・重み・呼び名・単位を写して公開の JSON（型の valueTable）にし、式の参照・テーマの有無・値・重みを検査する。同じテーマなら作業台と実験室で値・重み・期待値が一致する。
+### 実験室の定義
 
 実験室の定義をデータで書き、画面（knowledge-net の実験室：予測→実験→観察→理由→応用→比べる を1画面ずつ）は読むだけ。型は kn-schema の `experiments`。
 
 - 実験は前の条件と変えた条件の両方を、同じセット数ずつ起こして比べる（#121）。反例も、条件どおりと崩した起き方の両方を起こす。
-- 比べるの段（#122）：学習者が決めた条件を記録カードに残し、4つまで重ねる。カードは条件と種とセット数だけ（同じ種なら同じ結果に作り直せる）。保存はその端末のブラウザ（消えることがある前提）・URL（`?cards=`）・発見メモ（比べた条件と再現の URL を入れて、ChatGPT から学習ログへ）。公開サイトは個人の記録を持たない。
-
-- `links`：つなぐ概念（説明のある用語）と線（関係・導出）。地図と実験室を行き来する
-- `start`（前の条件）と `compare`（問いで変える条件）、`vary`（条件の範囲）。`reason`（理由の段：概念の式と1〜3行）
-- `themes`：場面（こういう時に使う）。計算は同じで、並びの絵・言葉・最初の p が変わる
-- `counterexamples`：反例を実験する。成り立つ条件（`breaks`。概念の `conditions.math` の言葉で）を1つ崩した起き方（urn・streak・mix）で理論とのずれを見る。数は概念しだい
+- 比べるの段（#122）：学習者が決めた条件を記録カードに残し、4つまで重ねる。カードは条件と種とセット数だけ（同じ種なら同じ結果に作り直せる）。保存はその端末のブラウザ（消えることがある前提）と URL（`?cards=`）だけ。公開サイトは個人の記録を持たない。
 - **反例の共通の方針**（渡辺さん 2026-11-01。#118）：種類は「成り立つ条件を外す実験」「誤解を正す例」「指標の限界を示す比較」。どれも ①何を確かめるかを先に書く ②比べる条件をそろえる（戻す・戻さないなら当たりの割合と回数を同じに）③成り立つ範囲と差が出ない端を示す ④理論の関係と実験のゆれを分ける ⑤観察のあとの理解（どの分布・概念で考えるか）までつなぐ。文章・実験の仕組み・比べる理論・検証が同じ主張を指すことを完成の条件にする
-- 反例の `effect`（平均・散らばりの向き。mean: same・spread: larger／smaller）：build（build/effects.py）が起き方の定義から分布を分数で求め、vary の全部の n・p とテーマの p で確かめる。端（n＝1・割合 0・1）は「同じ」になることも確かめる。公開の JSON には出さない（画面は engine の mechanismMoments から答えを求める）
-- `model`：`binom`（二項分布。vary・start・compare）か `table`（値の表。#119：テーマごとに values・labels・start と compare の重み・change、反例は values と weights の表）。値の表は、値が小さい順・重みと呼び名が値と同じ数・前と変えた重みが違うことを build が確かめる
 - **予想の答えは書かない**（公開の JSON に出る。画面が理論のモデルから求める）。build が止める
-- 発見メモは ChatGPT に渡し、ChatGPT が学習記録へ書く（公開サイトは個人の記録を持たない）
+- 発見メモを ChatGPT へ送る仕組みは外す（渡辺さん 2026-11-02。外部と学習履歴への接続は今はしない。#57・#54 は保留）。教材の創造の段にも、ChatGPT に頼む節を置かない（同日に全単元から外した）。
 
 ## 例題・問題にはラボか図を付ける（build が止める）
 
-- 問題には `lab:`（上）か `figure:` を書く。`figure:` は答えの中に「🖼️ 図で確かめる」として入る（図ID は `FIG-<問題ID>`）。
+- 問題には `lab:`（書き方は docs/authoring.md）か `figure:` を書く。`figure:` は答えの中に「🖼️ 図で確かめる」として入る（図ID は `FIG-<問題ID>`）。
 - 本文の例題（`**例題…`）には、次の例題・見出し・問題までに `{{lab:…}}` か `{{fig:…}}` を置く。例題の図は unit.yaml の `figures:` に書く。
-- 図は設定から作る（build/figures.py）：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`paths`（n 回中ちょうど k 回成功する並びを全部書き出す。解説付き再生の静止図）、`joint`（2つの 0/1 の同時確率の2×2の表。独立なら の値つき）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・geom・hyper・normal・uniform・expo。`overlay` で2つ目の分布を点線の棒か正規分布の曲線で重ね、`lines` で数の行、`maxdiff` で差の最大（丸めて0になるときは「0.001未満」）を出す）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
+- 図は設定から作る（型の一覧は docs/authoring.md）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
 - 各単元の初学「意味」か「式の構造」に、単元の中心を1枚で見せる概念図を置く。初学「図を再現する」は、その概念図を手本として示し、自分で描いて照らし合わせる形にする（手本のない「図を再現する」を作らない）。
 - 図の中の数は問題文・答え（例題なら本文）にある数だけ。計算で出す数（合計・比・係数）は図を作るときに計算する。
 - まだ付け終えていない単元は unit.yaml に `visuals_pending: true`（build が警告する）。
@@ -287,7 +159,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 渡辺さんの判断が要るものはラベル「決めること」を付け、決まったら issue に結論を書く。
 - 途中で出たアイデア・方針の変更は、すぐ直さず issue（テンプレート「アイデア・方針の変更」）にする。Claude が原本を調べて修正の大きさ（小・中・大）と影響する範囲を数で書き、取り込む時期の案を出す。渡辺さんが時期を決めたら、作業の issue に移す（済んだ段階のやり直しも作業として書く）。
 - 進み具合は `python3 build/progress.py` で原本から数える（人の記憶で判断しない）。Notion の「進み具合」ページも同じものから生成する。段階を閉じる前に、その単元が全部 ✓ かを確かめる。
-- issue のチェックリストは GitHub の上のもの。教材の Notion ページにはチェック欄を置かない（下の決まりのまま）。
+- issue のチェックリストは GitHub の上のもの。教材の Notion ページにはチェック欄を置かない（上の決まりのまま）。
 
 ## 確かめる
 
@@ -319,30 +191,9 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 静止図：svgkit の色（BLUE・ORANGE など）は写しから読む。ラボと静止図で同じ系列は同じ色。
 - 動きは「何が変わったか」を伝えるためだけ。押すと少し沈む・タブを替えると中身がすっと出る・予想の結果を一度だけ光らせる（iPhone では軽く振動する試み）。1つの操作に動きは1つ。動きを減らす設定では止める。
 
-## 公開サイト（ラボと図）
+## 公開
 
-`publish/notion.yaml` に `site_base_url` があると、ラボと図はアップロードせず URL で埋め込む（`<slug>/?p=場面`、`fig/<図ID>.svg`）。
-`python3 build/build.py` で `out/site/` ができる。`build/check_all.sh` を通してから `build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開する。公開されるのは out/site/ だけ（原本・予想の答え・個人データは出ない）。
-ラボの `slug` と図の ID は URL の一部なので変えない。
-
-## Notion への公開手順
-
-`site_base_url` があるので、ラボと図はアップロードせず公開サイトの URL で埋め込む（out/notion/<ID>.md をそのまま使う）。
-
-1. `build/check_all.sh` を通し、`build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開サイトを更新する（ページより先に。埋め込み先が無いと空の枠になる）。
-2. 既にあるページは、`out/notion/<ID>.md` の全文で `publish/notion.yaml` のページへ replace_content。長いので、別のエージェントにファイルを読ませて一字も変えずに送らせてよい。
-3. 新しい単元ページは、入口ページを親に create-pages（アイコン 📘、題名 `NN｜単元名`、本文は out/notion/<ID>.md）。返ったページ ID を `publish/notion.yaml` の `units:` に番号順で書く。
-4. もう一度 build し、`out/notion/*.md` で新しい ID を参照しているページを探して、それぞれ旧版の ID へのメンションを新しい ID に置き換える（update_content、replace_all）。
-5. 入口ページ：旧版一覧の行を消し、末尾に自動で付いた子ページを、前の単元の子ページの後ろへ移す。
-6. 表示される数（タブ・開閉・ラボ・図・メンションなど）を、公開後に取得したページと照らし合わせる。
-7. 移行した単元は `python3 build/audit.py <ID>` で旧版との欠落がないことを確かめる（落とす項目は migration/waivers に理由を書く）。
-
-`site_base_url` が空の配布先では、`python3 build/publish_prep.py <ID>` で素材を一覧してアップロードし（返った content_length が一覧のバイト数と一致することを確かめる）、`python3 build/publish_prep.py <ID> <json>` で作る `out/notion/<ID>.publish.md` を使う。
-
-旧版（Notion）の残りは `publish/legacy.yaml` で管理する。build が各項目を「まだ参照あり／削除してよい／削除済み」で出す。「削除してよい」になったら、その生成物を Notion に公開してから旧版を削除し、`deleted:` に日付を書く。削除済みの ID が原本や生成物に戻ると build が止まる。旧版を新しく参照しない（refs に足さない）。
-
-入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。新しい単元ページを作ると入口の末尾に子ページが付くので、root.md の並びに合わせて動かす。
-
-個人用の学習記録（publish/notion.yaml の personal_root）：解答記録・到達記録・学習ログの3つのDB。問題は「問題ID」の文字列で指す。教材の生成物から個人データを読み書きしない。
-
-Notion の記法の注意：`<sup>` は消える（ʳ や ² を使う）。メンションは `<mention url="https://app.notion.com/p/ID" />`。
+- 公開サイト（deploy_site.sh）と Notion への公開は、全部が通った main から行う。手順は docs/authoring.md の「公開」。
+- 公開されるのは out/site/ だけ（原本・予想の答え・個人データは出ない）。ラボの `slug` と図の ID は URL の一部なので変えない。
+- 旧版（Notion）の残りは `publish/legacy.yaml` で管理する。旧版を新しく参照しない（refs に足さない）。削除済みの ID が戻ると build が止まる。
+- 個人用の学習記録（publish/notion.yaml の personal_root）は教材の生成物から読み書きしない。
