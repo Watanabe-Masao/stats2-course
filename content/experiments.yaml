@@ -9,7 +9,7 @@ experiments:
     question: 成功確率を上げると、成功回数の山はどう動く？
     links:
       concepts: [TERM-binom, TERM-expect]
-      relations: [REL-indep-binom, REL-comb-binom, DER-binom-moments]
+      relations: [REL-indep-binom, REL-comb-binom, DER-binom-moments, REL-binom-sampleprop]   # 割合の散らばり（A-02・C-02）は二項分布を n で割った分布（#171）
     model: binom
     vary:
       n: {min: 1, max: 30, step: 1}

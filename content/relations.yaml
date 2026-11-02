@@ -76,6 +76,16 @@ relations:
     gist: 回数が多いと、成功の数はなめらかな山の形になる。平均と標準偏差だけで、範囲の確率が出せる。   # つまり（#95）
     conditions: [np と n(1−p) がどちらも十分大きい（目安は5以上）, 整数の棒を曲線で近似するので、境目を0.5ずらす（連続修正）]
     basis: {units: [U14, U16]}
+  - id: REL-binom-sampleprop
+    from: TERM-binom
+    to: TERM-sample-prop
+    version: 1
+    type: 変換
+    mode: exact
+    description: 成功の回数 X が二項分布 B(n, p) に従うとき、X を n で割った標本比率 p̂＝X÷n は、同じ形の分布を横に 1/n に縮めたもの。平均は p、分散は p(1−p)÷n。
+    gist: 回数を割合に直しても、分布の形は変わらず目盛りが縮むだけ。だから割合のぶれは、回数のぶれを n で割った大きさになる。   # つまり（#95）
+    conditions: [X は二項分布 B(n, p) に従う（各回が独立・毎回同じ p）, n は決まった数]
+    basis: {units: [U14, U22]}
   - id: REL-binom-poisson-contrast
     from: TERM-binom
     to: TERM-poisson
