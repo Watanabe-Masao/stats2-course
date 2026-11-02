@@ -26,3 +26,4 @@
 | 18 | 2026-11-02 | 二項分布の実験室の `questions` の form に spread（広がり：to.n）・conv（理論と実測）を足し、prob に任意の free（学習者が結果を選ぶ）。反例の起き方に fatigue（回を追って確率が変わる：drop）（stats2-course #161）。任意 |
 | 19 | 2026-11-02 | 二項分布の実験室に任意の `catalog`（テーマ体系：まとまり id・title と、その下の問い id〔教材名:概念-まとまり-番号。stats2:binom-A-01〕・title・finds〔主な発見〕・predict〔何を予想するか〕・operate〔何を操作するか〕・judge〔理解判定〕・open〔開く入口。ないものは作成中〕・concept〔主概念〕・related〔関連概念〕）。サイトの実験室のタブで概念から問いを絞る（stats2-course #163）。任意 |
 | 20 | 2026-11-02 | テーマ体系の問いに任意の `retired`（使わない印。重複などで外した問い。id は残し、並べない）。主（concept）に関係（REL-…）も書ける（2つの概念のつながりが主の問い。両端の概念から引く）（stats2-course #169）。任意 |
+| 21 | 2026-11-03 | テーマ体系の問いに任意の `apply`（応用の課題：考え方 kind・課題の文 task・答えの求め方 solve〔engine の solveApply の method と条件〕・答えの形 answer〔number は tol、choice は options〕・why）。答えは書かない（画面が求める）（stats2-course #171・#169 の3）。任意 |

@@ -104,6 +104,15 @@ def table_errors(eid: str, x: dict) -> list[str]:
 
 
 
+# 応用の課題の求め方（math-lab engine の ApplySolve。#171）：method ごとの条件の項目
+APPLY_METHODS = {
+    "mean-to-p": ["n", "mean"], "min-n-share-sd": ["p", "sd"], "compare-eq": ["a", "b"], "boundary": ["n", "p", "k"],
+    "expected-observers": ["n", "p", "event", "people"], "sets-for-error": ["n", "p", "event", "err"], "binom-judge": ["mechanism"],
+    "max-strength": ["mechanism", "param", "min", "max", "step", "ratio"], "min-total": ["n", "ratio"], "solve-spread": ["n", "p", "variance"],
+}
+APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
+
+
 def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:
     """値の表の作業台の表を、実験室のテーマから作る（#119：同じ表を2か所に書かない）。
     原本は {experiment: EXP-…, theme: テーマ id, use: start か compare} だけを書き、値・重み・呼び名・単位はテーマから写す。
@@ -179,6 +188,27 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                 op = it.get("open")
                 if it.get("retired") and op:
                     err.append(f"{eid}: {iid} は使わない印（retired）なので open を書かない")
+                # 応用の課題（#171）：開ける問いにだけ。答えは書かず、method ごとに条件の項目がそろうかだけを見る
+                # （値が条件の外なら画面の engine が理由を言って止まり、knowledge-net のテストが公開の JSON の全部の課題を解いて止める）
+                ap = it.get("apply")
+                if ap:
+                    if not op:
+                        err.append(f"{eid}: {iid} の応用の課題（apply）は開ける問い（open のある問い）にだけ書く")
+                    sv = ap.get("solve") or {}
+                    need = APPLY_METHODS.get(sv.get("method"))
+                    if need is None:
+                        err.append(f"{eid}: {iid} の apply の method {sv.get('method')} を engine が知らない（{'・'.join(APPLY_METHODS)}）")
+                    else:
+                        miss = [k for k in need if k not in sv]
+                        extra = [k for k in sv if k != "method" and k not in need]
+                        if miss or extra:
+                            err.append(f"{eid}: {iid} の apply（{sv['method']}）の条件：足りない {miss}・余分 {extra}")
+                    an = ap.get("answer") or {}
+                    nopt = APPLY_CHOICES.get(sv.get("method"))
+                    if nopt and (an.get("type") != "choice" or len(an.get("options") or []) != nopt):
+                        err.append(f"{eid}: {iid} の apply（{sv.get('method')}）の答えは選ぶ形で、選び肢は {nopt} つ")
+                    if not nopt and need is not None and (an.get("type") != "number" or not an.get("tol")):
+                        err.append(f"{eid}: {iid} の apply（{sv.get('method')}）の答えは数（type: number）で、合っているとする幅 tol を書く")
                 if op:
                     # 実験の仕組みは共有してよいが、同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）
                     if op in opened:

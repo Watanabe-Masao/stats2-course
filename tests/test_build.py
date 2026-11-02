@@ -810,6 +810,42 @@ class TestNetwork(unittest.TestCase):
         self.assertNotIn("open", it["stats2:binom-A-03"])
         self.assertFalse(network.schema_errors(d))
 
+    def test_apply(self):
+        # 確かめる対象：応用の課題（apply。#171）。想定する故障：engine の知らない method（画面で課題が出ない）、条件の項目の書き漏れ・書き誤り（画面で理由を言って止まる）、
+        # 選ぶ形の選び肢の数の違い（答えの番号が選び肢を指さない）、数の答えに幅（tol）がない（照らせない）、開けない問いに課題、公開中の10問のどれかから課題が落ちる。
+        # 見つけ方：本物の定義は通り、1つずつ崩した課題がそれぞれの理由で止まる。答えの正しさは math-lab の apply.test.ts（手計算の値）と knowledge-net（公開の JSON の全部を解く）で見る。既存との違い：応用の課題は初めて
+        import network
+        c = course()
+        rel_ids = {r["id"] for r in network.load_network()[0]}
+        der_ids = {d["id"] for d in network.load_network()[1]}
+        orig = network.load_experiments
+        x = dict(next(e for e in orig() if e.get("catalog")))
+        opened = [it for g in x["catalog"] for it in g["items"] if it.get("open")]
+        self.assertTrue(opened and all(it.get("apply") for it in opened), "公開中の問いのどれかに応用の課題がない")
+        def errs(**ap):
+            item = {"id": "binom-A-01", "title": "t", "concept": "TERM-binom", "open": "shift", "predict": "p", "operate": "o", "judge": "j",
+                    "apply": {"kind": "逆算", "task": "t", "why": "w", "solve": {"method": "mean-to-p", "n": 20, "mean": 6}, "answer": {"type": "number", "tol": {"abs": 1}}, **ap}}
+            try:
+                network.load_experiments = lambda: [{**x, "catalog": [{"id": "A", "title": "t", "items": [item]}]}]
+                return [e for e in network.experiment_errors(c, rel_ids, der_ids) if "apply" in e or "応用" in e]
+            finally:
+                network.load_experiments = orig
+        self.assertFalse(errs())
+        self.assertTrue(any("method mean-to-q を engine が知らない" in e for e in errs(solve={"method": "mean-to-q", "n": 20, "mean": 6})))
+        self.assertTrue(any("足りない ['mean']" in e for e in errs(solve={"method": "mean-to-p", "n": 20})))
+        self.assertTrue(any("余分 ['p']" in e for e in errs(solve={"method": "mean-to-p", "n": 20, "mean": 6, "p": 0.3})))
+        self.assertTrue(any("選び肢は 3 つ" in e for e in errs(solve={"method": "compare-eq", "a": {}, "b": {}}, answer={"type": "choice", "options": ["a", "b"]})))
+        self.assertTrue(any("幅 tol を書く" in e for e in errs(answer={"type": "number"})))
+        network.load_experiments = lambda: [{**x, "catalog": [{"id": "A", "title": "t", "items": [{"id": "binom-A-01", "title": "t", "concept": "TERM-binom", "apply": {"kind": "逆算", "task": "t", "why": "w", "solve": {"method": "mean-to-p", "n": 20, "mean": 6}, "answer": {"type": "number", "tol": {"abs": 1}}}}]}]}]
+        try:
+            self.assertTrue(any("開ける問い（open のある問い）にだけ" in e for e in network.experiment_errors(c, rel_ids, der_ids)))
+        finally:
+            network.load_experiments = orig
+        d = network.export_network(c, {"site_base_url": ""})
+        it = {i["id"]: i for g in next(e for e in d["experiments"] if e.get("catalog"))["catalog"] for i in g["items"]}
+        self.assertEqual(it["stats2:binom-E-04"]["apply"]["solve"], {"method": "solve-spread", "n": 10, "p": 0.5, "variance": 3.4})
+        self.assertFalse(network.schema_errors(d))
+
     def test_skeleton(self):
         # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
         import network
