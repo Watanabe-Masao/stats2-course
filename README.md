@@ -41,4 +41,4 @@ python3 build/build.py           # 生成（out/notion/*.md と out/labs/）
 build/check_all.sh               # 公開・コミット前に全部を確かめる（npm install が先に要る）
 ```
 
-本文の書き方は `CLAUDE.md` の「本文の記法」を参照。
+本文の書き方は `docs/authoring.md` の「本文の記法」を参照（決まりは `CLAUDE.md`）。
