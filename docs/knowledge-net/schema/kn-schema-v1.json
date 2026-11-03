@@ -944,6 +944,165 @@
                         "why": {
                           "$ref": "#/$defs/text",
                           "description": "答えのあとの一言（なぜそうなるか）"
+                        },
+                        "walk": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "segs",
+                            "tags",
+                            "steps"
+                          ],
+                          "description": "解き方を自分で組み立てる（stats2-course #181）。段は engine の解き方と同じ（題名・まとめの式は engine が作る）。最初の段は課題の文に印を付け、数の意味を選ぶ。steps は2段目から最後の1つ前（最後は下の道具を問いの値に合わせる段で、合わせる先は engine が決める）",
+                          "properties": {
+                            "segs": {
+                              "type": "array",
+                              "minItems": 2,
+                              "description": "課題の文の区切り（つなぐと task と同じ）。key：q＝求めるもの、それ以外は tags.vars の数",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "text"
+                                ],
+                                "properties": {
+                                  "text": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "key": {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-z0-9]*$"
+                                  }
+                                }
+                              }
+                            },
+                            "tags": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "opts",
+                                "vars"
+                              ],
+                              "properties": {
+                                "opts": {
+                                  "type": "array",
+                                  "minItems": 2,
+                                  "items": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "description": "数を押したときの「それは何か」の選び肢"
+                                },
+                                "vars": {
+                                  "type": "object",
+                                  "minProperties": 1,
+                                  "additionalProperties": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "sym",
+                                      "of",
+                                      "ans",
+                                      "ng"
+                                    ],
+                                    "properties": {
+                                      "sym": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "付く記号（n・E(X)・A の n など）"
+                                      },
+                                      "of": {
+                                        "type": "string",
+                                        "description": "solve のどの値か（a.n のように . でたどる）。値は書かない"
+                                      },
+                                      "ans": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                      },
+                                      "ng": {
+                                        "type": "string",
+                                        "minLength": 1
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "meaning": {
+                              "$ref": "#/$defs/walkQuiz",
+                              "description": "最初の段の意味の確かめ（誤解を正す1問。要る課題だけ）"
+                            },
+                            "steps": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "todo": {
+                                    "type": "string"
+                                  },
+                                  "quiz": {
+                                    "$ref": "#/$defs/walkQuiz"
+                                  },
+                                  "slots": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "lines"
+                                    ],
+                                    "properties": {
+                                      "lines": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "items": {
+                                          "type": "array",
+                                          "minItems": 1,
+                                          "items": {
+                                            "oneOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "object",
+                                                "additionalProperties": false,
+                                                "required": [
+                                                  "slot"
+                                                ],
+                                                "properties": {
+                                                  "slot": {
+                                                    "type": "string"
+                                                  },
+                                                  "ph": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      },
+                                      "then": {
+                                        "$ref": "#/$defs/walkQuiz"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "check": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "todo": {
+                                  "type": "string"
+                                },
+                                "hit": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -1260,6 +1419,46 @@
             "$ref": "#/$defs/text"
           },
           "description": "値の呼び名（なければ値と単位）。values と同じ数"
+        }
+      }
+    },
+    "walkQuiz": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opts",
+        "ok",
+        "fb"
+      ],
+      "description": "選ぶ問い（正解の番号 ok・間違えたときの言葉 fb は選び肢と同じ数。正解の所は空でよい）",
+      "properties": {
+        "ask": {
+          "type": "string"
+        },
+        "todo": {
+          "type": "string"
+        },
+        "opts": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ok": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fb": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "math": {
+          "type": "boolean",
+          "description": "選び肢が式（式の字体で出す）"
         }
       }
     }
@@ -2007,5 +2206,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 22
+  "x-revision": 23
 }

@@ -145,6 +145,37 @@ experiments:
               solve: {method: mean-to-p, n: 20, mean: 6}
               answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: ほしい平均（中心）が決まっていれば、平均＝回数×確率から、確率を逆に決められる。
+              walk:   # 解き方を自分で組み立てる（#181）。段の題名・まとめの式・数の値・確かめる段の合わせる先は engine が作る
+                segs:
+                  - {text: '20 回', key: n}
+                  - {text: 'の挑戦で、成功の回数の平均を '}
+                  - {text: '6 回', key: e}
+                  - {text: 'にしたい。'}
+                  - {text: '1回の成功確率 p を何 % にすればよい？', key: q}
+                tags:
+                  opts: [回数 n, 平均 E(X), 確率 p]
+                  vars:
+                    n: {sym: n, of: n, ans: 0, ng: 20 回は挑戦する回数。平均でも確率でもない。}
+                    e: {sym: E(X), of: mean, ans: 1, ng: 6 回は成功の回数の平均。挑戦の回数ではない。}
+                meaning:
+                  ask: 「平均 6 回」の意味として正しいのは？
+                  opts: [20 回挑戦すれば、必ず 6 回成功する, 何度もくり返すと、成功の回数の平均が 6 回に近づく, 6 回より多く成功することはない]
+                  ok: 1
+                  fb: [期待値は「平均」。1セットだけ見ると、6 回より多いことも少ないこともある。, '', 平均が 6 回でも、7 回や 8 回成功するセットもある。]
+                steps:
+                  - quiz:
+                      todo: わかっている「回数」「平均」と、求める p をつなぐ式を選ぶ
+                      math: true
+                      opts: ['E(X) = np', 'V(X) = np(1 − p)', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                      ok: 0
+                      fb: ['', それは分散（ばらつき）の式。この課題でわかっているのは平均。, それは「ちょうど k 回」になる確率の式。この課題は平均の話。]
+                  - slots:
+                      lines: [[{slot: e, ph: E(X)}, '=', {slot: n, ph: n}, '× p']]
+                  - quiz:
+                      todo: 20 × p = 6 から、p だけを残す操作を選ぶ
+                      opts: [両辺に 20 を掛ける, 両辺を 20 で割る, 両辺から 20 を引く]
+                      ok: 1
+                      fb: [掛けると 400p になり、p から離れる。, '', p には 20 が掛け算で付いている。引き算では外れない。]
           - id: binom-A-02
             title: 試行回数を増やすと分布はどう変わる？
             finds: 成功回数と成功割合の散らばり
@@ -213,6 +244,46 @@ experiments:
               solve: {method: boundary, n: 10, p: 0.3, k: 3}
               answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: 「以上」と「より多い」の差は境目の棒1本。境目が山の高い所なら、取り違えると大きくずれる。
+              walk:
+                segs:
+                  - {text: '成功確率 '}
+                  - {text: '30%', key: p}
+                  - {text: ' で '}
+                  - {text: '10 回', key: n}
+                  - {text: '。報告に「3 回より多くなる確率」と書くはずが「'}
+                  - {text: '3 回', key: k}
+                  - {text: '以上」の値を使っていた。'}
+                  - {text: '確率は何 % 多く見積もられた？', key: q}
+                tags:
+                  opts: [回数 n, 確率 p, 境目 k]
+                  vars:
+                    p: {sym: p, of: p, ans: 1, ng: 30% は1回の成功確率 p。}
+                    n: {sym: n, of: n, ans: 0, ng: 10 回は挑戦の回数 n。}
+                    k: {sym: k, of: k, ans: 2, ng: 3 回は「以上・より多い」の境目 k。}
+                meaning:
+                  ask: 「3 回より多い」に入る回数は？
+                  opts: [3・4・…・10 回, 4・5・…・10 回, 0・1・2・3 回]
+                  ok: 1
+                  fb: [3 回は「より多い」に入らない。3 回を含むのは「3 回以上」。, '', それは「3 回以下」。]
+                steps:
+                  - quiz:
+                      ask: 「3 回以上」の確率から「3 回より多い」の確率を引くと、残るのは？
+                      opts: [ちょうど 3 回の棒1本, 2 回以下の棒, 何も残らない（同じ確率）]
+                      ok: 0
+                      fb: ['', 2 回以下はどちらにも入らない。, 「以上」は 3 回を含み、「より多い」は含まない。そこが違う。]
+                  - quiz:
+                      todo: ちょうど 3 回の棒の高さを求める式を選ぶ
+                      math: true
+                      opts: ['P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ', 'E(X) = np', 'V(X) = np(1 − p)']
+                      ok: 0
+                      fb: ['', それは平均の式。棒1本の高さは出ない。, それは分散の式。]
+                  - slots:
+                      lines: [[{slot: n}, 'C', {slot: k}, '×', {slot: p}, 'ᵏ × (1 − p)ⁿ⁻ᵏ']]
+                      then:
+                        ask: ₁₀C₃ ＝ (10×9×8)÷(3×2×1) はいくつ？
+                        opts: ['30', '120', '720']
+                        ok: 1
+                        fb: [10×3 ではない。10 個から 3 個を選ぶ並びの数。, '', 720 は 10×9×8 まで。並び順の 3×2×1＝6 で割る。]
           - id: binom-B-03
             title: 補集合を使うと計算が簡単になる？
             finds: 補集合と確率の和
@@ -308,6 +379,47 @@ experiments:
               solve: {method: compare-var, a: {n: 10, p: 0.6}, b: {n: 20, p: 0.3}}
               answer: {type: choice, options: [A, ほぼ同じ, B]}
               why: 分散は np(1−p)。回数が多いほど大きく、p が 50% に近いほど大きい。回数と p の両方で比べる。
+              walk:
+                segs:
+                  - {text: 'A は '}
+                  - {text: '10 回', key: an}
+                  - {text: '・成功確率 '}
+                  - {text: '60%', key: ap}
+                  - {text: '、B は '}
+                  - {text: '20 回', key: bn}
+                  - {text: '・成功確率 '}
+                  - {text: '30%', key: bp}
+                  - {text: '。'}
+                  - {text: '成功回数の分散が大きいのはどちら？', key: q}
+                tags:
+                  opts: [回数 n, 確率 p]
+                  vars:
+                    an: {sym: A の n, of: a.n, ans: 0, ng: 10 回は回数 n。}
+                    ap: {sym: A の p, of: a.p, ans: 1, ng: 60% は確率 p。}
+                    bn: {sym: B の n, of: b.n, ans: 0, ng: 20 回は回数 n。}
+                    bp: {sym: B の p, of: b.p, ans: 1, ng: 30% は確率 p。}
+                meaning:
+                  ask: 分散が表すのは？
+                  opts: [山の中心の位置, 山の広がり（ばらつき）, いちばん起こりやすい回数]
+                  ok: 1
+                  fb: [中心の位置は平均（期待値）。, '', それは最頻値（いちばん高い棒）。]
+                steps:
+                  - quiz:
+                      todo: ばらつき（分散）の式を選ぶ
+                      math: true
+                      opts: ['V(X) = np(1 − p)', 'E(X) = np', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                      ok: 0
+                      fb: ['', それは平均の式。, それは棒1本の確率の式。]
+                  - quiz:
+                      ask: A と B の成功回数の平均（np）は？
+                      opts: [A 6 回・B 6 回, A 6 回・B 4 回, A 4 回・B 6 回]
+                      ok: 0
+                      fb: ['', B は 20 × 0.3 ＝ 6。, A は 10 × 0.6 ＝ 6。]
+                  - todo: 下の数を押してから、式の枠を押す（A の行・B の行）
+                    slots:
+                      lines:
+                        - ['A：', {slot: an, ph: n}, '×', {slot: ap, ph: p}, '× (1 − p)']
+                        - ['B：', {slot: bn, ph: n}, '×', {slot: bp, ph: p}, '× (1 − p)']
           - id: binom-D-03
             title: 期待値が同じでも分布は違う？
             finds: 期待値だけでは分布を特定できない
