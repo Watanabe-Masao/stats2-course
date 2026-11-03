@@ -1485,6 +1485,96 @@
           "description": "選び肢が式（式の字体で出す）"
         }
       }
+    },
+    "chartDist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "label"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "binom",
+            "hyper",
+            "poisson"
+          ]
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "p": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "success": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lambda": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 60
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "binom"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "n",
+              "p"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "hyper"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "n",
+              "total",
+              "success"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "poisson"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "lambda"
+            ]
+          }
+        }
+      ]
     }
   },
   "properties": {
@@ -2102,6 +2192,126 @@
           "gist": {
             "type": "string",
             "description": "つまり：その関係が言っていることを日常の言葉で1〜2文。説明・図・ラボより先に出す（stats2-course #95）"
+          },
+          "stages": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "関係を開いたときの段（stats2-course #188 04）。対比は same（同じ所）・differ（違う所）・so（だから何が違うか）、変換は origin（元の形）・operation（変える操作）・result（行き着く形）。段の名前は画面が付ける",
+            "properties": {
+              "same": {
+                "$ref": "#/$defs/text"
+              },
+              "differ": {
+                "$ref": "#/$defs/text"
+              },
+              "so": {
+                "$ref": "#/$defs/text"
+              },
+              "origin": {
+                "$ref": "#/$defs/text"
+              },
+              "operation": {
+                "$ref": "#/$defs/text"
+              },
+              "result": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          },
+          "chart": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "description": "関係を開いたときの図：その場で描く（数は engine から。画像にしない。stats2-course #188 04）。pair＝2つの分布を並べた棒、normal＝二項分布の棒に平均・分散の同じ正規分布の曲線を重ねる",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "pair",
+                  "normal"
+                ]
+              },
+              "a": {
+                "$ref": "#/$defs/chartDist"
+              },
+              "b": {
+                "$ref": "#/$defs/chartDist"
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "note": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "pair"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "a",
+                    "b"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "n"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "p"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "normal"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "n",
+                    "p"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "a"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "b"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
           }
         },
         "allOf": [
@@ -2193,6 +2403,119 @@
                 ]
               }
             }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "対比"
+                }
+              },
+              "required": [
+                "stages"
+              ]
+            },
+            "then": {
+              "properties": {
+                "stages": {
+                  "required": [
+                    "same",
+                    "differ",
+                    "so"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "origin"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "required": [
+                          "operation"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "required": [
+                          "result"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "変換"
+                }
+              },
+              "required": [
+                "stages"
+              ]
+            },
+            "then": {
+              "properties": {
+                "stages": {
+                  "required": [
+                    "origin",
+                    "operation",
+                    "result"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "same"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "required": [
+                          "differ"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "required": [
+                          "so"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "not": {
+                    "enum": [
+                      "対比",
+                      "変換"
+                    ]
+                  }
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "stages"
+                ]
+              }
+            }
           }
         ]
       }
@@ -2267,5 +2590,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 25
+  "x-revision": 26
 }

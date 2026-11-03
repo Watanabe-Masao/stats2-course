@@ -31,3 +31,4 @@
 | 23 | 2026-11-03 | 応用の課題に任意の `walk`（解き方を自分で組み立てる：課題の文の区切り segs〔key：q＝求めるもの・数〕・数の意味の選び肢 tags〔記号 sym・solve のどの値か of・正解の番号 ans・間違えたときの言葉 ng〕・意味の確かめ meaning・2段目から最後の1つ前の段 steps〔quiz か slots〕・確かめる段の言葉 check）。段の題名とまとめ・数の値・合わせる先は書かない（engine が作る）（stats2-course #181）。任意 |
 | 24 | 2026-11-03 | 応用の課題の `walk` を、思考の段と操作の部品の形に置き換える（segments〔role〕・info〔word・sym・of〕・formulas〔engine の公式 ref と bind。前の公式の id で導いた値を運ぶ〕・steps〔kind：ask・unit・event・info・relate・formula・build・probe、mark・collect・choose・rowQuiz〕）。rev23 の形は教材の3問だけが使っていて、同じ PR で置き換える（stats2-course #181）。任意 |
 | 25 | 2026-11-04 | 概念に任意の `gist`（つまり：日常の言葉で1〜2文）・`question`（この概念で考える問い）・`chart`（概要の図：分布の棒をその場で描く設定 kind・n・p・note。数は engine から）（stats2-course #188 R1c：概念のページを実験室と同じ質に）。任意 |
+| 26 | 2026-11-04 | 関係に任意の `stages`（開いたときの段：対比は same・differ・so、変換は origin・operation・result。ほかの種類には書かない）と `chart`（開いたときの図：pair＝2つの分布〔`$defs.chartDist`：binom・hyper・poisson〕を並べた棒、normal＝二項分布に同じ平均・分散の正規分布の曲線を重ねる。数は engine から）（stats2-course #188 04）。任意 |
