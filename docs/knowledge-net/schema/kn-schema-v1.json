@@ -69,6 +69,114 @@
               "check"
             ],
             "description": "tour：ラボで解説（解説付き再生。答えを見せる）／check：ラボで確かめる（予想・法則・自由に動かす）。教材の build が版から判定する（stats2-course #90）"
+          },
+          "play": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode"
+            ],
+            "description": "ネットワークの画面がこの版を JS の部品で描くための形（stats2-course #188 04b・#192）。教材の build がラボの版（tool.yaml）から作る。予想の答えは入れない",
+            "properties": {
+              "mode": {
+                "type": "string"
+              },
+              "modes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "string"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "task": {
+                "$ref": "#/$defs/text"
+              },
+              "kmax": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "decimals": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 6
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "title",
+                    "text",
+                    "states"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "type": [
+                                "number",
+                                "string"
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "number",
+                                  "string"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "focus": {
+                      "type": "string"
+                    },
+                    "gist": {
+                      "type": "boolean"
+                    },
+                    "ms": {
+                      "type": "integer",
+                      "minimum": 100
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2590,5 +2698,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 26
+  "x-revision": 27
 }
