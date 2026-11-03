@@ -60,6 +60,19 @@ relations:
     mode: limit
     description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。
     gist: めったに起きない事をたくさんの機会で数えると、回数の上限が効かなくなる。平均 λ だけで確率が出せる。   # つまり（#95）
+    stages:   # 開いたときの段（#188 04）
+      origin: 二項分布 B(n, p)。回数 n と確率 p の2つで形が決まる。
+      operation: 平均 np＝λ を保ったまま、n を大きく・p を小さくしていく。
+      result: ポアソン分布 Po(λ)。λ 1つで形が決まる。
+    chart:
+      kind: pair
+      a: {model: binom, n: 50, p: 0.06, label: 二項分布 n＝50・p＝0.06}
+      b: {model: poisson, lambda: 3, label: ポアソン分布 λ＝3}
+      note: どちらも平均は3回。n＝50 でも棒の高さはほとんど同じで、n を大きくするほど差が縮む。
+    checks:   # 平均 np＝50×0.06＝3＝λ。差（全変動の距離）は n＝50 で 0.02 未満、n を大きくすると縮む
+      - abs(50*0.06-3) < 1e-12
+      - sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))/2 < 0.02
+      - sum(abs(comb(200,k)*0.015**k*0.985**(200-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(41)) < sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))
     conditions: [n が大きい, p が小さい, np＝λ を一定に保つ]
     basis: {units: [U15]}
   - id: REL-binom-normal
@@ -74,6 +87,17 @@ relations:
     mode: approximation
     description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
     gist: 回数が多いと、成功の数はなめらかな山の形になる。平均と標準偏差だけで、範囲の確率が出せる。   # つまり（#95）
+    stages:
+      origin: 二項分布 B(n, p)。0〜n の飛び飛びの棒。
+      operation: 平均 np・分散 np(1−p) が同じ正規分布の曲線を重ねる。
+      result: 正規分布 N(np, np(1−p))。なめらかな山。
+    chart:
+      kind: normal
+      n: 30
+      p: 0.3
+      note: 平均 9 回・標準偏差 約 2.5 回。np＝9 と n(1−p)＝21 がどちらも5以上なので、棒の頭が曲線に沿う。
+    checks:
+      - abs(30*0.3-9) < 1e-12 and abs(30*0.7-21) < 1e-12 and round(math.sqrt(30*0.3*0.7),1) == 2.5
     conditions: [np と n(1−p) がどちらも十分大きい（目安は5以上）, 整数の棒を曲線で近似するので、境目を0.5ずらす（連続修正）]
     basis: {units: [U14, U16]}
   - id: REL-binom-sampleprop
@@ -93,6 +117,17 @@ relations:
     type: 対比
     description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
     gist: 回数に上限がある数え方（二項）は、上限のない数え方（ポアソン）より散らばりが小さい。平均が同じでも外れ方が違う。   # つまり（#95）
+    stages:
+      same: どちらも起きた回数を数える分布。平均は同じにできる（np＝λ）。
+      differ: 二項分布は回数に上限 n がある。ポアソン分布には上限がない。
+      so: 二項分布の分散 np(1−p) は平均より小さく、ポアソン分布の分散は平均と同じ λ。だから二項分布の方が散らばりが小さい。
+    chart:
+      kind: pair
+      a: {model: binom, n: 6, p: 0.5, label: 二項分布 n＝6・p＝0.5（上限6回）}
+      b: {model: poisson, lambda: 3, label: ポアソン分布 λ＝3}
+      note: どちらも平均は3回。二項分布は6回で切れ、ポアソン分布は7回より先にも続く。
+    checks:   # 平均 6×0.5＝3＝λ。分散 1.5 は平均 3 より小さい。ポアソンの7回以上の確率は0より大きい
+      - abs(6*0.5-3) < 1e-12 and 6*0.5*0.5 < 3 and 1-sum(math.exp(-3)*3**k/math.factorial(k) for k in range(7)) > 0.03
     labs:
       - {id: LAB-pois, preset: rel-contrast-tour, purpose: 平均は同じ3のまま、回数の上限と分散の違いを段ごとに見る}
       - {id: LAB-pois, preset: rel-contrast, purpose: n・p を自分で動かし、二項とポアソンの棒の切れ方と広がりを比べる}
@@ -222,6 +257,19 @@ relations:
     type: 対比
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が二項分布の (N−n)/(N−1) 倍になる（小さくなる）。
     gist: 戻さずに取り出すと、取るたびに残りの割合が変わり、結果のぶれが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
+    stages:
+      same: 当たりの数を数える。取る数 n と当たりの割合が同じなら、平均はどちらも np。
+      differ: 戻して取る（毎回同じ確率）か、戻さずに取る（取るたびに残りの割合が変わる）か。
+      so: 戻さない方が散らばりが小さい。分散は二項分布の (N−n)/(N−1) 倍になる。
+    chart:
+      kind: pair
+      a: {model: binom, n: 10, p: 0.3, label: 戻す（二項分布 n＝10・p＝0.3）}
+      b: {model: hyper, n: 10, total: 20, success: 6, label: 戻さない（20個のうち当たり6個から10個）}
+      note: どちらも平均は3個。戻さない方が3個の近くに集まり、山が細い。
+    checks:   # 平均 10×0.3＝10×6/20＝3。分散は 2.1 と 2.1×(20−10)/(20−1)。3個の確率は戻さない方が高い
+      - abs(10*0.3-3) < 1e-12 and abs(10*6/20-3) < 1e-12
+      - comb(6,3)*comb(14,7)/comb(20,10) > comb(10,3)*0.3**3*0.7**7
+      - abs(sum((k-3)**2*comb(6,k)*comb(14,10-k)/comb(20,10) for k in range(7)) - 2.1*10/19) < 1e-9
     labs:
       - {id: LAB-pois, preset: rel-hyper-contrast-tour, purpose: 平均は同じまま、取る数を増やすと戻さない方の散らばりが小さくなるのを段ごとに見る}
       - {id: LAB-pois, preset: rel-hyper, purpose: 集団を大きくすると、戻さない確率が戻す確率に近づく}

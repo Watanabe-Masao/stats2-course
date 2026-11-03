@@ -557,6 +557,9 @@ def validate_network(c: Course) -> list[str]:
     rel_ids: set[str] = set()
     for r in rels:
         rid = r.get("id", "?")
+        # 開いたときの段・図の一言に数があれば検算を書く（概念の説明と同じ決まり。#188 04）
+        if re.search(r"[0-9０-９]", str(r.get("stages", "")) + str((r.get("chart") or {}).get("note", ""))) and not r.get("checks"):
+            err.append(f"{rid}: 段・図の一言に数があるのに checks がない")
         if not str(rid).startswith("REL-"):
             err.append(f"{rid}: 関係の id は REL- で始める")
         if rid in rel_ids:
@@ -667,7 +670,9 @@ def validate_network(c: Course) -> list[str]:
 
 
 def network_checks(c: Course) -> list[tuple[str, str]]:
-    return [(tid, e) for tid, t in c.terms.items() for e in t.get("checks", [])]
+    rels, _ = load_network()
+    return [(tid, e) for tid, t in c.terms.items() for e in t.get("checks", [])] + \
+        [(r["id"], e) for r in rels for e in r.get("checks", [])]   # 関係を開いたときの段・図の一言の数（#188 04）
 
 
 def export_network(c: Course, target: dict) -> dict:
@@ -761,7 +766,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise", "gist"):
+        for k in ("conditions", "mode", "premise", "gist", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
