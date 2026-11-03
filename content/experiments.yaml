@@ -216,8 +216,8 @@ experiments:
             open: 'conv'
             apply:
               kind: 設計
-              task: 成功確率 30% で 10 回の実験を何セットも行い、「4 回以上」になるセットの割合を理論と比べたい。ずれの目安（±2SE）を ±1% 以内にするには、何セット要る？
-              solve: {method: sets-for-error, n: 10, p: 0.3, event: {op: ge, k: 4}, err: 0.01}
+              task: 成功確率 30% で 10 回の実験を何セットも行い、「4 回以上」になるセットの割合を理論と比べたい。ずれの目安（±2SE）を ±1% 以内にするには、何セット要る？（100 セット単位で数える）
+              solve: {method: sets-for-error, n: 10, p: 0.3, event: {op: ge, k: 4}, err: 0.01, unit: 100}
               answer: {type: number, unit: セット, tol: {abs: 0}}
               why: 理論とのずれの目安はセット数の平方根に反比例する。ほしい精度から、要るセット数を決められる。
           - id: binom-C-03
@@ -284,8 +284,8 @@ experiments:
             open: 'break:streak'
             apply:
               kind: 評価
-              task: 10 回・成功確率 50%。前の結果に引きずられるとき、分散が二項分布の 1.1 倍以内なら二項分布で近似してよいとする。引きずる強さはどこまで許される？（0.01 刻み）
-              solve: {method: max-strength, mechanism: {kind: streak, n: 10, p: 0.5, carry: 0}, param: carry, min: 0, max: 0.6, step: 0.01, ratio: 1.1}
+              task: 10 回・成功確率 50%。前の結果に引きずられるとき、分散が二項分布の 1.1 倍以内なら二項分布で近似してよいとする。引きずる強さはどこまで許される？（0.05 刻み）
+              solve: {method: max-strength, mechanism: {kind: streak, n: 10, p: 0.5, carry: 0}, param: carry, min: 0.05, max: 0.6, step: 0.05, ratio: 1.1}
               answer: {type: number, tol: {abs: 0}}
               why: 小さな引きずりでも、隣どうしの相関が積み重なって分散が増える。近似してよいかは、許すずれを先に決めてから判断する。
           - id: binom-E-03
@@ -298,8 +298,8 @@ experiments:
             open: 'break:urn'
             apply:
               kind: 変換
-              task: 箱から戻さずに 10 個取る。分散の減り方を二項分布（戻して取る）の2割以内（0.8 倍以上）にしたい。箱の数は最低いくつ要る？
-              solve: {method: min-total, n: 10, ratio: 0.8}
+              task: 箱から戻さずに 10 個取る。分散の減り方を二項分布（戻して取る）の2割以内（0.8 倍以上）にしたい。箱の数は最低いくつ要る？（箱は 2 個単位で数える）
+              solve: {method: min-total, n: 10, ratio: 0.8, step: 2}
               answer: {type: number, unit: 個, tol: {abs: 0}}
               why: 取る数が箱に比べて小さいほど、戻さずに取っても二項分布に近い。どこまで近ければよいかを決めれば、要る箱の大きさが決まる。
           - id: binom-E-04
