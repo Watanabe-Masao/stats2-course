@@ -722,7 +722,7 @@ def export_network(c: Course, target: dict) -> dict:
             if t.get(k):
                 e[k] = t[k]
         if filled(t):
-            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace"):
+            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace", "gist", "question", "chart"):
                 if t.get(k):
                     e[k] = t[k]
             if t.get("table_workspace"):
