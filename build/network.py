@@ -434,6 +434,33 @@ def relations_without_figures() -> list[str]:
     return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES and not r.get("figures")]
 
 
+def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
+    """ラボの版を、ネットワークの画面が JS の部品で描く形にする（#188 04b・#192）。
+    段の状態は tour.states（静止図と同じ重ね方）で作り、関係から開く解説には最後に「つまり」の段を足す。
+    予想の答え（expect・why）と予想の形（predict）は出さない（公開の JSON に答えを出さない）。"""
+    from tour import states, with_gist
+    if not pre.get("mode"):
+        return None
+    pre = with_gist(lid, name or "", pre)
+    out: dict = {"mode": pre["mode"]}
+    for k in ("modes", "set", "task"):
+        if pre.get(k):
+            out[k] = pre[k]
+    if pre.get("tour"):
+        t = pre["tour"]
+        for k in ("kmax", "decimals"):
+            if t.get(k) is not None:
+                out[k] = t[k]
+        out["steps"] = []
+        for st, sx in zip(t["steps"], states(t)):
+            step = {"title": st["title"], "text": st["text"], "states": [] if st.get("gist") else [sx["start"], *sx["frames"]]}
+            for k in ("focus", "gist", "ms"):
+                if st.get(k):
+                    step[k] = st[k]
+            out["steps"].append(step)
+    return out
+
+
 def validate_network(c: Course) -> list[str]:
     rels, ders = load_network()
     err: list[str] = []
@@ -697,6 +724,8 @@ def export_network(c: Course, target: dict) -> dict:
             for k in ("preset", "purpose"):
                 if lab.get(k):
                     e[k] = lab[k]
+            if play_of(lab["id"], lab.get("preset"), pre):
+                e["play"] = play_of(lab["id"], lab.get("preset"), pre)
             out.append(e)
         return out
 
