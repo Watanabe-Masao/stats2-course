@@ -221,6 +221,27 @@ class TestLabs(unittest.TestCase):
         page = NotionRenderer(course(), TARGET).unit_page("U14")
         self.assertIn("<b>▶ ラボで解説</b>\n\n<embed source=", page)   # 解説の版には見出しが付く
 
+    def test_play_for_network(self):
+        # 対象：ネットワークの画面が JS の部品で描くための play（#188 04b・#192）。
+        # 想定する故障：予想の答え（expect・why）や予想の形（predict）が公開の JSON に出る・段の状態が静止図と違う重ね方になる・つまりの段が抜ける。
+        # 見つけ方：公開先のある設定で書き出し、全部の play に答えの項目がないこと、解説の段の状態が tour.states の start と frames と同じこと、
+        # 関係から開く解説の最後が gist の「つまり」であること。既存の test_tour_gist_step（ラボの版）とは別に、ネットワークへの書き出しを見る。
+        import network
+        from tour import states
+        d = network.export_network(COURSE, {**TARGET, "site_base_url": "https://example.com/labs"})
+        refs = [(x["id"], lab) for kind in ("concepts", "relations") for x in d[kind] for lab in x.get("labs", [])]
+        self.assertGreater(len(refs), 30)
+        for xid, lab in refs:
+            play = lab["play"]
+            self.assertFalse({"expect", "why", "predict", "unlock"} & set(play), f"{xid} {lab['preset']}")
+            pre = COURSE.labs[lab["id"]]["presets"][lab["preset"]]
+            if pre.get("tour"):
+                sx = states(pre["tour"])
+                self.assertEqual([st["states"] for st in play["steps"][:len(sx)]], [[s0["start"], *s0["frames"]] for s0 in sx])
+        rel = next(lab for xid, lab in refs if xid.endswith("REL-binom-hyper-contrast") and lab.get("kind") == "tour")
+        self.assertTrue(rel["play"]["steps"][-1].get("gist"))
+        self.assertIn("戻さずに取り出すと", rel["play"]["steps"][-1]["text"])
+
     def test_tour_gist_step(self):
         from labs import variants
         v = variants(COURSE)

@@ -103,6 +103,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 - 概念（terms.yaml）と関係（relations.yaml）に書ける。書けるのは id・preset・purpose だけ。URL は build が `site_base_url` から作る（配布先で空なら出さない）。
 - build が止めるもの：ないラボ、そのラボにない場面の版（tool.yaml の presets）、id・preset・purpose 以外の項目。
+- 公開サイトのネットワークでは、版を旧版のラボの iframe で開かず、JS の部品（math-lab の場面：Scene・Tour・Explore）で描く（#188 04b・#192）。build が版の mode・modes・set・task と、解説の段の状態（tour.states と同じ重ね方）を `play` として書き出す。予想の答え（expect・why・predict）は出さない。部品にないモードの版をネットワークから指すと、knowledge-net のテスト（tests/unit/scene.test.ts）が止まるので、先に math-lab の場面にモードを足す。本文（Notion）の `{{lab:…}}` は今までどおり旧版のラボ。
 
 ### 概念・関係に図を出す（`figures:`）
 
