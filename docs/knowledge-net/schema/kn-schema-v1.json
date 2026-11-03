@@ -1949,6 +1949,43 @@
                 }
               }
             }
+          },
+          "gist": {
+            "$ref": "#/$defs/text",
+            "description": "つまり：日常の言葉で1〜2文（関係の gist と同じ役割）。概念のページの概要の最初の画面に出す（stats2-course #188）"
+          },
+          "question": {
+            "$ref": "#/$defs/text",
+            "description": "この概念で考える問い（1文）。概要の最初に出し、下にこの概念を主にする実験室の問いを並べる（stats2-course #188）"
+          },
+          "chart": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "description": "概要の図：分布の棒をその場で描く設定（数は engine の modelPmf から。画像にしない。stats2-course #188 01b）",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "binom"
+                ]
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 60
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "note": {
+                "$ref": "#/$defs/text",
+                "description": "図の下の一言"
+              }
+            }
           }
         },
         "allOf": [
@@ -2230,5 +2267,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 24
+  "x-revision": 25
 }

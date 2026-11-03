@@ -860,6 +860,10 @@
   en: binomial distribution
   category: 確率分布
   short: 同じ条件で成功・失敗をくり返したとき、成功回数がどのような確率で現れるかを表す分布   # 一言（地図・実験室の入口に出す。渡辺さん 2026-11-02）
+  # 概念のページの概要の最初の画面（R1c・#188 02）：問い → つまり → 図 → 定義
+  question: 同じ条件で n 回くり返すと、成功は何回くらいになる？
+  gist: 当たる確率が毎回同じ挑戦を n 回して、当たった回数を数える。何回当たるかの起こりやすさを並べたのが二項分布。
+  chart: {kind: binom, n: 10, p: 0.3, note: いちばん起こりやすいのは 3 回。平均 np＝3 回の近くに山ができる。}   # 数は engine が描く（画像にしない。#188 01b）
   definition: 成功確率 p の独立な試行を n 回くり返したときの、成功した回数の分布 B(n, p)。
   version: 1
   workspace: {formula: 0, vary: [n, p], over: k, mean: 1, linear: 3}   # 式の作業台（#110）。linear：変換の欄の式（#156）
@@ -977,8 +981,11 @@
   sources:
   - source: 公式2級範囲表
     locator: 確率モデルの導入（確率変数・確率分布）
+  - source: NIST統計ハンドブック   # 公式テキストの代わりに照らした（定義・式・平均・分散・最頻値。食い違いなし。#188 01c）
+    locator: 1.3.6.6.18 Binomial Distribution
   checks:
   - abs(10*0.3-3)<1e-12 and abs(10*0.3*0.7-2.1)<1e-12
+  - 3 <= (10+1)*0.3 < 4 and abs(10*0.3-3)<1e-12   # 図の一言：いちばん起こりやすいのは 3 回・平均 np＝3（chart の n・p）
 - id: TERM-poisson
   name: ポアソン分布
   en: Poisson distribution
