@@ -861,7 +861,7 @@ class TestNetwork(unittest.TestCase):
         import network
         x = network.load_experiments()[0]
         aps = {it["id"]: it["apply"] for g in x["catalog"] for it in g["items"] if (it.get("apply") or {}).get("walk")}
-        self.assertEqual(sorted(aps), ["binom-A-01", "binom-B-02", "binom-B-04", "binom-D-02"])
+        self.assertEqual(sorted(aps), [f"binom-{x}" for x in ("A-01", "A-02", "A-03", "B-01", "B-02", "B-04", "C-01", "C-02", "D-01", "D-02", "E-01", "E-02", "E-03", "E-04")])
         for iid, ap in aps.items():
             self.assertEqual(network.walk_errors(iid, ap), [], iid)
         bad = copy.deepcopy(aps["binom-D-02"]); bad["solve"]["b"]["p"] = 0.4   # 文は 30% のまま
@@ -874,6 +874,9 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("段の順" in e for e in network.walk_errors("B4", bad)))
         bad = copy.deepcopy(aps["binom-B-04"]); bad["walk"]["formulas"][1]["bind"]["p"] = "two"
         self.assertTrue(any("記号 p に当てはめる" in e for e in network.walk_errors("B4", bad)))
+        # of を solve の式で書いた情報（E-01 の最初 80%＝p＋drop）。故障：式を読まず、文の数と solve がずれても通る
+        bad = copy.deepcopy(aps["binom-E-01"]); bad["solve"]["mechanism"]["drop"] = 0.2   # 文は 80%・20% のまま
+        self.assertTrue(any("情報 f" in e for e in network.walk_errors("E1", bad)) and any("情報 l" in e for e in network.walk_errors("E1", bad)))
     def test_skeleton(self):
         # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
         import network
