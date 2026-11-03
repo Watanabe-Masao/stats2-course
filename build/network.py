@@ -115,6 +115,54 @@ APPLY_OPTIONAL = {"sets-for-error": ["unit"], "min-total": ["step"]}   # 実験�
 APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2, "within-band": 2, "compare-var": 3}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
 
 
+def walk_errors(iid: str, ap: dict) -> list[str]:
+    """解き方を組み立てる（walk。#181）を確かめる。数の値は原本に書かず、文の中の数と solve の値が同じかを見る
+    （想定する故障：課題の文の数を直して solve を直し忘れる・その逆。文をつなぐと課題と違う。正解の番号が選び肢の外）。
+    段の数が engine の解き方と合うかは、公開の JSON を engine で解く knowledge-net のテストが見る"""
+    err: list[str] = []
+    w, sv = ap.get("walk") or {}, ap.get("solve") or {}
+    segs, vars_ = w.get("segs") or [], (w.get("tags") or {}).get("vars") or {}
+    nopt = len((w.get("tags") or {}).get("opts") or [])
+    if "".join(g.get("text", "") for g in segs) != ap.get("task"):
+        err.append(f"{iid} の walk：segs をつなぐと task と違う")
+    if sum(1 for g in segs if g.get("key") == "q") != 1:
+        err.append(f"{iid} の walk：求めるもの（key: q）がちょうど1つでない")
+    for g in segs:
+        if g.get("key") and g["key"] != "q" and g["key"] not in vars_:
+            err.append(f"{iid} の walk：文の key {g['key']} が tags.vars にない")
+    for k, v in vars_.items():
+        hit = [g for g in segs if g.get("key") == k]
+        if len(hit) != 1:
+            err.append(f"{iid} の walk：数 {k} が文の中にちょうど1つでない"); continue
+        val: object = sv
+        for part in str(v.get("of", "")).split("."):
+            val = val.get(part) if isinstance(val, dict) else None
+        m = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(%)?", hit[0]["text"])
+        num = (float(m.group(1)) / (100 if m.group(2) else 1)) if m else None
+        if not isinstance(val, (int, float)) or num is None or abs(num - val) > 1e-9:
+            err.append(f"{iid} の walk：数 {k}（文「{hit[0]['text']}」）と solve の {v.get('of')}（{val}）が違う")
+        if not 0 <= int(v.get("ans", -1)) < nopt:
+            err.append(f"{iid} の walk：数 {k} の正解の番号が選び肢の外")
+    def quiz(q: dict | None, where: str) -> None:
+        if not q:
+            return
+        if not 0 <= int(q.get("ok", -1)) < len(q.get("opts") or []):
+            err.append(f"{iid} の walk：{where}の正解の番号が選び肢の外")
+        if len(q.get("fb") or []) != len(q.get("opts") or []):
+            err.append(f"{iid} の walk：{where}の fb の数が選び肢と違う")
+    quiz(w.get("meaning"), "意味の確かめ")
+    for i, st in enumerate(w.get("steps") or [], start=2):
+        if bool(st.get("quiz")) == bool(st.get("slots")):
+            err.append(f"{iid} の walk：段 {i} は quiz か slots のどちらか1つ")
+        quiz(st.get("quiz"), f"段 {i} ")
+        quiz((st.get("slots") or {}).get("then"), f"段 {i} の then ")
+        for ln in (st.get("slots") or {}).get("lines") or []:
+            for t in ln:
+                if isinstance(t, dict) and t.get("slot") not in vars_:
+                    err.append(f"{iid} の walk：段 {i} の枠 {t.get('slot')} が tags.vars にない")
+    return err
+
+
 def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:
     """値の表の作業台の表を、実験室のテーマから作る（#119：同じ表を2か所に書かない）。
     原本は {experiment: EXP-…, theme: テーマ id, use: start か compare} だけを書き、値・重み・呼び名・単位はテーマから写す。
@@ -211,6 +259,8 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                         err.append(f"{eid}: {iid} の apply（{sv.get('method')}）の答えは選ぶ形で、選び肢は {nopt} つ")
                     if not nopt and need is not None and (an.get("type") != "number" or not an.get("tol")):
                         err.append(f"{eid}: {iid} の apply（{sv.get('method')}）の答えは数（type: number）で、合っているとする幅 tol を書く")
+                    if ap.get("walk"):
+                        err += [f"{eid}: {e}" for e in walk_errors(iid, ap)]
                 if op:
                     # 実験の仕組みは共有してよいが、同じ画面を開くだけで別の問いを実現した扱いにしない（渡辺さん 2026-11-02）
                     if op in opened:
