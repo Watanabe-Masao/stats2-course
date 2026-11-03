@@ -29,3 +29,4 @@
 | 21 | 2026-11-03 | テーマ体系の問いに任意の `apply`（応用の課題：考え方 kind・課題の文 task・答えの求め方 solve〔engine の solveApply の method と条件〕・答えの形 answer〔number は tol、choice は options〕・why）。答えは書かない（画面が求める）（stats2-course #171・#169 の3）。任意 |
 | 22 | 2026-11-03 | 二項分布の問いの形に paths（並び・ks）・repeat（くり返し・events・sets）・mean（平均）・var（ばらつき・ps）。応用の求め方に mode・within-band・linear-sum・compare-var（stats2-course #171：作成中の A-03・C-01・D-01・D-02）。任意 |
 | 23 | 2026-11-03 | 応用の課題に任意の `walk`（解き方を自分で組み立てる：課題の文の区切り segs〔key：q＝求めるもの・数〕・数の意味の選び肢 tags〔記号 sym・solve のどの値か of・正解の番号 ans・間違えたときの言葉 ng〕・意味の確かめ meaning・2段目から最後の1つ前の段 steps〔quiz か slots〕・確かめる段の言葉 check）。段の題名とまとめ・数の値・合わせる先は書かない（engine が作る）（stats2-course #181）。任意 |
+| 24 | 2026-11-03 | 応用の課題の `walk` を、思考の段と操作の部品の形に置き換える（segments〔role〕・info〔word・sym・of〕・formulas〔engine の公式 ref と bind。前の公式の id で導いた値を運ぶ〕・steps〔kind：ask・unit・event・info・relate・formula・build・probe、mark・collect・choose・rowQuiz〕）。rev23 の形は教材の3問だけが使っていて、同じ PR で置き換える（stats2-course #181）。任意 |

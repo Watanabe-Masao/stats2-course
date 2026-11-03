@@ -145,37 +145,44 @@ experiments:
               solve: {method: mean-to-p, n: 20, mean: 6}
               answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: ほしい平均（中心）が決まっていれば、平均＝回数×確率から、確率を逆に決められる。
-              walk:   # 解き方を自分で組み立てる（#181）。段の題名・まとめの式・数の値・確かめる段の合わせる先は engine が作る
-                segs:
-                  - {text: '20 回', key: n}
-                  - {text: 'の挑戦で、成功の回数の平均を '}
-                  - {text: '6 回', key: e}
-                  - {text: 'にしたい。'}
-                  - {text: '1回の成功確率 p を何 % にすればよい？', key: q}
-                tags:
-                  opts: [回数 n, 平均 E(X), 確率 p]
-                  vars:
-                    n: {sym: n, of: n, ans: 0, ng: 20 回は挑戦する回数。平均でも確率でもない。}
-                    e: {sym: E(X), of: mean, ans: 1, ng: 6 回は成功の回数の平均。挑戦の回数ではない。}
-                meaning:
-                  ask: 「平均 6 回」の意味として正しいのは？
-                  opts: [20 回挑戦すれば、必ず 6 回成功する, 何度もくり返すと、成功の回数の平均が 6 回に近づく, 6 回より多く成功することはない]
-                  ok: 1
-                  fb: [期待値は「平均」。1セットだけ見ると、6 回より多いことも少ないこともある。, '', 平均が 6 回でも、7 回や 8 回成功するセットもある。]
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                  - {text: '20 回', role: info, key: n}
+                  - {text: 'の挑戦で、成功の回数の平均を ', role: text}
+                  - {text: '6 回', role: info, key: e}
+                  - {text: 'にしたい。', role: text}
+                  - {text: '1回の成功確率 p を何 % にすればよい？', role: ask, key: q}
+                info:
+                  n: {word: 挑戦する回数, sym: n, of: n}
+                  e: {word: 成功の回数の平均, sym: E, of: mean}
+                formulas:
+                  - {id: p, ref: binom.mean-p, bind: {E: e, n: n}, word: 1回の成功確率}
                 steps:
-                  - quiz:
-                      todo: わかっている「回数」「平均」と、求める p をつなぐ式を選ぶ
-                      math: true
-                      opts: ['E(X) = np', 'V(X) = np(1 − p)', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
-                      ok: 0
-                      fb: ['', それは分散（ばらつき）の式。この課題でわかっているのは平均。, それは「ちょうど k 回」になる確率の式。この課題は平均の話。]
-                  - slots:
-                      lines: [[{slot: e, ph: E(X)}, '=', {slot: n, ph: n}, '× p']]
-                  - quiz:
-                      todo: 20 × p = 6 から、p だけを残す操作を選ぶ
-                      opts: [両辺に 20 を掛ける, 両辺を 20 で割る, 両辺から 20 を引く]
-                      ok: 1
-                      fb: [掛けると 400p になり、p から離れる。, '', p には 20 が掛け算で付いている。引き算では外れない。]
+                  - {kind: ask, short: p を求める, sum: 1回の成功確率 p を求める。}
+                  - kind: info
+                    short: 20 回・平均 6 回
+                    sum: 挑戦する回数 20 回と、成功の回数の平均 6 回。
+                    collect: {need: [n, e]}
+                    choose:
+                      - ask: 「平均 6 回」の意味として正しいのは？
+                        opts: [20 回挑戦すれば、必ず 6 回成功する, 何度もくり返すと、成功の回数の平均が 6 回に近づく, 6 回より多く成功することはない]
+                        ok: 1
+                        fb: [期待値は「平均」。1セットだけ見ると、6 回より多いことも少ないこともある。, '', 平均が 6 回でも、7 回や 8 回成功するセットもある。]
+                  - kind: formula
+                    choose:
+                      - todo: わかっている「回数」「平均」と、求める p をつなぐ式を選ぶ
+                        math: true
+                        opts: ['E(X) = np', 'V(X) = np(1 − p)', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                        ok: 0
+                        fb: ['', それは分散（ばらつき）の式。この課題でわかっているのは平均。, それは「ちょうど k 回」になる確率の式。この課題は平均の話。]
+                  - kind: build
+                    rowQuiz:
+                      p.div:
+                        ask: 20 × p = 6 から、p だけを残すには？
+                        opts: [両辺に 20 を掛ける, 両辺を 20 で割る, 両辺から 20 を引く]
+                        ok: 1
+                        fb: [掛けると 400p になり、p から離れる。, '', p には 20 が掛け算で付いている。引き算では外れない。]
+                  - {kind: probe}
           - id: binom-A-02
             title: 試行回数を増やすと分布はどう変わる？
             finds: 成功回数と成功割合の散らばり
@@ -244,46 +251,56 @@ experiments:
               solve: {method: boundary, n: 10, p: 0.3, k: 3}
               answer: {type: number, unit: '%', percent: true, tol: {abs: 0}}
               why: 「以上」と「より多い」の差は境目の棒1本。境目が山の高い所なら、取り違えると大きくずれる。
-              walk:
-                segs:
-                  - {text: '成功確率 '}
-                  - {text: '30%', key: p}
-                  - {text: ' で '}
-                  - {text: '10 回', key: n}
-                  - {text: '。報告に「3 回より多くなる確率」と書くはずが「'}
-                  - {text: '3 回', key: k}
-                  - {text: '以上」の値を使っていた。'}
-                  - {text: '確率は何 % 多く見積もられた？', key: q}
-                tags:
-                  opts: [回数 n, 確率 p, 境目 k]
-                  vars:
-                    p: {sym: p, of: p, ans: 1, ng: 30% は1回の成功確率 p。}
-                    n: {sym: n, of: n, ans: 0, ng: 10 回は挑戦の回数 n。}
-                    k: {sym: k, of: k, ans: 2, ng: 3 回は「以上・より多い」の境目 k。}
-                meaning:
-                  ask: 「3 回より多い」に入る回数は？
-                  opts: [3・4・…・10 回, 4・5・…・10 回, 0・1・2・3 回]
-                  ok: 1
-                  fb: [3 回は「より多い」に入らない。3 回を含むのは「3 回以上」。, '', それは「3 回以下」。]
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                  - {text: '成功確率 ', role: text}
+                  - {text: '30%', role: info, key: p}
+                  - {text: ' で ', role: text}
+                  - {text: '10 回', role: info, key: n}
+                  - {text: '。報告に「3 回より多くなる確率」と書くはずが「', role: text}
+                  - {text: '3 回', role: info, key: k}
+                  - {text: '以上」の値を使っていた。', role: text}
+                  - {text: '確率は何 % 多く見積もられた？', role: ask, key: q}
+                info:
+                  p: {word: 1回の成功確率, sym: p, of: p}
+                  n: {word: 挑戦する回数, sym: n, of: n}
+                  k: {word: 境目の回数, sym: k, of: k}
+                formulas:
+                  - {id: one, ref: binom.pmf, bind: {n: n, k: k, p: p}, word: ちょうど 3 回の確率}
                 steps:
-                  - quiz:
-                      ask: 「3 回以上」の確率から「3 回より多い」の確率を引くと、残るのは？
-                      opts: [ちょうど 3 回の棒1本, 2 回以下の棒, 何も残らない（同じ確率）]
-                      ok: 0
-                      fb: ['', 2 回以下はどちらにも入らない。, 「以上」は 3 回を含み、「より多い」は含まない。そこが違う。]
-                  - quiz:
-                      todo: ちょうど 3 回の棒の高さを求める式を選ぶ
-                      math: true
-                      opts: ['P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ', 'E(X) = np', 'V(X) = np(1 − p)']
-                      ok: 0
-                      fb: ['', それは平均の式。棒1本の高さは出ない。, それは分散の式。]
-                  - slots:
-                      lines: [[{slot: n}, 'C', {slot: k}, '×', {slot: p}, 'ᵏ × (1 − p)ⁿ⁻ᵏ']]
-                      then:
+                  - {kind: ask, short: 多く見積もった分, sum: 「3 回以上」と「3 回より多い」の確率の差。}
+                  - kind: info
+                    short: 30%・10 回・境目 3 回
+                    sum: 1回の成功確率 30%、挑戦する回数 10 回、境目の回数 3 回。
+                    collect: {need: [p, n, k]}
+                    choose:
+                      - ask: 「3 回より多い」に入る回数は？
+                        opts: [3・4・…・10 回, 4・5・…・10 回, 0・1・2・3 回]
+                        ok: 1
+                        fb: [3 回は「より多い」に入らない。3 回を含むのは「3 回以上」。, '', それは「3 回以下」。]
+                  - kind: relate
+                    short: 差は棒1本
+                    sum: 「3 回以上」は 3 回を含み、「3 回より多い」は含まない。差はちょうど 3 回の棒1本。
+                    choose:
+                      - ask: 「3 回以上」の確率から「3 回より多い」の確率を引くと、残るのは？
+                        opts: [ちょうど 3 回の棒1本, 2 回以下の棒, 何も残らない（同じ確率）]
+                        ok: 0
+                        fb: ['', 2 回以下はどちらにも入らない。, 「以上」は 3 回を含み、「より多い」は含まない。そこが違う。]
+                  - kind: formula
+                    choose:
+                      - todo: ちょうど 3 回の棒の高さを求める式を選ぶ
+                        math: true
+                        opts: ['P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ', 'E(X) = np', 'V(X) = np(1 − p)']
+                        ok: 0
+                        fb: ['', それは平均の式。棒1本の高さは出ない。, それは分散の式。]
+                  - kind: build
+                    rowQuiz:
+                      one.comb:
                         ask: ₁₀C₃ ＝ (10×9×8)÷(3×2×1) はいくつ？
                         opts: ['30', '120', '720']
                         ok: 1
                         fb: [10×3 ではない。10 個から 3 個を選ぶ並びの数。, '', 720 は 10×9×8 まで。並び順の 3×2×1＝6 で割る。]
+                  - {kind: probe}
           - id: binom-B-03
             title: 補集合を使うと計算が簡単になる？
             finds: 補集合と確率の和
@@ -299,10 +316,98 @@ experiments:
             open: 'rare'
             apply:
               kind: 評価
-              task: 成功確率 50% の挑戦を 10 回して、10 回とも成功した人がいた。同じ挑戦を 1000 人がしたら、10 回とも成功する人は平均で何人？
-              solve: {method: expected-observers, n: 10, p: 0.5, event: {op: ge, k: 10}, people: 1000}
+              task: バスケットボール部の部員50 人が、体育館でフリースローの練習をする。練習は1 日 2 時間で、ボールは7 号球を使う。部員はそれぞれ10 本ずつ打ち、どの部員も 1 本ごとの成功確率は70%で、1 本ごとの結果は互いに影響しないし、部員どうしの結果も互いに影響しないとする。10 本すべて成功する部員の人数は、平均で何人になるか？
+              solve: {method: expected-observers, n: 10, p: 0.7, event: {op: ge, k: 10}, people: 50}
               answer: {type: number, unit: 人, tol: {abs: 0.03}}
               why: 1人では珍しいことも、たくさんの人や回数の中では起きるのがふつう。全体で何回起きうるかを見てから「珍しい」と言う。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                  - {text: 'バスケットボール部の部員', role: text}
+                  - {text: '50 人', role: info, key: people}
+                  - {text: 'が、体育館でフリースローの練習をする。練習は', role: text}
+                  - {text: '1 日 2 時間', role: noise, key: hours}
+                  - {text: 'で、ボールは', role: text}
+                  - {text: '7 号球', role: noise, key: ball}
+                  - {text: 'を使う。部員はそれぞれ', role: text}
+                  - {text: '10 本', role: info, key: n}
+                  - {text: 'ずつ打ち、どの部員も 1 本ごとの成功確率は', role: text}
+                  - {text: '70%', role: info, key: p}
+                  - {text: 'で、', role: text}
+                  - {text: '1 本ごとの結果は互いに影響しない', role: condition, key: indep}
+                  - {text: 'し、', role: text}
+                  - {text: '部員どうしの結果も互いに影響しない', role: condition, key: members}
+                  - {text: 'とする。', role: text}
+                  - {text: '10 本すべて成功', role: event, key: k}
+                  - {text: 'する部員の人数は、', role: text}
+                  - {text: '平均で何人になるか？', role: ask, key: q}
+                info:
+                  people: {word: 部員の人数, sym: N, of: people}
+                  n: {word: 1人が打つ本数, sym: n, of: n}
+                  p: {word: 1本の成功確率, sym: p, of: p}
+                  k: {word: 成功してほしい本数, sym: k, of: event.k}
+                  indep: {word: 1本ごとに影響しない}
+                  members: {word: 部員どうしも影響しない}
+                formulas:
+                  - {id: one, ref: binom.pmf, bind: {n: n, k: k, p: p}, word: 1人の確率}
+                  - {id: all, ref: binom.mean, bind: {n: people, p: one}, word: 全体の平均}
+                steps:
+                  - {kind: ask, short: 平均何人か, sum: 10 本すべて成功する部員は、平均何人いるか。}
+                  - kind: unit
+                    short: まず部員1人
+                    sum: 50 人をまとめて考えず、まず部員1人について考える。
+                    choose:
+                      - ask: この問いを考えるとき、まず誰について考える？
+                        opts: [50 人の部員全体, 部員 1 人, 1 本のフリースロー]
+                        ok: 1
+                        fb: [全体の人数はあとで使う。全体のことは、1人に何が起きるかが分かってから考える。, '', 1 本だけでは「10 本すべて」が決まらない。1人が 10 本打つ所まで見る。]
+                  - kind: event
+                    short: 10 本中 10 本成功
+                    sum: 1人が 10 本打って、10 本とも成功する。
+                    mark: k
+                    todo: 課題の文で、その1人に起きてほしいことを押す
+                    choose:
+                      - ask: その1人が 10 本打つとき、何本成功した場合を考える？
+                        opts: [7 本（70% だから）, 10 本, 1 本以上]
+                        ok: 1
+                        fb: [70% は1本ごとの確率。問いは「すべて成功」の場合。, '', 「すべて」なので、1 本以上ではなく 10 本とも。]
+                  - kind: info
+                    short: 10 本・70%・1本ごとに独立
+                    sum: 1人が打つ本数 10 本、1本の成功確率 70%、1本ごとに影響しない（だから確率を掛け合わせられる）。
+                    collect: {need: [n, p, indep], later: [people]}
+                  - kind: relate
+                    short: 50 × 1人の確率
+                    sum: 50 人それぞれに「10 本すべて成功」が同じ確率で起きる。平均の人数は 50 × 1人の確率。平均には部員どうしの独立は要らないが、「少なくとも1人いる確率」を出すには要る。
+                    mark: people
+                    todo: 課題の文で、全体の人数を押す
+                    choose:
+                      - ask: 50 人全体では、平均の人数をどう考える？
+                        opts: [50 人それぞれに「10 本すべて成功」が同じ確率で起きる。だから 50 × 1人の確率, 1 本の成功確率を使って、50 × 0.7, 全部の本数を使って、50 × 10 × 0.7]
+                        ok: 0
+                        fb: ['', 0.7 は「1 本」が入る確率。ほしいのは「10 本すべて」が入る人。, それは全員が打った本数のうち、入る本数の平均。聞かれているのは人数。]
+                  - kind: formula
+                    choose:
+                      - ask: 1人が 10 本中 k 本成功する確率は、どの公式で求める？
+                        math: true
+                        opts: ['E(X) = np', 'V(X) = np(1 − p)', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                        ok: 2
+                        fb: [それは成功する本数の平均。ほしいのは「ちょうど 10 本」になる確率。, それは散らばりの大きさ。ほしいのは確率。, '']
+                      - ask: 「50 × 1人の確率」は、どの公式と同じ形？
+                        math: true
+                        opts: ['E(X) = np（n → 人数、p → 1人の確率）', 'V(X) = np(1 − p)', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                        ok: 0
+                        fb: ['', それは散らばりの大きさ。ほしいのは平均の人数。, それは「ちょうど k 人」になる確率。ほしいのは平均。]
+                  - kind: build
+                    rowQuiz:
+                      one.fail:
+                        ask: 0.3<sup>0</sup> はいくつ？（失敗は 0 本）
+                        opts: ['0', '0.3', '1']
+                        ok: 2
+                        fb: [0 乗は 0 ではない。「1 回も掛けない」ので 1 のまま。, 0.3 は 1 乗（1 回掛けた）とき。, '']
+                    choose:
+                      - ask: 答えの「平均 1.41 人」とは？
+                        opts: [毎回、1 人か 2 人が必ず全部成功する, 何度もくり返すと、全部成功する人数の平均が 1.41 人に近づく。0 人の日もある, 50 人のうち 1.41% が全部成功する]
+                        ok: 1
+                        fb: [平均は毎回の結果ではない。0 人の日も 3 人の日もある。, '', 1.41 は割合ではなく人数。割合なら約 2.8%。]
       - id: C
         title: 理論と実験
         items:
@@ -379,47 +484,59 @@ experiments:
               solve: {method: compare-var, a: {n: 10, p: 0.6}, b: {n: 20, p: 0.3}}
               answer: {type: choice, options: [A, ほぼ同じ, B]}
               why: 分散は np(1−p)。回数が多いほど大きく、p が 50% に近いほど大きい。回数と p の両方で比べる。
-              walk:
-                segs:
-                  - {text: 'A は '}
-                  - {text: '10 回', key: an}
-                  - {text: '・成功確率 '}
-                  - {text: '60%', key: ap}
-                  - {text: '、B は '}
-                  - {text: '20 回', key: bn}
-                  - {text: '・成功確率 '}
-                  - {text: '30%', key: bp}
-                  - {text: '。'}
-                  - {text: '成功回数の分散が大きいのはどちら？', key: q}
-                tags:
-                  opts: [回数 n, 確率 p]
-                  vars:
-                    an: {sym: A の n, of: a.n, ans: 0, ng: 10 回は回数 n。}
-                    ap: {sym: A の p, of: a.p, ans: 1, ng: 60% は確率 p。}
-                    bn: {sym: B の n, of: b.n, ans: 0, ng: 20 回は回数 n。}
-                    bp: {sym: B の p, of: b.p, ans: 1, ng: 30% は確率 p。}
-                meaning:
-                  ask: 分散が表すのは？
-                  opts: [山の中心の位置, 山の広がり（ばらつき）, いちばん起こりやすい回数]
-                  ok: 1
-                  fb: [中心の位置は平均（期待値）。, '', それは最頻値（いちばん高い棒）。]
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                  - {text: 'A は ', role: text}
+                  - {text: '10 回', role: info, key: an}
+                  - {text: '・成功確率 ', role: text}
+                  - {text: '60%', role: info, key: ap}
+                  - {text: '、B は ', role: text}
+                  - {text: '20 回', role: info, key: bn}
+                  - {text: '・成功確率 ', role: text}
+                  - {text: '30%', role: info, key: bp}
+                  - {text: '。', role: text}
+                  - {text: '成功回数の分散が大きいのはどちら？', role: ask, key: q}
+                info:
+                  an: {word: A の回数, sym: n, of: a.n}
+                  ap: {word: A の成功確率, sym: p, of: a.p}
+                  bn: {word: B の回数, sym: n, of: b.n}
+                  bp: {word: B の成功確率, sym: p, of: b.p}
+                formulas:
+                  - {id: va, ref: binom.var, bind: {n: an, p: ap}, word: A の分散}
+                  - {id: vb, ref: binom.var, bind: {n: bn, p: bp}, word: B の分散}
                 steps:
-                  - quiz:
-                      todo: ばらつき（分散）の式を選ぶ
-                      math: true
-                      opts: ['V(X) = np(1 − p)', 'E(X) = np', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
-                      ok: 0
-                      fb: ['', それは平均の式。, それは棒1本の確率の式。]
-                  - quiz:
-                      ask: A と B の成功回数の平均（np）は？
-                      opts: [A 6 回・B 6 回, A 6 回・B 4 回, A 4 回・B 6 回]
-                      ok: 0
-                      fb: ['', B は 20 × 0.3 ＝ 6。, A は 10 × 0.6 ＝ 6。]
-                  - todo: 下の数を押してから、式の枠を押す（A の行・B の行）
-                    slots:
-                      lines:
-                        - ['A：', {slot: an, ph: n}, '×', {slot: ap, ph: p}, '× (1 − p)']
-                        - ['B：', {slot: bn, ph: n}, '×', {slot: bp, ph: p}, '× (1 − p)']
+                  - {kind: ask, short: 分散の大小, sum: A と B の、成功回数の分散の大きさを比べる。}
+                  - kind: info
+                    short: A 10 回・60%／B 20 回・30%
+                    sum: A は 10 回・成功確率 60%、B は 20 回・成功確率 30%。
+                    collect: {need: [an, ap, bn, bp]}
+                    choose:
+                      - ask: 分散が表すのは？
+                        opts: [山の中心の位置, 山の広がり（ばらつき）, いちばん起こりやすい回数]
+                        ok: 1
+                        fb: [中心の位置は平均（期待値）。, '', それは最頻値（いちばん高い棒）。]
+                  - kind: relate
+                    short: 平均はどちらも 6 回
+                    sum: 平均は A が 10 × 0.6 ＝ 6、B が 20 × 0.3 ＝ 6 で同じ。それでもばらつきは同じとは限らない。
+                    choose:
+                      - ask: A と B の成功回数の平均（np）は？
+                        opts: [A 6 回・B 6 回, A 6 回・B 4 回, A 4 回・B 6 回]
+                        ok: 0
+                        fb: ['', B は 20 × 0.3 ＝ 6。, A は 10 × 0.6 ＝ 6。]
+                  - kind: formula
+                    choose:
+                      - todo: ばらつき（分散）の式を選ぶ
+                        math: true
+                        opts: ['V(X) = np(1 − p)', 'E(X) = np', 'P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ']
+                        ok: 0
+                        fb: ['', それは平均の式。, それは棒1本の確率の式。]
+                  - kind: build
+                    choose:
+                      - ask: 分散が大きいのはどちら？
+                        opts: [A, ほぼ同じ, B]
+                        ok: 2
+                        fb: [A は 2.4、B は 4.2。, 2.4 と 4.2 は 1.75 倍違う。, '']
+                  - {kind: probe}
           - id: binom-D-03
             title: 期待値が同じでも分布は違う？
             finds: 期待値だけでは分布を特定できない
