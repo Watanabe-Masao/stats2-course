@@ -733,6 +733,13 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("to.n" in e for e in effects.question_errors("E", {**x, "questions": [{**sq, "to": {"n": 10}}]})))
         self.assertTrue(any("0〜n＝10 の外" in e for e in effects.question_errors("E", out)))
         self.assertTrue(any("大きい順" in e for e in effects.question_errors("E", {**x, "prob_scale": [0.01, 0.5]})))
+        # 並び・ばらつき（#171）：予想の答えが割れる定義。想定する故障：ばらつきの ps が 0.3 と 0.7 だけ（理論の分散が同じで最大が2つ）だと、
+        # どちらを選んでも「予想と違った」になりうる。並びの2つの回数が同じ・n の外だと比べられない。見つけ方：崩した定義が止まる
+        vq = next(q for q in x["questions"] if q["form"] == "var")
+        self.assertTrue(any("1つに決まらない" in e for e in effects.question_errors("E", {**x, "questions": [{**vq, "ps": [0.3, 0.7]}]})))
+        pa = next(q for q in x["questions"] if q["form"] == "paths")
+        for ks in ([3, 3], [3, 7]):
+            self.assertTrue(any("別々の2つ" in e for e in effects.question_errors("E", {**x, "questions": [{**pa, "ks": ks}]})))
 
     def test_experiment_table(self):
         # 値の表の実験（#119）：値と重み・呼び名の数がそろい、重みが正。前と変えた重みが同じなら問いにならない。書き出しは型（改訂10）に合う
@@ -807,12 +814,12 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(it["stats2:binom-E-03"]["concept"], "stats2:REL-binom-hyper-contrast")   # 関係が主
         self.assertTrue(it["stats2:binom-C-03"]["retired"])
         self.assertEqual((it["stats2:binom-D-03"]["concept"], it["stats2:binom-D-03"]["related"]), ("stats2:TERM-expect", ["stats2:TERM-var", "stats2:TERM-dist", "stats2:TERM-binom"]))   # 主概念は実験室の所属でなく、発見させたい性質で決める
-        self.assertNotIn("open", it["stats2:binom-A-03"])
+        self.assertNotIn("open", it["stats2:binom-A-04"])   # 作成中の問いは open を出さない
         self.assertFalse(network.schema_errors(d))
 
     def test_apply(self):
         # 確かめる対象：応用の課題（apply。#171）。想定する故障：engine の知らない method（画面で課題が出ない）、条件の項目の書き漏れ・書き誤り（画面で理由を言って止まる）、
-        # 選ぶ形の選び肢の数の違い（答えの番号が選び肢を指さない）、数の答えに幅（tol）がない（照らせない）、開けない問いに課題、公開中の10問のどれかから課題が落ちる。
+        # 選ぶ形の選び肢の数の違い（答えの番号が選び肢を指さない）、数の答えに幅（tol）がない（照らせない）、開けない問いに課題、公開中の14問のどれかから課題が落ちる。
         # 見つけ方：本物の定義は通り、1つずつ崩した課題がそれぞれの理由で止まる。答えの正しさは math-lab の apply.test.ts（手計算の値）と knowledge-net（公開の JSON の全部を解く）で見る。既存との違い：応用の課題は初めて
         import network
         c = course()

@@ -109,9 +109,10 @@ APPLY_METHODS = {
     "mean-to-p": ["n", "mean"], "min-n-share-sd": ["p", "sd"], "compare-eq": ["a", "b"], "boundary": ["n", "p", "k"],
     "expected-observers": ["n", "p", "event", "people"], "sets-for-error": ["n", "p", "event", "err"], "binom-judge": ["mechanism"],
     "max-strength": ["mechanism", "param", "min", "max", "step", "ratio"], "min-total": ["n", "ratio"], "solve-spread": ["n", "p", "variance"],
+    "mode": ["n", "p"], "within-band": ["P", "m", "x"], "linear-sum": ["n", "p", "a", "b"], "compare-var": ["a", "b"],
 }
 APPLY_OPTIONAL = {"sets-for-error": ["unit"], "min-total": ["step"]}   # 実験室の道具の刻みに合わせる（省くと1）
-APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
+APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2, "within-band": 2, "compare-var": 3}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
 
 
 def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:

@@ -541,9 +541,13 @@
                 "enum": [
                   "prob",
                   "spread",
-                  "conv"
+                  "conv",
+                  "paths",
+                  "repeat",
+                  "mean",
+                  "var"
                 ],
-                "description": "問いの形：prob（確率の値：事象の確率を桁の目盛りで予想）・spread（広がり：n を変えたとき、回数と割合の散らばりの向きを予想）・conv（理論と実測：セットを増やしたとき、理論とのずれの目安が何分の1になるかを予想）"
+                "description": "問いの形：prob（確率の値：事象の確率を桁の目盛りで予想）・spread（広がり：n を変えたとき、回数と割合の散らばりの向きを予想）・conv（理論と実測：セットを増やしたとき、理論とのずれの目安が何分の1になるかを予想）・paths（並び：2つの回数のどちらが起きやすいかを予想し、並びの数 ₙCₖ と1つの並びの確率を見る。ks）・repeat（くり返し：同じ条件の実験を何回もして、実測の割合が理論のまわりでゆれるのを見る。events・sets）・mean（平均：多くのセットの成功回数の平均を予想し、移り変わりを見る）・var（ばらつき：理論の分散が最大になる成功確率を予想し、p ごとの理論と実測の分散を見る。ps）"
               },
               "title": {
                 "$ref": "#/$defs/text",
@@ -617,6 +621,32 @@
                   }
                 },
                 "description": "spread の変えたあとの回数"
+              },
+              "ks": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "description": "paths で比べる2つの成功回数"
+              },
+              "sets": {
+                "type": "integer",
+                "minimum": 10,
+                "description": "repeat の1回の実験のセット数"
+              },
+              "ps": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 6,
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "description": "var で比べる成功確率"
               }
             },
             "allOf": [
@@ -626,7 +656,8 @@
                     "form": {
                       "enum": [
                         "prob",
-                        "conv"
+                        "conv",
+                        "repeat"
                       ]
                     }
                   }
@@ -648,6 +679,48 @@
                 "then": {
                   "required": [
                     "to"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "paths"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "ks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "repeat"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "sets"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "var"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "ps"
                   ]
                 }
               }
@@ -783,7 +856,11 @@
                                 "binom-judge",
                                 "max-strength",
                                 "min-total",
-                                "solve-spread"
+                                "solve-spread",
+                                "mode",
+                                "within-band",
+                                "linear-sum",
+                                "compare-var"
                               ]
                             }
                           }
@@ -1930,5 +2007,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 21
+  "x-revision": 22
 }

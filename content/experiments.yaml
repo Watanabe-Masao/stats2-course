@@ -94,6 +94,31 @@ experiments:
         question: 10 回中 5 回以上になるセットの割合。セットを 100 倍にすると、理論とのずれの目安は？
         set: {n: 10, p: 0.5}
         events: [{op: ge, k: 5}]
+      # paths（並び）・repeat（くり返し）・mean（平均）・var（ばらつき）：#171 で作成中だった4問の入口
+      - id: paths
+        form: paths
+        title: なぜ中央付近の成功回数が起こりやすい？
+        question: コインを 6 回投げる。表が 6 回と表が 3 回、どちらが起こりやすい？
+        set: {n: 6, p: 0.5}
+        ks: [6, 3]
+      - id: repeat
+        form: repeat
+        title: 理論分布と実験結果は一致する？
+        question: 10 回中ちょうど 5 回成功するセットの割合。100 セットの実験をくり返すと、理論と一致する？
+        set: {n: 10, p: 0.5}
+        events: [{op: eq, k: 5}]
+        sets: 100
+      - id: mean
+        form: mean
+        title: 成功回数の期待値はどこにある？
+        question: 成功確率 35% で 10 回。セットをくり返すと、成功回数の平均はいくつに近づく？
+        set: {n: 10, p: 0.35}
+      - id: var
+        form: var
+        title: 成功回数のばらつきは何で決まる？
+        question: 回数 10 回のまま p を変える。成功回数の分散がいちばん大きい p は？
+        set: {n: 10, p: 0.5}
+        ps: [0.1, 0.3, 0.5, 0.7, 0.9]
     # テーマ体系（#163。渡辺さんの企画書「二項分布実験室」の 4. 実験テーマ体系）：まとまり（A〜F）の下に問い。
     # 問いの id は 概念-まとまり-番号（binom-A-01。企画書の B01〜B24 を置き換えた。変えない・消さない）。公開では教材名が付く（stats2:binom-A-01）。
     # concept は主概念（1つ）、related は関連概念（その問いを理解するのに実際に使う概念）。open は開く入口（shift・questions の id・break:反例の id）。
@@ -140,6 +165,16 @@ experiments:
             finds: 組合せ数と確率の関係
             concept: TERM-binom
             related: [TERM-comb]
+            predict: 表が全部の回数と、半分の回数のどちらが起こりやすいか
+            operate: 実験のセット数（並びの種類を数える）
+            judge: 1つの並びの確率と並びの数 ₙCₖ を分けて、真ん中の回数が起こりやすい理由を説明できる
+            open: 'paths'
+            apply:
+              kind: 評価
+              task: 成功確率 80% で 10 回。成功の回数で、いちばん起こりやすいのは何回？
+              solve: {method: mode, n: 10, p: 0.8}
+              answer: {type: number, unit: 回, tol: {abs: 0}}
+              why: いちばん起こりやすい回数は、並びの数と1つの並びの確率の掛け算がいちばん大きい所。p が 50% でないと真ん中からずれ、平均 np の近くに来る。
           - id: binom-A-04
             title: 成功確率 50% なら必ず左右対称？
             finds: 対称性と非対称性
@@ -205,6 +240,16 @@ experiments:
             finds: 理論確率と実測割合
             concept: REL-samplingerror-se-contrast
             related: [TERM-binom]
+            predict: 同じ条件の実験をくり返すと、実測の割合が理論と一致するか
+            operate: 同じ条件の実験の回数
+            judge: 実測の割合が実験ごとにゆれる理由を標本のゆれ（SE）で説明し、ゆれの目安と比べて理論を疑うかを判断できる
+            open: 'repeat'
+            apply:
+              kind: 反証
+              task: 理論では 20% で起きる事象を 100 回試したら、27 回起きた。この結果から「理論は間違っている」と言える？
+              solve: {method: within-band, P: 0.2, m: 100, x: 27}
+              answer: {type: choice, options: [言える, 言えない]}
+              why: 理論どおりでも、実測の割合は ±2SE くらいはゆれる。その幅の中の結果だけでは、理論が間違っているとは言えない（正しいと証明されたわけでもない）。
           - id: binom-C-02
             title: 実験セット数を増やすと誤差はどう変わる？
             finds: 大数の法則
@@ -238,11 +283,31 @@ experiments:
             finds: E(X)＝np
             concept: TERM-binom
             related: [TERM-expect]
+            predict: セットをくり返したとき、成功回数の平均がいくつに近づくか
+            operate: 実験のセット数
+            judge: 成功回数の平均が np に近づくことを、1回ごとの期待値 p の足し算（線形性）で説明できる
+            open: 'mean'
+            apply:
+              kind: 変換
+              task: 成功確率 30% の挑戦を 10 回する。成功すると 200 円もらえ、失敗すると 50 円払う。もらえる金額の合計の期待値は何円？
+              solve: {method: linear-sum, n: 10, p: 0.3, a: 200, b: -50}
+              answer: {type: number, unit: 円, tol: {abs: 0}}
+              why: 合計＝200×（成功回数）−50×（失敗回数）。期待値は足し算と定数倍をそのまま通るので、成功回数の期待値 np から求められる。
           - id: binom-D-02
             title: 成功回数のばらつきは何で決まる？
             finds: V(X)＝np(1−p)
             concept: TERM-binom
             related: [TERM-var, TERM-indep]
+            predict: 回数を決めたまま p を変えると、分散がいちばん大きいのはどの p か
+            operate: 成功確率 p
+            judge: 分散が np(1−p) で、p＝0.5 で最大・p と 1−p で同じになることを、1回の分散と独立な足し算で説明できる
+            open: 'var'
+            apply:
+              kind: 評価
+              task: A は 10 回・成功確率 60%、B は 20 回・成功確率 30%。成功回数の分散が大きいのはどちら？
+              solve: {method: compare-var, a: {n: 10, p: 0.6}, b: {n: 20, p: 0.3}}
+              answer: {type: choice, options: [A, ほぼ同じ, B]}
+              why: 分散は np(1−p)。回数が多いほど大きく、p が 50% に近いほど大きい。回数と p の両方で比べる。
           - id: binom-D-03
             title: 期待値が同じでも分布は違う？
             finds: 期待値だけでは分布を特定できない

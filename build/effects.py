@@ -184,6 +184,23 @@ def question_errors(eid: str, x: dict, margin: F = F(1, 10)) -> list[str]:
             if len(q.get("events") or []) != 1:
                 err.append(f"{eid}: 問い {qid}（理論と実測）の events は1つ")
             continue
+        # 並び・くり返し・ばらつき（#171）：予想の答えが1つに決まること（並びは2つの回数が別で 0〜n、ばらつきは理論の分散の最大が1つ）
+        if q.get("form") == "paths":
+            ks = [int(k) for k in q.get("ks") or []]
+            if len(ks) != 2 or ks[0] == ks[1] or not all(0 <= k <= n for k in ks):
+                err.append(f"{eid}: 問い {qid}（並び）の ks は 0〜n＝{n} の別々の2つ")
+            continue
+        if q.get("form") == "repeat":
+            if len(q.get("events") or []) != 1 or not all(0 <= int(e["k"]) <= n for e in q.get("events") or []):
+                err.append(f"{eid}: 問い {qid}（くり返し）の events は1つで、k は 0〜n")
+            continue
+        if q.get("form") == "var":
+            vs = [_frac(v) * (1 - _frac(v)) for v in q.get("ps") or []]
+            if not vs or vs.count(max(vs)) != 1:
+                err.append(f"{eid}: 問い {qid}（ばらつき）の ps で理論の分散がいちばん大きい p が1つに決まらない（予想の答えが割れる）")
+            continue
+        if q.get("form") == "mean":
+            continue
         if q.get("form") == "prob" and q.get("free") and len(q.get("events") or []) != 1:
             err.append(f"{eid}: 問い {qid}（自分で選ぶ）の events は1つ（最初の結果）")
         if q.get("form") == "prob":
