@@ -115,51 +115,71 @@ APPLY_OPTIONAL = {"sets-for-error": ["unit"], "min-total": ["step"]}   # 実験�
 APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2, "within-band": 2, "compare-var": 3}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
 
 
+WALK_ORDER = ["ask", "unit", "event", "info", "relate", "formula", "build", "probe"]
+WALK_FORMULAS = {"binom.pmf": ["n", "k", "p"], "binom.mean": ["n", "p"], "binom.mean-p": ["E", "n"], "binom.var": ["n", "p"]}   # math-lab engine の WALK_FORMULAS の記号
+
+
 def walk_errors(iid: str, ap: dict) -> list[str]:
-    """解き方を組み立てる（walk。#181）を確かめる。数の値は原本に書かず、文の中の数と solve の値が同じかを見る
-    （想定する故障：課題の文の数を直して solve を直し忘れる・その逆。文をつなぐと課題と違う。正解の番号が選び肢の外）。
-    段の数が engine の解き方と合うかは、公開の JSON を engine で解く knowledge-net のテストが見る"""
+    """解き方を組み立てる（walk。#181・骨格設計）を確かめる。数の値は原本に書かず、文の中の数と solve の値が同じかを見る
+    （想定する故障：課題の文の数を直して solve を直し忘れる・その逆。文をつなぐと課題と違う。押させる区切りがない〔進めない〕。
+    段の順の崩れ。公式の記号に当てはめる情報がない。正解の番号が選び肢の外）。
+    公式の値と応用の答えが同じかは、公開の JSON を engine で解く knowledge-net のテストが見る"""
     err: list[str] = []
     w, sv = ap.get("walk") or {}, ap.get("solve") or {}
-    segs, vars_ = w.get("segs") or [], (w.get("tags") or {}).get("vars") or {}
-    nopt = len((w.get("tags") or {}).get("opts") or [])
+    segs, info = w.get("segments") or [], w.get("info") or {}
     if "".join(g.get("text", "") for g in segs) != ap.get("task"):
-        err.append(f"{iid} の walk：segs をつなぐと task と違う")
-    if sum(1 for g in segs if g.get("key") == "q") != 1:
-        err.append(f"{iid} の walk：求めるもの（key: q）がちょうど1つでない")
+        err.append(f"{iid} の walk：segments をつなぐと task と違う")
+    asks = [g for g in segs if g.get("role") == "ask"]
+    if len(asks) != 1 or not asks[0].get("key"):
+        err.append(f"{iid} の walk：聞かれている所（role: ask・key あり）がちょうど1つでない")
+    keys = {g.get("key") for g in segs if g.get("key")}
     for g in segs:
-        if g.get("key") and g["key"] != "q" and g["key"] not in vars_:
-            err.append(f"{iid} の walk：文の key {g['key']} が tags.vars にない")
-    for k, v in vars_.items():
+        if g.get("role") in ("info", "event", "condition") and g.get("key") not in info:
+            err.append(f"{iid} の walk：区切り「{g.get('text')}」の key が info にない")
+    for k, v in info.items():
         hit = [g for g in segs if g.get("key") == k]
         if len(hit) != 1:
-            err.append(f"{iid} の walk：数 {k} が文の中にちょうど1つでない"); continue
+            err.append(f"{iid} の walk：情報 {k} が文の中にちょうど1つでない"); continue
+        if not v.get("of"):
+            continue
         val: object = sv
-        for part in str(v.get("of", "")).split("."):
+        for part in str(v["of"]).split("."):
             val = val.get(part) if isinstance(val, dict) else None
         m = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(%)?", hit[0]["text"])
         num = (float(m.group(1)) / (100 if m.group(2) else 1)) if m else None
         if not isinstance(val, (int, float)) or num is None or abs(num - val) > 1e-9:
-            err.append(f"{iid} の walk：数 {k}（文「{hit[0]['text']}」）と solve の {v.get('of')}（{val}）が違う")
-        if not 0 <= int(v.get("ans", -1)) < nopt:
-            err.append(f"{iid} の walk：数 {k} の正解の番号が選び肢の外")
-    def quiz(q: dict | None, where: str) -> None:
-        if not q:
-            return
+            err.append(f"{iid} の walk：情報 {k}（文「{hit[0]['text']}」）と solve の {v.get('of')}（{val}）が違う")
+    got = {k for k, v in info.items() if v.get("of")}
+    for f in w.get("formulas") or []:
+        syms = WALK_FORMULAS.get(f.get("ref"))
+        if syms is None:
+            err.append(f"{iid} の walk：公式 {f.get('ref')} を engine が知らない（{'・'.join(WALK_FORMULAS)}）"); continue
+        for sym in syms:
+            if (f.get("bind") or {}).get(sym) not in got:
+                err.append(f"{iid} の walk：公式 {f.get('id')} の記号 {sym} に当てはめる情報か前の公式がない")
+        got.add(f.get("id"))
+    kinds = [st.get("kind") for st in w.get("steps") or []]
+    idx = [WALK_ORDER.index(k) if k in WALK_ORDER else -1 for k in kinds]
+    if any(b <= a for a, b in zip(idx, idx[1:])) or -1 in idx:
+        err.append(f"{iid} の walk：段の順が {'→'.join(WALK_ORDER)} でない（同じ段も2つ置かない）")
+    for k in ("ask", "info", "formula", "build"):
+        if k not in kinds:
+            err.append(f"{iid} の walk：段 {k} がない（問い・情報・公式・当てはめは省かない）")
+    def quiz(q: dict, where: str) -> None:
         if not 0 <= int(q.get("ok", -1)) < len(q.get("opts") or []):
             err.append(f"{iid} の walk：{where}の正解の番号が選び肢の外")
         if len(q.get("fb") or []) != len(q.get("opts") or []):
             err.append(f"{iid} の walk：{where}の fb の数が選び肢と違う")
-    quiz(w.get("meaning"), "意味の確かめ")
-    for i, st in enumerate(w.get("steps") or [], start=2):
-        if bool(st.get("quiz")) == bool(st.get("slots")):
-            err.append(f"{iid} の walk：段 {i} は quiz か slots のどちらか1つ")
-        quiz(st.get("quiz"), f"段 {i} ")
-        quiz((st.get("slots") or {}).get("then"), f"段 {i} の then ")
-        for ln in (st.get("slots") or {}).get("lines") or []:
-            for t in ln:
-                if isinstance(t, dict) and t.get("slot") not in vars_:
-                    err.append(f"{iid} の walk：段 {i} の枠 {t.get('slot')} が tags.vars にない")
+    for i, st in enumerate(w.get("steps") or [], start=1):
+        if st.get("mark") and st["mark"] not in keys:
+            err.append(f"{iid} の walk：段 {i} の mark {st['mark']} が文にない")
+        for k in ((st.get("collect") or {}).get("need") or []) + ((st.get("collect") or {}).get("later") or []):
+            if k not in keys:
+                err.append(f"{iid} の walk：段 {i} の collect の {k} が文にない")
+        for j, q in enumerate(st.get("choose") or [], start=1):
+            quiz(q, f"段 {i} の問い {j} ")
+        for k, q in (st.get("rowQuiz") or {}).items():
+            quiz(q, f"段 {i} の計算の問い {k} ")
     return err
 
 

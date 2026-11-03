@@ -854,23 +854,26 @@ class TestNetwork(unittest.TestCase):
         self.assertFalse(network.schema_errors(d))
 
     def test_walk(self):
-        # 確かめる対象：解き方を組み立てる（walk。#181）。想定する故障：課題の文の数と solve の値がずれる（式の枠に入る数が答えと合わない）・
-        # 文の区切りをつなぐと課題と違う・正解の番号が選び肢の外。見つけ方：本物の3問は通り、それぞれを崩すと止まる。
-        # 既存との違い：apply の検査は solve の項目の有無だけ。段の数と engine の解き方の対応は knowledge-net のテスト
+        # 確かめる対象：解き方を組み立てる（walk。#181・骨格設計）。想定する故障：課題の文の数と solve の値がずれる（式の枠に入る数が答えと合わない）・
+        # 文の区切りをつなぐと課題と違う・正解の番号が選び肢の外・段の順の崩れ・公式の記号に当てはめる情報がない。見つけ方：本物の4問は通り、それぞれを崩すと止まる。
+        # 既存との違い：apply の検査は solve の項目の有無だけ。公式の値と応用の答えの一致は knowledge-net のテスト（engine で解く）
         import copy
         import network
         x = network.load_experiments()[0]
         aps = {it["id"]: it["apply"] for g in x["catalog"] for it in g["items"] if (it.get("apply") or {}).get("walk")}
-        self.assertEqual(sorted(aps), ["binom-A-01", "binom-B-02", "binom-D-02"])
+        self.assertEqual(sorted(aps), ["binom-A-01", "binom-B-02", "binom-B-04", "binom-D-02"])
         for iid, ap in aps.items():
             self.assertEqual(network.walk_errors(iid, ap), [], iid)
         bad = copy.deepcopy(aps["binom-D-02"]); bad["solve"]["b"]["p"] = 0.4   # 文は 30% のまま
-        self.assertTrue(any("数 bp" in e and "違う" in e for e in network.walk_errors("D", bad)))
-        bad = copy.deepcopy(aps["binom-A-01"]); bad["walk"]["segs"][1]["text"] = "の挑戦で、"
+        self.assertTrue(any("情報 bp" in e and "違う" in e for e in network.walk_errors("D", bad)))
+        bad = copy.deepcopy(aps["binom-A-01"]); bad["walk"]["segments"][1]["text"] = "の挑戦で、"
         self.assertTrue(any("task と違う" in e for e in network.walk_errors("A", bad)))
-        bad = copy.deepcopy(aps["binom-B-02"]); bad["walk"]["steps"][2]["slots"]["then"]["ok"] = 3
+        bad = copy.deepcopy(aps["binom-B-02"]); bad["walk"]["steps"][4]["rowQuiz"]["one.comb"]["ok"] = 3
         self.assertTrue(any("正解の番号が選び肢の外" in e for e in network.walk_errors("B", bad)))
-
+        bad = copy.deepcopy(aps["binom-B-04"]); bad["walk"]["steps"][1], bad["walk"]["steps"][2] = bad["walk"]["steps"][2], bad["walk"]["steps"][1]
+        self.assertTrue(any("段の順" in e for e in network.walk_errors("B4", bad)))
+        bad = copy.deepcopy(aps["binom-B-04"]); bad["walk"]["formulas"][1]["bind"]["p"] = "two"
+        self.assertTrue(any("記号 p に当てはめる" in e for e in network.walk_errors("B4", bad)))
     def test_skeleton(self):
         # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
         import network
