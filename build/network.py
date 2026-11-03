@@ -116,7 +116,36 @@ APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2, "within-band": 2, "compare-v
 
 
 WALK_ORDER = ["ask", "unit", "event", "info", "relate", "formula", "build", "probe"]
-WALK_FORMULAS = {"binom.pmf": ["n", "k", "p"], "binom.mean": ["n", "p"], "binom.mean-p": ["E", "n"], "binom.var": ["n", "p"]}   # math-lab engine の WALK_FORMULAS の記号
+WALK_FORMULAS = {   # math-lab engine の WALK_FORMULAS の記号
+    "binom.pmf": ["n", "k", "p"], "binom.mean": ["n", "p"], "binom.mean-p": ["E", "n"], "binom.var": ["n", "p"],
+    "share.sd-n": ["p", "s"], "binom.mode": ["n", "p"], "ratio": ["A", "B"], "share.se": ["P", "m"], "share.z": ["x", "m", "P", "S"],
+    "binom.ge": ["k", "n", "p"], "sets.n": ["P", "e", "u"], "lin.sum": ["a", "E", "b", "n"], "fatigue.var": ["n", "F", "L"],
+    "streak.max": ["n", "r", "h"], "fpc.N": ["n", "r", "u"], "mix.d": ["V", "B", "n"],
+}
+
+
+def solve_value(sv: dict, path: str) -> float | None:
+    """情報の of を solve から求める（math-lab の solveValue と同じ）。a.n のように . でたどり、足し引き・掛け算で書ける（掛け算が先）"""
+    def one(t: str):
+        if re.fullmatch(r"-?[0-9]+(?:\.[0-9]+)?", t):
+            return float(t)
+        v: object = sv
+        for part in t.split("."):
+            v = v.get(part) if isinstance(v, dict) else None
+        return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+    total = 0.0
+    for term in re.split(r"(?=[+-])", re.sub(r"\s+", "", path)):
+        if not term:
+            continue
+        sign = -1 if term.startswith("-") else 1
+        prod = 1.0
+        for f in term.lstrip("+-").split("*"):
+            x = one(f)
+            if x is None:
+                return None
+            prod *= x
+        total += sign * prod
+    return total
 
 
 def walk_errors(iid: str, ap: dict) -> list[str]:
@@ -142,12 +171,11 @@ def walk_errors(iid: str, ap: dict) -> list[str]:
             err.append(f"{iid} の walk：情報 {k} が文の中にちょうど1つでない"); continue
         if not v.get("of"):
             continue
-        val: object = sv
-        for part in str(v["of"]).split("."):
-            val = val.get(part) if isinstance(val, dict) else None
+        val = solve_value(sv, str(v["of"]))
         m = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(%)?", hit[0]["text"])
         num = (float(m.group(1)) / (100 if m.group(2) else 1)) if m else None
-        if not isinstance(val, (int, float)) or num is None or abs(num - val) > 1e-9:
+        # 文の数に符号は書かない（「50 円払う」は solve の -50）。向きは言葉が担うので、大きさを比べる
+        if val is None or num is None or abs(num - abs(val)) > 1e-9:
             err.append(f"{iid} の walk：情報 {k}（文「{hit[0]['text']}」）と solve の {v.get('of')}（{val}）が違う")
     got = {k for k, v in info.items() if v.get("of")}
     for f in w.get("formulas") or []:

@@ -198,6 +198,57 @@ experiments:
               solve: {method: min-n-share-sd, p: 0.3, sd: 0.08}
               answer: {type: number, unit: 回, tol: {abs: 0}}
               why: 割合のぶれは回数の平方根に反比例する。ぶれを半分にするには、回数を4倍にする。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: '成功確率 ', role: text}
+                - {text: 30%, role: info, key: p}
+                - {text: ' の調査で、成功の割合の標準偏差を ', role: text}
+                - {text: 0.08 以下, role: info, key: s}
+                - {text: にしたい。, role: text}
+                - {text: 回数 n は最低いくつ要る？, role: ask, key: q}
+                info:
+                  p: {word: 成功確率, sym: p, of: p}
+                  s: {word: 標準偏差の上限, sym: s, of: sd}
+                formulas:
+                - id: n
+                  ref: share.sd-n
+                  bind: {p: p, s: s}
+                  word: 最低の回数
+                steps:
+                - {kind: ask, short: 最低の n, sum: 成功の割合の標準偏差が 0.08 以下になる、いちばん小さい回数 n を求める。}
+                - kind: info
+                  short: 30%・0.08 以下
+                  sum: 成功確率 30% と、割合の標準偏差の上限 0.08。
+                  collect:
+                    need: [p, s]
+                  choose:
+                  - ask: 「成功の割合の標準偏差」が表すのは？
+                    opts: [n 回のうち成功した割合が、くり返すたびにどれだけばらつくか, 成功の回数のばらつき, 成功確率 p の測りまちがい]
+                    ok: 0
+                    fb: ['', 回数ではなく割合（回数 ÷ n）のばらつき。, p は決まった値。ばらつくのは、実際に起きた割合。]
+                - kind: relate
+                  short: n が増えると小さくなる
+                  sum: 回数 n を増やすほど、割合のばらつきは小さくなる。だから「最低いくつ」を求める。
+                  choose:
+                  - ask: 回数 n を増やすと、成功の割合の標準偏差は？
+                    opts: [小さくなる, 大きくなる, 変わらない]
+                    ok: 0
+                    fb: ['', 大きくなるのは成功の回数のばらつき。割合（÷ n）のばらつきは小さくなる。, 回数を増やすほど、割合は p の近くに集まる。]
+                - kind: formula
+                  choose:
+                  - todo: 割合の標準偏差と回数 n をつなぐ式を選ぶ
+                    math: true
+                    opts: [SD(割合) = √(p(1 − p)/n), SD(回数) = √(np(1 − p)), E(X) = np]
+                    ok: 0
+                    fb: ['', それは成功の回数の標準偏差。この課題は割合。, それは平均の式。この課題はばらつき。]
+                - kind: build
+                  rowQuiz:
+                    n.ceil:
+                      ask: 回数 n は整数。境目が小数のとき、条件を満たす最小の n は？
+                      opts: [境目の小数を切り捨てた整数, 境目の小数を切り上げた整数, 境目を四捨五入した整数]
+                      ok: 1
+                      fb: [切り捨てると境目より小さくなり、標準偏差が上限を超える。, '', 四捨五入では、境目より小さくなることがある。]
+                - {kind: probe}
           - id: binom-A-03
             title: なぜ中央付近の成功回数が起こりやすい？
             finds: 組合せ数と確率の関係
@@ -213,6 +264,52 @@ experiments:
               solve: {method: mode, n: 10, p: 0.8}
               answer: {type: number, unit: 回, tol: {abs: 0}}
               why: いちばん起こりやすい回数は、並びの数と1つの並びの確率の掛け算がいちばん大きい所。p が 50% でないと真ん中からずれ、平均 np の近くに来る。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: '成功確率 ', role: text}
+                - {text: 80%, role: info, key: p}
+                - {text: ' で ', role: text}
+                - {text: 10 回, role: info, key: n}
+                - {text: 。, role: text}
+                - {text: 成功の回数で、いちばん起こりやすいのは何回？, role: ask, key: q}
+                info:
+                  p: {word: 成功確率, sym: p, of: p}
+                  n: {word: 挑戦する回数, sym: n, of: n}
+                formulas:
+                - id: k
+                  ref: binom.mode
+                  bind: {n: n, p: p}
+                  word: いちばん起こりやすい回数
+                steps:
+                - {kind: ask, short: いちばん高い棒, sum: 成功の回数の分布で、いちばん高い棒（最頻値）の回数を求める。}
+                - kind: info
+                  short: 80%・10 回
+                  sum: 成功確率 80% と、挑戦する回数 10 回。
+                  collect:
+                    need: [p, n]
+                - kind: relate
+                  short: 平均の近く
+                  sum: いちばん起こりやすい回数は平均 np の近くにあるが、同じとは限らない。
+                  choose:
+                  - ask: いちばん起こりやすい回数（最頻値）は、いつも平均 np と同じ？
+                    opts: [いつも同じ, 近いが、同じとは限らない, 平均とは関係ない]
+                    ok: 1
+                    fb: [p が 0.5 から離れると山が左右非対称になり、平均とずれることがある。, '', 山の頂上は平均の近くにある。]
+                - kind: formula
+                  choose:
+                  - todo: いちばん高い棒の位置を決める式を選ぶ
+                    math: true
+                    opts: [最頻値 = ⌊(n + 1)p⌋, E(X) = np, V(X) = np(1 − p)]
+                    ok: 0
+                    fb: ['', それは平均。この課題はいちばん高い棒。, それは分散（ばらつき）。]
+                - kind: build
+                  rowQuiz:
+                    k.floor:
+                      ask: (n＋1)p が小数のとき、いちばん高い棒は？
+                      opts: [小数を切り捨てた回数, 小数を切り上げた回数, 小数そのもの]
+                      ok: 0
+                      fb: ['', 切り上げた回数の棒は、隣の棒より低くなり始めている。, 回数は整数。]
+                - {kind: probe}
           - id: binom-A-04
             title: 成功確率 50% なら必ず左右対称？
             finds: 対称性と非対称性
@@ -236,6 +333,74 @@ experiments:
               solve: {method: compare-eq, a: {n: 10, p: 0.3, k: 3}, b: {n: 30, p: 0.3, k: 9}}
               answer: {type: choice, options: [10 回中 3 回の方が起きやすい, ほぼ同じ, 30 回中 9 回の方が起きやすい]}
               why: 回数が増えると結果の候補が増え、ちょうど1つの値の確率は小さくなる。だから珍しさは「以上・以下」で見る。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: 「, role: text}
+                - {text: 10 回, role: info, key: an}
+                - {text: '中 ', role: text}
+                - {text: 3 回, role: info, key: ak}
+                - {text: 」と「, role: text}
+                - {text: 30 回, role: info, key: bn}
+                - {text: '中 ', role: text}
+                - {text: 9 回, role: info, key: bk}
+                - {text: '」。成功の割合はどちらも ', role: text}
+                - {text: 30%, role: info, key: p}
+                - {text: （p＝0.3）。, role: text}
+                - {text: ちょうどその回数になる確率も同じくらい？, role: ask, key: q}
+                info:
+                  an: {word: 1つ目の回数, sym: n, of: a.n}
+                  ak: {word: 1つ目の成功回数, sym: k, of: a.k}
+                  bn: {word: 2つ目の回数, sym: n, of: b.n}
+                  bk: {word: 2つ目の成功回数, sym: k, of: b.k}
+                  p: {word: 成功確率, sym: p, of: a.p}
+                formulas:
+                - id: a
+                  ref: binom.pmf
+                  bind: {n: an, k: ak, p: p}
+                  word: 1つ目の確率
+                - id: b
+                  ref: binom.pmf
+                  bind: {n: bn, k: bk, p: p}
+                  word: 2つ目の確率
+                - id: r
+                  ref: ratio
+                  bind: {A: a, B: b}
+                  word: 確率の比
+                steps:
+                - {kind: ask, short: 同じくらい？, sum: 「10 回中ちょうど 3 回」と「30 回中ちょうど 9 回」の確率が同じくらいかを比べる。}
+                - kind: info
+                  short: 10 回中 3 回・30 回中 9 回・30%
+                  sum: 1つ目は 10 回中 3 回、2つ目は 30 回中 9 回。成功確率はどちらも 30%。
+                  collect:
+                    need: [an, ak, bn, bk, p]
+                - kind: relate
+                  short: 割合が同じでも
+                  sum: 割合が同じでも、回数が多いほど結果の候補が増え、ちょうど1つの値の確率は小さくなりうる。
+                  choose:
+                  - ask: 割合が同じなら、「ちょうどその回数」になる確率も同じ？
+                    opts: [同じになる, 同じとは限らない, 回数が多いほど必ず大きい]
+                    ok: 1
+                    fb: [割合は同じでも、回数が多いと 8 回・10 回など近い結果に確率が散らばる。, '', 回数が多いと結果の候補が増え、1つの値の確率はむしろ小さくなりやすい。]
+                - kind: formula
+                  choose:
+                  - todo: 「ちょうど k 回」の確率の式を選ぶ
+                    math: true
+                    opts: [P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ, E(X) = np, V(X) = np(1 − p)]
+                    ok: 0
+                    fb: ['', それは平均。この課題は「ちょうど k 回」の確率。, それは分散。]
+                - kind: build
+                  rowQuiz:
+                    b.succ:
+                      ask: 0.3⁹ はどのくらいの大きさ？
+                      opts: [0.3 より少し小さい, とても小さい（0.00002 くらい）, '0']
+                      ok: 1
+                      fb: [0.3 を 9 回掛けると、急に小さくなる。, '', 0 にはならない。とても小さいが正の数。]
+                  choose:
+                  - ask: ちょうどその回数になる確率は？
+                    opts: [10 回中 3 回の方が起きやすい, ほぼ同じ, 30 回中 9 回の方が起きやすい]
+                    ok: 0
+                    fb: ['', 比は 1 から大きく離れている。, 比は 1 より大きい。1つ目の方が大きい。]
+                - {kind: probe}
           - id: binom-B-02
             title: k 回以上・以下の確率を調べる
             finds: 累積確率と事象の範囲
@@ -426,6 +591,68 @@ experiments:
               solve: {method: within-band, P: 0.2, m: 100, x: 27}
               answer: {type: choice, options: [言える, 言えない]}
               why: 理論どおりでも、実測の割合は ±2SE くらいはゆれる。その幅の中の結果だけでは、理論が間違っているとは言えない（正しいと証明されたわけでもない）。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: '理論では ', role: text}
+                - {text: 20%, role: info, key: pr}
+                - {text: ' で起きる事象を ', role: text}
+                - {text: 100 回, role: info, key: m}
+                - {text: 試したら、, role: text}
+                - {text: 27 回, role: info, key: x}
+                - {text: 起きた。, role: text}
+                - {text: この結果から「理論は間違っている」と言える？, role: ask, key: q}
+                info:
+                  pr: {word: 理論の確率, sym: P, of: P}
+                  m: {word: 試した回数, sym: m, of: m}
+                  x: {word: 起きた回数, sym: x, of: x}
+                formulas:
+                - id: se
+                  ref: share.se
+                  bind: {P: pr, m: m}
+                  word: 標準誤差
+                - id: z
+                  ref: share.z
+                  bind: {x: x, m: m, P: pr, S: se}
+                  word: ずれの大きさ
+                steps:
+                - {kind: ask, short: 理論を疑えるか, sum: 27 回が、理論 20% のもとでもたまたま起きるずれかを判断する。}
+                - kind: info
+                  short: 20%・100 回・27 回
+                  sum: 理論の確率 20%、試した回数 100 回、起きた回数 27 回。
+                  collect:
+                    need: [pr, m, x]
+                - kind: relate
+                  short: たまたまのずれ
+                  sum: 理論が正しくても、割合はぴったり 20% にはならない。ずれを、たまたまのずれの目安（標準誤差）と比べる。
+                  choose:
+                  - ask: 理論が正しいとき、100 回中の割合はいつもぴったり 20% になる？
+                    opts: [なる, ならない。たまたまのずれがある, 理論が正しければ必ず 20 回]
+                    ok: 1
+                    fb: [割合は試すたびにゆれる。, '', 20 回は平均。1回の実験ではゆれる。]
+                - kind: formula
+                  choose:
+                  - todo: 割合のずれの目安（標準誤差）の式を選ぶ
+                    math: true
+                    opts: [SE = √(P(1 − P)/m), V(X) = np(1 − p), E(X) = np]
+                    ok: 0
+                    fb: ['', それは回数の分散。割合のずれの目安は標準誤差。, それは平均。]
+                  - todo: ずれが標準誤差の何個分かを測る式を選ぶ
+                    math: true
+                    opts: [z = |x/m − P| ÷ SE, z = x − m, z = P ÷ SE]
+                    ok: 0
+                    fb: ['', 回数の差ではなく、割合のずれを標準誤差で測る。, 理論の確率そのものではなく、起きた割合とのずれを測る。]
+                - kind: build
+                  rowQuiz:
+                    z.diff:
+                      ask: 理論とのずれは、どう測る？
+                      opts: [起きた割合と理論の確率の差, 起きた回数と試した回数の差, 理論の確率そのもの]
+                      ok: 0
+                      fb: ['', 回数どうしの差では、試した回数が違うと比べられない。, ずれは、起きた割合が理論からどれだけ離れたか。]
+                  choose:
+                  - ask: ずれは標準誤差の 2 個分（±2SE）の中。「理論は間違っている」と言える？
+                    opts: [言える, 言えない]
+                    ok: 1
+                    fb: [±2SE の中のずれは、理論が正しくてもたまたまよく起きる。, '']
           - id: binom-C-02
             title: 実験セット数を増やすと誤差はどう変わる？
             finds: 大数の法則
@@ -441,6 +668,84 @@ experiments:
               solve: {method: sets-for-error, n: 10, p: 0.3, event: {op: ge, k: 4}, err: 0.01, unit: 100}
               answer: {type: number, unit: セット, tol: {abs: 0}}
               why: 理論とのずれの目安はセット数の平方根に反比例する。ほしい精度から、要るセット数を決められる。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: '成功確率 ', role: text}
+                - {text: 30%, role: info, key: p}
+                - {text: ' で ', role: text}
+                - {text: 10 回, role: info, key: n}
+                - {text: の実験を何セットも行い、「, role: text}
+                - {text: 4 回以上, role: event, key: k}
+                - {text: 」になるセットの割合を理論と比べたい。ずれの目安（±2SE）を ±, role: text}
+                - {text: 1% 以内, role: info, key: e}
+                - {text: にするには、, role: text}
+                - {text: 何セット要る？, role: ask, key: q}
+                - {text: （, role: text}
+                - {text: 100 セット単位, role: info, key: u}
+                - {text: で数える）, role: text}
+                info:
+                  p: {word: 成功確率, sym: p, of: p}
+                  n: {word: 1セットの回数, sym: n, of: n}
+                  k: {word: セットに起きてほしいこと, sym: k, of: event.k}
+                  e: {word: 許すずれ, sym: e, of: err}
+                  u: {word: 数える単位, sym: u, of: unit}
+                formulas:
+                - id: q
+                  ref: binom.ge
+                  bind: {k: k, n: n, p: p}
+                  word: 1セットで起きる確率
+                - id: sets
+                  ref: sets.n
+                  bind: {P: q, e: e, u: u}
+                  word: 要るセット数
+                steps:
+                - {kind: ask, short: 要るセット数, sum: 「4 回以上」のセットの割合のずれの目安を ±1% 以内にする、セット数を求める。}
+                - kind: unit
+                  short: 1セット＝10 回
+                  sum: 1つのセットは 10 回の実験。セットごとに「4 回以上」になったかを数える。
+                  choose:
+                  - ask: この課題で数える「1つ」は？
+                    opts: [10 回の実験1回分（1セット）, 1回の挑戦, 100 セットのまとまり]
+                    ok: 0
+                    fb: ['', 数えるのは、セットごとに「4 回以上」になったか。, 100 セットは数える単位。1つ1つはセット。]
+                - {kind: event, short: 4 回以上, mark: k, sum: そのセットで成功が 4 回以上になること。}
+                - kind: info
+                  short: 30%・10 回・±1%・100 セット単位
+                  sum: 成功確率 30%、1セット 10 回、許すずれ ±1%、100 セット単位で数える。
+                  collect:
+                    need: [p, n, e, u]
+                - kind: relate
+                  short: セット数を増やすと
+                  sum: セットの割合のずれの目安 2SE は、セット数の平方根に反比例して小さくなる。
+                  choose:
+                  - ask: セット数を 4 倍にすると、ずれの目安（2SE）は？
+                    opts: [半分になる, 4 分の 1 になる, 変わらない]
+                    ok: 0
+                    fb: ['', SE はセット数の平方根に反比例する。4 倍の平方根は 2。, セット数を増やすほど、割合は理論の近くに集まる。]
+                - kind: formula
+                  choose:
+                  - todo: 1セットで「4 回以上」になる確率の式を選ぶ
+                    math: true
+                    opts: [P(X ≥ k) = 1 − P(X ≤ k − 1), P(X ≥ k) = P(X = k), E(X) = np]
+                    ok: 0
+                    fb: ['', 「以上」は k 回の棒1本ではなく、k 回から n 回までの全部。, それは平均。]
+                  - todo: セット数 N とずれの目安をつなぐ式を選ぶ
+                    math: true
+                    opts: [2SE = 2√(P(1 − P)/N), V(X) = np(1 − p), P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ]
+                    ok: 0
+                    fb: ['', それは1セットの成功回数の分散。この段はセットの割合のずれ。, それは棒1本の確率。]
+                - kind: build
+                  rowQuiz:
+                    q.comp:
+                      ask: 「4 回以上」の確率を、少ない計算で求めるには？
+                      opts: [0〜3 回の確率の和を 1 から引く, 4 回の確率を 7 倍する, 0〜3 回の確率を足す]
+                      ok: 0
+                      fb: ['', 4 回・5 回…の確率は同じではない。, それは「3 回以下」の確率。]
+                    sets.ceil:
+                      ask: 境目を 100 セット単位で数えるには？
+                      opts: [100 の倍数に切り上げる, 100 の倍数に切り捨てる, 四捨五入する]
+                      ok: 0
+                      fb: ['', 切り捨てると境目より少なくなり、ずれが ±1% を超える。, 四捨五入では、境目より少なくなることがある。]
           - id: binom-C-03
             title: 同じ実験を繰り返すと同じ結果になる？
             finds: 標本変動
@@ -469,6 +774,66 @@ experiments:
               solve: {method: linear-sum, n: 10, p: 0.3, a: 200, b: -50}
               answer: {type: number, unit: 円, tol: {abs: 0}}
               why: 合計＝200×（成功回数）−50×（失敗回数）。期待値は足し算と定数倍をそのまま通るので、成功回数の期待値 np から求められる。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: '成功確率 ', role: text}
+                - {text: 30%, role: info, key: p}
+                - {text: ' の挑戦を ', role: text}
+                - {text: 10 回, role: info, key: n}
+                - {text: 'する。成功すると ', role: text}
+                - {text: 200 円, role: info, key: a}
+                - {text: 'もらえ、失敗すると ', role: text}
+                - {text: 50 円払う, role: info, key: b}
+                - {text: 。, role: text}
+                - {text: もらえる金額の合計の期待値は何円？, role: ask, key: q}
+                info:
+                  p: {word: 成功確率, sym: p, of: p}
+                  n: {word: 挑戦する回数, sym: n, of: n}
+                  a: {word: 成功1回の金額, sym: a, of: a}
+                  b: {word: 失敗1回の金額, sym: b, of: b}
+                formulas:
+                - id: mean
+                  ref: binom.mean
+                  bind: {n: n, p: p}
+                  word: 成功の回数の平均
+                - id: total
+                  ref: lin.sum
+                  bind: {a: a, E: mean, b: b, n: n}
+                  word: 合計の期待値
+                steps:
+                - {kind: ask, short: 合計の期待値, sum: 10 回でもらえる金額の合計の、期待値（平均）を求める。}
+                - kind: info
+                  short: 30%・10 回・200 円・50 円払う
+                  sum: 成功確率 30%、10 回、成功で 200 円もらい、失敗で 50 円払う。
+                  collect:
+                    need: [p, n, a, b]
+                - kind: relate
+                  short: 成功と失敗の回数
+                  sum: 成功の回数を X とすると、失敗の回数は n − X。合計は 200X − 50(n − X)。
+                  choose:
+                  - ask: 成功の回数を X とすると、失敗の回数は？
+                    opts: [n − X, X − n, n × X]
+                    ok: 0
+                    fb: ['', それでは負の数になる。, 回数どうしを掛けても失敗の回数にはならない。]
+                - kind: formula
+                  choose:
+                  - todo: 成功の回数の平均の式を選ぶ
+                    math: true
+                    opts: [E(X) = np, V(X) = np(1 − p), P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ]
+                    ok: 0
+                    fb: ['', それは分散。, それは棒1本の確率。]
+                  - todo: 合計の期待値の式を選ぶ
+                    math: true
+                    opts: [E(aX + b(n − X)) = aE(X) + b(n − E(X)), E(aX + b(n − X)) = a + b, V(aX + b) = a²V(X)]
+                    ok: 0
+                    fb: ['', 金額は回数の分だけ積み上がる。, それは分散の式。]
+                - kind: build
+                  rowQuiz:
+                    total.failv:
+                      ask: 失敗の分の金額は、合計に足す？引く？
+                      opts: [払うので負の数として足す（引く）, もらうので正の数として足す, 0 円として扱う]
+                      ok: 0
+                      fb: ['', 失敗すると払う。もらえる金額としては負。, 払う金額も合計に入る。]
           - id: binom-D-02
             title: 成功回数のばらつきは何で決まる？
             finds: V(X)＝np(1−p)
@@ -567,6 +932,71 @@ experiments:
               solve: {method: binom-judge, mechanism: {kind: fatigue, n: 10, p: 0.5, drop: 0.3}}
               answer: {type: choice, options: [言える, 言えない]}
               why: 平均が合っていても、分布が同じとは限らない。散らばりも確かめる。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: 10 回, role: info, key: n}
+                - {text: 投げて成功の回数を数えると、平均はちょうど n×p＝, role: text}
+                - {text: 5 回, role: info, key: e}
+                - {text: 。ただし, role: text}
+                - {text: 回を追って成功確率が下がっていた, role: condition, key: c}
+                - {text: '（最初 ', role: text}
+                - {text: 80%, role: info, key: f}
+                - {text: '・最後 ', role: text}
+                - {text: 20%, role: info, key: l}
+                - {text: ）。, role: text}
+                - {text: 平均が合っているので、二項分布と言ってよい？, role: ask, key: q}
+                info:
+                  n: {word: 投げる回数, sym: n, of: mechanism.n}
+                  e: {word: 成功の回数の平均, sym: E, of: mechanism.n*mechanism.p}
+                  c: {word: 回ごとに確率が変わる}
+                  f: {word: 最初の確率, sym: F, of: mechanism.p+mechanism.drop}
+                  l: {word: 最後の確率, sym: L, of: mechanism.p-mechanism.drop}
+                formulas:
+                - id: p
+                  ref: binom.mean-p
+                  bind: {E: e, n: n}
+                  word: 平均の成功確率
+                - id: bv
+                  ref: binom.var
+                  bind: {n: n, p: p}
+                  word: 二項分布なら分散
+                - id: w
+                  ref: fatigue.var
+                  bind: {n: n, F: f, L: l}
+                  word: 崩した起き方の分散
+                steps:
+                - {kind: ask, short: 二項分布と言えるか, sum: 平均が合っていることだけで、二項分布と言ってよいかを判断する。}
+                - kind: info
+                  short: 10 回・平均 5 回・80% から 20% へ
+                  sum: 10 回、平均 5 回。回を追って確率が 80% から 20% へ下がる。
+                  collect:
+                    need: [n, e, c, f, l]
+                - kind: relate
+                  short: 前提を確かめる
+                  sum: 二項分布の前提は「どの回も同じ確率で、互いに影響しない」。平均が np になるだけでは足りない。
+                  choose:
+                  - ask: 二項分布と言うために要る前提は？
+                    opts: [どの回も同じ確率で、互いに影響しない, 平均が np になる, 成功と失敗の2通りがある]
+                    ok: 0
+                    fb: ['', 平均が np になるのは、確率が回ごとに違っても起きる（確率の平均が p なら）。, それだけでは足りない。どの回も同じ確率で独立なことも要る。]
+                - kind: formula
+                  choose:
+                  - todo: 二項分布ならの分散の式を選ぶ
+                    math: true
+                    opts: [V(X) = np(1 − p), E(X) = np, P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ]
+                    ok: 0
+                    fb: ['', それは平均。平均は合っている。比べるのはばらつき。, それは棒1本の確率。]
+                  - todo: 回ごとに確率が違うときの分散の式を選ぶ
+                    math: true
+                    opts: [V(X) = Σ pᵢ(1 − pᵢ), V(X) = np(1 − p), E(X) = np]
+                    ok: 0
+                    fb: ['', それは、どの回も同じ確率 p のときの分散。, それは平均。]
+                - kind: build
+                  choose:
+                  - ask: 平均は同じでも、分散が二項分布と違う。二項分布と言ってよい？
+                    opts: [言える, 言えない]
+                    ok: 1
+                    fb: [平均だけ合っても、分布の形（ばらつき）が違う。, '']
           - id: binom-E-02
             title: 前回の結果が次回に影響すると？
             finds: 独立性の重要性
@@ -582,6 +1012,59 @@ experiments:
               solve: {method: max-strength, mechanism: {kind: streak, n: 10, p: 0.5, carry: 0}, param: carry, min: 0.05, max: 0.6, step: 0.05, ratio: 1.1}
               answer: {type: number, tol: {abs: 0}}
               why: 小さな引きずりでも、隣どうしの相関が積み重なって分散が増える。近似してよいかは、許すずれを先に決めてから判断する。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: 10 回, role: info, key: n}
+                - {text: '・成功確率 ', role: text}
+                - {text: 50%, role: noise, key: p}
+                - {text: 。, role: text}
+                - {text: 前の結果に引きずられる, role: condition, key: c}
+                - {text: 'とき、分散が二項分布の ', role: text}
+                - {text: 1.1 倍以内, role: info, key: r}
+                - {text: なら二項分布で近似してよいとする。, role: text}
+                - {text: 引きずる強さはどこまで許される？, role: ask, key: q}
+                - {text: （, role: text}
+                - {text: 0.05 刻み, role: info, key: h}
+                - {text: ）, role: text}
+                info:
+                  n: {word: 回数, sym: n, of: mechanism.n}
+                  c: {word: 前の結果に引きずられる}
+                  r: {word: 許す倍率, sym: r, of: ratio}
+                  h: {word: 強さの刻み, sym: h, of: step}
+                formulas:
+                - id: c
+                  ref: streak.max
+                  bind: {n: n, r: r, h: h}
+                  word: 許される強さ
+                steps:
+                - {kind: ask, short: 許される強さ, sum: 分散が二項分布の 1.1 倍以内に収まる、引きずる強さの最大を求める。}
+                - kind: info
+                  short: 10 回・1.1 倍・0.05 刻み
+                  sum: 10 回。前の結果に引きずられる。許す倍率 1.1 倍、強さは 0.05 刻み。倍率は成功確率によらない。
+                  collect:
+                    need: [n, c, r, h]
+                - kind: relate
+                  short: 分散は大きくなる
+                  sum: 引きずられると同じ結果が続きやすく、成功の回数のばらつきは二項分布より大きくなる。
+                  choose:
+                  - ask: 前の結果に引きずられると、成功の回数の分散は二項分布より？
+                    opts: [大きくなる, 小さくなる, 変わらない]
+                    ok: 0
+                    fb: ['', 同じ結果が続きやすいと、成功が多いセットと少ないセットに分かれ、ばらつきは大きくなる。, 平均は変わらないが、ばらつきは変わる。]
+                - kind: formula
+                  choose:
+                  - todo: 分散が二項分布の何倍かを表す式を選ぶ
+                    math: true
+                    opts: [比 = 1 + (2/n) Σ (n − j)cʲ, V(X) = np(1 − p), E(X) = np]
+                    ok: 0
+                    fb: ['', それは二項分布の分散そのもの。比べる倍率の式を選ぶ。, それは平均。]
+                - kind: build
+                  rowQuiz:
+                    c.best:
+                      ask: 答えになる強さは？
+                      opts: [倍率を超えない中で最大の刻み, 倍率を超えた最初の刻み, いちばん小さい刻み]
+                      ok: 0
+                      fb: ['', 倍率を超えた強さは許されない。, 許される強さのうち、いちばん大きいものを答える。]
           - id: binom-E-03
             title: 戻さずに抽出するとどうなる？
             finds: 超幾何分布との違い
@@ -596,6 +1079,58 @@ experiments:
               solve: {method: min-total, n: 10, ratio: 0.8, step: 2}
               answer: {type: number, unit: 個, tol: {abs: 0}}
               why: 取る数が箱に比べて小さいほど、戻さずに取っても二項分布に近い。どこまで近ければよいかを決めれば、要る箱の大きさが決まる。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: 箱から, role: text}
+                - {text: 戻さずに, role: condition, key: c}
+                - {text: ' ', role: text}
+                - {text: 10 個, role: info, key: n}
+                - {text: 取る。分散の減り方を二項分布（戻して取る）の2割以内（, role: text}
+                - {text: 0.8 倍以上, role: info, key: r}
+                - {text: ）にしたい。, role: text}
+                - {text: 箱の数は最低いくつ要る？, role: ask, key: q}
+                - {text: '（箱は ', role: text}
+                - {text: 2 個単位, role: info, key: u}
+                - {text: で数える）, role: text}
+                info:
+                  c: {word: 戻さずに取る}
+                  n: {word: 取る個数, sym: n, of: n}
+                  r: {word: 許す倍率, sym: r, of: ratio}
+                  u: {word: 数える単位, sym: u, of: step}
+                formulas:
+                - id: boxes
+                  ref: fpc.N
+                  bind: {n: n, r: r, u: u}
+                  word: 最低の箱の数
+                steps:
+                - {kind: ask, short: 最低の箱の数, sum: 戻さずに取っても、分散が二項分布の 0.8 倍以上になる、いちばん少ない箱の数を求める。}
+                - kind: info
+                  short: 戻さない・10 個・0.8 倍・2 個単位
+                  sum: 戻さずに 10 個取る。分散は 0.8 倍以上。箱は 2 個単位で数える。
+                  collect:
+                    need: [c, n, r, u]
+                - kind: relate
+                  short: 戻さないと減る
+                  sum: 戻さずに取ると、取るたびに箱の中身が変わり、分散は戻して取るときより小さくなる。箱が多いほど差は小さい。
+                  choose:
+                  - ask: 戻さずに取ると、分散は戻して取るとき（二項分布）より？
+                    opts: [小さくなる, 大きくなる, 同じ]
+                    ok: 0
+                    fb: ['', 当たりを取ると残りの当たりが減り、偏りが打ち消し合う。, 箱の数が限られていると、取るたびに中身が変わる。]
+                - kind: formula
+                  choose:
+                  - todo: 戻さずに取るときの分散の式を選ぶ
+                    math: true
+                    opts: [V = np(1 − p) × (N − n)/(N − 1), V(X) = np(1 − p), E(X) = np]
+                    ok: 0
+                    fb: ['', それは戻して取るときの分散。, それは平均。]
+                - kind: build
+                  rowQuiz:
+                    boxes.solve:
+                      ask: (N − n)/(N − 1) ≧ r を N について解く最初の一手は？
+                      opts: [両辺に N − 1 を掛ける, 両辺から n を引く, 両辺を r で割る]
+                      ok: 0
+                      fb: ['', 分母に N があるので、先に分母を払う。, 分母に N が残ったまま。]
           - id: binom-E-04
             title: 同じ平均成功確率でも結果は同じ？
             finds: 確率の異質性と分布の広がり
@@ -610,6 +1145,60 @@ experiments:
               solve: {method: solve-spread, n: 10, p: 0.5, variance: 3.4}
               answer: {type: number, tol: {abs: 0}}
               why: 二項分布より広がった分から、確率のばらつきの大きさを逆に求められる。
+              walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
+                segments:
+                - {text: 10 回, role: info, key: n}
+                - {text: '・平均の成功確率 ', role: text}
+                - {text: 50%, role: info, key: p}
+                - {text: 。, role: text}
+                - {text: 日によって確率が p−d か p＋d に変わり, role: condition, key: c}
+                - {text: '、成功の回数の分散は ', role: text}
+                - {text: '3.4', role: info, key: v}
+                - {text: ' だった（二項分布なら 2.5）。', role: text}
+                - {text: ずれ幅 d はいくつ？, role: ask, key: q}
+                info:
+                  n: {word: 回数, sym: n, of: n}
+                  p: {word: 平均の成功確率, sym: p, of: p}
+                  c: {word: 日によって確率が変わる}
+                  v: {word: 観測した分散, sym: V, of: variance}
+                formulas:
+                - id: bv
+                  ref: binom.var
+                  bind: {n: n, p: p}
+                  word: 二項分布の分散
+                - id: d
+                  ref: mix.d
+                  bind: {V: v, B: bv, n: n}
+                  word: ずれ幅
+                steps:
+                - {kind: ask, short: ずれ幅 d, sum: 日によって変わる確率のずれ幅 d を、分散から逆に求める。}
+                - kind: info
+                  short: 10 回・50%・分散 3.4
+                  sum: 10 回、平均の成功確率 50%、日によって p±d、分散 3.4。
+                  collect:
+                    need: [n, p, c, v]
+                - kind: relate
+                  short: 分散が増える
+                  sum: 日によって確率が変わると、分散は二項分布より n(n−1)d² だけ大きくなる。
+                  choose:
+                  - ask: 日によって確率が変わると、成功の回数の分散は二項分布より？
+                    opts: [大きくなる, 小さくなる, 同じ]
+                    ok: 0
+                    fb: ['', 確率の高い日と低い日で、成功の回数が大きく分かれる。, 平均は同じでも、ばらつきは変わる。]
+                - kind: formula
+                  choose:
+                  - todo: 日によって確率が変わるときの分散の式を選ぶ
+                    math: true
+                    opts: [V(X) = np(1 − p) + n(n − 1)d², V(X) = np(1 − p), E(X) = np]
+                    ok: 0
+                    fb: ['', それは日によって変わらないときの分散。, それは平均。]
+                - kind: build
+                  rowQuiz:
+                    d.d:
+                      ask: d² から d を出すには？
+                      opts: [平方根を取る, 2 で割る, 2 乗する]
+                      ok: 0
+                      fb: ['', d² は d を2回掛けたもの。2 で割っても d にはならない。, 2 乗すると d⁴ になる。]
       - id: F
         title: 応用・発展
         items:
