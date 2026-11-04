@@ -10,7 +10,7 @@ CLAUDE.md の決まりを、原本に書くときの形（記法・YAML の例�
 | `::: toggle 題名` 〜 `:::` | 開閉する欄（答えなど） |
 | `{{problem:Q-U09-001}}` | 問題を差し込む（番号・難度・答えの開閉は自動） |
 | `{{lab:LAB-count}}` | ラボを埋め込む（自由に動かす版） |
-| `{{lab:LAB-scale@s1-temp}}` | 場面ごとの版（最初のモード・数値・課題・予想を tool.yaml の presets に書く） |
+| `{{lab:LAB-scale@s1-temp}}` | 場面ごとの版（最初のモード・数値・課題・予測を tool.yaml の presets に書く） |
 | `{{fig:FIG-U03-population}}` | 図を入れる（説明文は content/assets.yaml） |
 | `{{ref:REF-PQ-DB}}` | 旧版の問題集などへのリンク（shared.yaml の refs） |
 | `{{unit:U14}}` `{{term:TERM-perm}}` | 単元・用語へのリンク（ID で書く。番号や名前を直接書かない） |
@@ -29,13 +29,13 @@ CLAUDE.md の決まりを、原本に書くときの形（記法・YAML の例�
     mode: unit                      # 最初に開くモード
     set: {kind: temp, a: 10, b: 15} # 問題の数値
     task: 課題の文（ラボの上に出る）
-    predict: {type: number, key: "ratio:1", label: "K で B÷A", unit: "倍"}   # 予想するまで結果を隠す
-    expect: 1.018                   # 予想の答え。テストでラボの計算値と照合する（HTML には入れない）
+    predict: {type: number, key: "ratio:1", label: "K で B÷A", unit: "倍"}   # 予測するまで結果を隠す
+    expect: 1.018                   # 予測の答え。テストでラボの計算値と照合する（HTML には入れない）
     why: 結果のあとに出す一言
 ```
 
-場面の版はタブを1つ（mode）に絞る。複数見せるときは presets に `modes: [judge, bin]`。予想のある版では `set` で決めた選択欄（`data-key` の select）は文字になり、選べない。
-Notion の埋め込み（高さ約320pxで固定）では小さい表示になる：予想の前は課題カードだけ、結果のあとは要点と操作だけ、表・式は「くわしく」、広く使うときは「大きく開く ↗」。`build/check_all.sh` が 360×320 で予想の前が枠に収まるかを調べる。
+場面の版はタブを1つ（mode）に絞る。複数見せるときは presets に `modes: [judge, bin]`。予測のある版では `set` で決めた選択欄（`data-key` の select）は文字になり、選べない。
+Notion の埋め込み（高さ約320pxで固定）では小さい表示になる：予測の前は課題カードだけ、結果のあとは要点と操作だけ、表・式は「くわしく」、広く使うときは「大きく開く ↗」。`build/check_all.sh` が 360×320 で予測の前が枠に収まるかを調べる。
 
 答えに問題文にない数が出るのに `checks` がないと build が止まる。計算した数でなければ `no_checks: 理由` を書く。
 
@@ -46,7 +46,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 ```yaml
   s3-rule:
     mode: power
-    steps:                       # 2段以上。各段で予想する
+    steps:                       # 2段以上。各段で予測する
       - label: n＝25             # 記録の表に出る条件の名前
         set: {n: 25}             # その段で変える値（前の段からの差分でよい）
         task: 課題の文
@@ -56,7 +56,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
     law: {title: 式で説明する, lines: [式…], text: 説明, limit: この式で言えないこと}
 ```
 
-解説付き再生（tour。#90、試作は LAB-pois@rel-approx-tour）：同じ段階データから「図で解説」（段ごとの静止図）・「アニメで解説」（ラボの再生）・「自分で触る」を作る。関係（変換・対比・導出）の説明に使う。予想は置かない。
+解説付き再生（tour。#90、試作は LAB-pois@rel-approx-tour）：同じ段階データから「図で解説」（段ごとの静止図）・「アニメで解説」（ラボの再生）・「自分で触る」を作る。関係（変換・対比・導出）の説明に使う。予測は置かない。
 
 ```yaml
   rel-approx-tour:
@@ -103,7 +103,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 
 - 概念（terms.yaml）と関係（relations.yaml）に書ける。書けるのは id・preset・purpose だけ。URL は build が `site_base_url` から作る（配布先で空なら出さない）。
 - build が止めるもの：ないラボ、そのラボにない場面の版（tool.yaml の presets）、id・preset・purpose 以外の項目。
-- 公開サイトのネットワークでは、版を旧版のラボの iframe で開かず、JS の部品（math-lab の場面：Scene・Tour・Explore）で描く（#188 04b・#192）。build が版の mode・modes・set・task と、解説の段の状態（tour.states と同じ重ね方）を `play` として書き出す。予想の答え（expect・why・predict）は出さない。部品にないモードの版をネットワークから指すと、knowledge-net のテスト（tests/unit/scene.test.ts）が止まるので、先に math-lab の場面にモードを足す。本文（Notion）の `{{lab:…}}` は今までどおり旧版のラボ。
+- 公開サイトのネットワークでは、版を旧版のラボの iframe で開かず、JS の部品（math-lab の場面：Scene・Tour・Explore）で描く（#188 04b・#192）。build が版の mode・modes・set・task と、解説の段の状態（tour.states と同じ重ね方）を `play` として書き出す。予測の答え（expect・why・predict）は出さない。部品にないモードの版をネットワークから指すと、knowledge-net のテスト（tests/unit/scene.test.ts）が止まるので、先に math-lab の場面にモードを足す。本文（Notion）の `{{lab:…}}` は今までどおり旧版のラボ。
 
 ### 概念・関係に図を出す（`figures:`）
 
@@ -137,7 +137,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - `question`（任意）：このつながりで考える問い。概念のページのつながりの地図で点を選ぶと、最初に出る（その下に解説の段。#188 07c）。答えを書かない（問いの形にする）。
 - 面の並びは つまり → 段 → 図 → 成り立つ条件 → 解説・触る。段の名前（同じ所・違う所・だから／元の形・変える操作・行き着く形）は画面が付ける。前提・応用は段を書かず、説明が「なぜ前に要るか」「どう使うか」の1段になる。
 - 図は画面がその場で engine の確率から描く（画像にしない）。`chart` のある関係では、画像の `figures` を面に重ねて出さない（`figures` は Notion の側で使う）。
-- 図の中で学習者に予想させる数（実験室で確かめる数）を先に見せない。図は設定を1つに固定し、条件を変えて確かめるのは実験室に任せる。
+- 図の中で学習者に予測させる数（実験室で確かめる数）を先に見せない。図は設定を1つに固定し、条件を変えて確かめるのは実験室に任せる。
 
 ### 式の分解の木（`formulas[].tree`）
 
@@ -183,7 +183,7 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 ### 公開サイト（ラボと図）
 
 `publish/notion.yaml` に `site_base_url` があると、ラボと図はアップロードせず URL で埋め込む（`<slug>/?p=場面`、`fig/<図ID>.svg`）。
-`python3 build/build.py` で `out/site/` ができる。`build/check_all.sh` を通してから `build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開する。公開されるのは out/site/ だけ（原本・予想の答え・個人データは出ない）。
+`python3 build/build.py` で `out/site/` ができる。`build/check_all.sh` を通してから `build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開する。公開されるのは out/site/ だけ（原本・予測の答え・個人データは出ない）。
 ラボの `slug` と図の ID は URL の一部なので変えない。
 
 ### Notion への公開手順

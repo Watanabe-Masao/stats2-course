@@ -128,7 +128,7 @@ relations:
     stages:
       same: どちらも起きた回数を数える分布。平均は同じにできる（np＝λ）。
       differ: 二項分布は回数に上限 n がある。ポアソン分布には上限がない。
-      so: 二項分布の分散 np(1−p) は平均より小さく、ポアソン分布の分散は平均と同じ λ。だから二項分布の方が散らばりが小さい。
+      so: 二項分布の分散 np(1−p) は平均より小さく、ポアソン分布の分散は平均と同じ λ。だから二項分布の方がばらつきが小さい。
     chart:
       kind: pair
       a: {model: binom, n: 6, p: 0.5, label: 二項分布 n＝6・p＝0.5（上限6回）}
@@ -282,7 +282,7 @@ relations:
       - comb(6,3)*comb(14,7)/comb(20,10) > comb(10,3)*0.3**3*0.7**7
       - abs(sum((k-3)**2*comb(6,k)*comb(14,10-k)/comb(20,10) for k in range(7)) - 2.1*10/19) < 1e-9
     labs:
-      - {id: LAB-pois, preset: rel-hyper-contrast-tour, purpose: 平均は同じまま、取る数を増やすと戻さない方の散らばりが小さくなるのを段ごとに見る}
+      - {id: LAB-pois, preset: rel-hyper-contrast-tour, purpose: 平均は同じまま、取る数を増やすと戻さない方のばらつきが小さくなるのを段ごとに見る}
       - {id: LAB-pois, preset: rel-hyper, purpose: 箱を大きくすると、戻さないときの分布が二項分布（戻すとき）に近づく}
     figures: [FIG-LAB-pois-rel-hyper-contrast-tour-1, FIG-LAB-pois-rel-hyper-contrast-tour-2, FIG-LAB-pois-rel-hyper-contrast-tour-3]
     basis: {units: [U15]}
@@ -658,7 +658,7 @@ relations:
     to: TERM-clt
     type: 前提
     premise: learning
-    description: 大数の法則（平均が母平均に近づく）を知ってから、近づくときのぶれの形（正規分布）を学ぶ。
+    description: 大数の法則（平均が母平均に近づく）を知ってから、近づくときのばらつきの形（正規分布）を学ぶ。
     basis:
       units:
       - U19
@@ -762,7 +762,7 @@ relations:
     type: 変換
     mode: limit
     description: 自由度を大きくすると、t 分布は標準正規分布に近づく。
-    gist: データが多いと、不偏分散で σ を置き換えたぶれがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
+    gist: データが多いと、不偏分散で σ を置き換えたばらつきがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
     conditions:
     - 自由度を大きくする
     basis:
@@ -885,7 +885,7 @@ relations:
     from: TERM-point-est
     to: TERM-interval-est
     type: 対比
-    description: 点推定は1つの値で、区間推定は幅をもった区間で母数を推定する。区間推定は、推定がどれだけぶれるか（標準誤差）を幅で示す。
+    description: 点推定は1つの値で、区間推定は幅をもった区間で母数を推定する。区間推定は、推定がどれだけばらつくか（標準誤差）を幅で示す。
     gist: 「たぶん50」と1つの値で言うのが点推定、「45〜55のどこか」と幅で言うのが区間推定。幅があると、推定の確かさまで伝わる。
     basis:
       units:
@@ -1022,7 +1022,7 @@ relations:
     to: TERM-h1
     type: 前提
     premise: mathematical
-    description: 対立仮説は、帰無仮説を退けたときに採る仮説として決める。
+    description: 対立仮説は、帰無仮説を棄却したときに採る仮説として決める。
     basis:
       units:
       - U24
@@ -1076,7 +1076,7 @@ relations:
     from: TERM-pvalue
     to: TERM-alpha
     type: 対比
-    description: どちらも確率で、比べて帰無仮説を退けるか決める。有意水準はデータを見る前に決める基準、p値はデータから計算する値。p値が有意水準以下なら退ける。
+    description: どちらも確率で、比べて帰無仮説を棄却するか決める。有意水準はデータを見る前に決める基準、p値はデータから計算する値。p値が有意水準以下なら棄却する。
     gist: 有意水準は前もって引いておく線、p値はデータが出した数。線より小さければ「偶然とは考えにくい」と判断する。
     basis:
       units:
@@ -1107,7 +1107,7 @@ relations:
     to: TERM-type1
     type: 前提
     premise: mathematical
-    description: 第1種の過誤は、正しい帰無仮説を退ける誤り。
+    description: 第1種の過誤は、正しい帰無仮説を棄却する誤り。
     basis:
       units:
       - U24
@@ -1126,7 +1126,7 @@ relations:
     from: TERM-type1
     to: TERM-type2
     type: 対比
-    description: 第1種の過誤は正しい帰無仮説を退ける誤り、第2種の過誤は誤った帰無仮説を退けない誤り。データの数が同じなら、有意水準を小さくして第1種を減らすと、第2種は増える。
+    description: 第1種の過誤は正しい帰無仮説を棄却する誤り、第2種の過誤は誤った帰無仮説を棄却しない誤り。データの数が同じなら、有意水準を小さくして第1種を減らすと、第2種は増える。
     gist: 「無実の人を有罪にする」のが第1種、「犯人を見逃す」のが第2種。片方を厳しくすると、もう片方が起こりやすくなる。
     basis:
       units:
