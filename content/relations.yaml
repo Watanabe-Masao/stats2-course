@@ -36,6 +36,7 @@ relations:
     from: TERM-comb
     to: TERM-binom
     version: 1
+    question: なぜ ₙCₖ を掛けるのか？   # このつながりで考える問い（#188 07c）
     type: 前提
     premise: mathematical
     description: n 回のうちどの k 回が成功かの選び方 ₙCₖ 通りは、どれも同じ確率なので、その数だけ足し合わせる（掛ける）。
@@ -44,6 +45,7 @@ relations:
     from: TERM-indep
     to: TERM-binom
     version: 1
+    question: なぜ並び1つの確率を掛け算で出せるのか？   # このつながりで考える問い（#188 07c）
     type: 前提
     premise: mathematical
     description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。
@@ -52,6 +54,7 @@ relations:
     from: TERM-binom
     to: TERM-poisson
     version: 1
+    question: めったに起きない事を、たくさんの機会で数えると？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-pois, preset: rel-approx-tour, purpose: 平均3を保って n を 10→1000 にし、二項分布がポアソン分布に重なるまでを段ごとに見る}
       - {id: LAB-pois, preset: rel-approx, purpose: np を保って n を大きくすると、二項分布がポアソン分布に重なる}
@@ -79,6 +82,7 @@ relations:
     from: TERM-binom
     to: TERM-normal
     version: 1
+    question: 回数を増やすと、形はどうなる？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-binom, preset: rel-norm-tour, purpose: n を 10→100 にして棒が曲線に重なり、p が小さいとずれるのを段ごとに見る}
       - {id: LAB-binom, preset: s5-norm, purpose: n を大きくすると、棒が正規分布の曲線に重なる（p が小さいと崩れる）}
@@ -104,6 +108,7 @@ relations:
     from: TERM-binom
     to: TERM-sample-prop
     version: 1
+    question: 回数を割合に直すと、分布はどう変わる？   # このつながりで考える問い（#188 07c）
     type: 変換
     mode: exact
     description: 成功の回数 X が二項分布 B(n, p) に従うとき、X を n で割った標本比率 p̂＝X÷n は、同じ形の分布を横に 1/n に縮めたもの。平均は p、分散は p(1−p)÷n。
@@ -114,6 +119,7 @@ relations:
     from: TERM-binom
     to: TERM-poisson
     version: 1
+    question: 回数に上限があると、何が違う？   # このつながりで考える問い（#188 07c）
     type: 対比
     description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
     gist: 回数に上限がある数え方（二項）は、上限のない数え方（ポアソン）より散らばりが小さい。平均が同じでも外れ方が違う。   # つまり（#95）
@@ -228,6 +234,7 @@ relations:
     from: TERM-binom
     to: TERM-geom
     version: 1
+    question: 何を数えているかが、どう違う？   # このつながりで考える問い（#188 07c）
     type: 対比
     description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
     gist: 二項は「回数を決めて、当たりの数を数える」。幾何は「当たり1回を決めて、そこまでの回数を数える」。決める物と数える物が逆。   # つまり（#95）
@@ -240,6 +247,7 @@ relations:
     from: TERM-hyper
     to: TERM-binom
     version: 1
+    question: 箱を大きくすると、戻さない取り方はどう近づく？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-pois, preset: rel-hyper-tour, purpose: 割合0.3を保って箱を大きくし、補正 (N−n)/(N−1) が1に近づくのを段ごとに見る}
       - {id: LAB-pois, preset: rel-hyper, purpose: 集団を大きくすると、戻さない確率が戻す確率に近づく}
@@ -254,6 +262,7 @@ relations:
     from: TERM-binom
     to: TERM-hyper
     version: 1
+    question: 戻さずに取ると、何が変わる？   # このつながりで考える問い（#188 07c）
     type: 対比
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。分散は超幾何の方が二項分布の (N−n)/(N−1) 倍になる（小さくなる）。
     gist: 戻さずに取り出すと、取るたびに残りの割合が変わり、結果のぶれが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
@@ -662,6 +671,7 @@ relations:
       units:
       - U19
     version: 1
+    question: 整数の棒を曲線で近似するとき、なぜ境目を 0.5 ずらす？   # このつながりで考える問い（#188 07c）
   - id: REL-var-unbvar
     from: TERM-var
     to: TERM-unbvar
@@ -1606,6 +1616,7 @@ relations:
       units:
       - U14
     version: 1
+    question: 1回の試行から、分布はどう生まれる？   # このつながりで考える問い（#188 07c）
   - id: REL-quant-scatter
     from: TERM-quant
     to: TERM-scatter

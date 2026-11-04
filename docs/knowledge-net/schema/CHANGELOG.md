@@ -33,3 +33,4 @@
 | 25 | 2026-11-04 | 概念に任意の `gist`（つまり：日常の言葉で1〜2文）・`question`（この概念で考える問い）・`chart`（概要の図：分布の棒をその場で描く設定 kind・n・p・note。数は engine から）（stats2-course #188 R1c：概念のページを実験室と同じ質に）。任意 |
 | 26 | 2026-11-04 | 関係に任意の `stages`（開いたときの段：対比は same・differ・so、変換は origin・operation・result。ほかの種類には書かない）と `chart`（開いたときの図：pair＝2つの分布〔`$defs.chartDist`：binom・hyper・poisson〕を並べた棒、normal＝二項分布に同じ平均・分散の正規分布の曲線を重ねる。数は engine から）（stats2-course #188 04）。任意 |
 | 27 | 2026-11-04 | ラボへの参照（`$defs.labs`）に任意の `play`（画面が JS の部品で描く形：mode・modes・set・task・kmax・decimals・steps〔title・text・states〔段の状態。set と frames を重ねたもの〕・focus・gist・ms〕）。教材の build がラボの版から作り、予想の答えは入れない（stats2-course #188 04b・#192）。任意 |
+| 28 | 2026-11-04 | 関係に任意の `question`（このつながりで考える問い。概念のページのつながりで、選ぶと最初に出る）（stats2-course #188 07c）。任意 |

@@ -2420,6 +2420,10 @@
                 }
               }
             ]
+          },
+          "question": {
+            "$ref": "#/$defs/text",
+            "description": "このつながりで考える問い（概念のページのつながりで、選ぶと最初に出る。例：回数を増やすと、形はどうなる？）（stats2-course #188 07c）"
           }
         },
         "allOf": [
@@ -2698,5 +2702,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 27
+  "x-revision": 28
 }
