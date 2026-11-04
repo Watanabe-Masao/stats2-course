@@ -581,6 +581,15 @@ class TestNetwork(unittest.TestCase):
         rec = [{"formula": "F-binom-pmf", "points": next(x for x in k["contracts"] if x["formula"] == "F-binom-pmf")["review"], "judgement": "j", "date": "2026-11-01"}]
         self.assertNotIn("review_pending", marks(k, rec)["F-binom-pmf"])
 
+    def test_screen_revision_gate(self):
+        # 確かめる対象：公開の前に、公開中の画面の型の改訂がデータの改訂以上かを確かめる（#207）。
+        # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。
+        # 見つけ方：画面がデータより古いと止まる理由を返し、同じか新しければ止めない。既存との違い：公開の前の検査は式のレビューだけだった
+        from screen_check import check
+        self.assertIsNotNone(check(31, 30))
+        self.assertIsNone(check(30, 30))
+        self.assertIsNone(check(29, 30))
+
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
         # 想定する故障：レビューのあとに記号の of・domain や概念の条件を変えても、古い記録で「レビュー済み」のまま公開される／

@@ -9,6 +9,8 @@ dest="${1:?公開用リポジトリの手元のパスを指定する}"
 [ -f out/site/index.html ] || { echo "❌ out/site がない（python3 build/build.py を先に）"; exit 1; }
 # 公開の前の検査（#118 M9）：公開する代表の式は、今の版でレビュー済みでなければ止める
 python3 build/formulas.py --publish-check
+# 公開中の画面（knowledge-net）の型の改訂が、データの改訂以上か（#207）。画面の公開が遅れた日に教材だけを進めない
+python3 build/screen_check.py
 find "$dest" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp -a out/site/. "$dest/"
 cd "$dest"
