@@ -439,5 +439,512 @@
    "optional": [],
    "choices": 3
   }
+ },
+ "apply_steps": {
+  "binom-judge.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "binom-judge.goal": {
+   "vars": [],
+   "variants": []
+  },
+  "binom-judge.judge": {
+   "vars": [
+    "r"
+   ],
+   "variants": [
+    "same"
+   ]
+  },
+  "binom-judge.put": {
+   "vars": [],
+   "variants": []
+  },
+  "boundary.calc": {
+   "vars": [
+    "k",
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "boundary.check": {
+   "vars": [
+    "ge",
+    "gt",
+    "k",
+    "k1",
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "boundary.diff": {
+   "vars": [
+    "k"
+   ],
+   "variants": []
+  },
+  "boundary.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "boundary.goal": {
+   "vars": [
+    "k",
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "compare-eq.case": {
+   "vars": [
+    "k",
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "compare-eq.compare": {
+   "vars": [
+    "ak",
+    "an",
+    "bk",
+    "bn",
+    "r"
+   ],
+   "variants": [
+    "a",
+    "b"
+   ]
+  },
+  "compare-eq.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "compare-eq.goal": {
+   "vars": [
+    "ak",
+    "an",
+    "bk",
+    "bn"
+   ],
+   "variants": []
+  },
+  "compare-var.compare": {
+   "vars": [
+    "r"
+   ],
+   "variants": [
+    "a",
+    "b"
+   ]
+  },
+  "compare-var.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "compare-var.goal": {
+   "vars": [
+    "an",
+    "ap",
+    "bn",
+    "bp"
+   ],
+   "variants": []
+  },
+  "compare-var.mean": {
+   "vars": [],
+   "variants": []
+  },
+  "compare-var.var": {
+   "vars": [],
+   "variants": []
+  },
+  "event.each": {
+   "vars": [],
+   "variants": []
+  },
+  "event.one": {
+   "vars": [],
+   "variants": []
+  },
+  "event.sum": {
+   "vars": [
+    "k",
+    "nin",
+    "nrest",
+    "op"
+   ],
+   "variants": [
+    "rest"
+   ]
+  },
+  "event.total": {
+   "vars": [],
+   "variants": []
+  },
+  "expected-observers.any": {
+   "vars": [],
+   "variants": []
+  },
+  "expected-observers.calc": {
+   "vars": [
+    "inv",
+    "mean",
+    "people"
+   ],
+   "variants": [
+    "rare"
+   ]
+  },
+  "expected-observers.goal": {
+   "vars": [
+    "k",
+    "n",
+    "op",
+    "people"
+   ],
+   "variants": [
+    "all"
+   ]
+  },
+  "expected-observers.mean": {
+   "vars": [
+    "people"
+   ],
+   "variants": []
+  },
+  "expected-observers.one": {
+   "vars": [],
+   "variants": []
+  },
+  "linear-sum.alt": {
+   "vars": [],
+   "variants": []
+  },
+  "linear-sum.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "linear-sum.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "linear-sum.goal": {
+   "vars": [
+    "a",
+    "b",
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "linear-sum.put": {
+   "vars": [],
+   "variants": []
+  },
+  "max-strength.answer": {
+   "vars": [
+    "param",
+    "r",
+    "x"
+   ],
+   "variants": []
+  },
+  "max-strength.goal": {
+   "vars": [
+    "param",
+    "ratio",
+    "step"
+   ],
+   "variants": []
+  },
+  "max-strength.next": {
+   "vars": [
+    "ratio"
+   ],
+   "variants": []
+  },
+  "mean-to-p.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "mean-to-p.check": {
+   "vars": [],
+   "variants": []
+  },
+  "mean-to-p.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "mean-to-p.goal": {
+   "vars": [
+    "mean",
+    "n"
+   ],
+   "variants": []
+  },
+  "mean-to-p.put": {
+   "vars": [],
+   "variants": []
+  },
+  "mech.fatigue.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "mech.fatigue.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "mech.fatigue.probs": {
+   "vars": [
+    "first",
+    "last",
+    "list"
+   ],
+   "variants": []
+  },
+  "mech.mix": {
+   "vars": [],
+   "variants": []
+  },
+  "mech.streak": {
+   "vars": [],
+   "variants": []
+  },
+  "min-n-share-sd.answer": {
+   "vars": [
+    "n",
+    "prev",
+    "sd",
+    "sdN",
+    "sdPrev"
+   ],
+   "variants": [
+    "one"
+   ]
+  },
+  "min-n-share-sd.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "min-n-share-sd.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "min-n-share-sd.goal": {
+   "vars": [
+    "sd"
+   ],
+   "variants": []
+  },
+  "min-n-share-sd.put": {
+   "vars": [],
+   "variants": []
+  },
+  "min-total.answer": {
+   "vars": [
+    "N",
+    "fN",
+    "fp",
+    "prev",
+    "share",
+    "st"
+   ],
+   "variants": [
+    "unit"
+   ]
+  },
+  "min-total.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "min-total.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "min-total.goal": {
+   "vars": [
+    "n",
+    "ratio",
+    "st"
+   ],
+   "variants": [
+    "unit"
+   ]
+  },
+  "min-total.put": {
+   "vars": [],
+   "variants": []
+  },
+  "mode.answer": {
+   "vars": [
+    "k",
+    "km",
+    "kp",
+    "pk",
+    "pkm",
+    "pkp",
+    "t"
+   ],
+   "variants": [
+    "lower",
+    "upper"
+   ]
+  },
+  "mode.calc": {
+   "vars": [
+    "c",
+    "half",
+    "k",
+    "n",
+    "pv"
+   ],
+   "variants": []
+  },
+  "mode.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "mode.goal": {
+   "vars": [
+    "n",
+    "p"
+   ],
+   "variants": []
+  },
+  "ratio.mix": {
+   "vars": [],
+   "variants": []
+  },
+  "ratio.other": {
+   "vars": [
+    "key",
+    "x"
+   ],
+   "variants": []
+  },
+  "ratio.streak.calc": {
+   "vars": [
+    "c",
+    "n"
+   ],
+   "variants": []
+  },
+  "ratio.streak.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "sets-for-error.answer": {
+   "vars": [
+    "N",
+    "err",
+    "prev",
+    "seN",
+    "sePrev",
+    "u"
+   ],
+   "variants": [
+    "unit"
+   ]
+  },
+  "sets-for-error.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "sets-for-error.goal": {
+   "vars": [
+    "err",
+    "k",
+    "n",
+    "op",
+    "p",
+    "u"
+   ],
+   "variants": [
+    "unit"
+   ]
+  },
+  "sets-for-error.none": {
+   "vars": [],
+   "variants": []
+  },
+  "sets-for-error.prob": {
+   "vars": [],
+   "variants": []
+  },
+  "sets-for-error.put": {
+   "vars": [],
+   "variants": []
+  },
+  "sets-for-error.se": {
+   "vars": [],
+   "variants": []
+  },
+  "solve-spread.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "solve-spread.check": {
+   "vars": [
+    "hi",
+    "lo"
+   ],
+   "variants": []
+  },
+  "solve-spread.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "solve-spread.goal": {
+   "vars": [],
+   "variants": []
+  },
+  "solve-spread.put": {
+   "vars": [],
+   "variants": []
+  },
+  "within-band.band": {
+   "vars": [],
+   "variants": []
+  },
+  "within-band.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "within-band.goal": {
+   "vars": [
+    "P",
+    "m",
+    "obs",
+    "x"
+   ],
+   "variants": []
+  },
+  "within-band.judge": {
+   "vars": [],
+   "variants": [
+    "out"
+   ]
+  },
+  "within-band.put": {
+   "vars": [],
+   "variants": []
+  }
+ },
+ "apply_words": {
+  "op": [
+   "eq",
+   "ge",
+   "le",
+   "gt"
+  ],
+  "param": [
+   "carry",
+   "spread",
+   "drop"
+  ]
  }
 }
