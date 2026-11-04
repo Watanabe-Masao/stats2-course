@@ -1506,8 +1506,11 @@
       "type": "integer",
       "minimum": 1,
       "description": "教材が使った実験室の拡張（kn-experiment-v1.json）の x-revision。experiments があるときに書く"
+    },
+    "walk_texts": {
+      "$ref": "kn-experiment-v1.json#/$defs/walkTexts"
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 31
+  "x-revision": 32
 }

@@ -77,6 +77,249 @@
    "n"
   ]
  },
+ "walk_rows": {
+  "binom.pmf": {
+   "comb": {
+    "vars": [
+     "n",
+     "k",
+     "c"
+    ],
+    "variants": []
+   },
+   "succ": {
+    "vars": [
+     "k",
+     "p"
+    ],
+    "variants": [
+     "zero"
+    ]
+   },
+   "fail": {
+    "vars": [
+     "m"
+    ],
+    "variants": [
+     "zero"
+    ]
+   },
+   "prod": {
+    "vars": [
+     "k"
+    ],
+    "variants": []
+   }
+  },
+  "binom.mean": {
+   "prod": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "binom.mean-p": {
+   "div": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "binom.var": {
+   "q": {
+    "vars": [],
+    "variants": []
+   },
+   "prod": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "share.sd-n": {
+   "v": {
+    "vars": [],
+    "variants": []
+   },
+   "sq": {
+    "vars": [],
+    "variants": []
+   },
+   "div": {
+    "vars": [],
+    "variants": []
+   },
+   "ceil": {
+    "vars": [
+     "q",
+     "n"
+    ],
+    "variants": [
+     "exact"
+    ]
+   }
+  },
+  "binom.mode": {
+   "t": {
+    "vars": [],
+    "variants": []
+   },
+   "floor": {
+    "vars": [
+     "t",
+     "k",
+     "k1"
+    ],
+    "variants": [
+     "tie"
+    ]
+   }
+  },
+  "ratio": {
+   "div": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "share.se": {
+   "v": {
+    "vars": [],
+    "variants": []
+   },
+   "div": {
+    "vars": [],
+    "variants": []
+   },
+   "sqrt": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "share.z": {
+   "share": {
+    "vars": [],
+    "variants": []
+   },
+   "diff": {
+    "vars": [],
+    "variants": []
+   },
+   "z": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "binom.ge": {
+   "le": {
+    "vars": [
+     "km"
+    ],
+    "variants": []
+   },
+   "comp": {
+    "vars": [
+     "k",
+     "km"
+    ],
+    "variants": []
+   }
+  },
+  "sets.n": {
+   "v": {
+    "vars": [],
+    "variants": []
+   },
+   "q": {
+    "vars": [],
+    "variants": []
+   },
+   "ceil": {
+    "vars": [
+     "q",
+     "u"
+    ],
+    "variants": []
+   }
+  },
+  "lin.sum": {
+   "succ": {
+    "vars": [],
+    "variants": []
+   },
+   "fail": {
+    "vars": [],
+    "variants": []
+   },
+   "failv": {
+    "vars": [],
+    "variants": []
+   },
+   "sum": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "fatigue.var": {
+   "ps": {
+    "vars": [
+     "F",
+     "L"
+    ],
+    "variants": []
+   },
+   "sum": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "streak.max": {
+   "try": {
+    "vars": [
+     "c"
+    ],
+    "variants": [
+     "first",
+     "over"
+    ]
+   },
+   "best": {
+    "vars": [],
+    "variants": []
+   }
+  },
+  "fpc.N": {
+   "ratio": {
+    "vars": [],
+    "variants": []
+   },
+   "solve": {
+    "vars": [],
+    "variants": []
+   },
+   "ceil": {
+    "vars": [
+     "q",
+     "u"
+    ],
+    "variants": []
+   }
+  },
+  "mix.d": {
+   "extra": {
+    "vars": [],
+    "variants": []
+   },
+   "den": {
+    "vars": [],
+    "variants": []
+   },
+   "sq": {
+    "vars": [],
+    "variants": []
+   },
+   "d": {
+    "vars": [],
+    "variants": []
+   }
+  }
+ },
  "apply_methods": {
   "mean-to-p": {
    "required": [

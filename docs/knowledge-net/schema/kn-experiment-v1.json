@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 1,
+  "x-revision": 2,
   "if": {
     "type": "object",
     "required": [
@@ -1259,6 +1259,92 @@
         "math": {
           "type": "boolean",
           "description": "選び肢が式（式の字体で出す）"
+        }
+      }
+    },
+    "walkTexts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbols",
+        "formulas"
+      ],
+      "description": "解き方の公式の文（stats2-course #211）：engine は行の文の型の id・穴の値・別の言い方だけを返し、文はここ。公式と行の id・穴は engine の dist/contracts.json の walk_rows に合わせる（教材の build が確かめる）",
+      "properties": {
+        "symbols": {
+          "type": "object",
+          "description": "記号の意味（まちがえて入れたときに返す）",
+          "additionalProperties": {
+            "$ref": "kn-schema-v1.json#/$defs/text"
+          }
+        },
+        "formulas": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "word",
+              "pick",
+              "rows"
+            ],
+            "properties": {
+              "word": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "出てくる値の呼び名"
+              },
+              "pick": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "公式の選択の段で選び肢に出す形"
+              },
+              "mean": {
+                "type": "object",
+                "description": "この公式だけの記号の意味（symbols より先に使う）",
+                "additionalProperties": {
+                  "$ref": "kn-schema-v1.json#/$defs/text"
+                }
+              },
+              "rows": {
+                "type": "object",
+                "description": "文の型の id → 題と文",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "title",
+                    "why"
+                  ],
+                  "properties": {
+                    "title": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "行の題。{名前} は engine が返す穴の値"
+                    },
+                    "why": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "行の意味の文。{名前} は穴の値"
+                    },
+                    "variants": {
+                      "type": "object",
+                      "description": "別の言い方（engine の variant の名前 → 差し替える題・文）",
+                      "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "minProperties": 1,
+                        "properties": {
+                          "title": {
+                            "$ref": "kn-schema-v1.json#/$defs/text"
+                          },
+                          "why": {
+                            "$ref": "kn-schema-v1.json#/$defs/text"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
