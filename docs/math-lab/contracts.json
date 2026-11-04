@@ -1,0 +1,200 @@
+{
+ "_": "生成物：packages/engine/src（walk.ts・apply.ts）から scripts/bundle-formula.mjs で作る。手で直さない（npm run lab:bundle）",
+ "walk_formulas": {
+  "binom.pmf": [
+   "n",
+   "k",
+   "p"
+  ],
+  "binom.mean": [
+   "n",
+   "p"
+  ],
+  "binom.mean-p": [
+   "E",
+   "n"
+  ],
+  "binom.var": [
+   "n",
+   "p"
+  ],
+  "share.sd-n": [
+   "p",
+   "s"
+  ],
+  "binom.mode": [
+   "n",
+   "p"
+  ],
+  "ratio": [
+   "A",
+   "B"
+  ],
+  "share.se": [
+   "P",
+   "m"
+  ],
+  "share.z": [
+   "x",
+   "m",
+   "P",
+   "S"
+  ],
+  "binom.ge": [
+   "k",
+   "n",
+   "p"
+  ],
+  "sets.n": [
+   "P",
+   "e",
+   "u"
+  ],
+  "lin.sum": [
+   "a",
+   "E",
+   "b",
+   "n"
+  ],
+  "fatigue.var": [
+   "n",
+   "F",
+   "L"
+  ],
+  "streak.max": [
+   "n",
+   "r",
+   "h"
+  ],
+  "fpc.N": [
+   "n",
+   "r",
+   "u"
+  ],
+  "mix.d": [
+   "V",
+   "B",
+   "n"
+  ]
+ },
+ "apply_methods": {
+  "mean-to-p": {
+   "required": [
+    "n",
+    "mean"
+   ],
+   "optional": []
+  },
+  "min-n-share-sd": {
+   "required": [
+    "p",
+    "sd"
+   ],
+   "optional": []
+  },
+  "compare-eq": {
+   "required": [
+    "a",
+    "b"
+   ],
+   "optional": [],
+   "choices": 3
+  },
+  "boundary": {
+   "required": [
+    "n",
+    "p",
+    "k"
+   ],
+   "optional": []
+  },
+  "expected-observers": {
+   "required": [
+    "n",
+    "p",
+    "event",
+    "people"
+   ],
+   "optional": []
+  },
+  "sets-for-error": {
+   "required": [
+    "n",
+    "p",
+    "event",
+    "err"
+   ],
+   "optional": [
+    "unit"
+   ]
+  },
+  "binom-judge": {
+   "required": [
+    "mechanism"
+   ],
+   "optional": [],
+   "choices": 2
+  },
+  "max-strength": {
+   "required": [
+    "mechanism",
+    "param",
+    "min",
+    "max",
+    "step",
+    "ratio"
+   ],
+   "optional": []
+  },
+  "min-total": {
+   "required": [
+    "n",
+    "ratio"
+   ],
+   "optional": [
+    "step"
+   ]
+  },
+  "solve-spread": {
+   "required": [
+    "n",
+    "p",
+    "variance"
+   ],
+   "optional": []
+  },
+  "mode": {
+   "required": [
+    "n",
+    "p"
+   ],
+   "optional": []
+  },
+  "within-band": {
+   "required": [
+    "P",
+    "m",
+    "x"
+   ],
+   "optional": [],
+   "choices": 2
+  },
+  "linear-sum": {
+   "required": [
+    "n",
+    "p",
+    "a",
+    "b"
+   ],
+   "optional": []
+  },
+  "compare-var": {
+   "required": [
+    "a",
+    "b"
+   ],
+   "optional": [],
+   "choices": 3
+  }
+ }
+}

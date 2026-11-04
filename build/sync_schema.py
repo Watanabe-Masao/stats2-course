@@ -28,6 +28,8 @@ FILES = (
     ("knowledge-net", "math-lab/packages/engine/dist/formula.mjs", ROOT / "docs" / "math-lab" / "formula.mjs"),
     # ラボの乱数の束（種つき乱数・正規分布・並べ替え。labkit の前に差し込み、LK.rng で使う。#144 P6）
     ("knowledge-net", "math-lab/packages/engine/dist/random.js", ROOT / "docs" / "math-lab" / "random.js"),
+    # 解き方の公式の記号と応用の課題の項目（engine から書き出した JSON。network.py が原本を確かめる。#208）
+    ("knowledge-net", "math-lab/packages/engine/dist/contracts.json", ROOT / "docs" / "math-lab" / "contracts.json"),
 )
 
 
