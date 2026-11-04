@@ -250,7 +250,7 @@ class TestLabs(unittest.TestCase):
         v = variants(COURSE)
         last = v["LAB-pois@rel-contrast-tour"]["tour"]["steps"][-1]
         self.assertEqual(last["title"], "つまり")   # 関係の gist から build が足す（原本の tour には書かない）
-        self.assertIn("散らばりが小さい", last["text"])
+        self.assertIn("ばらつきが小さい", last["text"])
         self.assertEqual(len(v["LAB-pois@rel-contrast-tour"]["tour"]["steps"]),
                          len(COURSE.labs["LAB-pois"]["presets"]["rel-contrast-tour"]["tour"]["steps"]) + 1)
         self.assertNotIn("つまり", [s.get("title") for s in v["LAB-binom@def-tour"]["tour"]["steps"]])   # 概念の解説には足さない
