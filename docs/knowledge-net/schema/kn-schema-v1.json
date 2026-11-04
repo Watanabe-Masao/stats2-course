@@ -2013,6 +2013,46 @@
                 "review_pending": {
                   "type": "boolean",
                   "description": "数で保証できない観点の個別レビューが済んでいない式（true のときだけ書く）。画面は「レビュー前」の印を出す。#118 D4"
+                },
+                "why": {
+                  "type": "object",
+                  "description": "この式でなぜその値（確率など）が求まるかの段（作業台の読み方「構造」で順に出す。stats2-course #188）。steps の parts は、その段で効く式の部品（parts の番号）。note は前提が崩れたときに、どの段が成り立たなくなるか",
+                  "required": [
+                    "steps"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "steps": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "title",
+                          "text"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "title": {
+                            "$ref": "#/$defs/text"
+                          },
+                          "text": {
+                            "$ref": "#/$defs/text"
+                          },
+                          "parts": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "note": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
                 }
               }
             }
@@ -2724,5 +2764,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 29
+  "x-revision": 30
 }
