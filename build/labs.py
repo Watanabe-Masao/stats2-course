@@ -143,6 +143,7 @@ def build_site(course: Course) -> list[dict]:
         lid, _, name = aid.partition("@")
         if name:
             by_lab.setdefault(lid, {})[name] = page_cfg(spec)
+    all_variants = variants(course)   # 版の一覧は1回だけ作る（ラボごとに作り直さない）
     for lid, t in course.labs.items():
         if not t.get("src"):   # 共通部品を使わない古い形のラボはそのまま置く（場面の版はない）
             d = SITE / t["slug"]
@@ -160,7 +161,7 @@ def build_site(course: Course) -> list[dict]:
         rel = str((d / "index.html").relative_to(ROOT))
         entries.append({"asset": lid, "file": rel, "query": "", "cfg": {}, "expect": None, "modes": modes})
         for name, cfg in presets.items():
-            spec = variants(course)[f"{lid}@{name}"]
+            spec = all_variants[f"{lid}@{name}"]
             entries.append({"asset": f"{lid}@{name}", "file": rel, "query": f"?p={name}", "cfg": cfg,
                             "expect": expect_of(spec), "modes": modes, "tour_expect": tour_expect(f"{lid}@{name}", spec)})
         links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a>（場面 {len(presets)}）</li>')
