@@ -22,6 +22,7 @@ OWNER = "Watanabe-Masao"
 # （元のリポジトリ, 元の中の場所, 写しの場所）
 FILES = (
     ("knowledge-net", "schema/kn-schema-v1.json", ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"),
+    ("knowledge-net", "schema/kn-experiment-v1.json", ROOT / "docs" / "knowledge-net" / "schema" / "kn-experiment-v1.json"),   # 実験室の拡張（#211）
     ("knowledge-net", "schema/relation-types.yaml", ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"),
     ("knowledge-net", "math-lab/packages/ui/tokens.json", ROOT / "docs" / "math-lab" / "tokens.json"),
     # 式の計算の束（木から TeX を作る・木を検査する。build/formula_tex.mjs が読む。#118）

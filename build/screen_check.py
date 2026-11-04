@@ -22,20 +22,31 @@ def gh(path: str):
     return json.loads(subprocess.run(["gh", "api", path], check=True, capture_output=True, text=True).stdout)
 
 
-def screen_revision() -> tuple[int, str]:
-    """公開中の画面の型の改訂と、その公開のコミット"""
+# 型は芯と実験室の拡張の2つ（#211）。データの項目の名前 → 型のファイル
+SCHEMAS = {"schema_revision": ("芯", "schema/kn-schema-v1.json"), "experiment_revision": ("実験室の拡張", "schema/kn-experiment-v1.json")}
+
+
+def screen_revision() -> tuple[dict[str, int], str]:
+    """公開中の画面の型の改訂（芯・拡張）と、その公開のコミット。拡張の型がまだない版は 0"""
     for d in gh(f"repos/{REPO}/deployments?environment=github-pages&per_page=10"):
         st = gh(f"repos/{REPO}/deployments/{d['id']}/statuses")
         if st and st[0].get("state") == "success":
-            f = gh(f"repos/{REPO}/contents/schema/kn-schema-v1.json?ref={d['sha']}")
-            return json.loads(base64.b64decode(f["content"]))["x-revision"], d["sha"][:7]
+            revs = {}
+            for key, (_, path) in SCHEMAS.items():
+                try:
+                    f = gh(f"repos/{REPO}/contents/{path}?ref={d['sha']}")
+                    revs[key] = json.loads(base64.b64decode(f["content"]))["x-revision"]
+                except subprocess.CalledProcessError:
+                    revs[key] = 0
+            return revs, d["sha"][:7]
     raise RuntimeError("成功した画面の公開が見つからない")
 
 
-def check(data_rev: int, screen_rev: int) -> str | None:
-    """止める理由（なければ None）"""
-    if screen_rev < data_rev:
-        return f"公開中の画面の型の改訂（{screen_rev}）が、公開するデータの改訂（{data_rev}）より古い。knowledge-net の画面を先に公開する"
+def check(data_revs: dict[str, int], screen_revs: dict[str, int]) -> str | None:
+    """止める理由（なければ None）。データに書いていない型（実験室のない教材の拡張）は見ない"""
+    for key, (name, _) in SCHEMAS.items():
+        if key in data_revs and screen_revs.get(key, 0) < data_revs[key]:
+            return f"公開中の画面の{name}の型の改訂（{screen_revs.get(key, 0)}）が、公開するデータの改訂（{data_revs[key]}）より古い。knowledge-net の画面を先に公開する"
     return None
 
 
@@ -43,7 +54,8 @@ def main() -> int:
     if os.environ.get("SKIP_SCREEN_CHECK") == "1":
         print("⚠ 画面の改訂の確認を飛ばした（SKIP_SCREEN_CHECK=1）")
         return 0
-    data_rev = json.loads(DATA.read_text(encoding="utf-8")).get("schema_revision", 1)
+    data = json.loads(DATA.read_text(encoding="utf-8"))
+    data_rev = {k: data.get(k, 1) for k in SCHEMAS if k in data or k == "schema_revision"}
     try:
         screen_rev, sha = screen_revision()
     except Exception as e:  # noqa: BLE001
