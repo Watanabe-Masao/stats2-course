@@ -526,6 +526,18 @@ def validate_network(c: Course) -> list[str]:
                     err.append(f"{tid}: 式 {f.get('id')} の parts には path・name・meaning を書く")
                 if not isinstance(node, dict) or not part.get("path"):
                     err.append(f"{tid}: 式 {f.get('id')} の parts の path {part.get('path')} が木の中の節を指していない")
+            # なぜこの式で求まるかの段（型 rev30。#188）：段ごとに title・text、効く部品の番号は parts の中。2段以上
+            wy = f.get("why")
+            if wy is not None:
+                steps = wy.get("steps") if isinstance(wy, dict) else None
+                if not isinstance(steps, list) or len(steps) < 2:
+                    err.append(f"{tid}: 式 {f.get('id')} の why には2段以上の steps を書く")
+                else:
+                    for j, st in enumerate(steps):
+                        if not (isinstance(st, dict) and st.get("title") and st.get("text")):
+                            err.append(f"{tid}: 式 {f.get('id')} の why の段 {j + 1} には title・text を書く")
+                        elif any(not (isinstance(i, int) and 0 <= i < len(f.get("parts") or [])) for i in st.get("parts") or []):
+                            err.append(f"{tid}: 式 {f.get('id')} の why の段 {j + 1} の部品の番号が parts の外")
         # 式の作業台（#110）：主役の式・動かす記号（定義域つき）・横軸の記号（上限つき）・期待値の式
         ws = t.get("workspace")
         if ws:
