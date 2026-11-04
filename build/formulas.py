@@ -18,7 +18,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONTRACTS = ROOT / "content" / "formula-contracts.yaml"
 FID = re.compile(r"^F-[a-z0-9]+(-[a-z0-9]+)*$")
-CONTRACT_KEYS = {"formula", "kinds", "properties", "representative", "conditions", "review", "review_refs", "note"}
+CONTRACT_KEYS = {"formula", "kinds", "properties", "representative", "conditions", "review", "review_refs", "review_excludes", "note"}
+# 版（fingerprint）から外せる説明：観点がそれにかからないと契約に書いたときだけ外す（#204）
+REVIEW_EXCLUDABLE = {"parts", "why"}
 
 
 def originals(terms: dict) -> dict:
@@ -84,6 +86,8 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
             for c in k.get("conditions") or []:
                 if not (isinstance(c, dict) and c.get("text") and isinstance(c.get("tree"), dict)):
                     err.append(f"契約 {fid}：conditions は text と tree（比べる式の木）で書く")
+            if set(k.get("review_excludes") or []) - REVIEW_EXCLUDABLE:
+                err.append(f"契約 {fid}：review_excludes に書けるのは parts・why だけ")
             for r in k.get("review_refs") or []:
                 if r not in evidence():
                     err.append(f"契約 {fid}：review_refs の {r} が導出・実験室にない")
@@ -138,7 +142,8 @@ def evidence() -> dict:
 
 def fingerprint(term: dict, formula: dict, contract: dict | None, refs: dict | None = None) -> str:
     """レビューの対象の版（#118 M9）：式の木・記号の表（of・domain・concept・意味）・契約の組の条件・概念の成り立つ条件と反例・誤解、
-    契約の review_refs が指す根拠（導出・実験室の反例）。この中の何かが変われば値が変わり、古いレビューの記録では通らない。
+    契約の review_refs が指す根拠（導出・実験室の反例）、式の部品（parts）と「なぜ」の段（why。契約の review_excludes で外せる。#204）。
+    この中の何かが変われば値が変わり、古いレビューの記録では通らない。
     TeX は木から作るので入れない。同じ内容の作り直しでは変わらない"""
     import hashlib
     refs = refs or {}
@@ -146,6 +151,10 @@ def fingerprint(term: dict, formula: dict, contract: dict | None, refs: dict | N
             "contract_conditions": (contract or {}).get("conditions") or [], "term_conditions": term.get("conditions") or {},
             "term_counterexample": term.get("counterexample"), "term_misconceptions": term.get("misconceptions") or [],
             "evidence": {r: refs.get(r) for r in (contract or {}).get("review_refs") or []}}
+    # 部品の名前と意味・「なぜ」の段も、学習者が受け取る数学的な主張なので版に入れる（#204）。持たない式には足さない（今の版が変わらない）
+    for key in ("parts", "why"):
+        if formula.get(key) and key not in set((contract or {}).get("review_excludes") or []):
+            body[key] = formula[key]
     return hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()[:16]
 
 
