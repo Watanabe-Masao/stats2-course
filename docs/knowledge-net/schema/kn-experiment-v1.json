@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 2,
+  "x-revision": 3,
   "if": {
     "type": "object",
     "required": [
@@ -1339,6 +1339,65 @@
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "applyTexts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "words",
+        "steps"
+      ],
+      "description": "応用の課題の解き方の段の文（stats2-course #211）：engine は段ごとに文の型の id・穴の値・別の言い方だけを返し、文はここ。id・穴・別の言い方・語は engine の dist/contracts.json の apply_steps・apply_words に合わせる（教材の build が確かめる）",
+      "properties": {
+        "words": {
+          "type": "object",
+          "description": "値が語の名前の穴（op・param）→ 値 → 言葉",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "kn-schema-v1.json#/$defs/text"
+            }
+          }
+        },
+        "steps": {
+          "type": "object",
+          "description": "文の型の id → 段の題と文",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "段の題。{名前} は穴の値"
+              },
+              "text": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "段の文（ない段もある）"
+              },
+              "variants": {
+                "type": "object",
+                "description": "別の言い方 → 差し替える題・文",
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "minProperties": 1,
+                  "properties": {
+                    "title": {
+                      "$ref": "kn-schema-v1.json#/$defs/text"
+                    },
+                    "text": {
+                      "$ref": "kn-schema-v1.json#/$defs/text"
                     }
                   }
                 }

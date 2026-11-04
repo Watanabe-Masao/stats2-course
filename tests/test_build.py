@@ -601,6 +601,25 @@ class TestNetwork(unittest.TestCase):
             broke(x)
             self.assertTrue(any(want in e for e in walk_texts_errors(x)), want)
 
+    def test_apply_texts_match_engine(self):
+        # 確かめる対象：応用の段の文（content/apply-texts.yaml）が engine の表（contracts.json の apply_steps・apply_words）とちょうど合う（#211）。
+        # 想定する故障：engine が段・穴・別の言い方を足したのに文を書き忘れる・名前の書き違い・使われない文が残る・語の言葉の書き漏らし。
+        # 見つけ方：原本は通り、1つずつ崩すとそれぞれの理由で止まる。既存との違い：test_walk_texts_match_engine は解き方の公式の文
+        import copy
+        from network import load_apply_texts, apply_texts_errors
+        t = load_apply_texts()
+        self.assertEqual(apply_texts_errors(t), [])
+        for broke, want in [
+            (lambda x: x["steps"]["mode.goal"].update(text="{zz}"), "穴 {zz}"),
+            (lambda x: x["steps"]["mode.answer"]["variants"].pop("upper"), "別の言い方 upper がない"),
+            (lambda x: x["steps"].update(extra={"title": "a"}), "engine が返さない"),
+            (lambda x: x["steps"].pop("boundary.diff"), "段 boundary.diff の文がない"),
+            (lambda x: x["words"]["op"].pop("gt"), "語 op の gt の言葉がない"),
+        ]:
+            x = copy.deepcopy(t)
+            broke(x)
+            self.assertTrue(any(want in e for e in apply_texts_errors(x)), want)
+
     def test_screen_revision_gate(self):
         # 確かめる対象：公開の前に、公開中の画面の型の改訂がデータの改訂以上かを確かめる（#207）。
         # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。

@@ -1509,8 +1509,11 @@
     },
     "walk_texts": {
       "$ref": "kn-experiment-v1.json#/$defs/walkTexts"
+    },
+    "apply_texts": {
+      "$ref": "kn-experiment-v1.json#/$defs/applyTexts"
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 32
+  "x-revision": 33
 }
