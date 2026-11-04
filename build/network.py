@@ -252,6 +252,43 @@ def walk_texts_errors(t: dict) -> list[str]:
     return err
 
 
+APPLY_TEXTS = CONTENT / "apply-texts.yaml"   # 応用の解き方の段の文（engine は文の型の id・穴の値・別の言い方だけを返す。#211）
+
+
+def load_apply_texts() -> dict:
+    return (load_yaml(APPLY_TEXTS) or {}) if APPLY_TEXTS.exists() else {}
+
+
+def apply_texts_errors(t: dict) -> list[str]:
+    """応用の段の文が engine の表（contracts.json の apply_steps・apply_words）とちょうど合うか
+    （想定する故障：engine が段・穴・別の言い方を足したのに文を書き忘れる・名前の書き違い・使われない文が残る・語の穴の言葉の書き漏らし）"""
+    err: list[str] = []
+    spec, words = _CONTRACTS.get("apply_steps") or {}, _CONTRACTS.get("apply_words") or {}
+    steps, tw = t.get("steps") or {}, t.get("words") or {}
+    for w, keys in words.items():
+        for k in sorted(set(keys) - set(tw.get(w) or {})):
+            err.append(f"apply-texts：語 {w} の {k} の言葉がない")
+    for sid in sorted(set(spec) - set(steps)):
+        err.append(f"apply-texts：段 {sid} の文がない")
+    for sid in sorted(set(steps) - set(spec)):
+        err.append(f"apply-texts：段 {sid} は engine が返さない")
+    for sid, s in steps.items():
+        if sid not in spec:
+            continue
+        vs, alts = set(spec[sid]["vars"]), s.get("variants") or {}
+        if not str(s.get("title") or "").strip():
+            err.append(f"apply-texts：段 {sid} の題がない")
+        for name in sorted(set(spec[sid]["variants"]) - set(alts)):
+            err.append(f"apply-texts：段 {sid} の別の言い方 {name} がない")
+        for name in sorted(set(alts) - set(spec[sid]["variants"])):
+            err.append(f"apply-texts：段 {sid} の別の言い方 {name} は engine が返さない")
+        for where, v in [("title", s.get("title")), ("text", s.get("text"))] + [(f"{a}.{k}", x) for a, o in alts.items() for k, x in (o or {}).items()]:
+            for h in re.findall(r"\{(\w+)\}", str(v or "")):
+                if h not in vs:
+                    err.append(f"apply-texts：段 {sid} の {where} の穴 {{{h}}} は engine が返さない（{'・'.join(sorted(vs)) or 'なし'}）")
+    return err
+
+
 def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:
     """値の表の作業台の表を、実験室のテーマから作る（#119：同じ表を2か所に書かない）。
     原本は {experiment: EXP-…, theme: テーマ id, use: start か compare} だけを書き、値・重み・呼び名・単位はテーマから写す。
@@ -764,6 +801,7 @@ def validate_network(c: Course) -> list[str]:
     err += experiment_errors(c, rel_ids, {d["id"] for d in ders})
     if load_experiments():
         err += walk_texts_errors(load_walk_texts())
+        err += apply_texts_errors(load_apply_texts())
     err += skeleton_errors(c)
     return err
 
@@ -897,7 +935,7 @@ def export_network(c: Course, target: dict) -> dict:
     exp_revision = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision, **({"experiment_revision": exp_revision} if experiments else {}),
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
-            "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts()} if experiments else {})}
+            "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
 
 
 def schema_errors(data: dict) -> list[str]:
