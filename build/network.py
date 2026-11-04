@@ -172,7 +172,7 @@ def walk_errors(iid: str, ap: dict) -> list[str]:
         if not v.get("of"):
             continue
         val = solve_value(sv, str(v["of"]))
-        m = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(%)?", hit[0]["text"])
+        m = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)\s*(%|ポイント)?", hit[0]["text"])   # 割合の差の「ポイント」も % と同じく 1/100（#199）
         num = (float(m.group(1)) / (100 if m.group(2) else 1)) if m else None
         # 文の数に符号は書かない（「50 円払う」は solve の -50）。向きは言葉が担うので、大きさを比べる
         if val is None or num is None or abs(num - abs(val)) > 1e-9:
