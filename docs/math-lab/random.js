@@ -1,4 +1,4 @@
-// 生成物：packages/engine/src/random.ts から scripts/bundle-formula.mjs で作る。手で直さない（npm run bundle）
+// 生成物：packages/engine/src/random.ts から scripts/bundle-formula.mjs で作る。手で直さない（npm run lab:bundle）
 var MLRandom = (function(exports) {
 	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 	// packages/engine/src/random.ts
