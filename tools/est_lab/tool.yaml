@@ -5,7 +5,7 @@ kind: simulator
 src: est_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [unb.html, hyper.html]   # 旧版 教科書21 の「v と s² の平均を比べる（不偏・一致）」を var と comp に含む。有限母集団修正（hyper.html）は U17 の発展と LAB-srs に移した
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: calc
     name: 推定値を計算
     purpose: データ（カンマ区切り）から x̄・偏差の2乗和・n で割る v・n−1 で割る s²・s・標準誤差・中央値を出す。偏差を図に描く
@@ -58,7 +58,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（推定値、推定量の比較、分散の推定量、集め方の偏り）。
 used_by: [U21]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/est_lab/check.js          # 本文の値（s²＝7・v＝5.6、E[v]＝(n−1)σ²/n、MSE 50 と 36、c₄、自己選択の0.75）
 checked:
   browser_380px: 2026-10-28

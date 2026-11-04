@@ -2,7 +2,7 @@
 // 使い方: node tools/test_labs.js [スクリーンショットの保存先]
 //  - アップロード用の版（out/labs）と公開サイト（out/site の ?p=場面）の両方
 //  - エラーがない、380px で横にはみ出さない（ライト／ダーク）
-//  - 予想がある版：予想する前は結果（.res）が見えない。.res の外にも答えの数が出ていない。予想を入れると結果が出る
+//  - 予測がある版：予測する前は結果（.res）が見えない。.res の外にも答えの数が出ていない。予測を入れると結果が出る
 //  - expect：ラボが計算した値（LK.last）と一致する
 //  - ラボのモードが tool.yaml の modes と一致し、全モードを開いてボタンを押してもエラーが出ない
 const {chromium}=require('playwright');const path=require('path');const fs=require('fs');
@@ -32,8 +32,8 @@ const ROOT=path.resolve(__dirname,'..');
   if(first&&await p.evaluate(()=>document.getElementById('jitem').textContent)!==first)bad(`${tag}: 最初のデータが ${first} にならない`);
   if(pr){
    const vis=await p.evaluate(()=>[...document.querySelectorAll('.mode').values()].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
-   if(vis)bad(`${tag}: 予想の前に結果が見えている`);
-   // .res の付け忘れも見逃さない：予想の前に、課題・操作・説明文の外に答えの数が出ていないか
+   if(vis)bad(`${tag}: 予測の前に結果が見えている`);
+   // .res の付け忘れも見逃さない：予測の前に、課題・操作・説明文の外に答えの数が出ていないか
    if(typeof v0.expect==='number'&&v0.expect!==0){
     const given=[String(v0.cfg.task||''),JSON.stringify(v0.cfg.set||{})].join(' ');
     const nums=t=>(t.replace(/[,，]/g,'').replace(/[−–]/g,'-').match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);
@@ -42,21 +42,21 @@ const ROOT=path.resolve(__dirname,'..');
      const txt=await p.evaluate(()=>{const m=[...document.querySelectorAll('.mode')].find(d=>d.style.display!=='none');if(!m)return '';
       return [...m.querySelectorAll(':scope *')].filter(e=>e.children.length===0&&e.offsetParent!==null&&!e.closest('.lk-step,select,.res,.lk-wait')&&!(e.closest('p.mut')&&e.closest('p.mut').parentElement===m)).map(e=>e.textContent).join(' ');});
      const hit=nums(txt).find(near);
-     if(hit!==undefined)bad(`${tag}: 予想の前に答えの数（${hit}）が見えている（.res の付け忘れ？）`);}
+     if(hit!==undefined)bad(`${tag}: 予測の前に答えの数（${hit}）が見えている（.res の付け忘れ？）`);}
    }
    if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}_before.png`,fullPage:true});
    for(let i=0;i<EX.length;i++){const P=ST?ST[i].predict:pr,E=EX[i],st=ST?`（段${i+1}）`:'';
    if(i>0){await p.click('#lk-next');
     const vis2=await p.evaluate(()=>[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).some(e=>e.offsetParent!==null));
-    if(vis2)bad(`${tag}${st}: 予想の前に結果が見えている`);}
+    if(vis2)bad(`${tag}${st}: 予測の前に結果が見えている`);}
    if(P.type==='number')await p.fill('#lk-in',String(E));
    else await p.click(`#lk-ch button[data-v="${E}"]`);
    await p.click('#lk-go');
    const r=await p.evaluate(()=>({last:LK.last,locked:LK.locked,vis:[...document.querySelectorAll('.mode')].filter(d=>d.style.display!=='none').flatMap(d=>[...d.querySelectorAll('.res')]).every(e=>e.offsetParent!==null),verdict:document.getElementById('lk-verdict').innerText}));
-   if(r.locked||!r.vis)bad(`${tag}${st}: 予想のあとも結果が出ない`);
+   if(r.locked||!r.vis)bad(`${tag}${st}: 予測のあとも結果が出ない`);
    const ok=typeof E==='number'?Math.abs(r.last.v-E)<=Math.max(5e-4,Math.abs(E)*5e-4):r.last.text===E;
    if(!ok)bad(`${tag}${st}: expect ${E} とラボの値 ${r.last.text} が違う`);
-   if(!/予想どおり/.test(r.verdict))bad(`${tag}${st}: 正しい予想なのに「予想どおり」にならない`);}
+   if(!/予測どおり/.test(r.verdict))bad(`${tag}${st}: 正しい予測なのに「予測どおり」にならない`);}
    if(ST){await p.click('#lk-law');if(!(await p.$('.lk-law .l')))bad(`${tag}: 最後に式（law）が出ない`);}
    if(await sw()>380)bad(`${tag}: 結果を出したあと横にはみ出し`);
    if(shots&&scheme==='light'&&!v.site)await p.screenshot({path:`${shots}/${v.asset.replace('@','__')}_after.png`,fullPage:true});
@@ -91,7 +91,7 @@ const ROOT=path.resolve(__dirname,'..');
    if(N<2)bad(`${tag}: tour が2段未満`);}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
-  // Notion の埋め込み（高さ約320px）：予想の前は枠に収まる。結果のあとは「くわしく」で表・式が開く
+  // Notion の埋め込み（高さ約320px）：予測の前は枠に収まる。結果のあとは「くわしく」で表・式が開く
   const p=await b.newPage({viewport:{width:360,height:320}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
   await p.goto('file://'+path.join(ROOT,v.file)+(v.query?v.query+'&':'?')+'embed=1');
   const tag=`埋め込み ${v.site?'公開サイト ':''}${v.asset}`;
@@ -99,7 +99,7 @@ const ROOT=path.resolve(__dirname,'..');
   if(await p.evaluate(()=>document.documentElement.scrollWidth)>360)bad(`${tag}: 横にはみ出し`);
   const ST=v.cfg.steps||null,EX=ST?v.expect:[v.expect],pr=ST?ST[0].predict:v.cfg.predict;
   if(pr){
-   if(await h()>320)bad(`${tag}: 予想の前に枠（320px）に収まらない（${await h()}px）`);
+   if(await h()>320)bad(`${tag}: 予測の前に枠（320px）に収まらない（${await h()}px）`);
    const fixed=Object.keys(v.cfg.set||{}).filter(k=>!(v.cfg.unlock||[]).includes(k));
    for(const k of fixed)if(await p.$eval(`#m-${v.cfg.mode}`,(m,k)=>{const s=m.querySelector(`select[data-key="${k}"]`);return s&&s.offsetParent!==null;},k))bad(`${tag}: 問題で決めた ${k} が選べてしまう`);
    if(pr.type==='number')await p.fill('#lk-in',String(EX[0]));else await p.click(`#lk-ch button[data-v="${EX[0]}"]`);
@@ -121,4 +121,4 @@ const ROOT=path.resolve(__dirname,'..');
       if(fo&&!(await p.evaluate(([fo,W])=>{const es=[...document.querySelectorAll('.lk-hl')];return es.length>0&&es.every(e=>{const r=e.getBoundingClientRect();return e.offsetParent!==null&&r.height>0&&r.bottom<=320&&r.right<=W+4;});},[fo,W])))bad(`${tag}: ${where}で注目する場所（${fo}）が見えない`);}}}}
   if(errs.length)bad(`${tag}: エラー ${errs.join(' / ')}`);
   await p.close();}
- await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予想の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();
+ await b.close();if(process.env.EMBED_H)console.log('結果のあとの高さ',embedH.join(' '));console.log(fail?`❌ ${fail} 件`:`✅ ${man.length} 版：エラー・はみ出しなし、予測の前は結果が隠れ、答えはラボの値と一致`);process.exit(fail?1:0);})();

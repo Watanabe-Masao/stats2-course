@@ -5,7 +5,7 @@ kind: simulator
 src: ttest_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_dist.html, sim_test.html, twot.html]   # 旧版 教科書25 の「t(15) の境目2.131」を one に、「2群の t 検定（平均の差・標準偏差・日数で t と p 値）」を two に含む。対応ありを paired にした
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: one
     name: 1標本
     purpose: H₀：μ＝μ₀ の1標本 t 検定。t＝(x̄−μ₀)÷(s÷√n)、自由度 n−1 の p 値と境目。t 分布と標準正規を重ねて描き、正規の境目（数表の1.96など）も並べる
@@ -53,7 +53,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（1標本、対応あり、2群）。
 used_by: [U25]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/ttest_lab/check.js        # 本文の値（t＝2・p≒0.064、t の境目、ウェルチと等分散、対応あり）
 checked:
   browser_380px: null

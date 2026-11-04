@@ -5,14 +5,14 @@ kind: simulator
 src: xbar_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_clt.html, unb.html]   # 旧版 教科書18 の「n を4倍で SE が半分」を se、「n−1 で割る s² の平均は σ²」を unb に含む。中心極限定理（形が正規に近づく）は U19
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: se
-    name: 平均のぶれ
-    purpose: 1個の分布（σ）と n 個の平均の分布（SE＝σ÷√n）を重ねる。中心は μ のまま、n を4倍で SE は半分。「200回取り直す」で実際のぶれも見る（固定の乱数）
+    name: 平均のばらつき
+    purpose: 1個の分布（σ）と n 個の平均の分布（SE＝σ÷√n）を重ねる。中心は μ のまま、n を4倍で SE は半分。「200回取り直す」で実際のばらつきも見る（固定の乱数）
     set: [mu, sd, n]
     values: [se, var, sdsum, varsum, ratio, se4]
   - key: prop
-    name: 比率のぶれ
+    name: 比率のばらつき
     purpose: 標本比率 p̂ の SE＝√(p(1−p)÷n)、±2SE、目標の SE に必要な人数
     set: [p, n, e]                # e：目標の SE
     values: [se, var, margin, nFor, nWorst]
@@ -40,20 +40,20 @@ presets:
   s3-free:
     mode: se
     modes: [se, prop, unb]
-    task: 解いてから、問題が聞いていること（平均のぶれか、比率のぶれか、分散の割り方か）に合うモードで確かめる。
+    task: 解いてから、問題が聞いていること（平均のばらつきか、比率のばらつきか、分散の割り方か）に合うモードで確かめる。
   s4-free:
     mode: se
     modes: [se, prop]
-    task: 自分の売場の数字（1客の購入額の標準偏差と客数、購入率と調べる人数）を入れ、平均や比率がどれだけぶれるかを読む。
+    task: 自分の売場の数字（1客の購入額の標準偏差と客数、購入率と調べる人数）を入れ、平均や比率がどれだけばらつくかを読む。
   s5-free:
     mode: unb
     modes: [unb, se]
-    task: 「不偏分散」で n を2→3→4と変え、v の平均が (n−1)/n×σ² になることを確かめる（発展1）。「平均のぶれ」で「200回取り直す」を押し、取り直した x̄ の標準偏差が SE に近いことを見る（発展2）。
+    task: 「不偏分散」で n を2→3→4と変え、v の平均が (n−1)/n×σ² になることを確かめる（発展1）。「平均のばらつき」で「200回取り直す」を押し、取り直した x̄ の標準偏差が SE に近いことを見る（発展2）。
   s6-free:
-    task: 自分の課題の数字で、モードを切り替えて確かめる（平均のぶれ、比率のぶれ、不偏分散）。
+    task: 自分の課題の数字で、モードを切り替えて確かめる（平均のばらつき、比率のばらつき、不偏分散）。
 used_by: [U18]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/xbar_lab/check.js         # 本文の値（SE 4・2・1、0.04、σ²/n＝4、v の平均 4/3・s² の平均 8/3、必要人数 625）
 checked:
   browser_380px: 2026-10-28

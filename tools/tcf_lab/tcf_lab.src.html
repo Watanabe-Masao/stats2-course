@@ -18,7 +18,7 @@
  <input type="range" id="sm" min="0" max="1000" step="0.5" value="50" data-name="基準 μ₀">
  <input type="range" id="ss" min="0.5" max="200" step="0.5" value="8" data-name="標準偏差 s">
  <input type="range" id="sn" min="2" max="200" step="1" value="16" data-name="個数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="splot"></div>
  <div class="card res key" id="ssum"></div>
 </div>
@@ -28,7 +28,7 @@
  <input type="range" id="tdf" min="1" max="200" step="1" value="15" data-name="自由度">
  <div class="row ctl"><label>基準 <select id="tside" data-key="side"><option value="two">両側</option><option value="one">片側（上側）</option></select></label><label><select id="talpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label></div>
  <input type="range" id="tobs" min="0" max="6" step="0.01" value="1" data-name="t の値">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="tplot"></div>
  <div class="card res key" id="tsum"></div>
  <div class="res det" id="ttab"></div>
@@ -39,7 +39,7 @@
  <input type="range" id="cn" min="2" max="100" step="1" value="10" data-name="個数 n">
  <input type="range" id="cs" min="0.5" max="500" step="0.5" value="12" data-name="不偏分散 s²">
  <input type="range" id="cv" min="0.5" max="500" step="0.5" value="8" data-name="基準の σ²">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="cplot"></div>
  <div class="card res key" id="csum"></div>
 </div>
@@ -50,7 +50,7 @@
  <input type="range" id="fn1" min="2" max="100" step="1" value="11" data-name="n₁">
  <input type="range" id="fs2" min="0.5" max="2000" step="0.5" value="9" data-name="s₂²">
  <input type="range" id="fn2" min="2" max="100" step="1" value="13" data-name="n₂">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="fplot"></div>
  <div class="card res key" id="fsum"></div>
 </div>
@@ -99,7 +99,7 @@ function sVals(){const xb=+$("sx").value,mu=+$("sm").value,s=+$("ss").value,n=+$
  return {xbar:xb,mu0:mu,s,n,se,t,df,tcrit:tc,zcrit:1.959964,p:2*(1-tcdf(Math.abs(t),df)),judge:Math.abs(t)>tc?"基準を超える":"基準以内",wrong:(xb-mu)/s};}
 function sRender(){const S=sVals(),lim=Math.max(4.5,Math.abs(S.t)+1);
  $("splot").innerHTML=plot([{fn:x=>tpdf(x,S.df),col:"var(--acc)"},{fn:npdf,col:"var(--mut)",w:1.2,dash:"4 3"}],-lim,lim,{shade:[[-99,-S.tcrit],[S.tcrit,99]],ticks:[-4,-2,0,2,4].filter(x=>Math.abs(x)<=lim),lines:[{x:S.t,label:`t＝${f(S.t,3)}`,col:"var(--fg)",dash:"2 2"},{x:S.tcrit,label:`${f(S.tcrit,3)}`}],label:"t 分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${S.df})</span><span><i class="sw" style="background:var(--mut)"></i>標準正規</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>両側5%の外側</span></div>`;
- $("ssum").innerHTML=`<div>SE＝s÷√n＝${f(S.s,2)}÷√${S.n}＝<b>${f(S.se)}</b></div><div>t＝(${f(S.xbar,2)}−${f(S.mu0,2)})÷${f(S.se)}＝<b>${f(S.t,3)}</b>　自由度 ${S.df}</div><div>両側5%の点 t(${S.df}) の上側2.5%点＝<b>${f(S.tcrit,3)}</b>（正規なら1.96）→ |t| は <b>${S.judge}</b>（両側の p≒${f(S.p,3)}）</div><div class="mut">分母に s をそのまま入れると ${f(S.wrong,3)} になってしまう。分母は平均のぶれ s÷√n。</div>`;}
+ $("ssum").innerHTML=`<div>SE＝s÷√n＝${f(S.s,2)}÷√${S.n}＝<b>${f(S.se)}</b></div><div>t＝(${f(S.xbar,2)}−${f(S.mu0,2)})÷${f(S.se)}＝<b>${f(S.t,3)}</b>　自由度 ${S.df}</div><div>両側5%の点 t(${S.df}) の上側2.5%点＝<b>${f(S.tcrit,3)}</b>（正規なら1.96）→ |t| は <b>${S.judge}</b>（両側の p≒${f(S.p,3)}）</div><div class="mut">分母に s をそのまま入れると ${f(S.wrong,3)} になってしまう。分母は平均のばらつき s÷√n。</div>`;}
 LK.register("tstat",{name:"t 値を計算",
  init(){["sx","sm","ss","sn"].forEach(id=>LK.stepper($(id),sRender));sRender();},
  apply(s){if(s.xbar!==undefined)LK.setRange("sx",s.xbar);if(s.mu0!==undefined)LK.setRange("sm",s.mu0);if(s.s!==undefined)LK.setRange("ss",s.s);if(s.n!==undefined)LK.setRange("sn",s.n);sRender();},

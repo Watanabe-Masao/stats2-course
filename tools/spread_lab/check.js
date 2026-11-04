@@ -1,4 +1,4 @@
-// 散らばりラボの数値の検算：本文・問題に書いた値とラボの計算が一致するか
+// ばらつきラボの数値の検算：本文・問題に書いた値とラボの計算が一致するか
 const {chromium}=require('playwright');const path=require('path');
 (async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+path.resolve(__dirname,'../../out/labs/LAB-spread.html'));
  const r=await p.evaluate(()=>{const L=window.__LAB__,S=k=>L.stats(L.DATA[k].v);

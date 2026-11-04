@@ -4,7 +4,7 @@ slug: count                      # 公開サイトでのフォルダ名（URL �
 kind: simulator
 src: count_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 3                       # 2：共通部品に移した（slug は旧版と同じ）。3：条件付きで数えるモードを足した
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: list
     name: 並べて数える
     purpose: n 人から r 人。役割を区別する（順列）・しない（組合せ）を書き出して比べる
@@ -76,7 +76,7 @@ presets:
     task: 自分の式を小さい例で確かめる。「並べて数える」の書き出しや「道順」の書き出しで、式と書き出しの数が一致するか見る。
 used_by: [U09]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/count_lab/check.js        # 本文の値（₅P₂＝20・₅C₂＝10、₇C₃＝15＋20、₇C₄＝35、₄C₂ の段、完全順列 9/24、条件付き 10・34・48・7/15）
 checked:
   browser_380px: 2026-10-28

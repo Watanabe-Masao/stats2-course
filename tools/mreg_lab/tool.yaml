@@ -5,7 +5,7 @@ kind: simulator
 src: mreg_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [mreg.html, sim_reg.html]   # 旧版 教科書30 の「価格と客数が相関すると単回帰の傾きがずれる」を coef に、「回帰平方和180・残差平方和120・F」を anova に、「係数0.6・SE0.2 の t」を tval に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: coef
     name: 係数の読み方
     purpose: 2つの説明変数 x₁・x₂ の重回帰。点（店）をドラッグすると、x₁ だけの単回帰の直線（点線）と、x₂ を平均にそろえた重回帰の直線（実線）が同時に動く。係数・標準誤差・t、R²・調整済み R²、予測値
@@ -18,7 +18,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     values: [bD, mdiff, b1, slope0, slope1, bI]
   - key: colin
     name: 多重共線性
-    purpose: x₁ と x₂ の相関を変え、同じ仕組み（本当の係数はどちらも1）から標本を40回取り直した (b₁, b₂) を点で打つ。VIF、係数のぶれ、b₁＋b₂ のぶれ、符号が逆になった回数（固定の乱数）
+    purpose: x₁ と x₂ の相関を変え、同じ仕組み（本当の係数はどちらも1）から標本を40回取り直した (b₁, b₂) を点で打つ。VIF、係数のばらつき、b₁＋b₂ のばらつき、符号が逆になった回数（固定の乱数）
     set: [r, n]
     values: [vif, sef, sd1, sumsd, flip]
   - key: add
@@ -98,12 +98,12 @@ presets:
   s5-free:
     mode: dummy
     modes: [dummy, colin, add]
-    task: 交互作用を入れると「週末の効果」が客数によって変わることを見る。多重共線性で b₁ と b₂ が1つずつではぶれ、和は安定することを見る。
+    task: 交互作用を入れると「週末の効果」が客数によって変わることを見る。多重共線性で b₁ と b₂ が1つずつではばらつき、和は安定することを見る。
   s6-free:
     task: 自分の課題の数字で、モードを切り替えて確かめる（係数の読み方、ダミー変数、多重共線性、変数を足す、分散分析表、係数の t）。
 used_by: [U30]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/mreg_lab/check.js         # 本文の値（ŷ＝40−x₁＋3x₂、単回帰の傾き1.377、D の係数6、F＝12.75、t＝3、VIF 5.263、調整済み R²）と点のドラッグ
 checked:
   browser_380px: 2026-10-29

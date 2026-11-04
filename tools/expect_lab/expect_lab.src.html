@@ -18,7 +18,7 @@
  <div class="row ctl"><label>値 <select id="dxs" data-key="xs"></select></label></div>
  <div id="dps"></div>
  <div class="rest mut ctl" id="dlast"></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="dplot"></div>
  <div class="card res key" id="dsum"></div>
  <div class="res det" id="dtab"></div>
@@ -29,7 +29,7 @@
  <div class="card mut ctl" id="lx"></div>
  <input type="range" id="la" min="-10" max="300" step="1" value="200" data-name="a（掛ける）">
  <input type="range" id="lb" min="-100" max="300" step="1" value="50" data-name="b（足す）">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="lplot"></div>
  <div class="card res key" id="lsum"></div>
 </div>
@@ -41,7 +41,7 @@
  <input type="range" id="svx" min="0" max="200" step="0.5" value="4" data-name="V(X)">
  <input type="range" id="svy" min="0" max="200" step="0.5" value="9" data-name="V(Y)">
  <input type="range" id="scv" min="-100" max="100" step="0.5" value="1" data-name="Cov(X,Y)">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="splot"></div>
  <div class="card res key" id="ssum"></div>
 </div>
@@ -51,7 +51,7 @@
  <input type="range" id="tn" min="1" max="500" step="1" value="300" data-name="人数 n">
  <input type="range" id="tmu" min="0" max="10" step="0.1" value="1.1" data-name="1人の期待値">
  <input type="range" id="tvr" min="0" max="5" step="0.01" value="0.49" data-name="1人の分散">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="tplot"></div>
  <div class="card res key" id="tsum"></div>
 </div>
@@ -63,7 +63,7 @@
  <input type="range" id="j10" min="0" max="100" step="1" value="20" data-name="Xだけ" data-unit="%">
  <input type="range" id="j01" min="0" max="100" step="1" value="10" data-name="Yだけ" data-unit="%">
  <div class="rest mut ctl" id="jlast"></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="jplot" data-tour-anchor></div>
  <div class="card res key" id="jsum"></div>
 </div>
@@ -110,7 +110,7 @@ function dRender(){dClamp();const D=dVals(),u=DS.unit;
  $("dlast").textContent=`${f(DS.xs[DS.xs.length-1])}${u} の確率（残り）＝${D.raw[D.raw.length-1]}%`;
  $("dplot").innerHTML=distSvg(D.xs,D.p,D.mean,D.sd,u,170,`${DS.name}の分布`)+legendD;
  const terms=D.xs.map((x,i)=>`${f(x)}×${f(D.p[i])}`).join("＋");
- $("dsum").innerHTML=`<div>E(X)＝${terms}＝<b>${f(D.mean)}${esc(u)}</b></div><div>V(X)＝E(X²)−{E(X)}²＝${f(D.ex2)}−${f(D.mean)}²＝<b>${f(D.var)}</b>　標準偏差＝√${f(D.var)}＝<b>${f(D.sd)}${esc(u)}</b></div><div class="mut">100回（100人）なら合計はおよそ ${f(100*D.mean)}${esc(u)}。1回ごとには期待値から ±${f(D.sd)}${esc(u)} くらいぶれる。</div>`;
+ $("dsum").innerHTML=`<div>E(X)＝${terms}＝<b>${f(D.mean)}${esc(u)}</b></div><div>V(X)＝E(X²)−{E(X)}²＝${f(D.ex2)}−${f(D.mean)}²＝<b>${f(D.var)}</b>　標準偏差＝√${f(D.var)}＝<b>${f(D.sd)}${esc(u)}</b></div><div class="mut">100回（100人）なら合計はおよそ ${f(100*D.mean)}${esc(u)}。1回ごとには期待値から ±${f(D.sd)}${esc(u)} くらいばらつく。</div>`;
  $("dtab").innerHTML=`<table><tr><th>x</th><th>確率</th><th>x×確率</th><th>x²×確率</th></tr>${D.xs.map((x,i)=>`<tr><td>${f(x)}</td><td>${f(D.p[i])}</td><td>${f(x*D.p[i])}</td><td>${f(x*x*D.p[i])}</td></tr>`).join("")}<tr><th>合計</th><th>${f(D.p.reduce((a,b)=>a+b,0))}</th><th>${f(D.mean)}</th><th>${f(D.ex2)}</th></tr></table>`;
  if(LK.mode==="lin")lRender();}
 function dApply(s){if(s.unit!==undefined)DS.unit=s.unit;if(s.name)DS.name=s.name;if(s.xs!==undefined)dSetXs(s.xs);dBuild(s.p);dRender();}
@@ -164,7 +164,7 @@ function tRender(){const T=tVals(),H=170,L=40,R=W-14,base=H-26,top=14,N=Math.max
  s+=`<text x="${X(T.n)-4}" y="${Y(T.naive)+12}" font-size="11" text-anchor="end" fill="var(--acc2)">${f(T.naive)}</text>`;
  s+=`<text x="${L}" y="${H-8}" font-size="11" fill="var(--mut)">1人</text><text x="${R}" y="${H-8}" font-size="11" text-anchor="end" fill="var(--mut)">${T.n}人</text></svg>`;
  $("tplot").innerHTML=s+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>合計の標準偏差（√n 倍）</span><span><i class="sw" style="border:2px dashed var(--acc2)"></i>標準偏差を n 倍（誤り）</span></div>`;
- $("tsum").innerHTML=`<div>合計の期待値＝${T.n}×${f(T.mu)}＝<b>${f(T.etot)}${esc(TU)}</b></div><div>合計の分散＝${T.n}×${f(T.vr)}＝<b>${f(T.vtot)}</b>　標準偏差＝√${f(T.vtot)}＝<b>${f(T.sdtot)}${esc(TU)}</b></div><div class="mut">1人の標準偏差 ${f(T.sd)} を ${T.n} 倍した ${f(T.naive)} ではない。ぶれは打ち消し合うので √${T.n} 倍にしかならない。1人あたりの平均のぶれは ${f(T.sd)}÷√${T.n}＝${f(T.sdmean)}。</div>`;}
+ $("tsum").innerHTML=`<div>合計の期待値＝${T.n}×${f(T.mu)}＝<b>${f(T.etot)}${esc(TU)}</b></div><div>合計の分散＝${T.n}×${f(T.vr)}＝<b>${f(T.vtot)}</b>　標準偏差＝√${f(T.vtot)}＝<b>${f(T.sdtot)}${esc(TU)}</b></div><div class="mut">1人の標準偏差 ${f(T.sd)} を ${T.n} 倍した ${f(T.naive)} ではない。ばらつきは打ち消し合うので √${T.n} 倍にしかならない。1人あたりの平均のばらつきは ${f(T.sd)}÷√${T.n}＝${f(T.sdmean)}。</div>`;}
 LK.register("total",{name:"n 人の合計",
  init(){["tn","tmu","tvr"].forEach(id=>LK.stepper($(id),tRender));tRender();},
  apply(s){if(s.unit!==undefined)TU=s.unit;if(s.n!==undefined)LK.setRange("tn",s.n);if(s.mu!==undefined)LK.setRange("tmu",s.mu);if(s.var!==undefined)LK.setRange("tvr",s.var);tRender();},

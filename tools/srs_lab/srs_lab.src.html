@@ -20,18 +20,18 @@ td.on{color:var(--acc2);font-weight:700}
  <input type="range" id="in" min="1" max="100" step="1" value="10" data-name="選ぶ n">
  <input type="range" id="im" min="0" max="100" step="1" value="5" data-name="名簿の外">
  <div class="row ctl"><button type="button" class="sub" id="idraw">1回抽選する</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="iplot"></div>
  <div class="card res key" id="isum"></div>
 </div>
 
 <div id="m-enum" class="mode">
- <p class="mut" style="margin:0">小さな母集団から n 個を選ぶ組み合わせを全部並べ、それぞれの標本平均 x̄ を出す。x̄ の散らばり方が標本分布。</p>
+ <p class="mut" style="margin:0">小さな母集団から n 個を選ぶ組み合わせを全部並べ、それぞれの標本平均 x̄ を出す。x̄ のばらつき方が標本分布。</p>
  <div class="row ctl vals"><label style="flex:1">母集団の値 <input id="ev" value="3,5,7,9,11" inputmode="decimal" aria-label="母集団の値（カンマ区切り、2〜8個）"></label></div>
  <input type="range" id="en" min="1" max="7" step="1" value="2" data-name="選ぶ n">
  <input type="range" id="ec" min="0" max="20" step="0.5" value="8" data-name="基準 c">
  <input type="range" id="et" min="0" max="10" step="0.5" value="1" data-name="μ±幅">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="eplot"></div>
  <div class="card res key" id="esum"></div>
  <div class="res det" id="etab"></div>
@@ -41,7 +41,7 @@ td.on{color:var(--acc2);font-weight:700}
  <p class="mut" style="margin:0">戻して選ぶ（復元抽出）と、同じ件が2回以上選ばれることがある。戻さず選ぶ（非復元抽出）と重複はない。N が大きいと2つの差は小さい。</p>
  <input type="range" id="rN" min="2" max="1000" step="1" value="30" data-name="名簿 N">
  <input type="range" id="rn" min="1" max="60" step="1" value="5" data-name="選ぶ n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="rplot"></div>
  <div class="card res key" id="rsum"></div>
 </div>
@@ -100,7 +100,7 @@ function eRender(){eFix();const E=eVals();if(!E.count){$("eplot").innerHTML=`<di
  const lo=Math.min(...E.xs),hi=Math.max(...E.xs),L=16,R=W-16,X=x=>hi===lo?W/2:L+(x-lo)/(hi-lo)*(R-L);
  const key=m=>Math.round(m*1000)/1000,cnt={};E.list.forEach(o=>{o.k=key(o.m);cnt[o.k]=(cnt[o.k]||0)+1;});
  const top=Math.max(...Object.values(cnt)),r=Math.max(2.5,Math.min(7,90/top/2.2)),base=118,H=base+44,seen={};
- let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="標本平均の散らばり">`;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="標本平均のばらつき">`;
  s+=`<rect x="${X(Math.max(lo,E.mu-E.tol))}" y="10" width="${Math.max(1,X(Math.min(hi,E.mu+E.tol))-X(Math.max(lo,E.mu-E.tol)))}" height="${base-10}" fill="var(--acc)" fill-opacity=".08"/>`;
  E.list.forEach(o=>{const i=seen[o.k]=(seen[o.k]||0)+1,on=o.m>=E.c-1e-9;s+=`<circle cx="${X(o.m)}" cy="${base-r-(i-1)*(2*r+1)}" r="${r}" fill="${on?"var(--acc2)":"var(--acc)"}" fill-opacity="${on?.85:.55}"/>`;});
  s+=`<line x1="${L}" y1="${base}" x2="${R}" y2="${base}" stroke="var(--fg)" stroke-opacity=".5"/>`;

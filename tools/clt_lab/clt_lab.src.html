@@ -18,7 +18,7 @@
  <div class="row ctl"><label>母集団 <select id="cshape" data-key="shape"><option value="expo">待ち時間（右に長い裾）</option><option value="unif">一様（平ら）</option><option value="bimodal">山が2つ</option><option value="bern">0か1（買う・買わない）</option></select></label></div>
  <input type="range" id="cn" min="1" max="100" step="1" value="1" data-name="個数 n">
  <input type="range" id="cp" min="0.05" max="0.95" step="0.05" value="0.2" data-name="1の割合 p">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="cplot"></div>
  <div class="card res key" id="csum"></div>
 </div>
@@ -28,7 +28,7 @@
  <input type="range" id="lp" min="0.05" max="0.95" step="0.05" value="0.3" data-name="確率 p">
  <input type="range" id="lN" min="10" max="5000" step="10" value="100" data-name="回数 N">
  <div class="row ctl"><button type="button" class="sub" id="lagain">別の乱数で引き直す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="lplot"></div>
  <div class="card res key" id="lsum"></div>
 </div>
@@ -39,7 +39,7 @@
  <input type="range" id="bp" min="0.01" max="0.99" step="0.01" value="0.5" data-name="確率 p">
  <input type="range" id="bk" min="0" max="1000" step="1" value="55" data-name="k 回">
  <div class="row ctl"><label>求める <select id="bkind" data-key="kind"><option value="le">k 回以下</option><option value="ge">k 回以上</option><option value="eq">ちょうど k 回</option></select></label></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="bplot"></div>
  <div class="card res key" id="bsum"></div>
 </div>
@@ -47,7 +47,7 @@
 <div id="m-cheb" class="mode">
  <p class="mut" style="margin:0">分布の形が分からなくても、平均から kσ 以上離れる確率は 1÷k² 以下（チェビシェフの不等式）。正規分布なら実際はもっと小さい。</p>
  <input type="range" id="hk" min="1" max="5" step="0.1" value="2" data-name="k（σ の何倍）">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="hplot"></div>
  <div class="card res key" id="hsum"></div>
 </div>

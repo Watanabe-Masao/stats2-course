@@ -5,7 +5,7 @@ kind: simulator
 src: expect_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_expect.html]   # 旧版 教科書13 の「aX＋b を動かす」を lin モードに含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: dist
     name: 分布と期待値
     purpose: 値ごとの確率から、期待値（重心）・E(X²)・分散・標準偏差。最後の値の確率は合計100%になるよう自動で決まる
@@ -90,12 +90,12 @@ presets:
   s5-free:
     mode: joint
     modes: [joint, total, dist]
-    task: 「同時分布」で、共分散を0にすると P(両方)＝P(X＝1)P(Y＝1) になる（0/1 の量では無相関なら独立）ことを確かめる。「n 人の合計」で、1人あたりの平均のぶれが人数とともに小さくなるのを見る。
+    task: 「同時分布」で、共分散を0にすると P(両方)＝P(X＝1)P(Y＝1) になる（0/1 の量では無相関なら独立）ことを確かめる。「n 人の合計」で、1人あたりの平均のばらつきが人数とともに小さくなるのを見る。
   s6-free:
     task: 自分の課題の数字で、モードを切り替えて確かめる（分布と期待値、aX＋b、和と差、n 人の合計、同時分布）。
 used_by: [U13]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/expect_lab/check.js       # 本文の値（1.1・1.7・0.49・0.7、0.99、270円・140円、15・11、330個・147・12.1、Cov 0.1）
 checked:
   browser_380px: 2026-10-28

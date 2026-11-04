@@ -5,7 +5,7 @@ kind: simulator
 src: center_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_mean.html]   # 旧版 教科書06 の「平均と中央値」（外れ値で平均だけ動く）を mm モードに含む。成長率のラボ（growth.html）は LAB-ts の growth モードへ
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: mm
     name: 平均・中央値・最頻値
     purpose: 3つの代表値と Q₁・Q₃ を同じ図に置く。最大の値を動かすと平均だけが大きく動く
@@ -38,7 +38,7 @@ presets:
   s1-move:
     mode: mm
     set: {data: buy10, top: 40}
-    task: いちばん大きい17千円が40千円だったら、平均は何千円になるか。予想したら −／＋ で最大の値を動かし、中央値が動くかを見る。
+    task: いちばん大きい17千円が40千円だったら、平均は何千円になるか。予測したら −／＋ で最大の値を動かし、中央値が動くかを見る。
     predict: {type: number, key: mean, label: "平均", unit: "千円"}
     expect: 6.3
     why: 合計は 40−17＋40＝63 で、平均は6.3千円。中央値は2.5千円のまま。平均は合計を使うので端の値の大きさに引っ張られ、中央値は順番の真ん中なので引っ張られない。
@@ -54,7 +54,7 @@ presets:
     task: 自分の店の数字で、代表値の選び方を4つのモードで確かめる（3つの代表値、重み付き平均、度数表の平均、分布の形）。
 used_by: [U06]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/center_lab/check.js       # 本文の値（4・2.5・2、2,200円、175円、近似平均16、裾の向きと並び）
 checked:
   browser_380px: 2026-10-28

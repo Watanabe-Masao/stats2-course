@@ -5,7 +5,7 @@ kind: simulator
 src: graph_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: []              # 新しく作ったラボ（数字と図のつながりを触って覚える）
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: link
     name: 図をつなげる
     purpose: 同じデータを点・ヒストグラム・箱ひげ図で縦に並べる。点を指で動かす（または選んだ点の値を変える）と、図・平均・中央値・四分位数・外れ値がいっしょに変わる
@@ -52,7 +52,7 @@ presets:
     task: 4つの図を切り替え、同じデータでも図によって見えること・見えないことを比べる。
 used_by: [U04, U05]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/graph_lab/check.js        # 本文の値（中央値27.5、累積0.5 で26.7、幹2 の葉9個、食品の中心角162°）と、点のドラッグ
 checked:
   browser_380px: 2026-10-29

@@ -5,7 +5,7 @@ kind: simulator
 src: doe_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [anova.html]    # 旧版 教科書32 の「群の平均の差 d・群内のばらつき s・店舗数 n で SS_B・SS_W・F が変わる」を anova に含む。割り当て方・t 検定のくり返し・交互作用は新しく作った
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: anova
     name: 分散分析
     purpose: 群ごとの点・群の平均・全体の平均を並べ、群間の平方和（太い横線）と群内の平方和（細い線）、F と p 値、F の境目（3桁）を出す。平均のずれ・群内のばらつきを何倍かにし、店舗をくり返して自由度を増やす
@@ -104,7 +104,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（分散分析、割り当て方、t 検定のくり返し、効果が店で違う）。
 used_by: [U32]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/doe_lab/check.js          # 本文の値（16・6・F＝4・9.552、各3店の F＝6.75、割り当て方の偏り、3群の t 検定のくり返し約0.13（理論約0.12））
 checked:
   browser_380px: 2026-10-29

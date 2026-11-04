@@ -5,7 +5,7 @@ kind: simulator
 src: dist_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_mean.html]   # 旧版 教科書05 の「平均と中央値」シミュレーターの機能（外れ値で平均だけ動く）を box モードに含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: hist
     name: 度数分布
     purpose: 階級に分けて数え、表とヒストグラムを作る。幅を変えると見え方が変わる
@@ -23,7 +23,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     values: ["dens:0", "dens:1"]
   - key: cmp
     name: 店舗を比べる
-    purpose: 5店舗の箱ひげ図。中央値が同じでも散らばり（IQR）と裾が違う
+    purpose: 5店舗の箱ひげ図。中央値が同じでもばらつき（IQR）と裾が違う
     set: []
     values: [widest, tail]          # tail＝C店のひげが長いのは上か下か
   - key: shape
@@ -47,7 +47,7 @@ presets:
   s4-cmp:
     mode: cmp
     modes: [cmp, shape]
-    task: 5店舗の箱ひげ図で、散らばりの大きい店と裾の向きを読む。次に「同じ箱でも」で、箱ひげ図から分からないことを確かめる。
+    task: 5店舗の箱ひげ図で、ばらつきの大きい店と裾の向きを読む。次に「同じ箱でも」で、箱ひげ図から分からないことを確かめる。
   s5-hist:
     mode: hist
     set: {data: sales}
@@ -56,7 +56,7 @@ presets:
     task: 自分の集めたデータの扱い方を、5つのモードで確かめる（表の作り方、四分位数と外れ値、幅の違う階級、比べ方、箱ひげ図の限界）。
 used_by: [U05]
 tests:
-  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/dist_lab/check.js       # 本文の値（26.5・21.5・32・10.5・47.75、9個の 8・5.5・11、度数密度 0.4・0.3）
 checked:
   browser_380px: 2026-10-28

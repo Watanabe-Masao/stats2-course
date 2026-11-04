@@ -5,7 +5,7 @@ kind: simulator
 src: test_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_test.html]   # 旧版 教科書24 の「x̄・σ・n で z と p 値、μ₁ で検出力、α と両側／片側」を z と power に含む。多重検定（旧版の「誤解と条件」の文）を multi にした
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: z
     name: z 検定と p 値
     purpose: H₀：μ＝μ₀ のもとで z＝(x̄−μ₀)÷(σ÷√n) と p 値（両側・右片側・左片側）を出し、棄却域の境目（数表の 1.645・1.96・2.576 など）と比べる
@@ -88,7 +88,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（z 検定と p 値、検出力と過誤、何度も検定）。
 used_by: [U24]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/test_lab/check.js         # 本文の値（z＝2.2・p≒0.028、検出力0.516、1−0.95²⁰）
 checked:
   browser_380px: 2026-10-28

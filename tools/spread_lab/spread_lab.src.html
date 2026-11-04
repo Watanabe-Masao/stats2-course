@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>散らばりラボ</title>
+<title>ばらつきラボ</title>
 <style>
 /*@LABKIT_CSS@*/
 .legend span{margin-right:10px;font-size:12px;white-space:nowrap}
 .sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
 </style></head><body>
-<h1>🧪 散らばりラボ</h1>
+<h1>🧪 ばらつきラボ</h1>
 <div id="lk-task"></div>
 <div class="tabs" id="tabs"></div>
 
 <div id="m-dev" class="mode">
- <p class="mut" style="margin:0">平均からのずれ（偏差）を線で見る。偏差の合計はいつも0なので、2乗して足す（偏差平方和）。全部の値を b 倍して a を足すと、散らばりの数はどう変わるか。</p>
+ <p class="mut" style="margin:0">平均からのずれ（偏差）を線で見る。偏差の合計はいつも0なので、2乗して足す（偏差平方和）。全部の値を b 倍して a を足すと、ばらつきの数はどう変わるか。</p>
  <div class="row ctl"><label>データ <select id="ddata" data-key="data"></select></label></div>
  <input type="range" id="db" min="0.5" max="3" step="0.1" value="1" data-name="b 倍">
  <input type="range" id="da" min="-20" max="40" step="1" value="0" data-name="a を足す">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="dplot"></div>
  <div class="card res key" id="dsum"></div>
  <div class="card res det"><table id="dtab"></table></div>
@@ -23,12 +23,12 @@
 </div>
 
 <div id="m-cv" class="mode">
- <p class="mut" style="margin:0">平均の大きさが違う2つの散らばりを比べる。標準偏差は平均が大きいほど大きくなりやすいので、平均で割った変動係数（CV）で比べる。</p>
+ <p class="mut" style="margin:0">平均の大きさが違う2つのばらつきを比べる。標準偏差は平均が大きいほど大きくなりやすいので、平均で割った変動係数（CV）で比べる。</p>
  <input type="range" id="cmp" min="1" max="3000" step="1" value="100" data-name="Pの平均">
  <input type="range" id="csp" min="0" max="1000" step="1" value="10" data-name="Pの標準偏差">
  <input type="range" id="cmq" min="1" max="3000" step="1" value="20" data-name="Qの平均">
  <input type="range" id="csq" min="0" max="1000" step="1" value="4" data-name="Qの標準偏差">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="cplot"></div>
  <div class="card res key" id="csum"></div>
 </div>
@@ -36,7 +36,7 @@
 <div id="m-unb" class="mode">
  <p class="mut" style="margin:0">母集団 2, 4, 6, 8, 10（母分散 8）から大きさ n の標本を取る。取り方は全部で 5ⁿ 通り（同じ値を何度でも取れる）。全部の標本で n で割る分散と n−1 で割る分散を計算し、平均を比べる。</p>
  <input type="range" id="un" min="2" max="6" step="1" value="2" data-name="標本の大きさ n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="uplot"></div>
  <div class="card res key" id="usum"></div>
 </div>
@@ -47,7 +47,7 @@
  <input type="range" id="g2" min="0" max="20" step="1" value="1" data-name="2店目">
  <input type="range" id="g3" min="0" max="20" step="1" value="2" data-name="3店目">
  <input type="range" id="g4" min="0" max="20" step="1" value="6" data-name="4店目">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="gplot"></div>
  <div class="card res key" id="gsum"></div>
  <div id="gform"></div>
@@ -81,7 +81,7 @@ function dRender(){const R=dVals(),x=R.x,lo=Math.min(...x,R.m)-1,hi=Math.max(...
  s+=`<line x1="${X(R.m)}" y1="6" x2="${X(R.m)}" y2="${H}" stroke="var(--acc2)" stroke-width="2"/><text x="${Math.min(W-30,Math.max(30,X(R.m)))}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--acc2)" font-weight="700">平均 ${f(r2(R.m))}</text>`;
  x.forEach((v,i)=>{const y=18+i*18;s+=`<line x1="${X(R.m)}" y1="${y}" x2="${X(v)}" y2="${y}" stroke="var(--acc)" stroke-width="2" stroke-dasharray="4 3"/><circle cx="${X(v)}" cy="${y}" r="5" fill="var(--fg)"/><text x="${X(v)+(v>=R.m?9:-9)}" y="${y+4}" font-size="10" text-anchor="${v>=R.m?"start":"end"}" fill="var(--mut)">${f(r2(v))}</text>`;});
  $("dplot").innerHTML=s+`</svg><div class="mut">点線の長さ＝偏差（値−平均）。左右の点線を足すと0になる。</div>`;
- const u=R.D.unit,tr=(R.b!==1||R.a!==0)?`<div class="mut">変換 ${f(R.b)}x${R.a>=0?"＋":"−"}${Math.abs(R.a)}：平均は ${f(R.b)}倍して${R.a>=0?"足し":"引き"}、分散は ${f(r2(R.b*R.b))}倍、標準偏差は ${f(R.b)}倍。a は散らばりを変えない。</div>`:"";
+ const u=R.D.unit,tr=(R.b!==1||R.a!==0)?`<div class="mut">変換 ${f(R.b)}x${R.a>=0?"＋":"−"}${Math.abs(R.a)}：平均は ${f(R.b)}倍して${R.a>=0?"足し":"引き"}、分散は ${f(r2(R.b*R.b))}倍、標準偏差は ${f(R.b)}倍。a はばらつきを変えない。</div>`:"";
  $("dsum").innerHTML=`<div>偏差平方和 <b>${f(r2(R.ss))}</b>　分散（n）<b>${f(r2(R.v))}</b>　不偏分散（n−1）<b>${f(r2(R.s2))}</b></div><div>標準偏差 s＝√${f(r2(R.s2))}≒<b>${f(r2(R.s))}</b>${u}${R.m>0?`　CV≒<b>${f(r2(R.cv))}</b>`:""}</div>${tr}`;
  $("dtab").innerHTML="<tr><th>xᵢ</th><th>xᵢ−x̄</th><th>(xᵢ−x̄)²</th></tr>"+x.map(v=>`<tr><td>${f(r2(v))}</td><td>${f(r2(v-R.m))}</td><td>${f(r2((v-R.m)**2))}</td></tr>`).join("")+`<tr><td><b>合計</b></td><td>0</td><td><b>${f(r2(R.ss))}</b></td></tr>`;
  $("dform").innerHTML=LK.formula([`平均＝${f(r2(R.sx))}÷${n}＝${f(r2(R.m))}`,`分散（n）＝${f(r2(R.ss))}÷${n}＝${f(r2(R.v))}、不偏分散＝${f(r2(R.ss))}÷${n-1}＝${f(r2(R.s2))}`,`近道：Σx²−(Σx)²÷n＝${f(r2(R.sx2))}−${f(r2(R.sx))}²÷${n}＝${f(r2(R.ss))}`]);}

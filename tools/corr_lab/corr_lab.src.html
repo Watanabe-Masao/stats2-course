@@ -22,7 +22,7 @@
  <div class="ctl pic" id="sbox"></div>
  <p class="hint ctl">点はドラッグで動く（0.5 刻み）。</p>
  <div class="row ctl"><button type="button" class="sub" id="sadd">点を足す</button><button type="button" class="sub" id="sdel">点を消す</button><button type="button" class="sub" id="sreset">元に戻す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="ssum"></div>
  <div class="res det" id="stab"></div>
 </div>
@@ -33,7 +33,7 @@
  <input type="range" id="ua" min="-3" max="3" step="0.01" value="1.8" data-name="x の倍率 a">
  <input type="range" id="ub" min="-100" max="100" step="1" value="32" data-name="x に足す b">
  <input type="range" id="uc" min="0.1" max="10" step="0.1" value="1" data-name="y の倍率 c">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="usum"></div>
 </div>
 
@@ -41,7 +41,7 @@
  <p class="mut" style="margin:0">冬（●）と夏（▲）の2つの群。群の中では x と y に関係がないのに、2群を合わせると r が出る（擬相関）。群の中心を離すと、合わせた r だけが大きくなる。</p>
  <div class="ctl pic" id="tbox"></div>
  <input type="range" id="td" min="0" max="8" step="0.5" value="4" data-name="群の中心の差 d">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="tsum"></div>
 </div>
 
@@ -50,16 +50,16 @@
  <input type="range" id="pxy" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_xy">
  <input type="range" id="pxz" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_xz">
  <input type="range" id="pyz" min="-0.95" max="0.95" step="0.05" value="0.8" data-name="r_yz">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="pplot"></div>
  <div class="card res key" id="psum"></div>
 </div>
 
 <div id="m-range" class="mode">
- <p class="mut" style="margin:0">12店の広告費 x と売上 y。x が大きい店だけに絞ると（観測範囲を狭めると）、散らばりのうち関係で説明できる部分が減り、r は小さくなりやすい。</p>
+ <p class="mut" style="margin:0">12店の広告費 x と売上 y。x が大きい店だけに絞ると（観測範囲を狭めると）、ばらつきのうち関係で説明できる部分が減り、r は小さくなりやすい。</p>
  <div class="ctl pic" id="rbox"></div>
  <input type="range" id="rmin" min="1" max="10" step="1" value="1" data-name="x がこれ以上">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="rsum"></div>
 </div>
 
@@ -67,7 +67,7 @@
  <p class="mut" style="margin:0">H₀：母相関 ρ＝0（無相関）の検定。t＝r√(n−2)÷√(1−r²) が自由度 n−2 の t 分布に従う。同じ r でも n が大きいと有意になる。</p>
  <input type="range" id="qr" min="-0.99" max="0.99" step="0.01" value="0.5" data-name="相関係数 r">
  <input type="range" id="qn" min="4" max="200" step="1" value="20" data-name="個数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="qplot"></div>
  <div class="card res key" id="qsum"></div>
 </div>
@@ -126,7 +126,7 @@ const DEF="1,3 2,5 3,4 4,6 5,7";
 let sOrig=parse(DEF),sP=sOrig.map(p=>p.slice()),sD=domain(sP);
 function sVals(){const S=stats(sP);return {...S,sign:!isFinite(S.r)?"—":S.r>=0.2?"正":S.r<=-0.2?"負":"ほぼ0",data:sP.map(p=>p.join(",")).join(" ")};}
 function sRender(){scatter($("sbox"),sP,sD,{drag:sRender,label:"散布図と偏差の長方形"});const S=sVals();
- $("ssum").innerHTML=`<div>x̄＝${f(S.xbar,3)}、ȳ＝${f(S.ybar,3)}（n＝${S.n}）</div><div>偏差の積の和 Σ(x−x̄)(y−ȳ)＝<b>${f(S.sxy,3)}</b>　共分散 s_xy＝${f(S.sxy,3)}÷${S.n-1}＝<b>${f(S.cov,4)}</b></div><div>相関係数 r＝${f(S.sxy,3)}÷√(${f(S.sxx,3)}×${f(S.syy,3)})＝<b>${f(S.r,4)}</b>（${rText(S.r)}）</div><div class="mut">r は偏差の長方形の「＋の面積−−の面積」を、x と y の散らばりで割って −1〜1 にそろえたもの。</div>`;
+ $("ssum").innerHTML=`<div>x̄＝${f(S.xbar,3)}、ȳ＝${f(S.ybar,3)}（n＝${S.n}）</div><div>偏差の積の和 Σ(x−x̄)(y−ȳ)＝<b>${f(S.sxy,3)}</b>　共分散 s_xy＝${f(S.sxy,3)}÷${S.n-1}＝<b>${f(S.cov,4)}</b></div><div>相関係数 r＝${f(S.sxy,3)}÷√(${f(S.sxx,3)}×${f(S.syy,3)})＝<b>${f(S.r,4)}</b>（${rText(S.r)}）</div><div class="mut">r は偏差の長方形の「＋の面積−−の面積」を、x と y のばらつきで割って −1〜1 にそろえたもの。</div>`;
  $("stab").innerHTML=`<table><tr><th>x</th><th>y</th><th>x−x̄</th><th>y−ȳ</th><th>積</th></tr>${sP.map(([x,y])=>`<tr><td>${f(x,2)}</td><td>${f(y,2)}</td><td>${f(x-S.xbar,3)}</td><td>${f(y-S.ybar,3)}</td><td>${f((x-S.xbar)*(y-S.ybar),3)}</td></tr>`).join("")}<tr><th>計</th><td></td><td></td><td></td><th>${f(S.sxy,3)}</th></tr></table><div class="mut">Σ(x−x̄)²＝${f(S.sxx,3)}、Σ(y−ȳ)²＝${f(S.syy,3)}、s_x＝${f(S.sx,4)}、s_y＝${f(S.sy,4)}、x＋y の分散＝${f(S.vsum,4)}（＝s_x²＋s_y²＋2s_xy）、n で割る共分散＝${f(S.covn,4)}</div>`;}
 LK.register("scatter",{name:"散布図",
  init(){$("sadd").onclick=()=>{const S=stats(sP);sP.push([Math.round(((sD.x0+sD.x1)/2)*2)/2,Math.round(((sD.y0+sD.y1)/2)*2)/2]);sRender();};

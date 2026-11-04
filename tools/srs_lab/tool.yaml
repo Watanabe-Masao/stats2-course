@@ -5,7 +5,7 @@ kind: simulator
 src: srs_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [frame.html]    # 旧版 教科書17 の「抽出枠」ラボ（名簿の漏れは n を増やしても消えない）を incl に含む。偏りの大きさを見る版は LAB-sample（U03）
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: incl
     name: 選ばれる確率
     purpose: 名簿 N 件から n 件の単純無作為抽出。各件の包含確率 n÷N、名簿の外は0、選び方 NCn、特定の2件が両方・どちらか入る確率
@@ -40,7 +40,7 @@ presets:
   s3-free:
     mode: incl
     modes: [incl, enum, repl]
-    task: 解いてから、問題が聞いていること（選ばれる確率か、標本ごとの x̄ の散らばりか、戻すかどうか）に合うモードで確かめる。
+    task: 解いてから、問題が聞いていること（選ばれる確率か、標本ごとの x̄ のばらつきか、戻すかどうか）に合うモードで確かめる。
   s4-free:
     mode: incl
     modes: [incl, enum, repl]
@@ -50,10 +50,10 @@ presets:
     modes: [enum, repl]
     task: 「標本を並べる」で n を変え、くわしくの x̄ の標準偏差と σ÷√n×√((N−n)/(N−1)) が一致するのを見る（発展1）。「戻す・戻さない」で N を大きくし、差が消えるのを見る（発展2）。
   s6-free:
-    task: 自分の抽出の設計を、3つのモードで確かめる（選ばれる確率、標本ごとの x̄ の散らばり、戻すかどうか）。
+    task: 自分の抽出の設計を、3つのモードで確かめる（選ばれる確率、標本ごとの x̄ のばらつき、戻すかどうか）。
 used_by: [U17]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/srs_lab/check.js          # 本文の値（0.1、0.00955、10通り・x̄の平均7・0.6、0.2963、x̄ の標準偏差 √3）
 checked:
   browser_380px: 2026-10-28

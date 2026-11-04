@@ -5,7 +5,7 @@ kind: simulator
 src: sigma_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sigma.html]    # 旧版 教科書02 の「(Σx)² と Σx² の正方形」を sum モードに含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: sum
     name: Σを書き下す
     purpose: Σx・Σx²・(Σx)²・平均・偏差平方和を書き下して計算し、(Σx)² の正方形で Σx² との違いを見る
@@ -58,7 +58,7 @@ presets:
     task: 自分の数字で、Σ・階乗・関数を4つのモードで確かめる（Σを書き下す、Σの計算ルール、階乗・組合せ、関数 f(x)）。
 used_by: [U02]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/sigma_lab/check.js        # 本文の値（2,4,6 の Σx＝12・Σx²＝56・(Σx)²＝144・偏差平方和8、5!＝120、₅C₂＝10、f(3)＝7）
 checked:
   browser_380px: 2026-10-28

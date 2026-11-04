@@ -5,7 +5,7 @@ kind: simulator
 src: ts_lab.src.html             # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [ratio.html, growth.html, ma.html]   # 旧版 補講05-T の3つのラボ（増減率・平均成長率・移動平均と自己相関）をまとめた
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: ratio
     name: 増減を重ねる
     purpose: 2回の増減率は足さず倍率を掛ける。指数（最初＝100）も出す
@@ -62,7 +62,7 @@ presets:
     task: 自分の店の数字の扱い方を、5つのモードで確かめる（増減の重ね方、平均成長率、移動平均、自己相関、寄与度）。
 used_by: [U05T]
 tests:
-  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js            # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/ts_lab/check.js         # 本文の値（12.5%・6.07%・14.67・寄与度 6/−2、自己相関はラグ7が最大）
 checked:
   browser_380px: 2026-10-28
