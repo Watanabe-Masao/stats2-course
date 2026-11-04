@@ -37,6 +37,7 @@ relations:
     to: TERM-binom
     version: 1
     question: なぜ ₙCₖ を掛けるのか？   # このつながりで考える問い（#188 07c）
+    focus: {formula: F-binom-pmf, parts: [0]}   # このつながりが効く式の部品（#188 07c）
     type: 前提
     premise: mathematical
     description: n 回のうちどの k 回が成功かの選び方 ₙCₖ 通りは、どれも同じ確率なので、その数だけ足し合わせる（掛ける）。
@@ -46,6 +47,7 @@ relations:
     to: TERM-binom
     version: 1
     question: なぜ並び1つの確率を掛け算で出せるのか？   # このつながりで考える問い（#188 07c）
+    focus: {formula: F-binom-pmf, parts: [1, 2]}   # このつながりが効く式の部品（#188 07c）
     type: 前提
     premise: mathematical
     description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。
