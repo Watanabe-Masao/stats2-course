@@ -798,7 +798,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise", "gist", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
+        for k in ("conditions", "mode", "premise", "gist", "question", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
