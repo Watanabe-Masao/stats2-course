@@ -2,7 +2,7 @@ id: U32
 number: "32"
 title: 実験計画・分散分析
 domain: D8
-reference_section: ⑧ 調査と実験
+reference_section: ⑧ 調査・実験
 prev: U31
 prereq: [U07, U20, U24, U25]
 used_by: []
