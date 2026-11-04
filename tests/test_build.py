@@ -234,6 +234,9 @@ class TestLabs(unittest.TestCase):
         for xid, lab in refs:
             play = lab["play"]
             self.assertFalse({"expect", "why", "predict", "unlock"} & set(play), f"{xid} {lab['preset']}")
+            pre0 = COURSE.labs[lab["id"]]["presets"][lab["preset"]]
+            if pre0.get("predict"):   # 予想させる版は問いの文を出さない（触るは答えをすぐ出す。#188 07d）
+                self.assertNotIn("task", play, f"{xid} {lab['preset']}")
             pre = COURSE.labs[lab["id"]]["presets"][lab["preset"]]
             if pre.get("tour"):
                 sx = states(pre["tour"])

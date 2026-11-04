@@ -446,6 +446,9 @@ def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
     for k in ("modes", "set", "task"):
         if pre.get(k):
             out[k] = pre[k]
+    if pre.get("predict"):
+        # 予想させる版の課題の文は問い（「…の確率は？」）。触るは答えの数をすぐ出すので、問いと答えが同時に出ないよう文を出さない（#188 07d）
+        out.pop("task", None)
     if pre.get("tour"):
         t = pre["tour"]
         for k in ("kmax", "decimals"):
