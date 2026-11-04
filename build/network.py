@@ -104,24 +104,16 @@ def table_errors(eid: str, x: dict) -> list[str]:
 
 
 
-# 応用の課題の求め方（math-lab engine の ApplySolve。#171）：method ごとの条件の項目
-APPLY_METHODS = {
-    "mean-to-p": ["n", "mean"], "min-n-share-sd": ["p", "sd"], "compare-eq": ["a", "b"], "boundary": ["n", "p", "k"],
-    "expected-observers": ["n", "p", "event", "people"], "sets-for-error": ["n", "p", "event", "err"], "binom-judge": ["mechanism"],
-    "max-strength": ["mechanism", "param", "min", "max", "step", "ratio"], "min-total": ["n", "ratio"], "solve-spread": ["n", "p", "variance"],
-    "mode": ["n", "p"], "within-band": ["P", "m", "x"], "linear-sum": ["n", "p", "a", "b"], "compare-var": ["a", "b"],
-}
-APPLY_OPTIONAL = {"sets-for-error": ["unit"], "min-total": ["step"]}   # 実験室の道具の刻みに合わせる（省くと1）
-APPLY_CHOICES = {"compare-eq": 3, "binom-judge": 2, "within-band": 2, "compare-var": 3}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
+# 応用の課題の求め方（math-lab engine の ApplySolve。#171）と解き方の公式の記号（engine の WALK_FORMULAS）は、
+# engine が書き出した JSON の写し（docs/math-lab/contracts.json。build/sync_schema.py で取り込む）から読む。ここに書き写さない（#208）
+_CONTRACTS = json.loads((ROOT / "docs" / "math-lab" / "contracts.json").read_text(encoding="utf-8"))
+APPLY_METHODS = {m: f["required"] for m, f in _CONTRACTS["apply_methods"].items()}   # method ごとの条件の項目
+APPLY_OPTIONAL = {m: f["optional"] for m, f in _CONTRACTS["apply_methods"].items() if f["optional"]}   # 実験室の道具の刻みに合わせる（省くと1）
+APPLY_CHOICES = {m: f["choices"] for m, f in _CONTRACTS["apply_methods"].items() if "choices" in f}   # 選ぶ形の答えの選び肢の数（engine の answer が番号）
 
 
 WALK_ORDER = ["ask", "unit", "event", "info", "relate", "formula", "build", "probe"]
-WALK_FORMULAS = {   # math-lab engine の WALK_FORMULAS の記号
-    "binom.pmf": ["n", "k", "p"], "binom.mean": ["n", "p"], "binom.mean-p": ["E", "n"], "binom.var": ["n", "p"],
-    "share.sd-n": ["p", "s"], "binom.mode": ["n", "p"], "ratio": ["A", "B"], "share.se": ["P", "m"], "share.z": ["x", "m", "P", "S"],
-    "binom.ge": ["k", "n", "p"], "sets.n": ["P", "e", "u"], "lin.sum": ["a", "E", "b", "n"], "fatigue.var": ["n", "F", "L"],
-    "streak.max": ["n", "r", "h"], "fpc.N": ["n", "r", "u"], "mix.d": ["V", "B", "n"],
-}
+WALK_FORMULAS = _CONTRACTS["walk_formulas"]   # 公式ごとの記号（枠の順）
 
 
 def solve_value(sv: dict, path: str) -> float | None:
