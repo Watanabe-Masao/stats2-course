@@ -613,6 +613,22 @@ class TestNetwork(unittest.TestCase):
         finally:
             formulas.evidence = orig
         self.assertEqual([e.split("：")[0] for e in err], ["代表の式 F-var-linear"], err)   # 根拠を指す式だけがやり直し
+        # 「なぜ」の段・部品の意味も版に入る（#204）。想定する故障：why の言い切りを直してもレビューが古くならない（2026-11-04 の独立なレビューで見つかった種類）・
+        # 部品も段もない式の版まで変わり、要らないやり直しを求める・契約で外したのに止まる。見つけ方：F-binom-pmf の why の文と部品の意味を変えると止まり、
+        # ほかの式は止まらない。契約で why を外すと、why を変えても止まらない
+        terms = copy.deepcopy(c.terms)
+        f = next(f for f in terms["TERM-binom"]["formulas"] if f.get("id") == "F-binom-pmf")
+        f["why"]["steps"][2]["text"] += "（書き換えた）"
+        err = publish_errors(k, rec, current_fingerprints(terms, k))
+        self.assertEqual([e.split("：")[0] for e in err], ["代表の式 F-binom-pmf"], err)
+        terms2 = copy.deepcopy(c.terms)
+        next(f for f in terms2["TERM-binom"]["formulas"] if f.get("id") == "F-binom-pmf")["parts"][1]["meaning"] = "書き換えた"
+        self.assertEqual([e.split("：")[0] for e in publish_errors(k, rec, current_fingerprints(terms2, k))], ["代表の式 F-binom-pmf"])
+        k2 = copy.deepcopy(k)
+        next(x for x in k2["contracts"] if x["formula"] == "F-binom-pmf")["review_excludes"] = ["why"]
+        prints2 = current_fingerprints(c.terms, k2)
+        rec2 = [{**r, "fingerprint": prints2[r["formula"]]} for r in rec]
+        self.assertEqual(publish_errors(k2, rec2, current_fingerprints(terms, k2)), [])   # why を外した契約では、why を変えても止まらない
 
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
