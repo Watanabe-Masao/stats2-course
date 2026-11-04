@@ -581,6 +581,26 @@ class TestNetwork(unittest.TestCase):
         rec = [{"formula": "F-binom-pmf", "points": next(x for x in k["contracts"] if x["formula"] == "F-binom-pmf")["review"], "judgement": "j", "date": "2026-11-01"}]
         self.assertNotIn("review_pending", marks(k, rec)["F-binom-pmf"])
 
+    def test_walk_texts_match_engine(self):
+        # 確かめる対象：解き方の公式の文（content/walk-texts.yaml）が engine の表（contracts.json の walk_rows）とちょうど合う（#211）。
+        # 想定する故障：engine が行・穴・別の言い方を足したのに文を書き忘れる（画面に文が出ない・{x} のまま出る）・名前の書き違い・
+        # 使われない文が残る・記号の意味の書き漏らし。見つけ方：原本は通り、1つずつ崩すとそれぞれの理由で止まる。
+        # 既存との違い：walk_errors は課題ごとの walk（文の区切り・段・bind）で、公式の文は見ていなかった
+        import copy
+        from network import load_walk_texts, walk_texts_errors
+        t = load_walk_texts()
+        self.assertEqual(walk_texts_errors(t), [])
+        for broke, want in [
+            (lambda x: x["formulas"]["binom.pmf"]["rows"]["succ"].update(why="{zz}"), "穴 {zz}"),
+            (lambda x: x["formulas"]["binom.mode"]["rows"]["floor"].pop("variants"), "別の言い方 tie がない"),
+            (lambda x: x["formulas"]["ratio"]["rows"].update(extra={"title": "a", "why": "b"}), "engine が返さない"),
+            (lambda x: x["formulas"]["binom.var"]["rows"].pop("q"), "行 q の文がない"),
+            (lambda x: x["symbols"].pop("V"), "記号 V の意味がない"),
+        ]:
+            x = copy.deepcopy(t)
+            broke(x)
+            self.assertTrue(any(want in e for e in walk_texts_errors(x)), want)
+
     def test_screen_revision_gate(self):
         # 確かめる対象：公開の前に、公開中の画面の型の改訂がデータの改訂以上かを確かめる（#207）。
         # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。

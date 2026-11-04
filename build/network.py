@@ -204,6 +204,54 @@ def walk_errors(iid: str, ap: dict) -> list[str]:
     return err
 
 
+WALK_TEXTS = CONTENT / "walk-texts.yaml"   # 解き方の公式の文（engine は文の型の id・穴の値・別の言い方だけを返す。#211）
+
+
+def load_walk_texts() -> dict:
+    return (load_yaml(WALK_TEXTS) or {}) if WALK_TEXTS.exists() else {}
+
+
+def walk_texts_errors(t: dict) -> list[str]:
+    """解き方の公式の文が engine の表（contracts.json の walk_formulas・walk_rows）とちょうど合うか
+    （想定する故障：engine が行や穴を足したのに文がない〔画面に文が出ない・{x} のまま出る〕・別の言い方の名前の書き違い・
+    使われない文が残る・記号の意味の書き漏らし）"""
+    err: list[str] = []
+    spec = _CONTRACTS.get("walk_rows") or {}
+    fs = t.get("formulas") or {}
+    for ref in sorted(set(WALK_FORMULAS) - set(fs)):
+        err.append(f"walk-texts：公式 {ref} の文がない")
+    for ref in sorted(set(fs) - set(WALK_FORMULAS)):
+        err.append(f"walk-texts：公式 {ref} は engine にない")
+    syms = t.get("symbols") or {}
+    for ref, f in fs.items():
+        if ref not in WALK_FORMULAS:
+            continue
+        for k in ("word", "pick"):
+            if not str(f.get(k) or "").strip():
+                err.append(f"walk-texts：{ref} の {k} がない")
+        for s in WALK_FORMULAS[ref]:
+            if s not in syms and s not in (f.get("mean") or {}):
+                err.append(f"walk-texts：{ref} の記号 {s} の意味がない（symbols か mean に書く）")
+        rows, want = f.get("rows") or {}, spec.get(ref) or {}
+        for rid in sorted(set(want) - set(rows)):
+            err.append(f"walk-texts：{ref} の行 {rid} の文がない")
+        for rid in sorted(set(rows) - set(want)):
+            err.append(f"walk-texts：{ref} の行 {rid} は engine が返さない")
+        for rid, r in rows.items():
+            if rid not in want:
+                continue
+            vs, alts = set(want[rid]["vars"]), r.get("variants") or {}
+            for name in sorted(set(want[rid]["variants"]) - set(alts)):
+                err.append(f"walk-texts：{ref} の行 {rid} の別の言い方 {name} がない")
+            for name in sorted(set(alts) - set(want[rid]["variants"])):
+                err.append(f"walk-texts：{ref} の行 {rid} の別の言い方 {name} は engine が返さない")
+            for where, s in [("title", r.get("title")), ("why", r.get("why"))] + [(f"{a}.{k}", v) for a, o in alts.items() for k, v in (o or {}).items()]:
+                for h in re.findall(r"\{(\w+)\}", str(s or "")):
+                    if h not in vs:
+                        err.append(f"walk-texts：{ref} の行 {rid} の {where} の穴 {{{h}}} は engine が返さない（{'・'.join(sorted(vs)) or 'なし'}）")
+    return err
+
+
 def resolve_table_workspace(tw: dict) -> tuple[dict, list[str]]:
     """値の表の作業台の表を、実験室のテーマから作る（#119：同じ表を2か所に書かない）。
     原本は {experiment: EXP-…, theme: テーマ id, use: start か compare} だけを書き、値・重み・呼び名・単位はテーマから写す。
@@ -714,6 +762,8 @@ def validate_network(c: Course) -> list[str]:
         if filled(t) and tid not in linked:
             err.append(f"{tid}: 説明のある概念なのに、関係・導出のどれにもつながっていない")
     err += experiment_errors(c, rel_ids, {d["id"] for d in ders})
+    if load_experiments():
+        err += walk_texts_errors(load_walk_texts())
     err += skeleton_errors(c)
     return err
 
@@ -847,7 +897,7 @@ def export_network(c: Course, target: dict) -> dict:
     exp_revision = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision, **({"experiment_revision": exp_revision} if experiments else {}),
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
-            "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments} if experiments else {})}
+            "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts()} if experiments else {})}
 
 
 def schema_errors(data: dict) -> list[str]:

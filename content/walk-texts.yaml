@@ -1,0 +1,154 @@
+# 解き方の公式の文（応用の課題の「解き方を組み立てる」。stats2-course #211）
+# engine（knowledge-net の math-lab）は、計算の行ごとに 文の型の id・穴の値・別の言い方だけを返す。文はここに書く。
+# 公式・行の id・穴の名前・別の言い方は engine の表（docs/math-lab/contracts.json の walk_formulas・walk_rows）に合わせる（build が止める）。
+# {名前} は engine が返す穴の値（数は見せる形）。式（TeX）は engine が数から作る。
+
+# 記号の意味（まちがえて入れたときに返す。課題ごとに書かない）
+symbols:
+  n: n は挑戦する回数（何回打つか・何人か）。
+  k: k は成功する回数。
+  p: p は1回ごとの成功確率。
+  E: E は平均（期待値）。
+  s: s は標準偏差の上限。
+  A: A は比べる1つ目の値。
+  B: B は比べる2つ目の値。
+  P: P は1回で起きる確率（理論の確率）。
+  m: m は試した回数。
+  x: x は起きた回数。
+  S: S は標準誤差（割合のずれの目安）。
+  e: e は許すずれの幅。
+  u: u は数える単位（刻み）。
+  a: a は成功1回でもらえる額。
+  b: b は失敗1回でもらえる額（払うなら負）。
+  F: F は最初の回の成功確率。
+  L: L は最後の回の成功確率。
+  r: r は許す倍率。
+  h: h は強さの刻み。
+  V: V は観測した分散。
+
+# 公式ごと：word（出てくる値の呼び名）・pick（公式の選択の段の選び肢）・mean（この公式だけの記号の意味）・rows（行の題と文）
+formulas:
+  binom.pmf:
+    word: ちょうど k 回の確率
+    pick: P(X = k) = ₙCₖ pᵏ(1 − p)ⁿ⁻ᵏ
+    rows:
+      comb: {title: 並び方の数, why: "{n} 回のうち、成功する {k} 回の並び方は {c} 通り。"}
+      succ:
+        title: 成功の部分
+        why: "{k} 回とも成功する確率。1回ごとに影響しないから、{p} を {k} 回掛け合わせられる。"
+        variants: {zero: {why: 成功は 0 回。0 でない数の 0 乗は 1。}}
+      fail:
+        title: 失敗の部分
+        why: "残りの {m} 回とも失敗する確率。"
+        variants: {zero: {why: 失敗は 0 回。0 でない数の 0 乗は 1。}}
+      prod: {title: "ちょうど {k} 回の確率", why: 並び方の数 × 成功の部分 × 失敗の部分。}
+  binom.mean:
+    word: 平均（期待値）
+    pick: E(X) = np
+    rows:
+      prod: {title: 平均, why: 1つずつの期待値 p を n 個分足し合わせた平均。1つずつの結果が独立でなくても成り立つ。}
+  binom.mean-p:
+    word: 1回の成功確率
+    pick: E(X) = np
+    rows:
+      div: {title: p を求める, why: 両辺を n で割ると、p だけが残る。}
+  binom.var:
+    word: 分散
+    pick: V(X) = np(1 − p)
+    rows:
+      q: {title: 1回の失敗の確率, why: 1回ごとに成功か失敗のどちらか。失敗の確率は 1 − p。}
+      prod: {title: 分散, why: 1回の分散 p(1−p) を n 回分足す（各回が独立だから足せる）。}
+  share.sd-n:
+    word: 最低の回数
+    pick: SD(割合) = √(p(1 − p)/n)
+    rows:
+      v: {title: 1回の分散, why: 成功なら1・失敗なら0 の1回の分散は p(1−p)。}
+      sq: {title: 上限の2乗, why: 割合の分散は p(1−p)/n。標準偏差の上限を2乗すると、分散の上限になる。}
+      div: {title: 割って n の境目を出す, why: p(1−p)/n ≦ s² を n について解くと、n ≧ p(1−p)/s²。}
+      ceil:
+        title: 最低の回数
+        why: "回数は整数。{q} 以上で最小の整数は {n}。"
+        variants: {exact: {why: "n は {n} ちょうどで条件を満たす。"}}
+  binom.mode:
+    word: いちばん起こりやすい回数
+    pick: 最頻値 = ⌊(n + 1)p⌋
+    rows:
+      t: {title: 境目, why: 隣の棒との高さの比 P(k)/P(k−1)＝(n−k+1)p／(k(1−p)) は、k が (n+1)p より小さい間は 1 より大きい（棒が高くなっていく）。}
+      floor:
+        title: いちばん高い棒
+        why: "{t} 以下で最大の整数が、いちばん高い棒。"
+        variants: {tie: {why: "(n+1)p がちょうど整数なので、{k} と {k1} の棒が同じ高さ（小さい方を答える）。"}}
+  ratio:
+    word: 比
+    pick: A ÷ B
+    rows:
+      div: {title: 比, why: 差ではなく比で比べる。1 に近いほど「同じくらい」。}
+  share.se:
+    word: 標準誤差
+    pick: SE = √(P(1 − P)/m)
+    rows:
+      v: {title: 1回の分散, why: 起きたら1・起きなければ0 の1回の分散は P(1−P)。}
+      div: {title: 割合の分散, why: m 回の平均（割合）の分散は、1回の分散を m で割ったもの（各回が独立だから）。}
+      sqrt: {title: 標準誤差, why: 分散の平方根が、割合のずれの目安（標準誤差）。}
+  share.z:
+    word: ずれが標準誤差の何個分か
+    pick: z = |x/m − P| ÷ SE
+    rows:
+      share: {title: 起きた割合, why: 起きた回数を試した回数で割る。}
+      diff: {title: 理論とのずれ, why: 理論の確率からどれだけ離れたか（向きは問わない）。}
+      z: {title: 標準誤差の何個分か, why: ずれを、たまたまでも起きるずれの目安（標準誤差）で測る。}
+  binom.ge:
+    word: k 回以上の確率
+    pick: P(X ≥ k) = 1 − P(X ≤ k − 1)
+    rows:
+      le: {title: "{km} 回以下の確率", why: "ちょうど 0〜{km} 回の確率を足す（同時には起きないから足せる）。"}
+      comp: {title: "{k} 回以上の確率", why: "「{k} 回以上」は「{km} 回以下」でないこと（余事象）。足して 1 になる。"}
+  sets.n:
+    word: 要るセット数
+    pick: 2SE = 2√(P(1 − P)/N)
+    mean: {P: P は1セットでその事象が起きる確率（1回の成功確率ではない）。}
+    rows:
+      v: {title: 1セットの分散, why: そのセットで起きたら1・起きなければ0 の分散は P(1−P)。}
+      q: {title: セット数の境目, why: 2√(P(1−P)/N) ≦ e の両辺を2乗して N について解くと、N ≧ 4P(1−P)/e²。}
+      ceil: {title: 要るセット数, why: "{q} 以上で、{u} セット単位で数えた最小の数。"}
+  lin.sum:
+    word: 合計の期待値
+    pick: E(aX + b(n − X)) = aE(X) + b(n − E(X))
+    rows:
+      succ: {title: 成功の分, why: 成功の回数の平均 E 回分、1回 a ずつ（期待値は定数倍できる）。}
+      fail: {title: 失敗の回数の平均, why: 失敗の回数は n − X。その平均は n − E(X)。}
+      failv: {title: 失敗の分, why: 失敗の回数の平均の分、1回 b ずつ（払うときは負）。}
+      sum: {title: 合計の期待値, why: 和の期待値は期待値の和（線形性）。}
+  fatigue.var:
+    word: 崩した起き方の分散
+    pick: V(X) = Σ pᵢ(1 − pᵢ)
+    rows:
+      ps: {title: 回ごとの確率, why: "最初 {F} から最後 {L} へ、同じ幅で下がる。平均の確率は ({F}＋{L})÷2。"}
+      sum: {title: 分散, why: 各回は独立なので、1回ごとの分散 pᵢ(1−pᵢ) を足せる。確率の平均を p̄ とすると Σpᵢ(1−pᵢ) ＝ np̄(1−p̄) − Σ(pᵢ−p̄)²。確率が回ごとに違うほど、二項分布より小さくなる。}
+  streak.max:
+    word: 許される強さ
+    pick: 比 = 1 + (2/n) Σ (n − j)cʲ
+    rows:
+      try:
+        title: "c＝{c} を試す"
+        why: まだ許す倍率の中。次の刻みも試す。
+        variants:
+          first: {why: 隣どうしの相関が c、2つ離れると c²…と積み重なり、分散が二項分布より大きくなる。まだ許す倍率の中。}
+          over: {why: 許す倍率を超えた。ここで探すのをやめる。}
+      best: {title: 許される強さ, why: 倍率を超えなかった刻みのうち、いちばん大きい強さ。}
+  fpc.N:
+    word: 最低の玉の数
+    pick: V = np(1 − p) × (N − n)/(N − 1)
+    rows:
+      ratio: {title: 分散の比, why: 戻さずに取るときの分散を、戻して取るとき（二項分布）の分散で割る。np(1−p) は打ち消し合い、(N−n)/(N−1) だけが残る。これが r 以上になればよい。}
+      solve: {title: N の境目, why: (N−n)/(N−1) ≧ r の両辺に N−1 を掛けて、N について解く。}
+      ceil: {title: 最低の玉の数, why: "{q} 以上で、{u} 個単位で数えた最小の数。戻さずに取ると、分散は (N−n)/(N−1) 倍に減る（有限母集団の修正）。"}
+  mix.d:
+    word: ずれ幅
+    pick: V(X) = np(1 − p) + n(n − 1)d²
+    mean: {B: B は二項分布の分散 np(1−p)。}
+    rows:
+      extra: {title: 増えた分散, why: 日によって確率が変わると、二項分布の分散に n(n−1)d² が足される。}
+      den: {title: 掛かる数, why: 同じ日の回どうしが、同じ日の確率を共にするぶん（順番を付けた n(n−1) 組）。}
+      sq: {title: d の2乗, why: n(n−1)d² ＝ 増えた分散 を d² について解く。}
+      d: {title: ずれ幅, why: d は正の数なので、平方根を取る。}
