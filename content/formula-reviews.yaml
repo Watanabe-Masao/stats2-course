@@ -64,3 +64,10 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-04'
   fingerprint: a7f551318d7c4fa9
+- formula: F-var-linear
+  points:
+  - 導き方
+  judgement: 言葉をそろえる変更（散らばり→ばらつき）で記号 b の意味と DER-var-linear の statement が変わったためのやり直し（#199）。b の「足す定数（ばらつきは変えない）」と statement の「b はばらつきを変えない」は、分散で測る量を言い換えただけで、V(aX＋b) が b によらないという主張は前回と同じ。式の木、記号 V・X・a、導出の premises・steps・conditions、概念の成り立つ条件・反例・誤解と契約は前回と同じ文。DER-var-linear の3段（期待値の線形性で E(aX＋b)＝aμ＋b → ずれが a(X−μ) になり b が消える → 2乗の期待値で a² が外に出る）は Casella & Berger Thm 2.3.4 の証明と一致する。3段目で a² を外に出すのにも期待値の線形性を使う。前提は V(X) が有限・a・b が定数で、導出の conditions に書いてあり、概念の conditions.math（期待値と2乗の期待値が有限）と食い違わない。前提は期待値と、分散の定義（REL-expect-var）で、結論の概念を前提に入れない。記号は木に出る V・X・a・b と1対1に対応し、a・b は実数のどの値でも式が成り立つ（a＝0 なら V(b)＝0）ので、範囲を限らなくてよい
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-04'
+  fingerprint: 546fb4416b20cbfc
