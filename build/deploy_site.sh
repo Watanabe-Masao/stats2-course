@@ -16,7 +16,8 @@ cp -a out/site/. "$dest/"
 cd "$dest"
 git add -A
 if git diff --cached --quiet; then echo "変更なし"; exit 0; fi
-git commit -q -m "ラボを更新（stats2-course $(git -C "$OLDPWD" rev-parse --short HEAD)）" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01Mw2vhLEn7izCfdmNC3tr17"
+# 付記（誰が公開したか）は、走らせる側が環境の変数で渡す（固定のセッションの URL を書かない）。例：PUBLISH_TRAILER="Co-Authored-By: …"
+msg="ラボを更新（stats2-course $(git -C "$OLDPWD" rev-parse --short HEAD)）"
+if [ -n "${PUBLISH_TRAILER:-}" ]; then git commit -q -m "$msg" -m "$PUBLISH_TRAILER"; else git commit -q -m "$msg"; fi
 git push -q -u origin HEAD
 echo "✅ 公開サイトを更新した"
