@@ -586,9 +586,13 @@ class TestNetwork(unittest.TestCase):
         # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。
         # 見つけ方：画面がデータより古いと止まる理由を返し、同じか新しければ止めない。既存との違い：公開の前の検査は式のレビューだけだった
         from screen_check import check
-        self.assertIsNotNone(check(31, 30))
-        self.assertIsNone(check(30, 30))
-        self.assertIsNone(check(29, 30))
+        self.assertIsNotNone(check({"schema_revision": 31}, {"schema_revision": 30, "experiment_revision": 1}))
+        self.assertIsNone(check({"schema_revision": 30}, {"schema_revision": 30, "experiment_revision": 0}))
+        self.assertIsNone(check({"schema_revision": 29}, {"schema_revision": 30}))
+        # 型を芯と拡張に分けた（#211）：拡張だけ新しいデータも止める。拡張の型がまだない画面（0）は、拡張を使うデータを読めない
+        self.assertIsNotNone(check({"schema_revision": 31, "experiment_revision": 2}, {"schema_revision": 31, "experiment_revision": 1}))
+        self.assertIsNotNone(check({"schema_revision": 31, "experiment_revision": 1}, {"schema_revision": 30, "experiment_revision": 0}))
+        self.assertIsNone(check({"schema_revision": 31, "experiment_revision": 1}, {"schema_revision": 31, "experiment_revision": 1}))
 
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。

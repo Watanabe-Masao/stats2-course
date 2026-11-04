@@ -1,0 +1,1266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
+  "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
+  "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
+  "x-revision": 1,
+  "if": {
+    "type": "object",
+    "required": [
+      "model"
+    ],
+    "properties": {
+      "model": {
+        "const": "table"
+      }
+    }
+  },
+  "then": {
+    "$ref": "#/$defs/experimentTable"
+  },
+  "else": {
+    "$ref": "#/$defs/experimentBinom"
+  },
+  "$defs": {
+    "experimentBinom": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "title",
+        "question",
+        "links",
+        "model",
+        "vary",
+        "start",
+        "compare",
+        "themes"
+      ],
+      "additionalProperties": false,
+      "description": "実験室（stats2-course #102・計画の 6 の骨格）。実験の定義をデータで書き、画面は読むだけ。予想の答えは書かない（モデルから画面が求める）",
+      "properties": {
+        "id": {
+          "$ref": "kn-schema-v1.json#/$defs/gid"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "$ref": "kn-schema-v1.json#/$defs/text"
+        },
+        "question": {
+          "$ref": "kn-schema-v1.json#/$defs/text",
+          "description": "今回の問い（毎画面の上に出す）"
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "つなぐ概念（点）と関係・導出（線）。どちらか1つ以上",
+          "minProperties": 1,
+          "properties": {
+            "concepts": {
+              "$ref": "kn-schema-v1.json#/$defs/gids"
+            },
+            "relations": {
+              "$ref": "kn-schema-v1.json#/$defs/gids"
+            }
+          }
+        },
+        "model": {
+          "enum": [
+            "binom"
+          ],
+          "description": "理論のモデル：二項分布（binom）"
+        },
+        "vary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n",
+            "p"
+          ],
+          "properties": {
+            "n": {
+              "type": "object",
+              "required": [
+                "min",
+                "max",
+                "step"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "p": {
+              "type": "object",
+              "required": [
+                "min",
+                "max",
+                "step"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "min": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          }
+        },
+        "start": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n",
+            "p"
+          ],
+          "description": "予測の段で見せる前の条件",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "p": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "問いで変える条件（start からの差分）",
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "p": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "steps"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "kn-schema-v1.json#/$defs/text"
+            },
+            "concept": {
+              "$ref": "kn-schema-v1.json#/$defs/gid"
+            },
+            "formula": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "steps": {
+              "$ref": "kn-schema-v1.json#/$defs/texts"
+            }
+          }
+        },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "icon",
+              "success",
+              "failure"
+            ],
+            "additionalProperties": false,
+            "description": "場面（こういう時に使う）。計算は同じで、並びの絵・言葉・最初の p が変わる",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "icon": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "success": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "failure": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "unit": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "story": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              }
+            }
+          }
+        },
+        "next": {
+          "type": "array",
+          "description": "応用の段の次の問い",
+          "items": {
+            "type": "object",
+            "required": [
+              "question",
+              "set"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "points": {
+          "$ref": "kn-schema-v1.json#/$defs/texts",
+          "description": "ⓘ のシートのポイント"
+        },
+        "counterexamples": {
+          "type": "array",
+          "description": "反例を実験する：成り立つ条件（breaks）を1つ崩した起き方で、理論とのずれを見る。数は概念しだい（いくつでも）",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "breaks",
+              "mechanism",
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "mechanism": {
+                "type": "object",
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false,
+                "description": "起き方（math-lab の engine の Mechanism）。n・p は条件から入る",
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "urn",
+                      "streak",
+                      "mix",
+                      "fatigue"
+                    ]
+                  },
+                  "total": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "success": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "carry": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "spread": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "drop": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "fatigue：最初 p＋d から最後 p−d へ下がる幅（d＝min(drop, p, 1−p)）"
+                  }
+                }
+              },
+              "text": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "concept": {
+                "$ref": "kn-schema-v1.json#/$defs/gid"
+              },
+              "breaks": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "崩した成り立つ条件（概念の conditions の言葉で）"
+              }
+            }
+          }
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "description": "実験室の入口「何を確かめたい？」に並べる問い（stats2-course #161）。最初の問い（question・start・compare：位置）と反例（counterexamples：前提崩し）に加えて並べる。form は問いの形（予測と観察の部品の組）。予想の答えは書かない",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "form",
+              "title",
+              "question",
+              "set"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "form": {
+                "enum": [
+                  "prob",
+                  "spread",
+                  "conv",
+                  "paths",
+                  "repeat",
+                  "mean",
+                  "var"
+                ],
+                "description": "問いの形：prob（確率の値：事象の確率を桁の目盛りで予想）・spread（広がり：n を変えたとき、回数と割合の散らばりの向きを予想）・conv（理論と実測：セットを増やしたとき、理論とのずれの目安が何分の1になるかを予想）・paths（並び：2つの回数のどちらが起きやすいかを予想し、並びの数 ₙCₖ と1つの並びの確率を見る。ks）・repeat（くり返し：同じ条件の実験を何回もして、実測の割合が理論のまわりでゆれるのを見る。events・sets）・mean（平均：多くのセットの成功回数の平均を予想し、移り変わりを見る）・var（ばらつき：理論の分散が最大になる成功確率を予想し、p ごとの理論と実測の分散を見る。ps）"
+              },
+              "title": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "入口の一覧に出す短い名前"
+              },
+              "question": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "今回の問い（毎画面の上に出す）"
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "n",
+                  "p"
+                ],
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              },
+              "events": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2,
+                "description": "確率を予想する事象（prob は1〜2個、conv は1個）",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "op",
+                    "k"
+                  ],
+                  "properties": {
+                    "op": {
+                      "enum": [
+                        "eq",
+                        "ge",
+                        "le"
+                      ],
+                      "description": "eq：ちょうど k 回、ge：k 回以上、le：k 回以下"
+                    },
+                    "k": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "free": {
+                "type": "boolean",
+                "description": "prob で、学習者が n・p・ちょうど／以上／以下・k を選ぶ（珍しい結果を調べる）"
+              },
+              "to": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "n"
+                ],
+                "properties": {
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "description": "spread の変えたあとの回数"
+              },
+              "ks": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "description": "paths で比べる2つの成功回数"
+              },
+              "sets": {
+                "type": "integer",
+                "minimum": 10,
+                "description": "repeat の1回の実験のセット数"
+              },
+              "ps": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 6,
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "description": "var で比べる成功確率"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "enum": [
+                        "prob",
+                        "conv",
+                        "repeat"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "events"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "spread"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "to"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "paths"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "ks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "repeat"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "sets"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "form": {
+                      "const": "var"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "ps"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "prob_scale": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "description": "確率の値の問いで予想に使う目盛り（大きい順の境目。例 0.5・0.2・0.05・0.01 → 50%以上／20〜50%／…／1%未満）。境目の近くに答えがある問いは教材の build が止める",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
+          }
+        },
+        "catalog": {
+          "type": "array",
+          "minItems": 1,
+          "description": "テーマ体系（stats2-course #163）：まとまり（A〜F）の下に問い（B01〜）を並べる。問いは主概念（concept）と関連概念（related）を持ち、サイトの実験室のタブで概念から問いを絞る。open は開く入口（shift＝最初の問い・questions の id・break:反例の id）。open のない問いは「作成中」として並べるだけ",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title",
+              "items"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Z]$"
+              },
+              "title": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "title",
+                    "concept"
+                  ],
+                  "properties": {
+                    "id": {
+                      "$ref": "kn-schema-v1.json#/$defs/gid",
+                      "description": "問いの id：教材名:概念-まとまり-番号（stats2:binom-A-01）。教材をまたいでつなぐため、頭に教材名を置く。変えない・消さない"
+                    },
+                    "title": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "一覧に出す問いの名前"
+                    },
+                    "finds": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
+                    },
+                    "predict": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "何を予想するか（開ける問いは必ず書く）"
+                    },
+                    "operate": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "何を操作するか"
+                    },
+                    "judge": {
+                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
+                    },
+                    "open": {
+                      "type": "string",
+                      "pattern": "^(shift|break:[a-z][a-z0-9-]*|[a-z][a-z0-9-]*)$",
+                      "description": "開く入口。ないものは作成中"
+                    },
+                    "concept": {
+                      "$ref": "kn-schema-v1.json#/$defs/gid",
+                      "description": "主（この問いで理解させるもの。1つ）：概念か、2つの概念のつながりが主の問いなら関係（REL-…）。関係なら両端の概念から問いが引ける"
+                    },
+                    "related": {
+                      "$ref": "kn-schema-v1.json#/$defs/gids",
+                      "description": "関連概念（この問いを理解するのに実際に使う概念）"
+                    },
+                    "retired": {
+                      "type": "boolean",
+                      "description": "使わない印（重複などで外した問い。id は消さず、入口・一覧に並べない。open を持たない）"
+                    },
+                    "apply": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "task",
+                        "solve",
+                        "answer",
+                        "why"
+                      ],
+                      "description": "応用の課題（stats2-course #171）：予測〜理由で練習したのとは別の考え方を求める。答えは書かず、画面が engine の solveApply で solve から求めて照らす。open のある問いにだけ書く",
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "逆算",
+                            "設計",
+                            "反証",
+                            "評価",
+                            "変換",
+                            "モデル選択"
+                          ],
+                          "description": "求める考え方"
+                        },
+                        "task": {
+                          "$ref": "kn-schema-v1.json#/$defs/text",
+                          "description": "課題の文"
+                        },
+                        "solve": {
+                          "type": "object",
+                          "required": [
+                            "method"
+                          ],
+                          "description": "答えの求め方（math-lab engine の ApplySolve。method ごとの条件は engine が確かめ、理由を言って止まる）",
+                          "properties": {
+                            "method": {
+                              "enum": [
+                                "mean-to-p",
+                                "min-n-share-sd",
+                                "compare-eq",
+                                "boundary",
+                                "expected-observers",
+                                "sets-for-error",
+                                "binom-judge",
+                                "max-strength",
+                                "min-total",
+                                "solve-spread",
+                                "mode",
+                                "within-band",
+                                "linear-sum",
+                                "compare-var"
+                              ]
+                            }
+                          }
+                        },
+                        "answer": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type"
+                          ],
+                          "properties": {
+                            "type": {
+                              "enum": [
+                                "number",
+                                "choice"
+                              ]
+                            },
+                            "unit": {
+                              "type": "string",
+                              "description": "答えの単位（回・人・セット・個・%）"
+                            },
+                            "percent": {
+                              "type": "boolean",
+                              "description": "0〜1 の答えを % で入力・表示する"
+                            },
+                            "tol": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "description": "合っているとする幅（abs：差・rel：比。どちらか）",
+                              "properties": {
+                                "abs": {
+                                  "type": "number",
+                                  "minimum": 0
+                                },
+                                "rel": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              }
+                            },
+                            "options": {
+                              "type": "array",
+                              "minItems": 2,
+                              "items": {
+                                "$ref": "kn-schema-v1.json#/$defs/text"
+                              },
+                              "description": "選ぶ答え（solve の answer が番号）"
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "type": {
+                                    "const": "choice"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "required": [
+                                  "options"
+                                ]
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "type": {
+                                    "const": "number"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "required": [
+                                  "tol"
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        "why": {
+                          "$ref": "kn-schema-v1.json#/$defs/text",
+                          "description": "答えのあとの一言（なぜそうなるか）"
+                        },
+                        "walk": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "segments",
+                            "info",
+                            "formulas",
+                            "steps"
+                          ],
+                          "description": "解き方を自分で組み立てる（stats2-course #181、渡辺さんの「解法の段 骨格設計」）。思考の段（ask 問いの理解・unit 対象の分解・event 事象の定義・info 情報の抽出・relate 関係の発見・formula 公式の選択・build 式の構築と計算・probe 道具で確かめる）を、この順で使う段だけ書く。式・記号の意味・計算の行と意味・値・答えは engine が作る（原本に数を書かない）",
+                          "properties": {
+                            "segments": {
+                              "type": "array",
+                              "minItems": 2,
+                              "description": "課題の文の区切り（つなぐと task と同じ）。role：ask 聞かれている所・info 数・event 起きてほしいこと・condition 条件・noise 使わない数・text そのほか。info・event・condition は key で info を指す",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "text",
+                                  "role"
+                                ],
+                                "properties": {
+                                  "text": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "role": {
+                                    "enum": [
+                                      "ask",
+                                      "info",
+                                      "event",
+                                      "condition",
+                                      "noise",
+                                      "text"
+                                    ]
+                                  },
+                                  "key": {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-zA-Z0-9]*$"
+                                  }
+                                }
+                              }
+                            },
+                            "info": {
+                              "type": "object",
+                              "minProperties": 1,
+                              "description": "学習者が見つける情報。word：ふだんの言葉、sym：当てはめる記号、of：応用の課題の solve のどの値か（a.n のように . でたどる。値は書かない）。条件（condition）は word だけ",
+                              "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "word"
+                                ],
+                                "properties": {
+                                  "word": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "sym": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "of": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                }
+                              }
+                            },
+                            "formulas": {
+                              "type": "array",
+                              "minItems": 1,
+                              "description": "当てはめる公式（engine の WALK_FORMULAS の ref）。bind：公式の記号 → info の key か、前の公式の id（導いた値を運ぶ）",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "id",
+                                  "ref",
+                                  "bind"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-zA-Z0-9]*$"
+                                  },
+                                  "ref": {
+                                    "type": "string"
+                                  },
+                                  "bind": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "word": {
+                                    "type": "string",
+                                    "description": "導いた値の呼び名（1人の確率 など）"
+                                  }
+                                }
+                              }
+                            },
+                            "steps": {
+                              "type": "array",
+                              "minItems": 3,
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "kind"
+                                ],
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "ask",
+                                      "unit",
+                                      "event",
+                                      "info",
+                                      "relate",
+                                      "formula",
+                                      "build",
+                                      "probe"
+                                    ]
+                                  },
+                                  "short": {
+                                    "type": "string",
+                                    "description": "これまでの段に残す短い結論（formula・build・probe は engine）"
+                                  },
+                                  "sum": {
+                                    "type": "string",
+                                    "description": "この段のまとめ（1〜2文。formula・build・probe は engine が作る）"
+                                  },
+                                  "mark": {
+                                    "type": "string",
+                                    "description": "押させる文の区切りの key（ask は q を使わず role: ask の区切り）"
+                                  },
+                                  "collect": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "need"
+                                    ],
+                                    "properties": {
+                                      "need": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "later": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "choose": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/$defs/walkQuiz"
+                                    }
+                                  },
+                                  "rowQuiz": {
+                                    "type": "object",
+                                    "description": "計算の行に付ける問い（キーは 公式の id.行の key。例 one.fail）",
+                                    "additionalProperties": {
+                                      "$ref": "#/$defs/walkQuiz"
+                                    }
+                                  },
+                                  "todo": {
+                                    "type": "string"
+                                  },
+                                  "hit": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "experimentTable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "title",
+        "question",
+        "links",
+        "model",
+        "themes"
+      ],
+      "description": "値の表の実験室（stats2-course #119）：値と重みの表から1回ずつ引き、平均（期待値）を確かめる。予想の答えは書かない（表から画面が求める）。values と重みの数が同じことは教材の build が確かめる",
+      "properties": {
+        "id": {
+          "$ref": "kn-schema-v1.json#/$defs/gid"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "$ref": "kn-schema-v1.json#/$defs/text"
+        },
+        "question": {
+          "$ref": "kn-schema-v1.json#/$defs/text",
+          "description": "今回の問い（毎画面の上に出す）"
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "つなぐ概念（点）と関係・導出（線）。どちらか1つ以上",
+          "minProperties": 1,
+          "properties": {
+            "concepts": {
+              "$ref": "kn-schema-v1.json#/$defs/gids"
+            },
+            "relations": {
+              "$ref": "kn-schema-v1.json#/$defs/gids"
+            }
+          }
+        },
+        "model": {
+          "const": "table",
+          "description": "理論のモデル：値の表（table）"
+        },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "icon",
+              "values",
+              "start",
+              "compare",
+              "change"
+            ],
+            "description": "場面（こういう時に使う）。値の表と、前の重み・問いで変えた重み",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "icon": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "unit": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "story": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number"
+                },
+                "description": "値（賞金・目など）。小さい順"
+              },
+              "labels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "kn-schema-v1.json#/$defs/text"
+                },
+                "description": "値の呼び名（なければ値と単位）。values と同じ数"
+              },
+              "start": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": "前の表の重み（合計で割って確率にする）"
+              },
+              "compare": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "description": "問いで変えた重み"
+              },
+              "change": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "何を変えたかの文（「6 の面を3倍出やすくする」）"
+              }
+            }
+          }
+        },
+        "reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "steps"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "kn-schema-v1.json#/$defs/text"
+            },
+            "concept": {
+              "$ref": "kn-schema-v1.json#/$defs/gid"
+            },
+            "formula": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "steps": {
+              "$ref": "kn-schema-v1.json#/$defs/texts"
+            }
+          }
+        },
+        "counterexamples": {
+          "type": "array",
+          "description": "反例を実験する：成り立つ条件（breaks）を崩した表で、引いた平均がどうなるかを見る。数は概念しだい",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "breaks",
+              "values",
+              "weights",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "breaks": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "崩した成り立つ条件（概念の conditions の言葉で）"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "weights": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "labels": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "kn-schema-v1.json#/$defs/text"
+                },
+                "description": "値の呼び名（なければ値と単位）。values と同じ数"
+              },
+              "text": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "concept": {
+                "$ref": "kn-schema-v1.json#/$defs/gid"
+              }
+            }
+          }
+        },
+        "points": {
+          "$ref": "kn-schema-v1.json#/$defs/texts",
+          "description": "ⓘ のシートのポイント"
+        },
+        "contrasts": {
+          "type": "array",
+          "description": "誤解を正す例・指標の限界を示す比較（成り立つ条件を外す実験は counterexamples）。stats2-course #118 の反例の方針：確かめる主張（claim）を先に書き、比べる表をそろえる",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "name",
+              "claim",
+              "tables",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "kind": {
+                "enum": [
+                  "misconception",
+                  "limit"
+                ],
+                "description": "misconception：誤解を正す例、limit：指標の限界を示す比較"
+              },
+              "name": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "claim": {
+                "$ref": "kn-schema-v1.json#/$defs/text",
+                "description": "確かめる主張（例：平均は同じでも散らばりが違う）"
+              },
+              "tables": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2,
+                "items": {
+                  "$ref": "kn-schema-v1.json#/$defs/valueTable"
+                },
+                "description": "見る表（比べるときは2つ。比べる条件をそろえる）"
+              },
+              "text": {
+                "$ref": "kn-schema-v1.json#/$defs/text"
+              },
+              "concept": {
+                "$ref": "kn-schema-v1.json#/$defs/gid",
+                "description": "観察のあとに考える概念（例：分散）"
+              }
+            }
+          }
+        }
+      }
+    },
+    "walkQuiz": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opts",
+        "ok",
+        "fb"
+      ],
+      "description": "選ぶ問い（正解の番号 ok・間違えたときの言葉 fb は選び肢と同じ数。正解の所は空でよい）",
+      "properties": {
+        "ask": {
+          "type": "string"
+        },
+        "todo": {
+          "type": "string"
+        },
+        "opts": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ok": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fb": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "math": {
+          "type": "boolean",
+          "description": "選び肢が式（式の字体で出す）"
+        }
+      }
+    }
+  }
+}

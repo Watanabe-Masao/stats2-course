@@ -14,6 +14,7 @@ from model import CONTENT, ROOT, Course, load_yaml, run_check
 from effects import effect_errors, question_errors
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
+EXPERIMENT_SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-experiment-v1.json"   # 実験室の拡張（芯の experiments が指す。#211）
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
 KIND = load_yaml(RELATION_TYPES)
 TYPES = tuple(KIND["types"])
@@ -843,15 +844,20 @@ def export_network(c: Course, target: dict) -> dict:
             e["counterexamples"] = [{**{k: v for k, v in b.items() if k != "effect"}, **({"concept": g(b["concept"])} if b.get("concept") else {})} for b in x["counterexamples"]]
         experiments.append(e)
     revision = json.loads(SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
-    return {"schema": "kn-schema", "version": 1, "schema_revision": revision,
+    exp_revision = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
+    return {"schema": "kn-schema", "version": 1, "schema_revision": revision, **({"experiment_revision": exp_revision} if experiments else {}),
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments} if experiments else {})}
 
 
 def schema_errors(data: dict) -> list[str]:
     import jsonschema  # requirements.txt
+    from referencing import Registry, Resource
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
-    v = jsonschema.Draft202012Validator(schema)
+    ext = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8"))
+    # 芯と実験室の拡張は互いを $id（URL）で指す。ネットには取りに行かず、写しの2つを登録して解く
+    reg = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in (schema, ext)])
+    v = jsonschema.Draft202012Validator(schema, registry=reg)
     return [f"{'/'.join(map(str, e.absolute_path)) or '(全体)'}: {e.message}" for e in v.iter_errors(data)]
 
 
