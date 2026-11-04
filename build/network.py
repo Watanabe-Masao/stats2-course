@@ -587,6 +587,14 @@ def validate_network(c: Course) -> list[str]:
     rel_ids: set[str] = set()
     for r in rels:
         rid = r.get("id", "?")
+        # このつながりが効く式の部品：両端の概念のどちらかの式で、その式の parts の番号の中（#188 07c）
+        if r.get("focus"):
+            fo = r["focus"]
+            fs = [f for t in (r.get("from"), r.get("to")) for f in (c.terms.get(t) or {}).get("formulas", []) if isinstance(f, dict) and f.get("id") == fo.get("formula")]
+            if not fs:
+                err.append(f"{rid}: focus の式 {fo.get('formula')} が両端の概念の式にない")
+            elif any(not (0 <= i < len(fs[0].get("parts") or [])) for i in fo.get("parts") or []):
+                err.append(f"{rid}: focus の部品の番号が式 {fo.get('formula')} の parts の外")
         # 開いたときの段・図の一言に数があれば検算を書く（概念の説明と同じ決まり。#188 04）
         if re.search(r"[0-9０-９]", str(r.get("stages", "")) + str((r.get("chart") or {}).get("note", ""))) and not r.get("checks"):
             err.append(f"{rid}: 段・図の一言に数があるのに checks がない")
@@ -798,7 +806,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise", "gist", "question", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
+        for k in ("conditions", "mode", "premise", "gist", "question", "focus", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
