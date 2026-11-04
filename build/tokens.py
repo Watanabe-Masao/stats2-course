@@ -1,4 +1,4 @@
-"""見た目と手触りの値（元は math-lab の packages/ui/tokens.json。写しは docs/math-lab/tokens.json）。
+"""見た目と手触りの値（元は knowledge-net の math-lab/packages/ui/tokens.json。写しは docs/math-lab/tokens.json）。
 
 - css()：ラボ（labkit）に差し込む CSS の変数（knowledge-net の scripts/tokens.mjs と同じ名前・同じ値）
 - color(名前)・dark(名前)：静止図（svgkit・figures.py）が使う色

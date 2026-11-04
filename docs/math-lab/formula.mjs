@@ -1,4 +1,4 @@
-// 生成物：packages/engine/src/formula から scripts/bundle-formula.mjs で作る。手で直さない（npm run bundle）
+// 生成物：packages/engine/src/formula から scripts/bundle-formula.mjs で作る。手で直さない（npm run lab:bundle）
 // packages/engine/src/formula/types.ts
 const isSym = (n) => "sym" in n;
 const isNum = (n) => "num" in n;

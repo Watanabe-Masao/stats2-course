@@ -1,4 +1,5 @@
-"""写しを確かめる・取り込む：知識ネットワークの型（元は knowledge-net の schema/）と、見た目と手触りの値（元は math-lab の packages/ui/tokens.json。#107）、式の計算の束（math-lab の packages/engine/dist/formula.mjs。#118）。
+"""写しを確かめる・取り込む：知識ネットワークの型（元は knowledge-net の schema/）と、見た目と手触りの値（元は knowledge-net の math-lab/packages/ui/tokens.json。#107）、式の計算の束（math-lab/packages/engine/dist/formula.mjs。#118）。
+math-lab は knowledge-net の中にある（2026-11-04 に別のリポジトリから移した。#210）。
 
 写しは「取り込んだときの元の版（コミット）」を docs/sync-lock.json に固定して照らす（#129）。
 元のリポジトリの main が先に進んでも、教材の CI は落ちない（取り込むまでは固定した版のまま）。
@@ -22,11 +23,11 @@ OWNER = "Watanabe-Masao"
 FILES = (
     ("knowledge-net", "schema/kn-schema-v1.json", ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"),
     ("knowledge-net", "schema/relation-types.yaml", ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"),
-    ("math-lab", "packages/ui/tokens.json", ROOT / "docs" / "math-lab" / "tokens.json"),
+    ("knowledge-net", "math-lab/packages/ui/tokens.json", ROOT / "docs" / "math-lab" / "tokens.json"),
     # 式の計算の束（木から TeX を作る・木を検査する。build/formula_tex.mjs が読む。#118）
-    ("math-lab", "packages/engine/dist/formula.mjs", ROOT / "docs" / "math-lab" / "formula.mjs"),
+    ("knowledge-net", "math-lab/packages/engine/dist/formula.mjs", ROOT / "docs" / "math-lab" / "formula.mjs"),
     # ラボの乱数の束（種つき乱数・正規分布・並べ替え。labkit の前に差し込み、LK.rng で使う。#144 P6）
-    ("math-lab", "packages/engine/dist/random.js", ROOT / "docs" / "math-lab" / "random.js"),
+    ("knowledge-net", "math-lab/packages/engine/dist/random.js", ROOT / "docs" / "math-lab" / "random.js"),
 )
 
 
@@ -93,7 +94,7 @@ def main(argv: list[str]) -> int:
             continue
         if ahead:
             print(f"ℹ️ {repo} の main は固定した版より先に進み、写しの元が変わっている：{'・'.join(ahead)}（取り込むときは --update）")
-    print("✅ 型（knowledge-net）と見た目の値（math-lab）の写しは固定した版の元と同じ（" + "・".join(f"{r}@{lock[r][:7]}" for r in repos) + "）")
+    print("✅ 型と見た目の値・式と乱数の束（knowledge-net）の写しは固定した版の元と同じ（" + "・".join(f"{r}@{lock[r][:7]}" for r in repos) + "）")
     return 0
 
 
