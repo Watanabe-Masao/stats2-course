@@ -25,7 +25,7 @@
 - {{icon:fig}} **図解**：図や表で関係を見る
 - {{icon:lab}} **ラボ**：シミュレーターを動かす。{{shared:lab_protocol}} の順に使う
 
-## 説明の型（言葉にする練習で使う）
+## 説明の型（説明の練習で使う）
 
 ::: pattern
 {{shared:explain_pattern}}
