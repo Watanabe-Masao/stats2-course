@@ -5,7 +5,7 @@ kind: simulator
 src: cont_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_normal.html, expo.html]   # 旧版 教科書16 の「正規分布（μ・σ・区間）」を norm、「指数分布と無記憶性」を expo に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: norm
     name: 正規分布の確率
     purpose: N(μ, σ²) で区間に入る確率を、標準化 z＝(値−μ)÷σ と Φ(z) の差で求める。面積として塗って見せる
@@ -70,7 +70,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（正規分布の確率、上位 p% の値、一様分布、指数分布、高さと面積）。
 used_by: [U16]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/cont_lab/check.js         # 本文の値（0.6827・0.0228・0.9104、1/3、2/3、e⁻²、上位5%の z＝1.645）
 checked:
   browser_380px: 2026-10-28

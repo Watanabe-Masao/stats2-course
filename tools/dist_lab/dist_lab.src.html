@@ -17,7 +17,7 @@
  <p class="mut" style="margin:0">データを階級に分けて数える。階級の幅を変えると、表とヒストグラムの見え方が変わる。</p>
  <div class="row ctl"><label>データ <select id="hdata" data-key="data"></select></label>
   <label>階級の幅 <select id="hw" data-key="w"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="hplot"></div>
  <div class="card res det"><table id="htab"></table></div>
  <div class="card res key" id="hsum"></div>
@@ -27,7 +27,7 @@
  <p class="mut" style="margin:0">小さい順に並べて4等分する。箱が真ん中50%、柵（Q₁−1.5×IQR、Q₃＋1.5×IQR）の外が外れ値候補。最大の値を動かすと、平均と中央値はどう動くか。</p>
  <div class="row ctl"><label>データ <select id="bdata" data-key="data"></select></label></div>
  <input type="range" id="bmax" min="0" max="100" step="1" value="55" data-name="最大値">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="bplot"></div>
  <div class="card res key" id="bsum"></div>
  <div id="bform"></div>
@@ -36,15 +36,15 @@
 <div id="m-dens" class="mode">
  <p class="mut" style="margin:0">階級の幅が違うとき、棒の高さを「度数」にするか「度数密度（度数÷幅）」にするか。面積（高さ×幅）が度数を表すのはどちらか。</p>
  <div class="row ctl seg" id="dview"><button type="button" data-v="count">高さ＝度数</button><button type="button" data-v="dens" class="on">高さ＝度数密度</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="dplot"></div>
  <div class="card res key" id="dsum"></div>
  <div id="dform"></div>
 </div>
 
 <div id="m-cmp" class="mode">
- <p class="mut" style="margin:0">5店舗の10日分の日販（万円）を箱ひげ図で並べる。箱の長さ（IQR）が散らばり、ひげの伸び方が裾の向き。</p>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <p class="mut" style="margin:0">5店舗の10日分の日販（万円）を箱ひげ図で並べる。箱の長さ（IQR）がばらつき、ひげの伸び方が裾の向き。</p>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="cplot"></div>
  <div class="card res det"><table id="ctab"></table></div>
  <div class="card res key" id="csum"></div>
@@ -53,7 +53,7 @@
 <div id="m-shape" class="mode">
  <p class="mut" style="margin:0">X店とY店の12日分の売上（万円）。箱ひげ図はまったく同じ。中身（1つ1つの値）を見ると何が違うか。</p>
  <div class="row ctl"><label><input type="checkbox" id="sdots" checked> 中身（1つ1つの値）を見る</label></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="splot"></div>
  <div class="card res key" id="ssum"></div>
 </div>
@@ -153,7 +153,7 @@ LK.register("dens",{name:"幅の違う階級",
 function cRender(){const rows=Object.entries(STORES).map(([k,v])=>({label:k+"店",F:five(v),color:k==="C"?"var(--acc2)":"var(--acc)"}));
  $("cplot").innerHTML=boxSvg(rows,20,100,10);
  $("ctab").innerHTML="<tr><th>店</th><th>中央値</th><th>IQR</th></tr>"+rows.map(r=>`<tr><td>${r.label}</td><td>${f(r.F.q2)}</td><td>${f(r.F.iqr)}</td></tr>`).join("");
- const w=cWidest();$("csum").innerHTML=`<div>箱がいちばん長い（散らばりが大きい）のは <b>${w}</b>。上のひげも長く、売上の多い日の側に裾が伸びている。</div><div class="mut">中央値は5店ともほぼ同じ。中央値だけを比べると違いが見えない。</div>`;}
+ const w=cWidest();$("csum").innerHTML=`<div>箱がいちばん長い（ばらつきが大きい）のは <b>${w}</b>。上のひげも長く、売上の多い日の側に裾が伸びている。</div><div class="mut">中央値は5店ともほぼ同じ。中央値だけを比べると違いが見えない。</div>`;}
 function cWidest(){let best=null,bi=-1;Object.entries(STORES).forEach(([k,v])=>{const i=five(v).iqr;if(i>bi){bi=i;best=k+"店";}});return best;}
 LK.register("cmp",{name:"店舗を比べる",init(){cRender();},render:cRender,
  value(key){if(key==="tail"){const F=five(STORES.C),r=(F.whi-F.q3)>(F.q1-F.wlo)?"上（売上の多い側）":"下（売上の少ない側）";return {v:r,text:r};}

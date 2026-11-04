@@ -28,7 +28,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
  <input type="range" id="ln" min="2" max="10" step="1" value="5" data-name="人数 n">
  <input type="range" id="lr" min="1" max="4" step="1" value="2" data-name="選ぶ数 r">
  <div class="row ctl"><label>役割（順番） <select id="lrole" data-key="role"><option value="あり">区別する</option><option value="なし">区別しない</option></select></label></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="lsum"></div>
  <div class="res det" id="llist"></div>
 </div>
@@ -39,7 +39,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
  <input type="range" id="pr" min="0" max="12" step="1" value="2" data-name="r">
  <input type="range" id="pp" min="0" max="1" step="0.05" value="0.5" data-name="確率 p">
  <div class="legend mut"><span>■ 選んだ数</span><span>太枠 足し合わせる2つ</span><span>┅ 対称な数</span></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="ptri"></div>
  <div class="card res key" id="pinfo"></div>
  <div class="res det" id="pbin"></div>
@@ -49,7 +49,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
  <p class="mut" style="margin:0">n 種類から r 個を選ぶ。同じ種類を何度選んでもよい。順番を区別すれば nʳ、区別しなければ ● と仕切り ｜ の並べ方。</p>
  <input type="range" id="mn" min="2" max="10" step="1" value="3" data-name="種類 n">
  <input type="range" id="mr" min="1" max="6" step="1" value="2" data-name="個数 r">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="msum"></div>
  <div class="res det" id="mlist"></div>
 </div>
@@ -58,7 +58,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
  <p class="mut" style="margin:0">格子の左下 S から右上 G への最短の道。→ と ↑ の並べ方を数える。</p>
  <input type="range" id="pa" min="1" max="6" step="1" value="3" data-name="右へ">
  <input type="range" id="pb" min="1" max="5" step="1" value="2" data-name="上へ">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="psvg"></div>
  <div class="row ctl res key"><button type="button" class="sub" id="pnew">別の道を表示</button></div>
  <div class="card res key" id="psum"></div>
@@ -68,7 +68,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
 <div id="m-der" class="mode">
  <p class="mut" style="margin:0">n 人がプレゼントを持ち寄って無作為に配り直す。全員が自分以外の物を受け取る確率は？</p>
  <input type="range" id="dn" min="2" max="10" step="1" value="4" data-name="人数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="dsum"></div>
  <div class="row ctl res key"><button type="button" class="act" id="dsim">1000回配り直す</button><button type="button" class="sub" id="dreset">リセット</button></div>
  <div class="card res key" id="dexp"></div>
@@ -82,7 +82,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:3px 8px;text-a
  <input type="range" id="cr" min="1" max="5" step="1" value="3" data-name="選ぶ r">
  <input type="range" id="cm" min="1" max="9" step="1" value="4" data-name="印の数 m">
  <input type="range" id="ck" min="0" max="5" step="1" value="1" data-name="ちょうど k">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="csum2"></div>
  <div class="res det" id="clist"></div>
 </div>
@@ -184,7 +184,7 @@ LK.register("path",{name:"道順",
 const D=[1,0];for(let n=2;n<=10;n++)D[n]=(n-1)*(D[n-1]+D[n-2]);
 let simT=0,simOK=0;
 function dVals(){const n=+$("dn").value;return {n,d:D[n],all:fact(n),p:D[n]/fact(n)};}
-function dReset(){simT=0;simOK=0;$("dexp").innerHTML='<span class="mut">ボタンを押すと、実際に配り直した結果の割合を表示する（押すたびに少し揺れる）。</span>';}
+function dReset(){simT=0;simOK=0;$("dexp").innerHTML='<span class="mut">ボタンを押すと、実際に配り直した結果の割合を表示する（押すたびに少しばらつく）。</span>';}
 function dRender(){const X=dVals();
  const terms=[];for(let k=0;k<=Math.min(X.n,4);k++)terms.push((k%2?"−":(k?"＋":""))+`1/${k}!`);
  $("dsum").innerHTML=`<div>全員が他人の物：<b>${fmt(X.d)}</b>通り／全 ${fmt(X.all)} 通り</div><div>確率＝<b>${X.p.toFixed(4)}</b>　1/e＝${(1/Math.E).toFixed(4)}</div><div class="mut">包除原理：確率＝${terms.join(" ")}${X.n>4?" …":""}。n が大きくなると 1/e に近づく。</div>`;

@@ -5,7 +5,7 @@ kind: simulator
 src: survey_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_strat.html, frame.html]   # 旧版 教科書31 の「層の割合と重み付き平均」を strat に、「抽出枠の漏れは n を増やしても残る」を bias（回答率の違い）に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: strat
     name: 層化と重み
     purpose: 2つの層から同じ数ずつ調べたとき、層の平均を母集団での割合で重み付けした平均と、そのまま平均した値を、帯（幅＝割合・高さ＝平均）で比べる
@@ -46,7 +46,7 @@ presets:
     task: 地域によって売上がかなり違う（地域の差1）。4つの方法で10店を選ぶとき、推定値のばらつきがいちばん小さいのは？
     predict: {type: choice, key: best, label: "いちばん小さい", options: [単純無作為, 層化, 集落, 系統]}
     expect: 層化
-    why: 地域ごとに1店ずつ選ぶと、地域の違いが推定値のばらつきに入らない。1地域だけ全部調べる集落は、どの地域を引くかで大きくぶれる。
+    why: 地域ごとに1店ずつ選ぶと、地域の違いが推定値のばらつきに入らない。1地域だけ全部調べる集落は、どの地域を引くかで大きくばらつく。
   s3-rule:
     mode: design
     steps:
@@ -98,7 +98,7 @@ presets:
     task: 自分の調査の設計を、5つのモードで確かめる（重み・抽出法・偏り・配分・多段の確率）。
 used_by: [U31]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/survey_lab/check.js       # 本文の値（80・125、58、層化がいちばん小さい、偏り0.167、ネイマン60人、確率0.004）
 checked:
   browser_380px: 2026-10-29

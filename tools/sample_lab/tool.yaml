@@ -5,7 +5,7 @@ kind: simulator
 src: sample_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 2
 replaces_legacy: [frame.html]   # 旧版 教科書03 の「抽出枠」ラボの機能を含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: rand
     name: 無作為に取る
     purpose: x̄ は取り直すと変わり μ のまわりにばらつく。n＝100 は全数調査
@@ -35,7 +35,7 @@ presets:
     task: n＝10 のまま「10回続けて」を押すと、x̄ は毎回同じか、変わるか。
     predict: {type: choice, key: varies, label: "x̄ は", options: [毎回同じ, 毎回変わる]}
     expect: 毎回変わる
-    why: x̄ は選んだ店で決まる統計量なので、取り直すたびに変わり μ のまわりに散らばる。n を100にすると全数調査になり、毎回 μ と一致する。
+    why: x̄ は選んだ店で決まる統計量なので、取り直すたびに変わり μ のまわりにばらつく。n を100にすると全数調査になり、毎回 μ と一致する。
   s2-frame:
     mode: frame
     set: {m: 20, n: 10}
@@ -57,7 +57,7 @@ presets:
     task: 自分の設計や考え方を、3つのモードで確かめる（無作為なら μ のまわりに集まるか、偏りがあればどちらにずれるか）。
 used_by: [U03]
 tests:
-  - node tools/test_labs.js            # out/labs の全部：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js            # out/labs の全部：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/sample_lab/check.js     # 無作為≒μ、全数＝μ、漏れ・自発回答はずれる（本文の 2.54・−0.18・2.17）
 checked:
   browser_380px: 2026-10-28

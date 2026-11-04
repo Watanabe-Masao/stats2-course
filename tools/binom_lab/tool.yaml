@@ -5,7 +5,7 @@ kind: simulator
 src: binom_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_binom.html]   # 旧版 教科書14 の「n と p を動かす」を pmf モードに含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: pmf
     name: 二項分布 B(n, p)
     purpose: B(n, p) の棒グラフ。ちょうど k 回・k 回以下・k 回以上の確率、平均 np・分散 np(1−p)。正規分布を重ねられる
@@ -82,7 +82,7 @@ presets:
   s4-free:
     mode: pmf
     modes: [pmf, bern]
-    task: 自分の売場の数字（人数 n と購入率・利用率 p）を入れ、「k 人以上」「1人もいない」の確率を読む。平均 np のまわりにどれくらい散らばるかも見る。
+    task: 自分の売場の数字（人数 n と購入率・利用率 p）を入れ、「k 人以上」「1人もいない」の確率を読む。平均 np のまわりにどれくらいばらつくかも見る。
   s5-norm:
     mode: pmf
     modes: [pmf, bern]
@@ -92,7 +92,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（二項分布 B(n, p)、並びを書き出す、ベルヌーイと np）。
 used_by: [U14]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/binom_lab/check.js        # 本文の値（0.421875・0.3164・0.6836・0.2617、0.375、0.2048、平均1・分散0.75）
 checked:
   browser_380px: 2026-10-28

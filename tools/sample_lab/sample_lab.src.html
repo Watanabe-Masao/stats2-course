@@ -18,7 +18,7 @@
  <p class="mut" style="margin:0">全100店（母集団）の廃棄率。μ（本当の平均）は普通は分からない。無作為に n 店を選んで x̄ を計算する。</p>
  <input type="range" id="rn" min="2" max="100" step="1" value="10" data-name="n" data-unit="店">
  <div class="row ctl"><button class="act" id="rdraw">選んで計算する</button><button class="act" id="rx10">10回続けて</button><button class="sub" id="rreset">やり直す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="rsum"></div>
  <div class="res key" id="rstrip"></div>
  <div class="row ctl"><label><input type="checkbox" id="rmu"> μ（本当の平均）を見る</label></div>
@@ -30,7 +30,7 @@
  <input type="range" id="fm" min="0" max="40" step="5" value="20" data-name="漏れ" data-unit="%">
  <input type="range" id="fn" min="2" max="60" step="1" value="10" data-name="n" data-unit="店">
  <div class="row ctl"><button class="act" id="fdraw">20回取り直す</button><button class="sub" id="freset">やり直す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="fsum"></div>
  <div class="res key" id="fstrip"></div>
  <div class="grid det" id="fgrid"></div>
@@ -40,7 +40,7 @@
  <p class="mut" style="margin:0">全100店にアンケートを送り、返事が来た店だけで平均を出す。廃棄率が低い店ほど返事をしやすいとする（偏りの強さ0なら、返事のしやすさは廃棄率と無関係）。</p>
  <input type="range" id="qk" min="0" max="10" step="1" value="6" data-name="偏り">
  <div class="row ctl"><button class="act" id="qdraw">アンケートを送る</button><button class="act" id="qx20">20回続けて</button><button class="sub" id="qreset">やり直す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="qsum"></div>
  <div class="res key" id="qstrip"></div>
  <div class="grid det" id="qgrid"></div>
@@ -50,7 +50,7 @@
  <p class="mut" style="margin:0">サイコロを1回振る試行。起こりうる結果の全部が<b>標本空間</b>、その一部が<b>事象</b>。目をタップして事象を作る。</p>
  <div class="row ctl" id="dice"></div>
  <div class="row ctl"><button class="sub" data-ev="2,4,6">偶数</button><button class="sub" data-ev="4,5,6">4以上</button><button class="sub" data-ev="">空にする</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="ssum"></div>
  <p class="mut det">注意：統計の「標本」（調べた一部のデータ）と「標本空間」は、名前が似ているだけで別の言葉。</p>
 </div>

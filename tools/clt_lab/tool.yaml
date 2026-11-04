@@ -5,7 +5,7 @@ kind: simulator
 src: clt_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_clt.html, sim_binom.html, lln.html]   # 旧版 教科書19 の「歪んだ母集団でも x̄ は正規に近づく」を clt、「二項の正規近似」を bin、「当たりの割合が p に落ち着く」を lln に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: clt
     name: 中心極限定理
     purpose: 4つの形の母集団から n 個の平均を2000回取り直し（固定の乱数）、x̄ の分布と N(μ, σ²/n) を重ねる。x̄ の歪度＝母集団の歪度÷√n
@@ -58,7 +58,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（中心極限定理、大数の法則、二項の正規近似、チェビシェフ）。
 used_by: [U19]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/clt_lab/check.js          # 本文の値（0.8643・0.8644、x̄ の歪度 2÷√30、SE 0.0458、上限 1/4）
 checked:
   browser_380px: 2026-10-28

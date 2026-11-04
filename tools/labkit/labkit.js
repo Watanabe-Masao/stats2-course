@@ -3,19 +3,19 @@
      mode   最初に開くモード
      modes  タブに出すモード（省略時：mode があればそれだけ、なければ全部）
      set    そのモードに渡す値（モードごとの apply が受け取る）
-     unlock 予想のある版でも選べるままにする set の選択欄（本文の手順で切り替えるとき）
+     unlock 予測のある版でも選べるままにする set の選択欄（本文の手順で切り替えるとき）
      task   課題の文
-     predict {type:"number"|"choice", key, label, unit, options, tol}  予想してから結果を見せる
+     predict {type:"number"|"choice", key, label, unit, options, tol}  予測してから結果を見せる
      why    結果のあとに出す一言
-     steps  法則を見つける：[{label, task, set, predict, why}, …]。条件を変えて予想→観察を何段か重ね、最後に law（決まり）を式で見せる
+     steps  法則を見つける：[{label, task, set, predict, why}, …]。条件を変えて予測→観察を何段か重ね、最後に law（決まり）を式で見せる
      law    {title, lines:[式…], text, limit}  最後に「式で説明する」で開く。limit は式の外にあること（前提が崩れる条件など）
      tour   解説付き再生（#90）：{kmax, decimals, steps:[{title, text, set, frames, focus, ms}, …]}
             段の状態＝前の段の終わり＋set、frames を順に重ねる（値は補間しない）。text の **…** を強調し、
             focus と同じ data-focus を持つ要素を囲む。前へ／再生／次へ。再生は今の段だけ動かして止まる（自動で次へ進めない）。
             「自分で動かす」で解説を止め、「解説に戻る」で値・説明・強調をその段（止めた frame）に戻す。
-   予想のある版では、set で決めた選択欄（data-key の select）を文字に置き換え、問題と関係のない選択をさせない。
+   予測のある版では、set で決めた選択欄（data-key の select）を文字に置き換え、問題と関係のない選択をさせない。
    Notion の埋め込み（iframe。高さ約320pxで変えられない）では「小さい表示」にする：
-     見出し・説明文を省き、予想の前は課題カードだけ、結果のあとは要点と操作だけを出す。
+     見出し・説明文を省き、予測の前は課題カードだけ、結果のあとは要点と操作だけを出す。
      表・式・図は「くわしく」で開く。全部を広く使うときは「大きく開く ↗」で別の画面に出す。
    ?embed=1 で小さい表示を試せる（テスト用）。
 */
@@ -58,7 +58,7 @@ const LK=(()=>{
  function setRange(id,v){const e=$(id);e.value=v;e._lkUpd&&e._lkUpd();}
  // 式で計算
  function formula(lines,title){return `<div class="lk-formula res"><div class="lk-ft">${esc(title||"式で計算")}</div>${lines.map(l=>`<div class="l">${esc(l)}</div>`).join("")}</div>`;}
- // 予想のある版：set で決めた選択欄は文字にする（問題と関係のない選択をさせない）
+ // 予測のある版：set で決めた選択欄は文字にする（問題と関係のない選択をさせない）
  function fixPicks(){if(!cfg.predict||!cfg.set)return;
   Object.keys(cfg.set).filter(k=>!(cfg.unlock||[]).includes(k)).forEach(k=>{const el=document.querySelector(`#m-${cur} select[data-key="${k}"]`);if(!el)return;
    const lab=el.closest("label"),name=lab?lab.firstChild.textContent.trim():"";
@@ -72,13 +72,13 @@ const LK=(()=>{
   if(FOCUS&&web&&window.__LABPRESETS__)h+=`<a class="lk-link" href="./" target="_blank" rel="noopener">ほかのモードも試す ↗</a>`;
   b.innerHTML=h;b.hidden=!h;const m=$("lk-more");
   if(m)m.onclick=()=>{const on=!document.body.classList.contains("lk-more");document.body.classList.toggle("lk-more",on);m.setAttribute("aria-expanded",on);m.textContent=on?"たたむ ▴":"くわしく（表・式）▾";};}
- // 課題カードと予想
+ // 課題カードと予測
  function taskCard(){const box=$("lk-task");if(!cfg.task){box.remove();return;}
   const p=cfg.predict;const head=STEPS?`🔍 法則を見つける ${si+1}／${STEPS.length}`:"🎯 課題";let h=`<div class="lk-task"><div class="lk-tt">${head}</div>${STEPS&&hist.length?histTable():""}<div class="lk-q">${esc(cfg.task)}</div>`;
-  if(p){h+=`<div id="lk-ask"><div class="mut lk-note">先に予想を決める。決めるまで結果は隠れている。</div>`;
-   if(p.type==="number")h+=`<div class="row"><label>${esc(p.label||"予想")} <input type="number" id="lk-in" inputmode="decimal" step="any">${esc(p.unit||"")}</label></div>`;
-   else h+=`<div class="mut">${esc(p.label||"予想")}</div><div class="lk-choices" id="lk-ch">${p.options.map(o=>`<button type="button" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
-   h+=`<div class="row"><button class="act" id="lk-go" disabled>予想を決めて確かめる</button><button class="lk-skip" id="lk-skip">予想せずに見る</button></div></div>`;}
+  if(p){h+=`<div id="lk-ask"><div class="mut lk-note">先に予測を決める。決めるまで結果は隠れている。</div>`;
+   if(p.type==="number")h+=`<div class="row"><label>${esc(p.label||"予測")} <input type="number" id="lk-in" inputmode="decimal" step="any">${esc(p.unit||"")}</label></div>`;
+   else h+=`<div class="mut">${esc(p.label||"予測")}</div><div class="lk-choices" id="lk-ch">${p.options.map(o=>`<button type="button" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+   h+=`<div class="row"><button class="act" id="lk-go" disabled>予測を決めて確認</button><button class="lk-skip" id="lk-skip">予測せずに表示</button></div></div>`;}
   h+=`<div id="lk-verdict"></div></div>`;box.innerHTML=h;
   if(!p)return;
   let guess=null;const go=$("lk-go");
@@ -87,29 +87,29 @@ const LK=(()=>{
   go.onclick=()=>reveal(guess);$("lk-skip").onclick=()=>reveal(null);}
  function lock(on){locked=on;document.body.classList.toggle("lk-locked",on);
   document.querySelectorAll("#tabs button").forEach(b=>b.disabled=on&&b.dataset.m!==cur);}
- // 結果のあと：動かすと予想の値がその場で変わる
+ // 結果のあと：動かすと予測の値がその場で変わる
  function live(){const el=$("lk-live");if(!el||!revealed||!moved)return;el.hidden=false;const p=cfg.predict,r=modes[cur].value(p.key);
   el.innerHTML=`動かすと変わる → ${esc(p.label||"結果")}：<b>${esc(r.text)}</b>`;}
  function reveal(guess){const p=cfg.predict;lock(false);revealed=true;if(modes[cur].render)modes[cur].render();
   const r=modes[cur].value(p.key);last=r;let h="";
   if(STEPS)hist.push({label:STEPS[si].label||`${si+1}`,guess:guess===null?"—":(p.type==="number"?fmtNum(guess)+(p.unit||""):String(guess)),result:r.text+(p.type==="number"?(p.unit||""):"")});
-  const both=`予想 <b>${esc(p.type==="number"?fmtNum(guess)+(p.unit||""):guess)}</b> ／ ラボ <b>${esc(r.text)}</b>`;
+  const both=`予測 <b>${esc(p.type==="number"?fmtNum(guess)+(p.unit||""):guess)}</b> ／ ラボ <b>${esc(r.text)}</b>`;
   if(guess===null)h=`<div>ラボの結果：<b>${esc(r.text)}</b></div>`;
   else if(p.type==="number"){const tol=p.tol??Math.max(Math.abs(r.v)*0.01,0.005);const d=guess-r.v,hit=Math.abs(d)<=tol;
-   h=hit?`<div><span class="ok">◎ 予想どおり</span>　${both}</div>`:
+   h=hit?`<div><span class="ok">◎ 予測どおり</span>　${both}</div>`:
     `<div><span class="ng">✕ ずれ ${d>0?"+":""}${esc(fmtNum(d))}${esc(p.unit||"")}</span>　${both}</div><div class="mut">外れた所が学びどころ。</div>`;}
-  else{const hit=guess===r.text;h=hit?`<div><span class="ok">◎ 予想どおり</span>　${both}</div>`:
-    `<div><span class="ng">✕ 予想と違った</span>　${both}</div><div class="mut">なぜかを1文で書く。</div>`;}
+  else{const hit=guess===r.text;h=hit?`<div><span class="ok">◎ 予測どおり</span>　${both}</div>`:
+    `<div><span class="ng">✕ 予測と違った</span>　${both}</div><div class="mut">なぜかを1文で書く。</div>`;}
   if(cfg.why)h+=`<div class="lk-why">${esc(cfg.why)}</div>`;
   h+=`<div class="lk-live" id="lk-live" hidden></div>`;
-  if(STEPS){if(si<STEPS.length-1)h+=`<div class="row"><button type="button" class="act" id="lk-next">次の条件で予想する ▶</button></div>`;
+  if(STEPS){if(si<STEPS.length-1)h+=`<div class="row"><button type="button" class="act" id="lk-next">次の条件で予測する ▶</button></div>`;
    else if(cfg.law)h+=`<div class="lk-lawask"><div class="mut">ここまでの結果から、決まりを1文で書いてみる。書けたら式で確かめる。</div><div class="row"><button type="button" class="act" id="lk-law">式で説明する ▼</button></div></div><div id="lk-lawbox"></div>`;}
   $("lk-verdict").innerHTML=`<div class="lk-verdict">${h}</div>`;flash($("lk-verdict").firstElementChild);haptic();
   const nx=$("lk-next");if(nx)nx.onclick=nextStep;const lw=$("lk-law");if(lw)lw.onclick=showLaw;
   const ask=$("lk-ask");if(ask)ask.remove();document.querySelector(".lk-task").classList.add("lk-done");
   live();bar();if(EMBED)window.scrollTo(0,0);}
  // 探究：次の条件へ
- function histTable(){const p=cfg.predict||{};return `<table class="lk-hist"><tr><th>条件</th><th>予想</th><th>結果</th></tr>${hist.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.guess)}</td><td><b>${esc(r.result)}</b></td></tr>`).join("")}</table>`;}
+ function histTable(){const p=cfg.predict||{};return `<table class="lk-hist"><tr><th>条件</th><th>予測</th><th>結果</th></tr>${hist.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.guess)}</td><td><b>${esc(r.result)}</b></td></tr>`).join("")}</table>`;}
  function nextStep(){si++;const s=STEPS[si];cfg.task=s.task;cfg.predict=s.predict;cfg.why=s.why;revealed=false;moved=false;
   if(s.set&&modes[cur].apply)modes[cur].apply(s.set);if(modes[cur].render)modes[cur].render();
   taskCard();lock(true);bar();$("lk-bar").hidden=true;if(EMBED)window.scrollTo(0,0);}

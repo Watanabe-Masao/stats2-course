@@ -5,7 +5,7 @@ kind: simulator
 src: tcf_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_dist.html]   # 旧版 教科書20 の「t・χ²・F を切り替え、自由度で形と確率点が変わる」を t・chi・f に、例題の t 値の計算を tstat に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: tstat
     name: t 値を計算
     purpose: x̄・μ₀・s・n から SE＝s÷√n と t＝(x̄−μ₀)÷SE を出し、t(n−1) の両側5%の点（0.975点）と比べる。分母に s をそのまま入れた誤りの値も並べる
@@ -38,7 +38,7 @@ presets:
   s1-df:
     mode: t
     set: {df: 4, side: two, alpha: 0.05, t: 1}
-    task: 5店（自由度4）のデータで t を使う。両側5%の t の点は？ 正規の1.96と比べて予想する。
+    task: 5店（自由度4）のデータで t を使う。両側5%の t の点は？ 正規の1.96と比べて予測する。
     predict: {type: number, key: tcrit, label: "t(4) の0.975点"}
     expect: 2.7764
     why: t(4) の0.975点は約2.776で、1.96よりかなり大きい。自由度を15にすると2.131、120にすると1.980と、1.96に近づく。
@@ -58,7 +58,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（t 値、t 分布、カイ二乗分布、F 分布）。
 used_by: [U20]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/tcf_lab/check.js          # 本文の値（t・χ²・F の確率点を数表の値と照合）
 checked:
   browser_380px: 2026-10-28

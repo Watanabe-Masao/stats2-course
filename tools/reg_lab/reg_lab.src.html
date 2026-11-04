@@ -22,7 +22,7 @@
  <p class="hint ctl">点はドラッグで動く（0.5 刻み）。◇は「予測する x」での予測値。</p>
  <div class="row ctl"><label><input type="checkbox" id="fsq" checked> 残差の2乗を正方形で</label><button type="button" class="sub" id="fadd">点を足す</button><button type="button" class="sub" id="fdel">点を消す</button><button type="button" class="sub" id="freset">元に戻す</button></div>
  <input type="range" id="fpx" min="0" max="80" step="0.5" value="5" data-name="予測する x">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="fsum"></div>
  <div class="res det" id="ftab"></div>
 </div>
@@ -32,7 +32,7 @@
  <div class="ctl pic" id="lbox"></div>
  <input type="range" id="lm" min="-5" max="5" step="0.1" value="0.5" data-name="傾き">
  <input type="range" id="lc" min="-20" max="20" step="0.1" value="4" data-name="切片">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="lsum"></div>
 </div>
 
@@ -40,14 +40,14 @@
  <p class="mut" style="margin:0">残差プロット：横に x、縦に残差 e＝y−ŷ をとる。直線で表せる関係なら、残差は0の上下にばらばらに散る。山形・谷形などの形が見えたら、直線では表しきれない曲がりがある。点はドラッグで動く。</p>
  <div class="ctl pic" id="rbox"></div>
  <div class="ctl pic" id="rres"></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="rsum"></div>
 </div>
 
 <div id="m-dir" class="mode">
  <p class="mut" style="margin:0">回帰の向き。y を x で予測する直線（縦のずれを最小）と、x を y で予測する直線（横のずれを最小）は、点が一直線に並ばない限り一致しない。2本の傾きの積は r²。点はドラッグで動く。</p>
  <div class="ctl pic" id="dbox"></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="card res key" id="dsum"></div>
 </div>
 

@@ -5,7 +5,7 @@ kind: simulator
 src: reg_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_reg.html]  # 旧版 教科書29 の「残差を表示して、2乗和が最小になる直線」を fit と line に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: fit
     name: 回帰直線
     purpose: 点をドラッグで動かすと、最小二乗の直線・残差の縦線と2乗の正方形・傾き・切片・SSE・R²・表・平方和の表が同時に動く。予測する x を動かすと予測値（◇）が動き、観測した範囲の外なら外挿と出す
@@ -31,7 +31,7 @@ presets:
   s1-fit:
     mode: fit
     set: {data: "1,3 2,5 3,4 4,6 5,7", px: 5}
-    task: 5週の広告回数 x と来店者数 y（百人）は (1,3)(2,5)(3,4)(4,6)(5,7)。最小二乗の回帰直線の傾き b を（小数で）予想する。
+    task: 5週の広告回数 x と来店者数 y（百人）は (1,3)(2,5)(3,4)(4,6)(5,7)。最小二乗の回帰直線の傾き b を（小数で）予測する。
     predict: {type: number, key: b, label: "傾き b"}
     expect: 0.9
     why: 偏差の積の和9 を x の偏差平方和10 で割って0.9。直線は (3, 5) を通るので a＝2.3。点を動かすと、正方形の合計（SSE）が最小になるよう直線がついてくる。
@@ -58,7 +58,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（回帰直線、自分で引く、残差プロット、回帰の向き）。
 used_by: [U29]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/reg_lab/check.js          # 本文の値（b＝0.9・a＝2.3・SSE 1.9・R² 0.81・F 12.79、目分量の直線4.75、残差の形、向き）とドラッグ
 checked:
   browser_380px: 2026-10-29

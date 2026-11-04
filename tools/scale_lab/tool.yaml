@@ -5,7 +5,7 @@ kind: simulator
 src: scale_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 2
 replaces_legacy: [scale.html]   # 旧版 教科書04 の「℃とKで何倍が変わる」ラボの機能を含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: judge
     name: 尺度を判定
     purpose: 4つの質問に上から答えて尺度を決める（15件）。間違えたら「どこで取り違えたか」を返す
@@ -37,7 +37,7 @@ presets:
   s1-temp:
     mode: unit
     set: {kind: temp, a: 10, b: 20}
-    unlock: [kind]               # 本文の手順2で「重さ」「売上金額」に切り替えるので、予想のあとは選べるようにする
+    unlock: [kind]               # 本文の手順2で「重さ」「売上金額」に切り替えるので、予測のあとは選べるようにする
     task: 10℃と20℃を、絶対温度（K）で表すと B÷A は何倍になるか。
     predict: {type: number, key: "ratio:1", label: "K で B÷A", unit: "倍"}
     expect: 1.035
@@ -61,7 +61,7 @@ presets:
     task: 自分の判定や設計を、5つのモードで確かめる（判定は「尺度を判定」、何倍の扱いは「単位を変える」、アンケートの比べ方は「満足度の平均」、まとめ方は「階級にまとめる」、番号の扱いは「数字のラベル」）。
 used_by: [U04]
 tests:
-  - node tools/test_labs.js            # out/labs の全部：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値
+  - node tools/test_labs.js            # out/labs の全部：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値
   - node tools/scale_lab/check.js      # 本文に書いた値（2.000/1.035/1.360、3.40/3.80/3.26、41.6/41.5、1.80）
 checked:
   browser_380px: 2026-10-27

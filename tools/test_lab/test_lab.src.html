@@ -19,7 +19,7 @@
  <input type="range" id="zm" min="0" max="2000" step="0.1" value="100" data-name="基準 μ₀">
  <input type="range" id="zs" min="0.1" max="500" step="0.1" value="10" data-name="σ">
  <input type="range" id="zn" min="1" max="10000" step="1" value="25" data-name="個数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="zplot"></div>
  <div class="card res key" id="zsum"></div>
 </div>
@@ -31,7 +31,7 @@
  <input type="range" id="wm1" min="0" max="2000" step="0.1" value="104" data-name="本当の μ₁">
  <input type="range" id="ws" min="0.1" max="500" step="0.1" value="10" data-name="σ">
  <input type="range" id="wn" min="1" max="2000" step="1" value="25" data-name="個数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="wplot"></div>
  <div class="card res key" id="wsum"></div>
  <div class="res det" id="wtab"></div>
@@ -41,7 +41,7 @@
  <p class="mut" style="margin:0">本当は差がない（H₀ が正しい）検定を何度も行うと、どれか1つが偶然「有意」になる確率は 1−(1−α)ᵏ に増える。1000組の「k 回の検定」で数えて確かめる（固定の乱数）。</p>
  <div class="row ctl"><label>α <select id="kalpha" data-key="alpha"><option value="0.1">10%</option><option value="0.05" selected>5%</option><option value="0.01">1%</option></select></label><label><input type="checkbox" id="kbon" data-key="bonf"> α÷k で判断（ボンフェローニ）</label></div>
  <input type="range" id="kk" min="1" max="50" step="1" value="1" data-name="検定の回数 k">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="kplot"></div>
  <div class="card res key" id="ksum"></div>
 </div>

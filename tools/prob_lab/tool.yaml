@@ -5,7 +5,7 @@ kind: simulator
 src: prob_lab.src.html           # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 3                       # 2：U11 用に「袋から2回」「クロス集計」、3：U12 用に「ベイズ」を足した
 replaces_legacy: [union.html, cond.html, sim_bayes.html]    # 旧版 教科書10 の「重なりを動かす」を area、教科書11 の条件付き確率を table に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: dice
     name: サイコロで A・B
     purpose: サイコロ1回の事象 A・B を選び、どの目が A・B・両方に入るかを色で見る。P(A∪B) は重なりを1回引く
@@ -121,7 +121,7 @@ presets:
     task: 「同じ検査を2回」に切り替え、2回とも検出されたときの事後確率を見る（発展1）。次に元の割合を0.5%・2%・10%・50%と変え、同じ検査でも事後確率が大きく変わることを見る（発展3）。
 used_by: [U10, U11, U12]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/prob_lab/check.js         # 本文の値（2/3、11/36、91/216、0.7・0.3、60%・40%、0.651、ベイズ 18÷67・16.2÷18.65）
 checked:
   browser_380px: 2026-10-28

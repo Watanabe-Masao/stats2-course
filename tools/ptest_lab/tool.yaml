@@ -5,7 +5,7 @@ kind: simulator
 src: ptest_lab.src.html          # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_test.html, prop.html]   # 旧版 教科書26 の「比率の検定（SE は p₀）」を p1・p2 に、「母分散の χ²・分散比の F」を var・ratio に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: p1
     name: 1つの比率
     purpose: H₀：p＝p₀ の z＝(p̂−p₀)÷√(p₀(1−p₀)÷n) と p 値。np₀・n(1−p₀) が5以上かの目安、二項分布で直接計算した p 値、区間推定の SE（p̂ で作る）も並べる
@@ -65,7 +65,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（1つの比率、2つの比率、母分散、分散の比）。
 used_by: [U26]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/ptest_lab/check.js        # 本文の値（z＝2.5、z≒−1.63、χ²＝16、F＝4、χ²(9)・F の点）
 checked:
   browser_380px: 2026-10-28

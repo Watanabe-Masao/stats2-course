@@ -18,7 +18,7 @@
  <input type="range" id="akb" min="0" max="3" step="0.25" value="1" data-name="平均のずれ" data-unit="倍">
  <input type="range" id="akw" min="0.25" max="3" step="0.25" value="1" data-name="群内のばらつき" data-unit="倍">
  <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="くり返し" data-unit="回">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="aplot"></div>
  <div class="card res key" id="asum"></div>
  <div class="res det" id="atab"></div>
@@ -28,7 +28,7 @@
  <p class="mut" style="margin:0">規模の違う20店で、施策の効果（本当は＋τ）を調べる実験を500回くり返す。割り当て方で、推定した効果の「偏り」と「ばらつき」がどう変わるかを見る。</p>
  <div class="row ctl"><label>割り当て方 <select id="smethod" data-key="method"><option value="random">くじで半分</option><option value="choose">大きい店を選ぶ</option><option value="block">近い2店の組でくじ</option></select></label></div>
  <input type="range" id="stau" min="0" max="6" step="0.5" value="3" data-name="本当の効果 τ">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="splot"></div>
  <div class="card res key" id="ssum"></div>
 </div>
@@ -37,7 +37,7 @@
  <p class="mut" style="margin:0">本当はどの群の平均も同じとき、群の組ごとに t 検定（5%）をくり返すと、どれかが偶然「有意」になる確率が増える。分散分析の F 検定（5%）と比べる。2000回の実験で数える（固定の乱数）。</p>
  <input type="range" id="mk" min="2" max="6" step="1" value="3" data-name="群の数">
  <input type="range" id="mn" min="3" max="20" step="1" value="5" data-name="各群の店舗数">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="mplot"></div>
  <div class="card res key" id="msum"></div>
 </div>
@@ -47,7 +47,7 @@
  <input type="range" id="ies" min="-4" max="8" step="0.5" value="4" data-name="小型店での効果">
  <input type="range" id="iel" min="-4" max="8" step="0.5" value="0" data-name="大型店での効果">
  <input type="range" id="ip" min="0" max="1" step="0.1" value="0.5" data-name="小型店の割合">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="iplot"></div>
  <div class="card res key" id="isum"></div>
 </div>

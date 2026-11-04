@@ -1,11 +1,11 @@
 id: LAB-spread
-name: 散らばりラボ
+name: ばらつきラボ
 slug: spread                     # 公開サイトでのフォルダ名（URL の一部。変えるとリンクが切れる）
 kind: simulator
 src: spread_lab.src.html         # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
-replaces_legacy: [sigma.html, unb.html]   # 旧版 教科書07 の「偏差平方和の近道」（dev モードの式）と「n か n−1 か」（unb モード）をまとめた。sim_mean.html の散らばり倍率は dev モードの b 倍に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+replaces_legacy: [sigma.html, unb.html]   # 旧版 教科書07 の「偏差平方和の近道」（dev モードの式）と「n か n−1 か」（unb モード）をまとめた。sim_mean.html のばらつき倍率は dev モードの b 倍に含む
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: dev
     name: 偏差と分散
     purpose: 偏差の線、偏差平方和、n と n−1 の分散、標準偏差、CV。b 倍・a を足す変換
@@ -38,7 +38,7 @@ presets:
   s1-scale:
     mode: dev
     set: {data: B, b: 2}
-    task: 売場Bの5日間の販売数を全部2倍にすると、不偏分散（もとは22.5）はいくつになるか。予想したら、a（足す数）も動かしてみる。
+    task: 売場Bの5日間の販売数を全部2倍にすると、不偏分散（もとは22.5）はいくつになるか。予測したら、a（足す数）も動かしてみる。
     predict: {type: number, key: s2, label: "2倍したあとの不偏分散"}
     expect: 90
     why: 偏差がどれも2倍になり、2乗するので分散は4倍の90。標準偏差は2倍。a を足しても全部が同じだけずれるので、偏差も分散も変わらない。
@@ -50,10 +50,10 @@ presets:
     mode: unb
     task: n を2から6まで動かし、n で割る分散の平均が母分散8のどれだけになるか（(n−1)/n 倍）を確かめる。
   s6-free:
-    task: 自分の店の数字で、散らばりの数の選び方を4つのモードで確かめる（偏差と分散、変動係数、n か n−1 か、ジニ係数）。
+    task: 自分の店の数字で、ばらつきの数の選び方を4つのモードで確かめる（偏差と分散、変動係数、n か n−1 か、ジニ係数）。
 used_by: [U07]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/spread_lab/check.js       # 本文の値（偏差平方和90・分散18・不偏分散22.5、n で割る分散の平均＝(n−1)/n×8、ジニ係数0.4）
 checked:
   browser_380px: 2026-10-28

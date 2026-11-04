@@ -5,7 +5,7 @@ kind: simulator
 src: ci_lab.src.html             # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_ci.html, prop.html]   # 旧版 教科書22 の「σ・n・信頼係数で誤差幅と30本の区間が変わる」を mean と cover に、「比率の区間（n を4倍で幅が半分）」を prop に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: mean
     name: 平均の区間
     purpose: x̄ ± 確率点×SE。σ が分かれば z（数表の 1.645・1.96・2.576）、分からなければ t(n−1)。目標の誤差幅に必要な n＝(zσ÷d)² の切り上げも出す。t のときは z で作った狭すぎる区間も並べる
@@ -53,7 +53,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（平均の区間、割合の区間、くり返して確かめる）。
 used_by: [U22]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/ci_lab/check.js           # 本文の値（48.04〜51.96、0.1608〜0.2392、必要な n、t の区間、ウィルソン、くり返しの割合）
 checked:
   browser_380px: 2026-10-28

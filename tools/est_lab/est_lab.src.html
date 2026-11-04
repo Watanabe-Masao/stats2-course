@@ -17,7 +17,7 @@
 <div id="m-calc" class="mode">
  <p class="mut" style="margin:0">データから推定値を計算する。平均 x̄ は母平均の推定値、偏差の2乗和を n−1 で割る不偏分散 s² は母分散の推定値。n で割る v と並べる。</p>
  <div class="row ctl vals"><label style="flex:1">データ <input id="dv" value="2,4,4,6,9" inputmode="decimal" aria-label="データ（カンマ区切り、2〜30個）"></label></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="dplot"></div>
  <div class="card res key" id="dsum"></div>
  <div class="res det" id="dtab"></div>
@@ -28,7 +28,7 @@
  <input type="range" id="ks" min="1" max="30" step="1" value="10" data-name="標準偏差 σ">
  <input type="range" id="kn" min="1" max="100" step="1" value="10" data-name="個数 n">
  <input type="range" id="kb" min="0" max="10" step="0.5" value="2" data-name="ずらす量 b">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="kplot"></div>
  <div class="card res key" id="ksum"></div>
  <div class="res det" id="ktab"></div>
@@ -38,7 +38,7 @@
  <p class="mut" style="margin:0">正規母集団（母分散 σ²）から n 個取り、偏差の2乗和を n−1 で割る s² と n で割る v を2000回比べる。s² は平均すると σ² に当たる（不偏）。v は小さめに偏るが、ばらつきが小さく MSE は小さい。</p>
  <input type="range" id="vs" min="1" max="400" step="1" value="100" data-name="母分散 σ²">
  <input type="range" id="vn" min="2" max="50" step="1" value="5" data-name="個数 n">
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="vplot"></div>
  <div class="card res key" id="vsum"></div>
  <div class="res det" id="vtab"></div>
@@ -51,7 +51,7 @@
  <input type="range" id="s0" min="0.05" max="1" step="0.05" value="0.2" data-name="不満の回答率">
  <input type="range" id="sn" min="10" max="5000" step="10" value="1000" data-name="回答数 n">
  <div class="row ctl"><button type="button" class="sub" id="sagain">別の乱数で集め直す</button></div>
- <div class="lk-wait card mut">予想を決めると、ここに結果が出る。</div>
+ <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="splot"></div>
  <div class="card res key" id="ssum"></div>
 </div>

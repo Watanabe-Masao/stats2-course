@@ -39,7 +39,7 @@ svg{max-width:100%;height:auto;display:block}
 .lk-choices button.on{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
 .lk-skip{background:none;border:none;color:var(--mut);text-decoration:underline;font-size:13px;cursor:pointer;min-height:44px}
 .lk-verdict{margin-top:6px;padding-top:6px;border-top:1px dashed var(--taskline)}
-/* 予想する前は結果を隠す */
+/* 予測する前は結果を隠す */
 .lk-locked .res{display:none}
 .lk-locked .ctl{pointer-events:none;opacity:.5}
 .lk-wait{display:none}
@@ -83,7 +83,7 @@ body.lk-embed{padding:8px 12px 10px}
 .lk-embed.lk-pred:not(.lk-more) .mode .res.key{display:block}
 body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 
-/* 法則を見つける：条件ごとの予想と結果の記録、最後の式 */
+/* 法則を見つける：条件ごとの予測と結果の記録、最後の式 */
 .lk-hist{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 6px}
 .lk-hist th,.lk-hist td{border-bottom:1px solid var(--line);padding:3px 6px;text-align:left}
 .lk-law{margin-top:8px;padding:8px 10px;border-left:4px solid var(--accent);background:var(--card)}
@@ -130,7 +130,7 @@ body.lk-embed.lk-locked.lk-pred .mode .res.key{display:none}
 /* 手触り（#42。knowledge-net と同じ決まり）：動きは何が変わったかを伝えるためだけ。1つの操作に動きは1つ
    - 押した瞬間に少し沈む（--dur-press・--press-scale）。つまみは押している間だけ少し大きくなる
    - タブを替えると、新しい中身だけがすっと出る（--dur）
-   - 予想の結果が出た所を一度だけ淡く光らせる（labkit.js の flash。--flash・--dur-flash）
+   - 予測の結果が出た所を一度だけ淡く光らせる（labkit.js の flash。--flash・--dur-flash）
    - 動きを減らす設定では全部止める */
 button{transition:transform var(--dur-press) var(--ease),background var(--dur),border-color var(--dur),color var(--dur)}
 button:active:not(:disabled){transform:scale(var(--press-scale))}

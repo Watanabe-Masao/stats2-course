@@ -5,7 +5,7 @@ kind: simulator
 src: two_lab.src.html            # 共通部品（tools/labkit）を差し込んで build/labs.py が out/labs/ に作る
 version: 1
 replaces_legacy: [sim_dist.html, twot.html]   # 旧版 教科書23 の「χ²(9) の 2.700 と 19.023」を var に、「2つの平均の差（Welch と等分散）」を diff に含む
-modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予想と照らし合わせられる値（build が検査する）
+modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values＝予測と照らし合わせられる値（build が検査する）
   - key: var
     name: 母分散
     purpose: (n−1)s² を χ²(n−1) の上側の点で割った下限〜下側の点で割った上限。母標準偏差の区間（平方根）と、上限÷下限の倍率も出す
@@ -75,7 +75,7 @@ presets:
     task: 自分の課題の数字で、モードを切り替えて確かめる（母分散、平均の差、対応あり、比率の差、分散の比、相関係数）。
 used_by: [U23]
 tests:
-  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予想の前に結果が隠れる・予想の答え＝ラボの値・埋め込み
+  - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
   - node tools/two_lab/check.js          # 本文の値（1.892〜13.333、0.869〜5.131、ウェルチと等分散、比率の差、分散比、フィッシャーの z）
 checked:
   browser_380px: 2026-10-28
