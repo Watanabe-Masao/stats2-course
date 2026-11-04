@@ -620,6 +620,23 @@ class TestNetwork(unittest.TestCase):
             broke(x)
             self.assertTrue(any(want in e for e in apply_texts_errors(x)), want)
 
+    def test_solve_value_matches_engine(self):
+        # 確かめる対象：network.py の solve_value（情報の of を solve から求める小さな式）が、engine の solveValue と同じ値を出す（#212）。
+        # 想定する故障：engine の式の読み方を変えたのに Python の写しを直し忘れる（教材の build は通るのに、画面では情報の値が違う・出ない）。
+        # 見つけ方：engine が書き出した見本（contracts.json の solve_value_cases：たどる・足し引き・掛け算・数・空白・数でない値・ない所）と1件ずつ照らす。
+        # 既存との違い：walk_errors は課題の文と solve を照らすだけで、engine と同じ読み方かは見ていなかった
+        import json
+        from network import solve_value, ROOT as NROOT
+        c = json.loads((NROOT / "docs" / "math-lab" / "contracts.json").read_text(encoding="utf-8"))["solve_value_cases"]
+        self.assertGreater(len(c["cases"]), 10)
+        for x in c["cases"]:
+            got = solve_value(c["solve"], x["path"])
+            if x["value"] is None:
+                self.assertIsNone(got, x["path"])
+            else:
+                self.assertIsNotNone(got, x["path"])
+                self.assertAlmostEqual(got, x["value"], places=12, msg=x["path"])
+
     def test_screen_revision_gate(self):
         # 確かめる対象：公開の前に、公開中の画面の型の改訂がデータの改訂以上かを確かめる（#207）。
         # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。
