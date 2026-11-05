@@ -1,6 +1,6 @@
 # 概念と概念の関係。id は変えない（ネットワークでは stats2:REL-…）。
 # from・to は用語（概念）の id。別の教材の概念は「教材名:id」で書く（例 math:CON-…）。
-# type：8種類。定義・矢印の読み方・該当例・該当しない例は docs/knowledge-net/schema/relation-types.yaml（どの教材も共通）。
+# type：10種類（種類・材料は関係図の決まり：docs/relation-map.md）。定義・矢印の読み方・該当例・該当しない例は docs/knowledge-net/schema/relation-types.yaml（どの教材も共通）。
 #   前提には premise（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）を必ず書く。
 #   変換には mode（exact：厳密／approximation：近似／limit：極限）と成立条件を必ず書く。「近い」と「等しい」を混ぜない。
 #   導出には成立条件を必ず書く。前提が2つ以上なら関係ではなく導出（derivations.yaml）の点にする。
@@ -35,22 +35,21 @@ relations:
   - id: REL-comb-binom
     from: TERM-comb
     to: TERM-binom
-    version: 1
+    version: 2
     question: なぜ ₙCₖ を掛けるのか？   # このつながりで考える問い（#188 07c）
     focus: {formula: F-binom-pmf, parts: [0]}   # このつながりが効く式の部品（#188 07c）
-    type: 前提
-    premise: mathematical
+    type: 材料
     description: 成功が k 回ある並びは、n 回のうちどの k 回を成功にするかの選び方の数 ₙCₖ 通りあり、どれも同じ確率なので、1つの並びの確率に ₙCₖ を掛ける。
     basis: {units: [U14]}
   - id: REL-indep-binom
     from: TERM-indep
     to: TERM-binom
-    version: 1
+    version: 2
     question: なぜ並び1つの確率を掛け算で出せるのか？   # このつながりで考える問い（#188 07c）
     focus: {formula: F-binom-pmf, parts: [1, 2]}   # このつながりが効く式の部品（#188 07c）
     type: 前提
-    premise: mathematical
-    description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。
+    premise: learning
+    description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。独立は、二項分布が成り立つ条件。
     basis: {units: [U14]}
   - id: REL-binom-poisson
     from: TERM-binom
@@ -123,6 +122,7 @@ relations:
     version: 1
     question: 回数に上限があると、何が違う？   # このつながりで考える問い（#188 07c）
     type: 対比
+    axis: 回数の上限と、分散と平均の関係
     description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
     gist: 平均が同じなら、回数に上限がある数え方（二項）は、上限のない数え方（ポアソン）よりばらつきが小さく、外れ方が違う。   # つまり（#95）
     stages:
@@ -178,10 +178,9 @@ relations:
   - id: REL-rv-dist
     from: TERM-rv
     to: TERM-dist
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 確率分布は、確率変数がとる値とその確率の対応。確率変数がなければ分布は作れない。
+    version: 2
+    type: 材料
+    description: 確率分布は、確率変数がとる値と、それぞれの値をとる確率の対応。確率変数がなければ分布は作れない。
     basis: {units: [U13]}
   - id: REL-dist-expect
     from: TERM-dist
@@ -227,10 +226,10 @@ relations:
   - id: REL-indep-geom
     from: TERM-indep
     to: TERM-geom
-    version: 1
+    version: 2
     type: 前提
-    premise: mathematical
-    description: 各回が独立なので、失敗が続いてから成功する確率が掛け算 (1−p)^(k−1)p で求まる。
+    premise: learning
+    description: 各回が独立なので、失敗が続いてから成功する確率が掛け算 (1−p)^(k−1)p で求まる。独立は、幾何分布が成り立つ条件。
     basis: {units: [U15]}
   - id: REL-binom-geom-contrast
     from: TERM-binom
@@ -238,6 +237,7 @@ relations:
     version: 1
     question: 何を数えているかが、どう違う？   # このつながりで考える問い（#188 07c）
     type: 対比
+    axis: 何を決めて、何を数えるか
     description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
     gist: 二項は「回数を決めて、当たりの数を数える」。幾何は「当たり1回を決めて、そこまでの回数を数える」。決める物と数える物が逆。   # つまり（#95）
     labs:
@@ -266,6 +266,7 @@ relations:
     version: 1
     question: 戻さずに取ると、何が変わる？   # このつながりで考える問い（#188 07c）
     type: 対比
+    axis: 取り出し方（戻すか、戻さないか）
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。超幾何分布の分散は、二項分布の分散の (N−n)/(N−1) 倍（2 個以上取れば 1 より小さい）。
     gist: 戻さずに取り出すと、取った結果によって残りの割合が変わり、結果のばらつきが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
     stages:
@@ -300,35 +301,31 @@ relations:
     figures: [FIG-LAB-pois-rel-expo-tour-1, FIG-LAB-pois-rel-expo-tour-2]
     basis: {units: [U15, U16]}
   - id: REL-dist-pdf
-    from: TERM-dist
-    to: TERM-pdf
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 連続な確率変数の分布は、値ごとの確率では書けない（1点の確率が0）ので、確率密度関数の面積で表す。
+    from: TERM-pdf
+    to: TERM-dist
+    version: 2
+    type: 材料
+    description: 連続な確率変数の分布は、値ごとの確率では書けない（1点の確率が0）ので、確率密度関数で表す（区間の確率は密度の面積）。確率分布の定義の「連続なら確率密度」に当たる。
     basis: {units: [U16]}
   - id: REL-pdf-normal
     from: TERM-pdf
     to: TERM-normal
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 材料
     description: 正規分布は確率密度関数 f(x) で定義され、確率は曲線の下の面積で読む。
     basis: {units: [U16]}
   - id: REL-pdf-uniform
     from: TERM-pdf
     to: TERM-uniform
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 材料
     description: 一様分布は、密度が一定の確率密度関数 1/(b−a) で定義される。
     basis: {units: [U16]}
   - id: REL-pdf-expo
     from: TERM-pdf
     to: TERM-expo
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 材料
     description: 指数分布は、確率密度関数 λe^(−λx) で定義される。
     basis: {units: [U16]}
   - id: REL-sd-std
@@ -1611,12 +1608,12 @@ relations:
     from: TERM-rv
     to: TERM-bernoulli
     type: 前提
-    premise: mathematical
-    description: ベルヌーイ分布は、0か1をとる確率変数の分布。
+    premise: learning
+    description: ベルヌーイ分布は、0か1をとる確率変数の分布。確率変数として値の出方を見ると読みやすい。
     basis:
       units:
       - U14
-    version: 1
+    version: 2
   - id: REL-bernoulli-binom
     from: TERM-bernoulli
     to: TERM-binom
@@ -2013,3 +2010,96 @@ relations:
       - U28
       - U32
     version: 1
+
+  # ---- 関係図の見本：確率分布の材料（定義の構成要素。docs/relation-map-design.md 4・#234）
+  - id: REL-prob-rv
+    from: TERM-prob
+    to: TERM-rv
+    version: 1
+    type: 材料
+    description: 確率変数は、試行の結果に応じて値が決まり、どの値が出るかが確率で表される量。確率がなければ作れない。
+    basis: {units: [U13]}
+  - id: REL-prob-dist
+    from: TERM-prob
+    to: TERM-dist
+    version: 1
+    type: 材料
+    description: 確率分布は、確率変数のそれぞれの値に、その値をとる確率を対応させたもの。
+    basis: {units: [U13]}
+  - id: REL-rv-pdf
+    from: TERM-rv
+    to: TERM-pdf
+    version: 1
+    type: 材料
+    description: 確率密度関数は、連続な確率変数が区間に入る確率を表す関数。
+    basis: {units: [U16]}
+  - id: REL-prob-pdf
+    from: TERM-prob
+    to: TERM-pdf
+    version: 1
+    type: 材料
+    description: 確率密度関数は、区間に入る確率を、その区間の下の面積で表す。値そのものは確率ではない。
+    basis: {units: [U16]}
+  - id: REL-rv-cov
+    from: TERM-rv
+    to: TERM-cov
+    version: 1
+    type: 材料
+    description: 共分散は、2つの確率変数が同じ向きにずれるか逆向きにずれるかを表す量。
+    basis: {units: [U13]}
+  - id: REL-expect-cov
+    from: TERM-expect
+    to: TERM-cov
+    version: 1
+    type: 材料
+    description: 共分散は、それぞれの期待値からのずれを掛け合わせた値の期待値。
+    basis: {units: [U13]}
+  - id: REL-prob-bernoulli
+    from: TERM-prob
+    to: TERM-bernoulli
+    version: 1
+    type: 材料
+    description: ベルヌーイ分布は、成功（1）を確率 p、失敗（0）を確率 1−p でとる分布。
+    basis: {units: [U14]}
+  - id: REL-prob-binom
+    from: TERM-prob
+    to: TERM-binom
+    version: 1
+    type: 材料
+    description: 二項分布は、成功確率 p の試行をくり返したときに、成功の回数がどんな確率で現れるかを表す。
+    basis: {units: [U14]}
+  - id: REL-prob-geom
+    from: TERM-prob
+    to: TERM-geom
+    version: 1
+    type: 材料
+    description: 幾何分布は、成功確率 p の試行を、初めて成功するまでくり返したときの回数の分布。
+    basis: {units: [U15]}
+  - id: REL-prob-negbinom
+    from: TERM-prob
+    to: TERM-negbinom
+    version: 1
+    type: 材料
+    description: 負の二項分布は、成功確率 p の試行を、r 回目の成功が起きるまでくり返したときの回数の分布。
+    basis: {units: [U15]}
+  - id: REL-comb-hyper
+    from: TERM-comb
+    to: TERM-hyper
+    version: 1
+    type: 材料
+    description: 超幾何分布の確率は、当たりからの選び方と外れからの選び方の積を、全体からの選び方で割る。3つとも組合せの数。
+    basis: {units: [U15]}
+  - id: REL-comb-negbinom
+    from: TERM-comb
+    to: TERM-negbinom
+    version: 1
+    type: 材料
+    description: 負の二項分布の確率は、最後の1回が r 回目の成功で、それまでの k−1 回のどこで r−1 回成功するかの選び方（組合せ）を掛ける。
+    basis: {units: [U15]}
+  - id: REL-fact-poisson
+    from: TERM-fact
+    to: TERM-poisson
+    version: 1
+    type: 材料
+    description: ポアソン分布の確率 e^(−λ)λᵏ／k! は、分母に k の階乗を持つ。
+    basis: {units: [U15]}

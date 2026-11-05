@@ -31,8 +31,13 @@ concept_pillars:
   - {id: infer, name: 推測する, categories: [調査・実験, 推定, 検定]}
 # 関係図（docs/relation-map.md・#233）：分類の中のまとまり（並べた順が学ぶ順。語は terms.yaml の group で1つに属する）と、
 # 関係図の決まりで書き終えた分類（build はこの分類にだけ、まとまりのない語・前提 mathematical・axis のない対比を止める）
-concept_groups: []
-relation_map_ready: []
+concept_groups:
+  # 確率分布（関係図の見本。docs/relation-map-design.md 4。渡辺さん 2026-11-06 D4）
+  - {id: GRP-dist-base, category: 確率分布, name: 分布のしくみ, summary: 確率変数と、その値の出方を表す分布・密度、2つの変数のずれ方}
+  - {id: GRP-dist-count, category: 確率分布, name: くり返して数える, summary: 取り出し・試行をくり返して、当たりや成功の数を数える}
+  - {id: GRP-dist-wait, category: 確率分布, name: 待つ・まれに起こる, summary: 成功までの回数を待つ、まれな出来事の回数を数える}
+  - {id: GRP-dist-cont, category: 確率分布, name: 連続の分布, summary: 値が連続にとれ、確率を密度の面積で表す分布}
+relation_map_ready: [確率分布]
 # 骨格の完了の条件を build で止めるか（129語の骨格がそろったので true：定義1文・分類がない語や孤立した語が出たら build が止める）
 skeleton_required: true
 
