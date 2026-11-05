@@ -132,7 +132,7 @@ experiments:
         title: 分布の形と仕組み
         items:
           - id: binom-A-01
-            title: 成功確率を変えると分布はどう動く？
+            title: 成功確率を上げると、成功回数の山はどう動く？   # 開いた画面の問い（question）と同じ文に（UI レビュー「用語・文章」。#224）
             finds: 成功確率と分布の形の関係
             concept: TERM-binom
             predict: 成功確率を上げたとき、成功回数の山の頂点がどこへ動くか
