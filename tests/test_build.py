@@ -1057,6 +1057,7 @@ class TestNetwork(unittest.TestCase):
         for t in c.terms.values():   # 今の教材のまとまりを外して、テストの中で書く
             t.pop("group", None)
         c.shared["relation_map_ready"] = []
+        c.shared["concept_groups"] = []
         self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 印のない教材は止めない
         c.shared["concept_groups"] = [{"id": "GRP-dist-base", "category": "確率分布", "name": "分布のしくみ"},
                                       {"id": "GRP-dist-count", "category": "確率分布", "name": "くり返して数える"}]
@@ -1067,6 +1068,7 @@ class TestNetwork(unittest.TestCase):
         rels = copy.deepcopy(self.rels)
         rv = next(r for r in rels if r["id"] == "REL-rv-dist")
         rv.update({"type": "前提", "premise": "mathematical"})   # 分け終えていない前提
+        next(r for r in rels if r["id"] == "REL-binom-geom-contrast").pop("axis", None)   # 軸のない対比
         rels.append({"id": "REL-x1", "from": "TERM-binom", "to": "TERM-dist", "type": "種類", "description": "x", "version": 1})
         rels.append({"id": "REL-x2", "from": "TERM-binom", "to": "TERM-rv", "type": "種類", "description": "x", "version": 1})
         err = n.relation_map_errors(c, rels)
