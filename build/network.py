@@ -11,6 +11,7 @@ import re
 import math
 
 from model import CONTENT, ROOT, Course, load_yaml, run_check
+import term_icons  # 語の印（#220）
 from effects import effect_errors, question_errors
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
@@ -556,6 +557,17 @@ def validate_network(c: Course) -> list[str]:
             return
         err.append(f"{where}: {what} の {ref} が用語{'・関係' if allow_rel else ''}にない")
 
+    # 語の印（全部の語にあり、動く物・外を指す物がない）と柱（どの分類もちょうど1つの柱に入る）。#220
+    err += term_icons.icon_errors(list(c.terms))
+    cats = c.shared.get("concept_categories") or []
+    pillars = c.shared.get("concept_pillars") or []
+    placed = [cat for p in pillars for cat in p.get("categories", [])]
+    for cat in cats:
+        if placed.count(cat) != 1:
+            err.append(f"shared.yaml：分類 {cat} が柱（concept_pillars）に {placed.count(cat)} 回ある（ちょうど1回にする）")
+    for cat in sorted(set(placed) - set(cats)):
+        err.append(f"shared.yaml：柱の分類 {cat} が concept_categories にない")
+
     # 概念
     for tid, t in c.terms.items():
         if not filled(t):
@@ -865,6 +877,8 @@ def export_network(c: Course, target: dict) -> dict:
         for k in ("en", "short", "category"):
             if t.get(k):
                 e[k] = t[k]
+        if base and term_icons.svg(tid):   # 語の印（build/term_icons.py が原本。公開サイトの icons/ に書く。#220）
+            e["icon"] = f"{base.rstrip('/')}/icons/{tid}.svg"
         if filled(t):
             for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace", "gist", "question", "chart"):
                 if t.get(k):
@@ -934,7 +948,8 @@ def export_network(c: Course, target: dict) -> dict:
     revision = json.loads(SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     exp_revision = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision, **({"experiment_revision": exp_revision} if experiments else {}),
-            "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units},
+            "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units,
+                       **({"pillars": c.shared["concept_pillars"]} if c.shared.get("concept_pillars") else {})},
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
 
 
