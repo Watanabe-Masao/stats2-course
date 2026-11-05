@@ -1053,7 +1053,11 @@ class TestNetwork(unittest.TestCase):
         # 検出の確かめ（2026-11-06）：4つの止めのそれぞれを関数から外すと、このテストが落ちることを見た
         n = self.n
         c = course()
-        self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 印のない今の教材は止めない
+        self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 今の教材（印があれば、書き終えた形）は止めない
+        for t in c.terms.values():   # 今の教材のまとまりを外して、テストの中で書く
+            t.pop("group", None)
+        c.shared["relation_map_ready"] = []
+        self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 印のない教材は止めない
         c.shared["concept_groups"] = [{"id": "GRP-dist-base", "category": "確率分布", "name": "分布のしくみ"},
                                       {"id": "GRP-dist-count", "category": "確率分布", "name": "くり返して数える"}]
         c.shared["relation_map_ready"] = ["確率分布"]
@@ -1061,6 +1065,8 @@ class TestNetwork(unittest.TestCase):
         c.terms["TERM-binom"]["group"] = "GRP-dist-count"
         c.terms["TERM-comb"]["group"] = "GRP-dist-count"   # 分類が違う（数学の道具）
         rels = copy.deepcopy(self.rels)
+        rv = next(r for r in rels if r["id"] == "REL-rv-dist")
+        rv.update({"type": "前提", "premise": "mathematical"})   # 分け終えていない前提
         rels.append({"id": "REL-x1", "from": "TERM-binom", "to": "TERM-dist", "type": "種類", "description": "x", "version": 1})
         rels.append({"id": "REL-x2", "from": "TERM-binom", "to": "TERM-rv", "type": "種類", "description": "x", "version": 1})
         err = n.relation_map_errors(c, rels)
@@ -1079,6 +1085,7 @@ class TestNetwork(unittest.TestCase):
         c.terms["TERM-binom"]["group"] = "GRP-dist-count"
         c.terms["TERM-comb"].pop("group")
         rels = [r for r in copy.deepcopy(self.rels)]
+        next(r for r in rels if r["id"] == "REL-rv-dist").update({"type": "前提", "premise": "mathematical"})
         for r in rels:
             if r["type"] == "前提" and r.get("premise") == "mathematical" and c.terms.get(r["to"], {}).get("category") == "確率分布":
                 r["type"] = "材料"; r.pop("premise")
