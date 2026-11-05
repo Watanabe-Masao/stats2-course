@@ -169,6 +169,12 @@ def build_site(course: Course) -> list[dict]:
     figdir.mkdir(exist_ok=True)
     for fid, f in course.figures.items():
         (figdir / f"{fid}.svg").write_bytes((ROOT / f["file"]).read_bytes())
+    icondir = SITE / "icons"   # 語の印（build/term_icons.py。概念の icon がここを指す。#220）
+    icondir.mkdir(exist_ok=True)
+    import term_icons
+    for tid in course.terms:
+        if (svg := term_icons.svg(tid)):
+            (icondir / f"{tid}.svg").write_text(svg, encoding="utf-8")
     (SITE / "index.html").write_text(
         '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         "<title>統計検定2級 ラボ</title><h1>統計検定2級 ラボ</h1><p>教材の原本（stats2-course）から自動で作るページ。"

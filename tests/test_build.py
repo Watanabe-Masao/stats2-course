@@ -637,6 +637,37 @@ class TestNetwork(unittest.TestCase):
                 self.assertIsNotNone(got, x["path"])
                 self.assertAlmostEqual(got, x["value"], places=12, msg=x["path"])
 
+    def test_term_icons_and_pillars(self):
+        # 確かめる対象：語の印（build/term_icons.py）が全部の語にあり、動く物・外を指す物がないこと。柱にどの分類もちょうど1回入ること（#220）。
+        # 想定する故障：語を足したのに印を描き忘れる（ライブラリに印が出ない）・印に <script>・on…=・href を入れる（教科書や Notion で開くと動く・外を読む）・
+        # 分類を足したのに柱に入れ忘れる・2つの柱に入れる（ライブラリで消える・二重に出る）。
+        # 見つけ方：原本は通り、印を1つ消す・危ない物を入れる・柱から分類を外す・重ねると止まる。既存との違い：印と柱の確かめはなかった
+        import copy
+        import term_icons as ti
+        from model import load_course
+        from network import validate_network
+        c = load_course()
+        self.assertEqual(ti.icon_errors(list(c.terms)), [])
+        saved = dict(ti.I)
+        try:
+            del ti.I["TERM-binom"]
+            self.assertTrue(any("TERM-binom" in e for e in ti.icon_errors(list(c.terms))))
+            ti.I.update(saved)
+            for bad in ['<script>x</script>', '<path onload="x"/>', '<use href="https://e.example/a.svg#x"/>', '<foreignObject/>']:
+                ti.I["TERM-binom"] = {"svg": bad, "form": "形"}
+                self.assertTrue(any("使えない物" in e for e in ti.icon_errors(list(c.terms))), bad)
+        finally:
+            ti.I.clear()
+            ti.I.update(saved)
+        self.assertFalse([e for e in validate_network(c) if "柱" in e])
+        sh = copy.deepcopy(c.shared)
+        c.shared["concept_pillars"][0]["categories"].remove("時系列")
+        self.assertTrue(any("時系列" in e and "0 回" in e for e in validate_network(c)))
+        c.shared["concept_pillars"][0]["categories"].append("確率")
+        self.assertTrue(any("確率" in e and "2 回" in e for e in validate_network(c)))
+        c.shared.clear()
+        c.shared.update(sh)
+
     def test_screen_revision_gate(self):
         # 確かめる対象：公開の前に、公開中の画面の型の改訂がデータの改訂以上かを確かめる（#207）。
         # 想定する故障：画面の公開が遅れた日に、新しい改訂のデータだけを公開する（新しい項目が画面に出ないまま気づかない）・同じ改訂でも止めて公開できない。
