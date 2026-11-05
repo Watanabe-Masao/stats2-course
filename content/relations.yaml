@@ -1202,6 +1202,16 @@ relations:
       units:
       - U27
     version: 1
+  - id: REL-h0-expected
+    from: TERM-h0
+    to: TERM-expected
+    type: 前提
+    premise: mathematical
+    description: 期待度数は、帰無仮説（適合度検定なら仮定した分布、独立性検定なら独立）が正しいとしたときに、各欄に入ると見込む度数。帰無仮説を決めないと求められない。
+    basis:
+      units:
+      - U27
+    version: 1
   - id: REL-expect-expected
     from: TERM-expect
     to: TERM-expected
