@@ -481,9 +481,12 @@
       key: pi
       kind: const
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}, {"op": "mul", "args": [{"op": "div", "args": [{"num": 1}, {"op": "mul", "args": [{"op": "sqrt", "args": [{"op": "mul", "args": [{"num": 2}, {"sym": "pi"}]}]}, {"sym": "sigma"}]}]}, {"op": "fn", "args": [{"op": "neg", "args": [{"op": "div", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "x"}, {"sym": "mu"}]}, {"num": 2}]}, {"op": "mul", "args": [{"num": 2}, {"op": "pow", "args": [{"sym": "sigma"}, {"num": 2}]}]}]}]}], "name": "exp"}]}]}
+  basis_formula: F-normal-pdf
   conditions:
     math:
-    - 確率密度が f(x) の式で表される（μ と σ で決まる）
+    - text: σ＞0（μ は実数）
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の正規分布として扱えない（σ＝0 では密度の式が定まらない）
     data:
     - ヒストグラムが左右対称で山が1つなのは手掛かりにすぎず、それだけでは正規分布と言えない（裾の重さなども見る）
     - 正規分布を前提にする方法は、データの分布が正規分布から外れると、結論を信頼しにくくなる
@@ -727,8 +730,9 @@
   - {ref: F-dist-sum}   # 同じ式 Σp(x)=1 の元は確率分布（TERM-dist）。build が元の式を写し、defined_in を付ける（#118 D2）
   conditions:
     math:
-    - 起こりうる値の範囲が決まっている
-    - 各値の確率が0以上で、合計が1
+    - text: 試行の結果ごとに、値が1つ決まる
+      kind: 要件
+      outside: 結果に値が1つに決まらなければ、確率変数として扱えない
     data:
     - 「記録する前の値の出方」として扱えるか（同じ仕組みでくり返し起きるか）を確かめる
   example: さいころの目 X は、1〜6 の値をそれぞれ確率 1/6 でとる。
@@ -767,8 +771,12 @@
     tree: {"op": "eq", "args": [{"op": "sum", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "p"}], "var": "x"}, {"num": 1}]}
   conditions:
     math:
-    - どの値の確率も0以上
-    - 全部の値の確率の合計が1（連続なら密度の面積が1）
+    - text: どの値の確率も0以上
+      kind: 要件
+      outside: この定義の確率分布として扱えない
+    - text: 全部の値の確率の合計が1（連続なら密度の面積が1）
+      kind: 要件
+      outside: この定義の確率分布として扱えない
     data:
     - データの相対度数の一覧は、分布の推定値。データが少ないと形が大きく変わる
   example: 1人が買う個数が 0個 0.2・1個 0.5・2個 0.3 なら、合計が1なので確率分布になっている。
@@ -843,9 +851,15 @@
       key: Y
       kind: rv
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"sym": "X"}, {"sym": "Y"}]}], "name": "V"}, {"op": "add", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"sym": "Y"}], "name": "V"}, {"op": "mul", "args": [{"num": 2}, {"op": "fn", "args": [{"sym": "X"}, {"sym": "Y"}], "name": "Cov"}]}]}]}
+  basis_formula: F-cov-def
   conditions:
     math:
-    - X・Y の分散が有限
+    - text: X・Y の分散が有限
+      kind: 仮定
+      claim: 共分散が有限の値に定まる
+      outside: 共分散が定まるとは限らない（ずれの積の期待値が存在しないことがある）
+      terms:
+      - TERM-var
     data:
     - 単位で値が変わる（円を千円にすると1000分の1）。関係の強さを比べるなら相関係数にする
     - 直線的な関係しか測らない
@@ -984,12 +998,30 @@
       domain: {min: 0, max: 1}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "mul", "args": [{"sym": "n"}, {"sym": "p"}, {"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}]}]}
   - {ref: F-expect-linear}   # 変換の欄（作業台の型 #156）。E(aX＋b)＝aE(X)＋b
+  basis_formula: F-binom-pmf
   conditions:
     math:
-    - 回数 n が決まっている
-    - 結果が成功・失敗の2つ
-    - 各回の成功確率 p が同じ
-    - 各回が独立
+    - text: n は1以上の整数（教材では n＝0 を扱わない）・0≦p≦1
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の二項分布として扱えない
+    - text: 回数 n が決まっている
+      kind: 仮定
+      claim: 成功回数 X が B(n, p) に従う
+      outside: 成功回数に二項分布を使えるとは保証できない（偶然に一致することはある）
+    - text: 結果が成功・失敗の2つ
+      kind: 仮定
+      claim: 成功回数 X が B(n, p) に従う
+      outside: 成功回数に二項分布を使えるとは保証できない（偶然に一致することはある）
+    - text: 各回の成功確率 p が同じ
+      kind: 仮定
+      claim: 成功回数 X が B(n, p) に従う
+      outside: 成功回数に二項分布を使えるとは保証できない（偶然に一致することはある）
+    - text: 各回が独立
+      kind: 仮定
+      claim: 成功回数 X が B(n, p) に従う
+      outside: 成功回数に二項分布を使えるとは保証できない（偶然に一致することはある）
+      terms:
+      - TERM-indep
     data:
     - 客ごとの購入のように、互いに影響しない（口コミや連れ立ちがない）か、p が客や時間でほぼ同じかを確かめる
   example: 来店客10人がそれぞれ確率 0.3 で買う（互いに独立）なら、買う人数は B(10, 0.3)。期待値は3人、分散は2.1。
@@ -1070,11 +1102,26 @@
       kind: param
       domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"sym": "lambda"}]}
+  basis_formula: F-poisson-pmf
   conditions:
     math:
-    - 出来事が互いに独立に起きる
-    - 同時に2つは起きない
-    - 起きる平均の割合が一定
+    - text: λ＞0
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義のポアソン分布として扱えない
+    - text: 出来事が互いに独立に起きる
+      kind: 仮定
+      claim: 一定の時間・範囲で起きた件数 X がポアソン分布 Po(λ) に従う
+      outside: 件数にポアソン分布を使えるとは保証できない（偶然に一致することはある）
+      terms:
+      - TERM-indep
+    - text: 同時に2つは起きない
+      kind: 仮定
+      claim: 一定の時間・範囲で起きた件数 X がポアソン分布 Po(λ) に従う
+      outside: 件数にポアソン分布を使えるとは保証できない（偶然に一致することはある）
+    - text: 起きる平均の割合が一定
+      kind: 仮定
+      claim: 一定の時間・範囲で起きた件数 X がポアソン分布 Po(λ) に従う
+      outside: 件数にポアソン分布を使えるとは保証できない（偶然に一致することはある）
     data:
     - 時間帯や曜日で割合が変わらないか、分散が平均とほぼ同じかを確かめる（分散が大きければ当てはまっていない）
   example: 1時間に平均2件の問い合わせがあるとき、ある1時間に1件もない確率は e⁻²≒0.135。
@@ -1157,10 +1204,22 @@
       kind: param
       domain: {min: 0, max: 1, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "pow", "args": [{"sym": "p"}, {"num": 2}]}]}]}
+  basis_formula: F-geom-pmf
   conditions:
     math:
-    - 各回が独立
-    - 成功確率 p が毎回同じ
+    - text: 0＜p≦1
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の幾何分布として扱えない
+    - text: 各回が独立
+      kind: 仮定
+      claim: 初めて成功するまでの試行回数 X が幾何分布に従う
+      outside: 試行回数に幾何分布を使えるとは保証できない（偶然に一致することはある）
+      terms:
+      - TERM-indep
+    - text: 成功確率 p が毎回同じ
+      kind: 仮定
+      claim: 初めて成功するまでの試行回数 X が幾何分布に従う
+      outside: 試行回数に幾何分布を使えるとは保証できない（偶然に一致することはある）
     data:
     - 回を重ねるほど成功しやすくなる（慣れ・学習）や、しにくくなる場面には当てはまらない
     - 「失敗の回数」で数える流儀もある（期待値は (1−p)/p）。問題文の数え方を確かめる
@@ -1220,10 +1279,22 @@
       key: comb
       concept: TERM-comb
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"op": "sub", "args": [{"sym": "k"}, {"num": 1}]}, {"op": "sub", "args": [{"sym": "r"}, {"num": 1}]}], "name": "comb"}, {"op": "pow", "args": [{"sym": "p"}, {"sym": "r"}]}, {"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"sym": "k"}, {"sym": "r"}]}]}]}]}
+  basis_formula: F-negbinom-pmf
   conditions:
     math:
-    - 各回が独立
-    - 成功確率 p が毎回同じ
+    - text: r は1以上の整数・0＜p≦1
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の負の二項分布として扱えない
+    - text: 各回が独立
+      kind: 仮定
+      claim: r 回目の成功までの試行回数 X が負の二項分布に従う
+      outside: 試行回数に負の二項分布を使えるとは保証できない（偶然に一致することはある）
+      terms:
+      - TERM-indep
+    - text: 成功確率 p が毎回同じ
+      kind: 仮定
+      claim: r 回目の成功までの試行回数 X が負の二項分布に従う
+      outside: 試行回数に負の二項分布を使えるとは保証できない（偶然に一致することはある）
     data:
     - 「r 回成功するまで」を数える場面（3件成約するまでの訪問回数など）。回数を決めて成功の数を数えるなら二項分布
   example: 成功率0.5で、2回目の成功がちょうど3回目の試行で起きる確率は ₂C₁×0.5²×0.5＝0.25。
@@ -1303,10 +1374,20 @@
       kind: param
       domain: {min: 0, integer: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"op": "mul", "args": [{"sym": "n"}, {"op": "div", "args": [{"sym": "M"}, {"sym": "N"}]}]}]}
+  basis_formula: F-hyper-pmf
   conditions:
     math:
-    - 戻さずに取り出す
-    - どの n 個の組も同じ確率で選ばれる
+    - text: N・M・n は整数で、0≦M≦N・1≦n≦N
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の超幾何分布として扱えない
+    - text: 戻さずに取り出す
+      kind: 仮定
+      claim: 取り出した当たりの個数 X が超幾何分布に従う
+      outside: 当たりの個数に超幾何分布を使えるとは保証できない（偶然に一致することはある）
+    - text: どの n 個の組も同じ確率で選ばれる
+      kind: 仮定
+      claim: 取り出した当たりの個数 X が超幾何分布に従う
+      outside: 当たりの個数に超幾何分布を使えるとは保証できない（偶然に一致することはある）
     data:
     - 集団 N が取り出す数 n に比べて十分大きいと、二項分布 B(n, M/N) とほとんど同じになる
   example: 10個中3個が不良の箱から2個取り出して、2個とも不良の確率は C(3,2)÷C(10,2)＝3/45＝1/15。
@@ -1416,10 +1497,18 @@
       kind: param
       domain: {min: 0, minOpen: true}
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"num": 1}, {"op": "pow", "args": [{"sym": "lambda"}, {"num": 2}]}]}]}
+  basis_formula: F-expo-pdf
   conditions:
     math:
-    - λ＞0
-    - 出来事が一定の割合で独立に起きる
+    - text: λ＞0
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の指数分布として扱えない
+    - text: 出来事が一定の割合で独立に起きる
+      kind: 仮定
+      claim: 次に起きるまでの待ち時間 X が指数分布に従う
+      outside: 待ち時間に指数分布を使えるとは保証できない（偶然に一致することはある）
+      terms:
+      - TERM-indep
     data:
     - 時間帯で起きる割合が変わる（昼と夕方で客の来方が違う）と当てはまらない。時間帯を分けて見る
   example: 1時間に平均4人来る（λ＝4/時）とき、次の客までの平均の待ち時間は 1/4 時間＝15分。
@@ -1484,8 +1573,12 @@
     tree: {"op": "eq", "args": [{"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x"}, {"num": 1}]}
   conditions:
     math:
-    - f(x) が0以上
-    - 全体の面積が1
+    - text: f(x) が0以上
+      kind: 要件
+      outside: 確率密度関数として扱えない
+    - text: 全体の面積が1
+      kind: 要件
+      outside: 確率密度関数として扱えない
     data:
     - ヒストグラムを「相対度数÷階級の幅」で描くと、密度の推定になる
   example: 0〜10分に一様に来るバスで、3〜5分の間に来る確率は 2÷10＝0.2。
@@ -1574,10 +1667,15 @@
       domain: {min: a, minOpen: true}
       kind: param
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "div", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "b"}, {"sym": "a"}]}, {"num": 2}]}, {"num": 12}]}]}
+  basis_formula: F-uniform-pdf
   conditions:
     math:
-    - a＜b
-    - 区間の外の密度は0
+    - text: a＜b
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義の一様分布として扱えない
+    - text: 区間の外の密度は0
+      kind: 要件
+      outside: この定義の一様分布として扱えない（区間の外にも値をとる）
     data:
     - 「どこも同じ出やすさ」は仮定。ヒストグラムが平らかで確かめる
   example: 0〜10分の一様分布の期待値は5分、分散は 100/12≒8.33。

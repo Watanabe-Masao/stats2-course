@@ -77,7 +77,11 @@ relations:
       - abs(50*0.06-3) < 1e-12
       - sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))/2 < 0.02
       - sum(abs(comb(200,k)*0.015**k*0.985**(200-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(41)) < sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))
-    conditions: [n が大きい, p が小さい, np＝λ を一定に保つ]
+    conditions:
+      - text: n を大きくし、np＝λ を一定に保つ（p は小さくなる）
+        kind: 仮定
+        claim: 二項分布 B(n, p) がポアソン分布 Po(λ) に近づく
+        outside: 近づくとは保証できない。n が小さい・p が大きいままなら差を別に確かめる
     basis: {units: [U15]}
   - id: REL-binom-normal
     from: TERM-binom
@@ -103,7 +107,14 @@ relations:
       note: 平均 9 回・標準偏差 約 2.5 回。np＝9 と n(1−p)＝21 がどちらも5以上なので、棒の頭が曲線に沿う。
     checks:
       - abs(30*0.3-9) < 1e-12 and abs(30*0.7-21) < 1e-12 and round(math.sqrt(30*0.3*0.7),1) == 2.5
-    conditions: [np と n(1−p) がどちらも十分大きい（目安は5以上）, 整数の棒を曲線で近似するので、境目を0.5ずらす（連続修正）]
+    conditions:
+      - text: np≧5 かつ n(1−p)≧5
+        kind: 目安
+        outside: この目安では正規近似を勧められない。二項分布の確率で直接求めるか、近似の精度を別に確かめる
+        target: 二項分布の正規近似
+        source:
+          source: Emory大学 MATH 117
+          locator: Approximating a Binomial Distribution with a Normal Curve（境目は教科書によって違うと注記）
     basis: {units: [U14, U16]}
   - id: REL-binom-sampleprop
     from: TERM-binom
@@ -114,7 +125,9 @@ relations:
     mode: exact
     description: 成功の回数 X が二項分布 B(n, p) に従うとき、X を n で割った標本比率 p̂＝X÷n は、同じ形の分布を横に 1/n に縮めたもの。平均は p、分散は p(1−p)÷n。
     gist: 回数を割合に直しても、分布の形は変わらず目盛りが縮むだけ。だから割合の標準偏差は、回数の標準偏差を n で割った大きさになる（分散なら n² で割る）。   # つまり（#95）
-    conditions: [X は二項分布 B(n, p) に従う（各回が独立・毎回同じ p）, n は決まった数]
+    conditions:
+      - X は二項分布 B(n, p) に従う（各回が独立・毎回同じ p）
+      - n は決まった数
     basis: {units: [U14, U22]}
   - id: REL-binom-poisson-contrast
     from: TERM-binom
@@ -165,7 +178,11 @@ relations:
       - {id: LAB-z, preset: s4-normal, purpose: 標準化すると、どの正規分布も同じ表で読める}
     type: 応用
     description: 正規分布に従う値を標準化すると標準正規分布 N(0, 1) になり、1つの表で確率が読める。
-    conditions: [X が正規分布に従う]
+    conditions:
+      - text: X が正規分布に従う
+        kind: 仮定
+        claim: 標準化した値 Z が標準正規分布 N(0, 1) に従う
+        outside: 標準化はできるが、Z が N(0, 1) に従うとは保証できない（正規分布の表で確率を読めない）
     basis: {units: [U16]}
   - id: REL-clt-normal
     from: TERM-clt
@@ -173,7 +190,23 @@ relations:
     version: 1
     type: 応用
     description: 独立な要因の和や平均は、元の分布によらず正規分布に近づく。正規分布がよく使われる理由。
-    conditions: [足し合わせる量が独立, 分散が有限, 個数が十分多い]
+    conditions:
+      - text: 足し合わせる量が独立
+        kind: 仮定
+        claim: 和や平均の分布が正規分布に近づく
+        outside: 正規分布で近似できるとは保証できない
+        terms:
+        - TERM-indep
+      - text: 分散が有限
+        kind: 仮定
+        claim: 和や平均の分布が正規分布に近づく
+        outside: 正規分布で近似できるとは保証できない（裾の重い分布では近づかない）
+        terms:
+        - TERM-var
+      - text: 個数が十分多い
+        kind: 仮定
+        claim: 和や平均の分布が正規分布に近づく
+        outside: 近似の精度は保証できない。元の分布の偏りが強いほど多くの個数が要る
     basis: {units: [U19]}
   - id: REL-rv-dist
     from: TERM-rv
@@ -220,7 +253,19 @@ relations:
     type: 導出
     description: 独立なら E(XY)＝E(X)E(Y) なので、共分散は0になる。逆（共分散0なら独立）は成り立たない。
     gist: お互いに影響しない2つの量は、一緒にずれる傾向がないので共分散は0。ただし共分散が0でも、影響し合っていることはある。   # つまり（#95）
-    conditions: [X と Y が独立, 期待値が有限]
+    conditions:
+      - text: X と Y が独立
+        kind: 仮定
+        claim: E(XY)＝E(X)E(Y) なので Cov(X, Y)＝0
+        outside: 共分散が0になるとは保証できない（独立でなくても0になることはある）
+        terms:
+        - TERM-indep
+      - text: 期待値が有限
+        kind: 仮定
+        claim: E(XY)＝E(X)E(Y) が使える
+        outside: 期待値が存在しなければ、共分散も定まらない
+        terms:
+        - TERM-expect
     figures: [FIG-LAB-expect-rel-indep-tour-1, FIG-LAB-expect-rel-indep-tour-2, FIG-LAB-expect-rel-indep-tour-3]
     basis: {units: [U13]}
   - id: REL-indep-geom
@@ -257,7 +302,15 @@ relations:
     mode: limit
     description: 集団 N を大きくして当たりの割合 M/N を保つと、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。
     gist: 箱がとても大きければ、取り出して戻さなくても中身の割合はほとんど変わらない。戻しても戻さなくても同じとみなせる。   # つまり（#95）
-    conditions: [N が取り出す数 n に比べて十分大きい, 当たりの割合 M/N を一定に保つ]
+    conditions:
+      - text: N が取り出す数 n に比べて十分大きい
+        kind: 仮定
+        claim: 超幾何分布が二項分布 B(n, M/N) に近づく
+        outside: 近づくとは保証できない。取り出す割合 n/N が大きいと、二項分布より散らばりが小さい
+      - text: 当たりの割合 M/N を一定に保つ
+        kind: 仮定
+        claim: 超幾何分布が二項分布 B(n, M/N) に近づく
+        outside: 近づく先の二項分布が決まらない
     figures: [FIG-LAB-pois-rel-hyper-tour-1, FIG-LAB-pois-rel-hyper-tour-2]
     basis: {units: [U15]}
   - id: REL-binom-hyper-contrast
@@ -297,7 +350,17 @@ relations:
     type: 導出
     description: 一定の割合 λ で独立に起きる出来事では、一定時間の件数がポアソン分布、次に起きるまでの待ち時間が指数分布になる。
     gist: 同じ出来事を「一定時間に何件来るか」で見るとポアソン、「次の1件まで何分待つか」で見ると指数分布。見方が違うだけ。   # つまり（#95）
-    conditions: [出来事が一定の割合 λ で起きる, 重ならない時間の件数が互いに独立]
+    conditions:
+      - text: 出来事が一定の割合 λ で起きる
+        kind: 仮定
+        claim: 件数がポアソン分布、待ち時間が指数分布に従う
+        outside: どちらの分布も使えるとは保証できない（時間帯で割合が変わるなら分けて見る）
+      - text: 重ならない時間の件数が互いに独立
+        kind: 仮定
+        claim: 件数がポアソン分布、待ち時間が指数分布に従う
+        outside: どちらの分布も使えるとは保証できない
+        terms:
+        - TERM-indep
     figures: [FIG-LAB-pois-rel-expo-tour-1, FIG-LAB-pois-rel-expo-tour-2]
     basis: {units: [U15, U16]}
   - id: REL-dist-pdf
@@ -761,7 +824,10 @@ relations:
     description: 自由度を大きくすると、t 分布は標準正規分布に近づく。
     gist: データが多いと、不偏分散で σ を置き換えたばらつきがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
     conditions:
-    - 自由度を大きくする
+      - text: 自由度を大きくする
+        kind: 仮定
+        claim: t 分布が標準正規分布に近づく
+        outside: 近づくとは保証できない。自由度が小さいと裾が重く、正規分布の値を使うと区間が狭すぎる
     basis:
       units:
       - U20

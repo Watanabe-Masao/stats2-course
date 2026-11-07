@@ -729,6 +729,20 @@ class TestNetwork(unittest.TestCase):
         prints2 = current_fingerprints(c.terms, k2)
         rec2 = [{**r, "fingerprint": prints2[r["formula"]]} for r in rec]
         self.assertEqual(publish_errors(k2, rec2, current_fingerprints(terms, k2)), [])   # why を外した契約では、why を変えても止まらない
+        # 成立条件の区分と基準の定義の式も版に入る（#249）。想定する故障：行の文は同じまま、仮定を要件に変える・保証すること・外れたときを
+        # 書き換える・basis_formula を変えても、古いレビューで公開される（2026-11-08 の独立なレビューで見つかった）。区分を持たない概念の式の版まで変わる。
+        # 見つけ方：二項分布の仮定の行の kind と outside、basis_formula をそれぞれ変えると F-binom-pmf だけが止まる。
+        # 検出の確かめ（2026-11-08）：fingerprint に区分を入れる行を外すと、この3つの assert が落ちることを見た
+        for change in ("kind", "outside", "basis"):
+            terms3 = copy.deepcopy(c.terms)
+            row = next(d for d in terms3["TERM-binom"]["_conditions_detail"] if d.get("text") == "各回が独立")
+            if change == "kind":
+                row["kind"] = "要件"
+            elif change == "outside":
+                row["outside"] += "（書き換えた）"
+            else:
+                terms3["TERM-binom"]["basis_formula"] = "F-binom-mean"
+            self.assertEqual([e.split("：")[0] for e in publish_errors(k, rec, current_fingerprints(terms3, k))], ["代表の式 F-binom-pmf"], change)
 
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
