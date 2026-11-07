@@ -1058,6 +1058,7 @@ class TestNetwork(unittest.TestCase):
             t.pop("group", None)
         c.shared["relation_map_ready"] = []
         c.shared["concept_groups"] = []
+        c.shared["group_relations"] = []   # まとまりの間の関係は test_group_relations で確かめる
         self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 印のない教材は止めない
         c.shared["concept_groups"] = [{"id": "GRP-dist-base", "category": "確率分布", "name": "分布のしくみ"},
                                       {"id": "GRP-dist-count", "category": "確率分布", "name": "くり返して数える"}]
@@ -1105,6 +1106,35 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")["group"], "stats2:GRP-dist-count")
         self.assertTrue(any(x.get("axis") for x in d["relations"]))
         self.assertFalse(n.schema_errors(d))
+
+    def test_group_relations(self):
+        # 確かめる対象：まとまりの間の関係（group_relations。関係図の全体の見え方の矢印。#240）の止めと書き出し。
+        # 想定する故障：矢印が指す関係の両端が from・to のまとまりにない（向きが逆・別のまとまり）のに通す。教材にない関係・まとまりを
+        #   指しても通す。同じ組に矢印が2本ある。言葉がない。書き出しに出ない・型に合わない。
+        # 見つけ方：今の教材（確率分布の3本）は止めが0で、書き出しが型に合う。そこから1つずつ壊し、それぞれの止めが出ることを見る。
+        # 既存との違い：test_relation_map_ready は概念と関係の段。ここはまとまりの間の段
+        # 検出の確かめ（2026-11-07）：両端の確かめ（まとまりにあるか）を関数から外すと、このテストが落ちることを見た
+        n = self.n
+        c = course()
+        self.assertEqual(n.relation_map_errors(c, self.rels), [])
+        d = n.export_network(c, {"site_base_url": ""})
+        self.assertEqual([(x["from"], x["to"]) for x in d["course"]["group_relations"]][0], ("stats2:GRP-dist-count", "stats2:GRP-dist-cont"))
+        self.assertEqual(d["course"]["group_relations"][1]["relations"], ["stats2:REL-binom-poisson"])
+        self.assertFalse(n.schema_errors(d))
+        cases = [
+            (lambda gr: gr[0].update(relations=["REL-binom-poisson"]), "REL-binom-poisson の両端"),     # 別のまとまりへの関係
+            (lambda gr: gr[2].update({"from": "GRP-dist-cont", "to": "GRP-dist-wait"}), "REL-poisson-expo の両端"),   # 向きが逆
+            (lambda gr: gr[0].update(relations=["REL-nothing"]), "REL-nothing が relations.yaml にない"),
+            (lambda gr: gr[0].update({"to": "GRP-nothing"}), "concept_groups のまとまりにする"),
+            (lambda gr: gr.append(dict(gr[0])), "同じ組の矢印が2本"),
+            (lambda gr: gr[0].update(label=""), "label（矢印の言葉）がない"),
+        ]
+        for broke, want in cases:
+            c2 = course()
+            c2.shared = copy.deepcopy(c2.shared)
+            broke(c2.shared["group_relations"])
+            err = n.relation_map_errors(c2, self.rels)
+            self.assertTrue(any(want in e for e in err), (want, err))
 
     def test_material_cycles(self):
         # 確かめる対象：材料の輪の警告。想定する故障：輪を見逃す・輪でない枝分かれを輪と数える。

@@ -563,6 +563,42 @@ def relation_map_errors(c: Course, rels: list[dict]) -> list[str]:
             err.append(f"{rid}: 分類「{cat_of[r['to']]}」は関係図に移したので、前提（mathematical）を材料か学ぶ順（前提 learning）に分ける")
         if r.get("type") == "対比" and not r.get("axis") and (cat_of.get(r.get("from")) in ready or cat_of.get(r.get("to")) in ready):
             err.append(f"{rid}: 関係図に移した分類の対比には axis（比べる軸）を書く")
+    err += group_relation_errors(c, rels, gcat)
+    return err
+
+
+def group_relation_errors(c: Course, rels: list[dict], gcat: dict[str, str]) -> list[str]:
+    """まとまりの間の関係（shared.yaml の group_relations。関係図の全体の見え方の矢印。#240）。
+    矢印は裏付けの関係を少なくとも1本指し、指した関係の両端がそれぞれ from と to のまとまりにある（概念の段と食い違わない）。
+    まとまりの組ごとに矢印は1本。種類は書かない（指した関係から画面が決める）"""
+    err: list[str] = []
+    by_id = {r.get("id"): r for r in rels}
+    grp = {tid: t.get("group") for tid, t in c.terms.items()}
+    seen: set[tuple[str, str]] = set()
+    for i, gr in enumerate(c.shared.get("group_relations") or []):
+        f, t = gr.get("from"), gr.get("to")
+        at = f"shared.yaml：group_relations の {i + 1} 本目（{f} → {t}）"
+        if f not in gcat or t not in gcat:
+            err.append(f"{at}：from・to は concept_groups のまとまりにする")
+            continue
+        if f == t:
+            err.append(f"{at}：同じまとまりどうしは結ばない")
+        if gcat[f] != gcat[t]:
+            err.append(f"{at}：分類の違うまとまりは結ばない（{gcat[f]}・{gcat[t]}）")
+        if (f, t) in seen:
+            err.append(f"{at}：同じ組の矢印が2本ある（組ごとに1本）")
+        seen.add((f, t))
+        if not gr.get("label"):
+            err.append(f"{at}：label（矢印の言葉）がない")
+        rs = gr.get("relations") or []
+        if not rs:
+            err.append(f"{at}：relations（裏付けの関係）を1本以上書く")
+        for rid in rs:
+            r = by_id.get(rid)
+            if not r:
+                err.append(f"{at}：裏付けの {rid} が relations.yaml にない")
+            elif (grp.get(r.get("from")), grp.get(r.get("to"))) != (f, t):
+                err.append(f"{at}：裏付けの {rid} の両端（{r.get('from')} → {r.get('to')}）が {f} → {t} のまとまりにない")
     return err
 
 
@@ -1051,7 +1087,11 @@ def export_network(c: Course, target: dict) -> dict:
                        # まとまり（改訂35）と、関係図に移した分類（改訂36）。docs/relation-map.md
                        **({"groups": [{"id": g(gr["id"]), "category": gr["category"], "name": gr["name"], **({"summary": gr["summary"]} if gr.get("summary") else {})}
                                       for gr in c.shared["concept_groups"]]} if c.shared.get("concept_groups") else {}),
-                       **({"relation_map_ready": list(c.shared["relation_map_ready"])} if c.shared.get("relation_map_ready") else {})},
+                       **({"relation_map_ready": list(c.shared["relation_map_ready"])} if c.shared.get("relation_map_ready") else {}),
+                       **({"group_relations": [{"from": g(x["from"]), "to": g(x["to"]), "label": x["label"],
+                                                "relations": [g(rid) for rid in x["relations"]],
+                                                **({"note": x["note"]} if x.get("note") else {})}
+                                               for x in c.shared["group_relations"]]} if c.shared.get("group_relations") else {})},
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
 
 
