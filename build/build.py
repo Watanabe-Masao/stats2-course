@@ -58,10 +58,6 @@ def main(argv: list[str]) -> int:
     if any(sk.values()):
         print(f"⚠ 骨格（#105）：定義1文がない語 {len(sk['no_short'])}・分類がない語 {len(sk['no_category'])}・孤立した語 {len(sk['isolated'])}"
               f"（P1 を閉じるとき shared.yaml の skeleton_required を true にして 0 にする）")
-    from network import material_cycles
-    cyc = material_cycles()
-    if cyc:
-        print(f"⚠ 材料の輪 {len(cyc)}：" + "／".join(" → ".join(x) for x in cyc) + "（docs/relation-map.md 7。どちらかの材料が定義の構成要素でない）")
     if "--check" in argv:
         return 0
 
