@@ -76,7 +76,7 @@
 - 概念＝用語（content/terms.yaml。129語）。状態は3つ：説明あり（`definition` を書いた語）・骨格（`short` だけ）・まだ（どちらもない）。
   - **骨格**（P1・#105）：`short`（定義1文。1文・80字まで）と `category`（分類。shared.yaml の `concept_categories` から）。地図では点線の枠。分類は全129語に書く。
   - 骨格の完了の条件（定義1文がない語0・分類がない語0・孤立0）は build が数えて警告する。P1 を閉じるとき shared.yaml の `skeleton_required` を true にして、build が止める形にする。
-- **語の印と柱**（渡辺さん 2026-11-05。#220）：語の印（全129語。48×48・線 2.4・色は画面が柱の色で塗る。分類ごとに形の系統をそろえる）の原本は build/term_icons.py（設定から作る。手で描いた SVG を置かない）。build が公開サイトの icons/ に書き、概念の `icon` にその URL を入れる。全部の語に印があり、印に動く物・外を指す物（script・on…=・href など）がないことを build が止める。柱（分類の大きなまとまり。上から学ぶ順）は shared.yaml の `concept_pillars` で、どの分類もちょうど1つの柱に入れる（build が止める）。
+- **概念の印と柱**（渡辺さん 2026-11-05。#220。呼び名は #238）：概念の印（全129概念。48×48・線 2.4・色は画面が柱の色で塗る。分類ごとに形の系統をそろえる）の原本は build/term_icons.py（設定から作る。手で描いた SVG を置かない）。build が公開サイトの icons/ に書き、概念の `icon` にその URL を入れる。全部の概念に印があり、印に動く物・外を指す物（script・on…=・href など）がないことを build が止める。柱（分類の大きなまとまり。上から学ぶ順）は shared.yaml の `concept_pillars` で、どの分類もちょうど1つの柱に入れる（build が止める）。
 - 説明ありの概念：
   - 必須：`principle`・`conditions`・`example`・`counterexample`・`version`（1から。意味が変わる書き直しで1つ上げる）。
   - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
