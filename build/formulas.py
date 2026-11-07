@@ -143,6 +143,7 @@ def evidence() -> dict:
 def fingerprint(term: dict, formula: dict, contract: dict | None, refs: dict | None = None) -> str:
     """レビューの対象の版（#118 M9）：式の木・記号の表（of・domain・concept・意味）・契約の組の条件・概念の成り立つ条件と反例・誤解、
     契約の review_refs が指す根拠（導出・実験室の反例）、式の部品（parts）と「なぜ」の段（why。契約の review_excludes で外せる。#204）。
+    成立条件の区分と基準にする定義の式（#249。区分を持つ概念だけ）。
     この中の何かが変われば値が変わり、古いレビューの記録では通らない。
     TeX は木から作るので入れない。同じ内容の作り直しでは変わらない"""
     import hashlib
@@ -155,6 +156,13 @@ def fingerprint(term: dict, formula: dict, contract: dict | None, refs: dict | N
     for key in ("parts", "why"):
         if formula.get(key) and key not in set((contract or {}).get("review_excludes") or []):
             body[key] = formula[key]
+    # 成立条件の区分（要件・仮定・目安と、保証すること・外れたとき・用語・目安の対象と出典）と基準にする定義の式も、
+    # 学習者が受け取る主張なので版に入れる（#249。独立なレビュー 2026-11-08 の指摘）。区分を持たない概念には足さない（今の版が変わらない）
+    detail = [{k: v for k, v in d.items() if k not in ("_plain",)} for d in term.get("_conditions_detail") or []]
+    if detail:
+        body["term_condition_kinds"] = detail
+    if term.get("basis_formula"):
+        body["term_basis_formula"] = term["basis_formula"]
     return hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()[:16]
 
 

@@ -68,3 +68,4 @@ refs:
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}
   - {name: NIST統計ハンドブック, url: "https://www.itl.nist.gov/div898/handbook/"}
+  - {name: Emory大学 MATH 117, url: "https://math.oxford.emory.edu/site/math117/normalApproxToBinomial/"}   # 二項分布の正規近似の目安 np≧5・n(1−p)≧5（#249）

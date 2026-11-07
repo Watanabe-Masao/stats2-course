@@ -74,6 +74,9 @@ def _first(prompt: str, limit: int = 120) -> str:
 def load_network() -> tuple[list[dict], list[dict]]:
     rel = (load_yaml(CONTENT / "relations.yaml") or {}).get("relations", []) if (CONTENT / "relations.yaml").exists() else []
     der = (load_yaml(CONTENT / "derivations.yaml") or {}).get("derivations", []) if (CONTENT / "derivations.yaml").exists() else []
+    from conditions import normalize_relation   # 成立条件の区分（#249）
+    for r in rel:
+        normalize_relation(r)
     return rel, der
 
 
@@ -602,9 +605,65 @@ def group_relation_errors(c: Course, rels: list[dict], gcat: dict[str, str]) -> 
     return err
 
 
-def material_cycles() -> list[list[str]]:
-    """材料の輪（A の材料に B、B の材料に A …）。build が警告する（docs/relation-map.md 7）"""
-    rels, _ = load_network()
+from conditions import export_detail  # noqa: E402
+
+
+def condition_errors(c: Course, rels: list[dict]) -> list[str]:
+    """成立条件の区分（#249 ①）と基準にする定義の式（③）。区分を書いた行はどの分類でも確かめ、
+    関係図に移した分類（relation_map_ready）では、概念の数学の行と、行き先がその分類の関係の行に区分を要る"""
+    from conditions import DETAIL, _split, detail_errors
+    ready = set(c.shared.get("relation_map_ready") or [])
+    sources = {s["name"] for s in c.shared.get("sources", [])}
+    terms = set(c.terms)
+    cat_of = {tid: t.get("category") for tid, t in c.terms.items()}
+    err: list[str] = []
+    for tid, t in c.terms.items():
+        cond = t.get("conditions")
+        if isinstance(cond, dict):
+            details = t.get(DETAIL) or [d for sc in ("math", "data") for d in _split(cond.get(sc), sc)[1]]
+            err += detail_errors(tid, details, terms, sources, t.get("category") in ready and filled(t), False)
+        bf = t.get("basis_formula")
+        if bf is not None and bf not in {f.get("id") for f in t.get("formulas") or []}:
+            err.append(f"{tid}: basis_formula の {bf} がこの概念の式（formulas）にない")
+    for r in rels:
+        if r.get("conditions"):
+            details = r.get(DETAIL) or _split(r["conditions"], None)[1]
+            err += detail_errors(r.get("id", "?"), details, terms, sources, cat_of.get(r.get("to")) in ready, True)
+    return err
+
+
+def dependency_errors(rels: list[dict]) -> list[str]:
+    """定義の依存と前提知識は直接の1段だけ（#249 ③）。
+    - 定義の依存の輪（材料の輪）は止める：A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない
+    - 重ねた前提知識は止める：A → D の前提知識があるのに、D から「前提をさかのぼる」種類をたどって A に着くなら、A → D は書かない
+      （A → B → C → D なら D は C だけを持ち、A・B は C をたどって出す）"""
+    err = [f"定義の依存の輪：{' → '.join(x)}（どちらかの材料が定義の構成要素でない。#249 ③）" for x in material_cycles(rels)]
+    trace = {k for k, v in (KIND.get("types") or {}).items() if v.get("trace")}
+    back: dict[str, list[tuple[str, str]]] = {}
+    for r in rels:
+        if r.get("type") in trace:
+            back.setdefault(r["to"], []).append((r["from"], r.get("id", "?")))
+    for r in rels:
+        if not (r.get("type") == "前提" and r.get("premise") == "learning"):
+            continue
+        a, d = r["from"], r["to"]
+        stack = [x for x, rid in back.get(d, []) if rid != r.get("id")]
+        seen = set(stack)
+        while stack:
+            x = stack.pop()
+            for y, _ in back.get(x, []):
+                if y not in seen:
+                    seen.add(y)
+                    stack.append(y)
+        if a in seen:
+            err.append(f"{r.get('id')}: {a} → {d} の前提知識は、{d} の前提をたどると {a} に着くので重ねて書かない（直接の1段だけ。#249 ③）")
+    return err
+
+
+def material_cycles(rels: list[dict] | None = None) -> list[list[str]]:
+    """材料の輪（A の材料に B、B の材料に A …）。dependency_errors が止める（#249 ③）"""
+    if rels is None:
+        rels, _ = load_network()
     nxt: dict[str, list[str]] = {}
     for r in rels:
         if r.get("type") == "材料":
@@ -947,6 +1006,8 @@ def validate_network(c: Course) -> list[str]:
         err += apply_texts_errors(load_apply_texts())
     err += skeleton_errors(c)
     err += relation_map_errors(c, rels)
+    err += condition_errors(c, rels)
+    err += dependency_errors(rels)
     return err
 
 
@@ -1019,6 +1080,10 @@ def export_network(c: Course, target: dict) -> dict:
                     e[k] = t[k]
             if t.get("table_workspace"):
                 e["table_workspace"] = resolve_table_workspace(t["table_workspace"])[0]   # 表は実験室のテーマから写す
+            if t.get("_conditions_detail"):   # 成立条件の区分（型の改訂38。#249）
+                e["conditions_detail"] = export_detail(t["_conditions_detail"], g, {x["name"]: x.get("url") for x in c.shared.get("sources", [])})
+            if t.get("basis_formula"):
+                e["basis_formula"] = t["basis_formula"]
             if t.get("formulas"):   # 記号が指す概念は、ネットワークの id（教材名:ID）にする
                 e["formulas"] = [{**f, **({"symbols": [{**s, **({"concept": g(s["concept"])} if s.get("concept") else {})}
                                                        for s in f["symbols"]]} if f.get("symbols") else {}),
@@ -1058,6 +1123,8 @@ def export_network(c: Course, target: dict) -> dict:
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
             e["derivation"] = g(r["basis"]["derivation"])
+        if r.get("_conditions_detail"):   # 成立条件の区分（型の改訂38。#249）
+            e["conditions_detail"] = export_detail(r["_conditions_detail"], g, {x["name"]: x.get("url") for x in c.shared.get("sources", [])})
         if labs(r.get("labs")):
             e["labs"] = labs(r.get("labs"))
         if figs(r.get("figures")):
@@ -1114,4 +1181,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "material_cycles", "validate_network", "network_checks", "export_network", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "schema_errors", "write_network", "run_check"]

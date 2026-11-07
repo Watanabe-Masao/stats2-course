@@ -101,6 +101,9 @@ def load_course() -> Course:
     powers = {p["id"]: p for p in load_yaml(CONTENT / "powers.yaml")}
     shared = load_yaml(CONTENT / "shared.yaml")
     terms = {t["id"]: t for t in load_yaml(CONTENT / "terms.yaml")}
+    from conditions import normalize_term   # 成立条件の区分は分けて持ち、条件の行は文字の一覧に戻す（#249）
+    for t in terms.values():
+        normalize_term(t)
     index = {u["id"]: u for u in load_yaml(CONTENT / "units" / "index.yaml")}
     labs = {}
     for ty in sorted(TOOLS.glob("*/tool.yaml")):

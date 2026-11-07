@@ -729,6 +729,20 @@ class TestNetwork(unittest.TestCase):
         prints2 = current_fingerprints(c.terms, k2)
         rec2 = [{**r, "fingerprint": prints2[r["formula"]]} for r in rec]
         self.assertEqual(publish_errors(k2, rec2, current_fingerprints(terms, k2)), [])   # why を外した契約では、why を変えても止まらない
+        # 成立条件の区分と基準の定義の式も版に入る（#249）。想定する故障：行の文は同じまま、仮定を要件に変える・保証すること・外れたときを
+        # 書き換える・basis_formula を変えても、古いレビューで公開される（2026-11-08 の独立なレビューで見つかった）。区分を持たない概念の式の版まで変わる。
+        # 見つけ方：二項分布の仮定の行の kind と outside、basis_formula をそれぞれ変えると F-binom-pmf だけが止まる。
+        # 検出の確かめ（2026-11-08）：fingerprint に区分を入れる行を外すと、この3つの assert が落ちることを見た
+        for change in ("kind", "outside", "basis"):
+            terms3 = copy.deepcopy(c.terms)
+            row = next(d for d in terms3["TERM-binom"]["_conditions_detail"] if d.get("text") == "各回が独立")
+            if change == "kind":
+                row["kind"] = "要件"
+            elif change == "outside":
+                row["outside"] += "（書き換えた）"
+            else:
+                terms3["TERM-binom"]["basis_formula"] = "F-binom-mean"
+            self.assertEqual([e.split("：")[0] for e in publish_errors(k, rec, current_fingerprints(terms3, k))], ["代表の式 F-binom-pmf"], change)
 
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
@@ -1041,6 +1055,89 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("定義1文（short）か説明（definition）がない" in x for x in err2))
         g = network.skeleton_gaps(course())
         self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short"))))
+
+    def test_condition_kinds(self):
+        # 確かめる対象：成立条件の区分（#249 ①）と基準にする定義の式（③）の build の止め、公開の JSON への書き出し。
+        # 想定する故障：移した分類で区分のない数学の行・関係の行を見逃す（区分の付け忘れが公開に出る）。
+        #   仮定に claim、区分に outside、目安に target・出典がなくても通る。出典・用語の id の誤りを見逃す。
+        #   移していない分類まで止める。区分が公開の JSON に出ない・用語の id に教材名が付かない・型に合わない。
+        #   区分を書いた行が文字の一覧に戻らず、実験室の反例の照合や式のレビューの指紋が形の違いで壊れる。
+        # 見つけ方：今の教材の二項分布と REL-binom-normal に、区分の正しい行と誤った行を書いて止めの文を見る。
+        #   正しい形に直すと止めが0になり、書き出した概念・関係に conditions_detail が出て型に合い、conditions は文字のまま。
+        # 既存との違い：test_relation_map_ready はまとまり・前提・軸・種類の親。ここは成立条件の区分。
+        # 検出の確かめ（2026-11-08）：detail_errors の「区分のない数学の行」の止めと、目安の出典の止めを外すと、それぞれ落ちることを見た
+        import conditions as cd
+        n = self.n
+        c = course()
+        c.shared["relation_map_ready"] = ["確率分布"]
+        binom = c.terms["TERM-binom"]
+        binom["conditions"] = {"math": [
+            {"text": "n は1以上の整数・0≦p≦1", "kind": "要件", "outside": "この定義の二項分布として扱えない"},
+            {"text": "各回が独立", "kind": "仮定", "outside": "保証できない", "terms": ["TERM-indep", "TERM-nowhere"]},   # claim がない・用語の id の誤り
+            "各回の成功確率 p が同じ",                                                                                 # 区分がない
+        ], "data": ["客ごとに確かめる"]}
+        binom["basis_formula"] = "F-nowhere"
+        cd.normalize_term(binom)
+        self.assertEqual(binom["conditions"]["math"][1], "各回が独立")   # 区分を書いた行も文字に戻る
+        rels = copy.deepcopy(self.rels)
+        bn = next(r for r in rels if r["id"] == "REL-binom-normal")
+        bn["conditions"] = [{"text": "np≧5 かつ n(1−p)≧5", "kind": "目安", "outside": "精度を別に確かめる",
+                             "target": "二項分布の正規近似", "source": {"source": "どこかの本"}}]
+        cd.normalize_relation(bn)
+        err = n.condition_errors(c, rels)
+        for w in ["TERM-binom: 成立条件の式の3行目「各回の成功確率 p が同じ」：関係図に移した分類なので",
+                  "TERM-binom: 成立条件の式の2行目「各回が独立」：仮定には、何を保証する仮定か（claim）",
+                  "terms の TERM-nowhere が用語にない",
+                  "TERM-binom: basis_formula の F-nowhere",
+                  "REL-binom-normal: 成立条件の1行目「np≧5 かつ n(1−p)≧5」：出典 どこかの本 が shared.yaml の sources にない"]:
+            self.assertTrue(any(w in e for e in err), w)
+        self.assertFalse(any("データの1行目" in e for e in err))   # データで確かめる手掛かりは区分なしでよい
+        self.assertFalse(any(e.startswith("TERM-mean") for e in err))   # 移していない分類は止めない
+        # 直すと、二項分布と REL-binom-normal の止めが消え、書き出しに区分が出て型に合う
+        binom["conditions"] = {"math": [
+            {"text": "n は1以上の整数・0≦p≦1", "kind": "要件", "outside": "この定義の二項分布として扱えない"},
+            {"text": "各回が独立", "kind": "仮定", "claim": "成功回数が B(n, p) に従う", "outside": "保証できない", "terms": ["TERM-indep"]},
+        ], "data": ["客ごとに確かめる"]}
+        binom["basis_formula"] = "F-binom-pmf"
+        binom.pop(cd.DETAIL, None)
+        cd.normalize_term(binom)
+        bn["conditions"] = [{"text": "np≧5 かつ n(1−p)≧5", "kind": "目安", "outside": "精度を別に確かめる",
+                             "target": "二項分布の正規近似", "source": {"source": "NIST統計ハンドブック", "locator": "7.2.4"}}]
+        bn.pop(cd.DETAIL, None)
+        cd.normalize_relation(bn)
+        err = n.condition_errors(c, rels)
+        self.assertFalse([e for e in err if e.startswith(("TERM-binom", "REL-binom-normal"))])
+        orig = n.load_network
+        n.load_network = lambda: (rels, self.ders)
+        try:
+            d = n.export_network(c, {"site_base_url": ""})
+        finally:
+            n.load_network = orig
+        b = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
+        self.assertEqual(b["conditions"]["math"], ["n は1以上の整数・0≦p≦1", "各回が独立"])
+        self.assertEqual([x.get("kind") for x in b["conditions_detail"]], ["要件", "仮定", None])
+        self.assertEqual(b["conditions_detail"][1]["terms"], ["stats2:TERM-indep"])
+        self.assertEqual(b["basis_formula"], "F-binom-pmf")
+        r = next(x for x in d["relations"] if x["id"] == "stats2:REL-binom-normal")
+        self.assertEqual(r["conditions_detail"][0]["source"]["title"], "NIST統計ハンドブック")
+        self.assertFalse(n.schema_errors(d))
+
+    def test_dependency_one_step(self):
+        # 確かめる対象：定義の依存と前提知識は直接の1段だけ（#249 ③）の build の止め。
+        # 想定する故障：定義の依存の輪（A の定義に B、B の定義に A）を見逃す。前提知識を重ねて書いても通る
+        #   （A → B → C と A → C の両方。画面の「前提をさかのぼる」で A が2回出て、学ぶ順が崩れる）。直接の1段だけの今の教材まで止める。
+        # 見つけ方：今の教材では0。材料を1本逆向きに足して輪を、たどれる所に前提知識を1本足して重ねを起こし、止めの文を見る。
+        # 既存との違い：材料の輪は今まで警告だけで、テストがなかった。前提知識の重ねは今回の止め。
+        # 検出の確かめ（2026-11-08）：dependency_errors の重ねの判定で「a in seen」を外すと落ち、輪の止めを外すと落ちることを見た
+        n = self.n
+        self.assertEqual(n.dependency_errors(self.rels), [])
+        rels = copy.deepcopy(self.rels)
+        rels.append({"id": "REL-x-loop", "from": "TERM-dist", "to": "TERM-rv", "type": "材料", "description": "x", "version": 1})   # 確率変数 → 確率分布 の逆
+        # 共分散 ← 確率変数 ← 確率（どちらも材料）とたどれるのに、確率 → 共分散 を前提知識でも書く（直接の関係はなく、2段の重ね）
+        rels.append({"id": "REL-x-twice", "from": "TERM-prob", "to": "TERM-cov", "type": "前提", "premise": "learning", "description": "x", "version": 1})
+        err = n.dependency_errors(rels)
+        self.assertTrue(any(e.startswith("定義の依存の輪") and "TERM-rv" in e and "TERM-dist" in e for e in err), err)
+        self.assertTrue(any(e.startswith("REL-x-twice:") for e in err), err)
 
     def test_relation_map_ready(self):
         # 確かめる対象：関係図の決まり（docs/relation-map.md・#233）の build の止め。

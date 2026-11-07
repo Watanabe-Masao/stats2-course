@@ -98,7 +98,7 @@ types:
   材料:
     trace: true   # 学ぶ順の見方（今の経路）は、M4 で作り直すまで前提といっしょにたどる（stats2-course #232）
     definition: A がなければ B を作れない、B の定義（定義1文か、その語を定める式）の構成要素。「B は何でできているか」に答える。定義に名前で出ることは必要条件で、十分条件ではない（docs/relation-map.md 規則2）。直接の材料だけを書く
-    reading: □ は ■ の材料
+    reading: □ は ■ の定義に使われる   # 画面の呼び名は「定義に使う概念」（向きは使われる概念 → それを使う概念。stats2-course #249 ④）
     required: []
     examples:
       - "偏差 → データの分散"
@@ -114,5 +114,5 @@ modes:
   approximation: 近似（有限の条件のもとで近い）
   limit: 極限（条件を保って進めると近づく）
 premises:
-  learning: 理解に必要な知識
+  learning: 理解に必要な知識   # 画面の呼び名は「前提知識」（#249）
   mathematical: 数学的な成立条件・定義に使う

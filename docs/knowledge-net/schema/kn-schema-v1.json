@@ -34,6 +34,144 @@
         "$ref": "#/$defs/gid"
       }
     },
+    "conditionDetail": {
+      "type": "object",
+      "description": "成立条件の1行の区分（stats2-course #249 ①）。kind：要件＝採用している定義を満たさない（母数が範囲外など。この定義の分布として扱えない）／仮定＝その定理・モデルによる保証が使えない（結論が偽とは限らない）／目安＝この目安では適用を勧められない（精度を別に確かめる）。kind がない行は、データで確かめる手掛かり（scope が data のときだけ）。text は conditions の同じ行の文",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "scope": {
+          "enum": [
+            "math",
+            "data"
+          ],
+          "description": "概念の conditions のどちらの行か（関係では書かない）"
+        },
+        "kind": {
+          "enum": [
+            "要件",
+            "仮定",
+            "目安"
+          ]
+        },
+        "claim": {
+          "$ref": "#/$defs/text",
+          "description": "仮定のとき：何を保証する仮定か（例：成功回数が B(n, p) に従う）"
+        },
+        "outside": {
+          "$ref": "#/$defs/text",
+          "description": "外れたときに何が言えなくなるか（1文）"
+        },
+        "terms": {
+          "$ref": "#/$defs/gids",
+          "description": "文に出る概念（文の下に押せる札で並べる）"
+        },
+        "target": {
+          "$ref": "#/$defs/text",
+          "description": "目安のとき：対象の近似（例：二項分布の正規近似）"
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "$ref": "#/$defs/text"
+            },
+            "locator": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "description": "目安のとき：出典"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "outside"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "仮定"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "claim"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "目安"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "target",
+              "source"
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "required": [
+                "kind"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "const": "data"
+              }
+            },
+            "required": [
+              "scope"
+            ]
+          }
+        }
+      ]
+    },
+    "conditionDetails": {
+      "type": "array",
+      "description": "成立条件の区分（conditions の行ごと。stats2-course #249）",
+      "items": {
+        "$ref": "#/$defs/conditionDetail"
+      }
+    },
     "labs": {
       "type": "array",
       "description": "数理ラボへの参照（概念・関係で共通の形）。ラボの定義（値・学習目標）はラボの側。url は教材の build が作る",
@@ -673,6 +811,13 @@
               }
             }
           },
+          "conditions_detail": {
+            "$ref": "#/$defs/conditionDetails"
+          },
+          "basis_formula": {
+            "type": "string",
+            "description": "基準にする定義の式の id（formulas のどれか。確率分布なら確率関数・確率密度の式）。定義1文は学習者向けの導入で、分類と成立条件の区分はこの式を基準にする（stats2-course #249 ③）"
+          },
           "example": {
             "$ref": "#/$defs/text"
           },
@@ -1168,6 +1313,9 @@
           "conditions": {
             "$ref": "#/$defs/texts"
           },
+          "conditions_detail": {
+            "$ref": "#/$defs/conditionDetails"
+          },
           "derivation": {
             "$ref": "#/$defs/gid"
           },
@@ -1662,5 +1810,5 @@
     }
   },
   "$comment": "改訂 2（2026-10-29）：概念・関係に任意の labs を追加。変更履歴は schema/CHANGELOG.md",
-  "x-revision": 37
+  "x-revision": 38
 }
