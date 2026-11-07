@@ -1042,6 +1042,85 @@ class TestNetwork(unittest.TestCase):
         g = network.skeleton_gaps(course())
         self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short"))))
 
+    def test_relation_map_ready(self):
+        # 確かめる対象：関係図の決まり（docs/relation-map.md・#233）の build の止め。
+        # 想定する故障：移した分類（relation_map_ready）で、まとまりのない語・分け終えていない前提（mathematical）・
+        #   軸のない対比・親が2つの種類を見逃す。移していない分類まで止めて、今の教材の build を落とす。
+        #   まとまりと分類の食い違い・宣言にないまとまりを見逃す。書き出しにまとまり・軸・移した分類が出ない。
+        # 見つけ方：確率分布を移した印にして、4つの止めをそれぞれ1つずつ起こし、どれも出ることを見る。
+        #   印のない教材（今のまま）では関係図の誤りが0。直した教材を書き出して型に合うことを見る。
+        # 既存との違い：test_clean は印のない教材だけ。ここは印を付けたときの止めと書き出し。
+        # 検出の確かめ（2026-11-06）：4つの止めのそれぞれを関数から外すと、このテストが落ちることを見た
+        n = self.n
+        c = course()
+        self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 今の教材（印があれば、書き終えた形）は止めない
+        for t in c.terms.values():   # 今の教材のまとまりを外して、テストの中で書く
+            t.pop("group", None)
+        c.shared["relation_map_ready"] = []
+        c.shared["concept_groups"] = []
+        self.assertEqual(n.relation_map_errors(c, self.rels), [])   # 印のない教材は止めない
+        c.shared["concept_groups"] = [{"id": "GRP-dist-base", "category": "確率分布", "name": "分布のしくみ"},
+                                      {"id": "GRP-dist-count", "category": "確率分布", "name": "くり返して数える"}]
+        c.shared["relation_map_ready"] = ["確率分布"]
+        c.terms["TERM-rv"]["group"] = "GRP-dist-base"
+        c.terms["TERM-binom"]["group"] = "GRP-dist-count"
+        c.terms["TERM-comb"]["group"] = "GRP-dist-count"   # 分類が違う（数学の道具）
+        rels = copy.deepcopy(self.rels)
+        rv = next(r for r in rels if r["id"] == "REL-rv-dist")
+        rv.update({"type": "前提", "premise": "mathematical"})   # 分け終えていない前提
+        next(r for r in rels if r["id"] == "REL-binom-geom-contrast").pop("axis", None)   # 軸のない対比
+        rels.append({"id": "REL-x1", "from": "TERM-binom", "to": "TERM-dist", "type": "種類", "description": "x", "version": 1})
+        rels.append({"id": "REL-x2", "from": "TERM-binom", "to": "TERM-rv", "type": "種類", "description": "x", "version": 1})
+        err = n.relation_map_errors(c, rels)
+        want = ["TERM-dist: 分類「確率分布」は関係図に移したので、group",          # まとまりのない語
+                "REL-rv-dist: 分類「確率分布」は関係図に移したので、前提（mathematical）",   # 分け終えていない前提
+                "REL-binom-geom-contrast: 関係図に移した分類の対比には axis",             # 軸のない対比
+                "TERM-binom: 種類の親が 2 つある",                                       # 親が2つ
+                "TERM-comb: group GRP-dist-count の分類（確率分布）"]                    # まとまりと分類の食い違い
+        for w in want:
+            self.assertTrue(any(w in e for e in err), w)
+        self.assertFalse(any("TERM-mean" in e for e in err))   # 移していない分類の語は止めない
+        # 直すと止めが消え、書き出しにまとまり・軸・移した分類が出て、型に合う
+        for tid, t in c.terms.items():
+            if t.get("category") == "確率分布":
+                t["group"] = "GRP-dist-base"
+        c.terms["TERM-binom"]["group"] = "GRP-dist-count"
+        c.terms["TERM-comb"].pop("group")
+        rels = [r for r in copy.deepcopy(self.rels)]
+        next(r for r in rels if r["id"] == "REL-rv-dist").update({"type": "前提", "premise": "mathematical"})
+        for r in rels:
+            if r["type"] == "前提" and r.get("premise") == "mathematical" and c.terms.get(r["to"], {}).get("category") == "確率分布":
+                r["type"] = "材料"; r.pop("premise")
+            if r["type"] == "対比" and "確率分布" in (c.terms.get(r["from"], {}).get("category"), c.terms.get(r["to"], {}).get("category")):
+                r["axis"] = "比べる軸"
+        self.assertEqual(n.relation_map_errors(c, rels), [])
+        orig = n.load_network
+        n.load_network = lambda: (rels, self.ders)
+        try:
+            d = n.export_network(c, {"site_base_url": ""})
+        finally:
+            n.load_network = orig
+        self.assertEqual(d["course"]["relation_map_ready"], ["確率分布"])
+        self.assertEqual([x["id"] for x in d["course"]["groups"]], ["stats2:GRP-dist-base", "stats2:GRP-dist-count"])
+        self.assertEqual(next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")["group"], "stats2:GRP-dist-count")
+        self.assertTrue(any(x.get("axis") for x in d["relations"]))
+        self.assertFalse(n.schema_errors(d))
+
+    def test_material_cycles(self):
+        # 確かめる対象：材料の輪の警告。想定する故障：輪を見逃す・輪でない枝分かれを輪と数える。
+        # 見つけ方：A→B→C→A の輪と、輪でない合流（D→B）を入れ、輪が1つだけ出ることを見る
+        n = self.n
+        rels = [{"id": f"REL-m{i}", "from": a, "to": b, "type": "材料"} for i, (a, b) in
+                enumerate([("TERM-a", "TERM-b"), ("TERM-b", "TERM-c"), ("TERM-c", "TERM-a"), ("TERM-d", "TERM-b")])]
+        orig = n.load_network
+        n.load_network = lambda: (rels, [])
+        try:
+            cyc = n.material_cycles()
+        finally:
+            n.load_network = orig
+        self.assertEqual(len(cyc), 1)
+        self.assertEqual(set(cyc[0]), {"TERM-a", "TERM-b", "TERM-c"})
+
     def test_lab_refs(self):
         c = course()
         c.terms["TERM-expect"]["labs"] = [{"id": "LAB-nothing"}, {"id": "LAB-expect", "preset": "s9-none"},

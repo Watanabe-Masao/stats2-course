@@ -139,6 +139,27 @@ Notion の埋め込み（高さ約320pxで固定）では小さい表示にな�
 - 図は画面がその場で engine の確率から描く（画像にしない）。`chart` のある関係では、画像の `figures` を面に重ねて出さない（`figures` は Notion の側で使う）。
 - 図の中で学習者に予測させる数（実験室で確かめる数）を先に見せない。図は設定を1つに固定し、条件を変えて確かめるのは実験室に任せる。
 
+### 関係図に移す（`group:`・種類・材料・`axis:`。#233）
+
+決まりは定義書 docs/relation-map.md、手順と見本（確率分布）は設計書 docs/relation-map-design.md の 2・4。1つの分類ずつ移す。
+
+```yaml
+# shared.yaml
+concept_groups:
+  - {id: GRP-dist-count, category: 確率分布, name: くり返して数える, summary: 同じ条件でくり返して、成功の数を数える}
+relation_map_ready: [確率分布]   # 書き終えた分類だけ
+# terms.yaml
+- id: TERM-binom
+  group: GRP-dist-count
+# relations.yaml
+- {id: REL-comb-binom, from: TERM-comb, to: TERM-binom, type: 材料, description: …, version: 2}
+- {id: REL-binom-hyper-contrast, …, type: 対比, axis: 取り出し方}
+```
+
+- まとまりの id は `GRP-`。まとまりの分類と語の category は同じにする（build が止める）。
+- 移した分類では、その分類の語を to にした前提（mathematical）を、材料か学ぶ順（前提 learning）に分ける。種類の親は1つまで。対比には axis。
+- 関係の種類を変えたら version を1つ上げ、description を新しい意味に直す。ID は変えない。
+
 ### 式の分解の木（`formulas[].tree`）
 
 

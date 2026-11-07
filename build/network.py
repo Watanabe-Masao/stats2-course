@@ -504,6 +504,101 @@ def skeleton_errors(c: Course) -> list[str]:
     return err
 
 
+GROUP_ID = re.compile(r"^GRP-[a-z0-9-]+$")
+
+
+def relation_map_errors(c: Course, rels: list[dict]) -> list[str]:
+    """関係図の決まり（docs/relation-map.md・設計書 2。#233）。
+    まとまりの宣言と語の所属・種類の親の数・axis の置き場所はどの分類でも確かめ、
+    移し終えた分類（shared.yaml の relation_map_ready）にだけ、書き終えたことの条件を止める。"""
+    err: list[str] = []
+    cats = c.shared.get("concept_categories") or []
+    groups = c.shared.get("concept_groups") or []
+    gcat: dict[str, str] = {}
+    for gr in groups:
+        gid = str(gr.get("id", "?"))
+        if not GROUP_ID.match(gid):
+            err.append(f"shared.yaml：まとまりの id {gid} は GRP- と小文字・数字・ハイフンで書く")
+        if gid in gcat:
+            err.append(f"shared.yaml：まとまりの id {gid} が重複")
+        if gr.get("category") not in cats:
+            err.append(f"shared.yaml：まとまり {gid} の category「{gr.get('category')}」が concept_categories にない")
+        if not gr.get("name"):
+            err.append(f"shared.yaml：まとまり {gid} に name がない")
+        gcat[gid] = gr.get("category")
+    for tid, t in c.terms.items():
+        g = t.get("group")
+        if g is None:
+            continue
+        if g not in gcat:
+            err.append(f"{tid}: group の {g} が shared.yaml の concept_groups にない")
+        elif gcat[g] != t.get("category"):
+            err.append(f"{tid}: group {g} の分類（{gcat[g]}）と、語の category（{t.get('category')}）が違う")
+    used = {t.get("group") for t in c.terms.values()}
+    for gid in gcat:
+        if gid not in used:
+            err.append(f"shared.yaml：まとまり {gid} に属する語がない")
+    ready = c.shared.get("relation_map_ready") or []
+    for cat in ready:
+        if cat not in cats:
+            err.append(f"shared.yaml：relation_map_ready の {cat} が concept_categories にない")
+    cat_of = {tid: t.get("category") for tid, t in c.terms.items()}
+    parents: dict[str, list[str]] = {}
+    for r in rels:
+        rid = r.get("id", "?")
+        if r.get("axis") and r.get("type") != "対比":
+            err.append(f"{rid}: axis（比べる軸）は対比だけに書く")
+        if r.get("type") == "種類":
+            parents.setdefault(r.get("from"), []).append(r.get("to"))
+    for tid, ps in parents.items():
+        if len(ps) > 1:
+            err.append(f"{tid}: 種類の親が {len(ps)} つある（{'・'.join(ps)}）。1つにする（docs/relation-map.md 3）")
+    # 移し終えた分類だけ：書き終えたことの条件
+    for tid, t in c.terms.items():
+        if t.get("category") in ready and not t.get("group"):
+            err.append(f"{tid}: 分類「{t['category']}」は関係図に移したので、group（まとまり）を書く")
+    for r in rels:
+        rid = r.get("id", "?")
+        if r.get("type") == "前提" and r.get("premise") == "mathematical" and cat_of.get(r.get("to")) in ready:
+            err.append(f"{rid}: 分類「{cat_of[r['to']]}」は関係図に移したので、前提（mathematical）を材料か学ぶ順（前提 learning）に分ける")
+        if r.get("type") == "対比" and not r.get("axis") and (cat_of.get(r.get("from")) in ready or cat_of.get(r.get("to")) in ready):
+            err.append(f"{rid}: 関係図に移した分類の対比には axis（比べる軸）を書く")
+    return err
+
+
+def material_cycles() -> list[list[str]]:
+    """材料の輪（A の材料に B、B の材料に A …）。build が警告する（docs/relation-map.md 7）"""
+    rels, _ = load_network()
+    nxt: dict[str, list[str]] = {}
+    for r in rels:
+        if r.get("type") == "材料":
+            nxt.setdefault(r["from"], []).append(r["to"])
+    cycles: list[list[str]] = []
+    seen: set = set()
+    state: dict[str, int] = {}
+    stack: list[str] = []
+
+    def walk(v: str) -> None:
+        state[v] = 1
+        stack.append(v)
+        for w in nxt.get(v, []):
+            if state.get(w) == 1:
+                cyc = stack[stack.index(w):]
+                key = frozenset(cyc)
+                if key not in seen:
+                    seen.add(key)
+                    cycles.append(cyc + [w])
+            elif not state.get(w):
+                walk(w)
+        stack.pop()
+        state[v] = 2
+
+    for v in list(nxt):
+        if not state.get(v):
+            walk(v)
+    return cycles
+
+
 # 図とラボで補う関係の種類（#95）。gist は必須、図がなければ build が警告する
 VISUAL_TYPES = ("変換", "対比", "導出", "一般化")
 
@@ -815,6 +910,7 @@ def validate_network(c: Course) -> list[str]:
         err += walk_texts_errors(load_walk_texts())
         err += apply_texts_errors(load_apply_texts())
     err += skeleton_errors(c)
+    err += relation_map_errors(c, rels)
     return err
 
 
@@ -877,6 +973,8 @@ def export_network(c: Course, target: dict) -> dict:
         for k in ("en", "short", "category"):
             if t.get(k):
                 e[k] = t[k]
+        if t.get("group"):   # 意味のまとまり（型の改訂35。docs/relation-map.md）
+            e["group"] = g(t["group"])
         if base and term_icons.svg(tid):   # 語の印（build/term_icons.py が原本。公開サイトの icons/ に書く。#220）
             e["icon"] = f"{base.rstrip('/')}/icons/{tid}.svg"
         if filled(t):
@@ -919,7 +1017,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise", "gist", "question", "focus", "stages", "chart"):   # stages・chart は開いたときの段と図（#188 04）
+        for k in ("conditions", "mode", "premise", "axis", "gist", "question", "focus", "stages", "chart"):   # axis は対比の比べる軸（改訂36）   # stages・chart は開いたときの段と図（#188 04）
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
@@ -949,7 +1047,11 @@ def export_network(c: Course, target: dict) -> dict:
     exp_revision = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8")).get("x-revision", 1)
     return {"schema": "kn-schema", "version": 1, "schema_revision": revision, **({"experiment_revision": exp_revision} if experiments else {}),
             "course": {"id": cid, "title": c.shared.get("course", {}).get("title", cid), "units": units,
-                       **({"pillars": c.shared["concept_pillars"]} if c.shared.get("concept_pillars") else {})},
+                       **({"pillars": c.shared["concept_pillars"]} if c.shared.get("concept_pillars") else {}),
+                       # まとまり（改訂35）と、関係図に移した分類（改訂36）。docs/relation-map.md
+                       **({"groups": [{"id": g(gr["id"]), "category": gr["category"], "name": gr["name"], **({"summary": gr["summary"]} if gr.get("summary") else {})}
+                                      for gr in c.shared["concept_groups"]]} if c.shared.get("concept_groups") else {}),
+                       **({"relation_map_ready": list(c.shared["relation_map_ready"])} if c.shared.get("relation_map_ready") else {})},
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
 
 
@@ -972,4 +1074,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["validate_network", "network_checks", "export_network", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "material_cycles", "validate_network", "network_checks", "export_network", "schema_errors", "write_network", "run_check"]
