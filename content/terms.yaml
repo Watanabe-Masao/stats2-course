@@ -746,8 +746,8 @@
   en: probability distribution
   category: 確率分布
   group: GRP-dist-base
-  definition: 確率変数がとる値と、それぞれの値をとる確率（連続なら確率密度）の対応。
-  version: 1
+  definition: 確率変数が、どの値やどの区間をどれだけの確率でとるかの対応。
+  version: 2
   figures: [FIG-U13-concept]
   labs:
   - {id: LAB-expect, preset: s1-dist, purpose: 値と確率の一覧を変えると、期待値（重心）がどう動くかを見る}
@@ -1438,8 +1438,8 @@
   en: probability density function
   category: 確率分布
   group: GRP-dist-base
-  definition: 連続な確率変数で、区間に入る確率を、その区間の下の面積で表す関数。
-  version: 1
+  definition: 確率分布のうち、確率変数が区間に入る確率を積分で表せるものについて、その積分に使う関数。
+  version: 2
   labs:
   - {id: LAB-cont, preset: s1-dens, purpose: 密度の高さは1を超えても、面積は1のままなのを見る}
   principle: 連続では1点の確率は0で、確率は面積（積分）で決まる。高さ f(x) は「その付近の出やすさの密度」。

@@ -301,11 +301,11 @@ relations:
     figures: [FIG-LAB-pois-rel-expo-tour-1, FIG-LAB-pois-rel-expo-tour-2]
     basis: {units: [U15, U16]}
   - id: REL-dist-pdf
-    from: TERM-pdf
-    to: TERM-dist
-    version: 2
+    from: TERM-dist
+    to: TERM-pdf
+    version: 3
     type: 材料
-    description: 連続な確率変数の分布は、値ごとの確率では書けない（1点の確率が0）ので、確率密度関数で表す（区間の確率は密度の面積）。確率分布の定義の「連続なら確率密度」に当たる。
+    description: 確率密度関数は、確率分布のうち区間の確率を積分で表せるもの（連続な確率変数の分布）について使う関数で、その定義に確率分布を使う。離散の分布には密度はない（すべての確率分布に密度があるわけではない）。
     basis: {units: [U16]}
   - id: REL-pdf-normal
     from: TERM-pdf
