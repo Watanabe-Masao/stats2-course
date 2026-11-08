@@ -79,7 +79,7 @@
 | 定める | — | — |
 | 一種 | — | — |
 | 特別な場合 | `fix`（母数を値に・2つを等しく・個数を決める）と、固定の文 | — |
-| 移る | `mode`（exact・limit・approximation）。limit のときは `claim`（④ の極限の主張） | `operation`（通す操作：概念の id か文）、`theorem`（通す定理：定理の点の概念の id）、`reversible`（逆向きもたどれる）、`use_form`（使う形：近似式の式の id だけ。目安は conditions。9 の暫定）、`conditions`（条件の行。target は transform） |
+| 移る | `mode`（exact・limit・approximation）。limit のときは `claim`（④ の極限の主張） | `operation`（通す操作：概念の id か文）、`theorem`（通す定理：定理の点の概念の id）、`reversible`（逆向きもたどれる）、`use_form`（使う形：近似式の式の id だけ。目安は conditions。9）、`conditions`（条件の行。target は transform） |
 | 従う | `claim`（何が従うか・行き先の母数・厳密か極限か） | `theorem` |
 | 推定する | `properties`（不偏・一致などの性質の主張の id。1つ以上） | `theorem` |
 | 導ける | `claim` | — |
@@ -135,7 +135,7 @@
 | `version` | 1から。意味が変わる書き直しで1つ上げる（概念・関係・導出と同じ。CLAUDE.md） | — |
 
 - **識別子の書き方**（D9）：④-番号の数字と枝をそのまま使う。④-25 → CLM-25、④-28b → CLM-28b、④-5a → CLM-5a、13の反例 → CLM-13-counter、13の逆 → CLM-13-converse。
-- **確認済み**は build が数える（④ の §9 の数え方）。指紋は statement・conditions・grounds・premises・conclusion から作り、確かめたあとに変われば確認済みに数えない（README の運用の決まり 6）。運用の決まり 6 の例外（転記・表記の統一）と指紋の関係は #277 で決める。
+- **確認済み**は build が数える（④ の §9 の数え方）。指紋は statement・conditions・grounds・premises・conclusion から作り、確かめたあとに変われば確認済みに数えない（README の運用の決まり 6）。運用の決まり 6 の例外（転記・表記の統一）と指紋の関係は #277 で決めた：指紋に入る項目を変える直しは、表記の統一でも例外にしない。
 
 ## 5. 式（formulas）
 
@@ -182,12 +182,9 @@
 - **build**（M4）：v2_ready でない分類は、v1 の行を legacy_type で書き出す。M4 の完了の条件「今と同じ」は、legacy_type を v1 の type に戻し、v2 で足した項目を除いたときに、今の公開の JSON と一致すること、で比べる。未移行の行（前提 mathematical 107 を含む）を progress.py で数える。
 - **終わり**（M7）：legacy_type・premise・basis_formula の書き出しを型から外す（D7。日数ではなく完了の条件で終える）。
 
-## 9. 決めていない食い違い：適用の目安と使う形の置き場
+## 9. 適用の目安と使う形の置き場（#278 で決めた）
 
-④ の §6 の 5b（二項分布の正規近似。目安 np≧5）と 28b（適合度。目安 期待度数が5以上）は、主張の中に適用の目安を書いている。③ の 2 では、主張に書けるのは仮定だけで、目安の掛かる先は変換と手続き。② の未決2 の暫定（近似式は ④ の主張の中に「使う形」として持つ）とも合わない。
-
-- **暫定**（決まるまで）：目安は、変換（移るの関係の conditions。5b は二項分布 → 標準正規分布の移る、limit）か手続き（28b は適合度検定の概念の conditions、target: procedure）に書く。使う形の近似式は、移るの `use_form` に書く。
-- 決めるのは #278（③④② の食い違い）。
+渡辺さん 2026-11-08：④ の 5b（有限の n で使う形と目安）は主張から外し、目安は変換（移るの関係の conditions。5b は二項分布 → 標準正規分布の移る、limit）か手続き（28b は適合度検定の概念の conditions、target: procedure）に書く。使う形の近似式は式として持ち、移るの `use_form` から指す（② の未決2 を決めた）。
 
 ## 10. 製本の決めることと、書く場所（照らし）
 
@@ -207,7 +204,7 @@
 | ⑤ 通す定理 | relations の theorem（定理の点の概念の id。1か所） |
 | ⑤ 推定するの性質 | relations の properties（1か所） |
 | ⑤ 3つ以上の要因の関係 | concepts（点）か定理の点 |
-| ⑤ 移るの使う形 | relations の use_form（式の id。9 の暫定） |
+| ⑤ 移るの使う形 | relations の use_form（式の id。9） |
 | ⑥ 足す・外す | learning（6） |
 | ⑦ 反例が同じ主張を指す | experiments の反例（7） |
 | ⑦ 載せるか | experiments の比べるの一覧の設定（7。1か所） |
