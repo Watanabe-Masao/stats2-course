@@ -88,7 +88,7 @@
 
 型 v1（2026-10-29 決定）の元はリポジトリ knowledge-net の schema/。ここの docs/knowledge-net/schema/ は build が使う写しで、直すときは knowledge-net で直して `python3 build/sync_schema.py --update` で取り込む（取り込んだ元の版は docs/sync-lock.json に固定する。写しが固定した版と違うと check_all が止まる。元の main が先に進んでも止まらず、知らせるだけ）。関係の種類の定義は relation-types.yaml。
 
-- **1つの概念にするかの判断**（#105）の正本は製本 ①（同一性・関係性・学習上のまとまりを分ける）。
+- **1つの概念にするかの判断**（#105）の正本は製本 ① の 2（同一性。重なって見える語・学習上のまとまりの扱いも ① の 2）。
 - 概念＝用語（content/terms.yaml。129語）。状態は3つ：説明あり（`definition` を書いた語）・骨格（`short` だけ）・まだ（どちらもない）。
   - **骨格**（P1・#105）：`short`（定義1文。1文・80字まで）と `category`（分類。shared.yaml の `concept_categories` から）。地図では点線の枠。分類は全129語に書く。
   - 骨格の完了の条件（定義1文がない語0・分類がない語0・孤立0）は build が数えて警告する。P1 を閉じるとき shared.yaml の `skeleton_required` を true にして、build が止める形にする。
@@ -98,7 +98,7 @@
   - `conditions` は `math`（数学的な定義・成立の条件）と `data`（現実のデータに当てはめるときの条件・確かめ方の手掛かり）に分ける。形の手掛かりを定義の条件に書かない。
   - 任意：`formulas`（式ごとに `id`・`tree`・`symbols`：記号・意味・値の範囲。tex は build が木から作る）、`misconceptions`（よくある誤解と訂正。反例とは別）、`sources`（`source` は shared.yaml の sources の名前、`locator` は該当箇所）。
   - 説明に数があれば `checks`。
-- 関係は content/relations.yaml（REL-…、`version` 必須）。型 v1 の10種類（前提・導出・一般化・特殊化・変換・対比・統合・応用・種類・材料）。登録の前に relation-types.yaml の定義・矢印の読み方・該当例・該当しない例を確かめる（例が製本と違うときは製本に従う。違いは docs/rules/migration.md）。関係の意味の判断の正本は製本 ⑤。v1 の種類への写し方は docs/rules/migration.md の対応表（移すのは #256）。
+- 関係は content/relations.yaml（REL-…、`version` 必須）。型 v1 の10種類（前提・導出・一般化・特殊化・変換・対比・統合・応用・種類・材料）。登録の前に relation-types.yaml の定義・矢印の読み方・該当例・該当しない例を確かめる（例が製本と違うときは製本に従う。分かっている違いは docs/rules/migration.md の 3、照らしていない例は 4。種類ごとの暫定は 2 の対応表に従う）。関係の意味の判断の正本は製本 ⑤。v1 の種類への写し方は docs/rules/migration.md の対応表（移すのは #256）。
   - **関係図**（渡辺さん 2026-11-06。#228）：書き方・画面・移し方の決まりは定義書 docs/relation-map.md・設計書 docs/relation-map-design.md・計画書 docs/relation-map-plan.md だけが現行（意味の判断は製本 ③⑤⑥）。分類ごとに移し、移し終えた分類を shared.yaml の `relation_map_ready` に書く。移した分類では、語に `group`（まとまり）、前提（mathematical）は材料（定義の構成要素。画面の呼び名は「定義に使う概念」）か前提知識（前提 learning）に分け、種類の親は1つまで、対比に `axis`（比べる軸）を書き、概念の `conditions.math` と行き先がその分類の関係の `conditions` の全部の行に区分（要件・仮定・目安）を書く（build が止める）。関係図のために語を足さない（相手がない関係は書かない）。
   - 前提には `premise`（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）。
   - **成立条件の区分**（#249）：成立条件は線にせず概念・関係に添え、行ごとに区分（要件・仮定・目安）と外れたときの説明を書く。確率分布は確率関数・確率密度の式を基準の定義にする（`basis_formula`）。定義1文は学習者向けの導入のまま。区分の意味と掛かる先の判断の正本は製本 ③、基準の定義は ①。書き方は docs/authoring.md。
