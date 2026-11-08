@@ -135,7 +135,7 @@
 | `version` | 1から。意味が変わる書き直しで1つ上げる（概念・関係・導出と同じ。CLAUDE.md） | — |
 
 - **識別子の書き方**（D9）：④-番号の数字と枝をそのまま使う。④-25 → CLM-25、④-28b → CLM-28b、④-5a → CLM-5a、13の反例 → CLM-13-counter、13の逆 → CLM-13-converse。
-- **確認済み**は build が数える（④ の §9 の数え方）。指紋は statement・conditions・grounds・premises・conclusion から作り、確かめたあとに変われば確認済みに数えない（README の運用の決まり 6）。運用の決まり 6 の例外（転記・表記の統一）と指紋の関係は #277 で決める。
+- **確認済み**は build が数える（④ の §9 の数え方）。指紋は statement・conditions・grounds・premises・conclusion から作り、確かめたあとに変われば確認済みに数えない（README の運用の決まり 6）。運用の決まり 6 の例外（転記・表記の統一）と指紋の関係は #277 で決めた：指紋に入る項目を変える直しは、表記の統一でも例外にしない。
 
 ## 5. 式（formulas）
 
