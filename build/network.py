@@ -1,7 +1,8 @@
 """概念・関係・導出（知識ネットワークのデータ）の検証と書き出し。
 
 原本：content/terms.yaml（説明のある用語＝概念）・content/relations.yaml・content/derivations.yaml
-型：docs/knowledge-net/schema/kn-schema-v1.json（リポジトリ knowledge-net を作るまでは、これが元）
+型：docs/knowledge-net/schema/kn-schema-v2.json で書き出す（元は knowledge-net。製本への移行 M4、#264）。
+  組み立ては今の形（v1）で行い、to_v2 で v2 に写す。移していない分類の関係は legacy_type（v1 の種類の名前）のまま書く（設計書 docs/schema-v2-design.md 8）。
 書き出し：out/site/net/<教材名>.json（公開サイトに載る。ネットワークの画面はこれだけを読む）
 """
 from __future__ import annotations
@@ -15,6 +16,7 @@ import term_icons  # 語の印（#220）
 from effects import effect_errors, question_errors
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
+SCHEMA_V2 = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v2.json"   # 書き出す型（M4。#264）
 EXPERIMENT_SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-experiment-v1.json"   # 実験室の拡張（芯の experiments が指す。#211）
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
 KIND = load_yaml(RELATION_TYPES)
@@ -1162,13 +1164,50 @@ def export_network(c: Course, target: dict) -> dict:
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
 
 
+# 機械で写せる v1 の種類 → ⑤ の種類（設計書 3.3）。M4 では名前を書き出さず（legacy_type のまま）、未移行の数え方にだけ使う。
+# 意味が ⑤ に合うかは、M5 の分類ごとの作業で振り分け直す
+NAME_MAP_V2 = {"材料": "定める", "種類": "一種", "一般化": "特別な場合", "変換": "移る", "対比": "比べる"}
+
+
+def to_v2(data: dict, ready: list[str] | None = None) -> dict:
+    """v1 の形で組み立てたデータを v2 に写す。v2_ready（移した分類）がなければ、全部の関係を legacy_type で書く。
+    移した分類の関係を v2 の種類で書く仕組みは M5 で足す（今は v2_ready が空なので、ここで v2 の種類は作らない）"""
+    if ready:
+        raise ValueError("v2_ready の分類の書き出しはまだない（M5。#265）")
+    out = {**data, "version": 2, "schema_revision": json.loads(SCHEMA_V2.read_text(encoding="utf-8")).get("x-revision", 1)}
+    out["relations"] = [{("legacy_type" if k == "type" else k): v for k, v in r.items()} for r in data["relations"]]
+    return out
+
+
+def from_v2(data: dict, v1_revision: int) -> dict:
+    """to_v2 の逆（M4 の完了の条件「今と同じ」を比べるため。設計書 8）：legacy_type を type に戻し、版を v1 にする"""
+    out = {**data, "version": 1, "schema_revision": v1_revision}
+    out["relations"] = [{("type" if k == "legacy_type" else k): v for k, v in r.items()} for r in data["relations"]]
+    return out
+
+
+def migration_counts(rels: list[dict]) -> dict:
+    """製本への移行の残り（#264）：v1 の関係を、名前だけ機械で写せるもの（M5 で意味を振り分け直す）と、写せないもの（未移行）に分けて数える。
+    前提は premise（mathematical・learning）ごとに分ける（mathematical は M5 で定める・条件・主張へ、learning は M6 で学ぶ順へ）"""
+    named, left = {}, {}
+    for r in rels:
+        t = r["type"]
+        if t in NAME_MAP_V2:
+            named[t] = named.get(t, 0) + 1
+        else:
+            key = f"{t}（{r.get('premise') or '区分なし'}）" if t == "前提" else t
+            left[key] = left.get(key, 0) + 1
+    return {"total": len(rels), "v2": 0, "named": named, "left": left}
+
+
 def schema_errors(data: dict) -> list[str]:
     import jsonschema  # requirements.txt
     from referencing import Registry, Resource
-    schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    v1 = json.loads(SCHEMA.read_text(encoding="utf-8"))
     ext = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8"))
-    # 芯と実験室の拡張は互いを $id（URL）で指す。ネットには取りに行かず、写しの2つを登録して解く
-    reg = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in (schema, ext)])
+    schema = json.loads(SCHEMA_V2.read_text(encoding="utf-8")) if data.get("version") == 2 else v1
+    # 芯と実験室の拡張は互いを $id（URL）で指す（v2 は v1 の部品も指す）。ネットには取りに行かず、写しを登録して解く
+    reg = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in (v1, schema, ext)])
     v = jsonschema.Draft202012Validator(schema, registry=reg)
     return [f"{'/'.join(map(str, e.absolute_path)) or '(全体)'}: {e.message}" for e in v.iter_errors(data)]
 
@@ -1181,4 +1220,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "schema_errors", "write_network", "run_check"]

@@ -9,6 +9,7 @@
   発展      新しい定義の形か（complex_pattern を使い、発展の問題に予想→照合がない）
   創造      探究の形か（「解釈」を扱い、評価の観点に「解釈」がある）
   用語      単元の用語のうち、まだ旧版の用語ページを指している数（0 が完了）
+  製本への移行  関係のうち v2 の種類で書いた行と、名前だけ写せる行・写せない行（未移行）の数（#259・#264）
 """
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ import sys
 
 from legacy import legacy_status
 from model import CONTENT, ROOT, load_course, load_yaml
+from network import load_network, migration_counts
 
 
 def _text(uid: str, s: int) -> str:
@@ -81,6 +83,14 @@ def _legacy_short(line: str) -> str:
     return f"{rest.strip().split('：')[0].split('（')[0]}：{state}"
 
 
+def migration_line() -> str:
+    """製本への移行（#259）の残り。名前だけ写せる行も、意味を振り分け直すまでは移したと数えない（M5）"""
+    m = migration_counts(load_network()[0])
+    part = lambda d: "・".join(f"{k} {v}" for k, v in d.items())  # noqa: E731
+    return (f"製本への移行（#259）：v2 の種類で書いた関係 {m['v2']}/{m['total']} 行。"
+            f"名前だけ写せる {sum(m['named'].values())}（{part(m['named'])}）、未移行 {sum(m['left'].values())}（{part(m['left'])}）")
+
+
 def notion_page(c=None, target: dict | None = None) -> str:
     """Notion 用（スマホ前提：表を使わず、単元ごとに1行）。"""
     c = c or load_course()
@@ -96,6 +106,7 @@ def notion_page(c=None, target: dict | None = None) -> str:
              f"- 旧版を指す用語リンク：{legacy_term_count(c, target)}（0 で完了）",
              f"- 概念図 {sum(r['figure'] for r in rows.values())}/{len(rows)}・発展 {sum(r['hatten'] for r in rows.values())}/{len(rows)}"
              f"・創造 {sum(r['sozo'] for r in rows.values())}/{len(rows)} 単元",
+             f"- {migration_line()}",
              "- 旧版：", *[f"  - {_legacy_short(x)}" for x in legacy_status({})[1]], ""]
     for w, units in WAVES:
         lines += [f"## {w}", ""]
@@ -130,6 +141,7 @@ def report() -> str:
               f"- 4 用語リンクの切り替え：旧版を指す用語 {legacy_term_count(c, target)}（0 で完了）",
               f"- 5 概念図 {sum(r['figure'] for r in rows)}/{n}・手本 {sum(1 for r in rows if r['model'])}/{sum(1 for r in rows if r['model'] is not None)}"
               f"・発展 {sum(r['hatten'] for r in rows)}/{n}・創造 {sum(r['sozo'] for r in rows)}/{n} 単元",
+              f"- {migration_line()}",
               "- 6 旧版：", *[f"  {x.strip()}" for x in legacy_status({})[1]],
               "- 2 孤立した概念がないこと・7 個人の記録は、build と #54 で確かめる"]
     return "\n".join(lines) + "\n"

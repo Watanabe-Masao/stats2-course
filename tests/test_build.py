@@ -680,6 +680,11 @@ class TestNetwork(unittest.TestCase):
         self.assertIsNotNone(check({"schema_revision": 31, "experiment_revision": 2}, {"schema_revision": 31, "experiment_revision": 1}))
         self.assertIsNotNone(check({"schema_revision": 31, "experiment_revision": 1}, {"schema_revision": 30, "experiment_revision": 0}))
         self.assertIsNone(check({"schema_revision": 31, "experiment_revision": 1}, {"schema_revision": 31, "experiment_revision": 1}))
+        # 芯の v2（#264）：v2 のデータの改訂（1から）を、画面の v1 の型の改訂と比べない（v1 の改訂は大きいので、v2 の型のない画面でも通ってしまう）。
+        # 検出の確かめ：schemas_for が版を見ずに v1 の型を返すと落ちる
+        from screen_check import schemas_for
+        self.assertEqual(schemas_for(2)["schema_revision"][1], "schema/kn-schema-v2.json")
+        self.assertEqual(schemas_for(1)["schema_revision"][1], "schema/kn-schema-v1.json")
 
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
@@ -1339,6 +1344,39 @@ class TestNetwork(unittest.TestCase):
         bad["concepts"][0].pop("definition", None)
         bad["concepts"][0]["status"] = "filled"
         self.assertGreaterEqual(len(self.n.schema_errors(bad)), 3)
+
+    def test_v2_export_is_same_as_v1(self):
+        # 確かめる対象：build が型 v2 で書き出し、移していない分類の結果が今（v1）と同じであること（M4 の完了の条件。設計書 docs/schema-v2-design.md 8。#264）。
+        # 想定する故障：v2 に写すときに関係の種類を落とす・v1 の種類の名前を v2 の type に入れる（画面が v2 の種類と取り違える）・項目を足し引きする。
+        # 見つけ方：教材の原本から v1 で組み立てたものを v2 に写し、v2 の厳しい型に合うこと、type が残らないこと、
+        #   legacy_type を type に戻すと v1 で組み立てたものとちょうど同じになること。
+        # 既存との違い：test_export_matches_schema_and_is_namespaced は v1 の形と v1 の型だけを見る。
+        # 検出の確かめ：to_v2 で type を legacy_type に替えないと、v2 の型（知らない種類）で落ちる。to_v2 で関係の項目を1つ落とすと、同じかの比べで落ちる
+        import json as _json
+        v1 = self.n.export_network(course(), TARGET)
+        v2 = self.n.to_v2(v1, course().shared.get("v2_ready"))
+        self.assertEqual(v2["version"], 2)
+        self.assertEqual(self.n.schema_errors(v2), [])
+        self.assertFalse(any("type" in r for r in v2["relations"]))
+        rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
+        self.assertEqual(self.n.from_v2(v2, rev), v1)
+        # 移した分類の書き出しは M5 で作る。それまで v2_ready に分類を書いたら止める（v1 の種類のまま「移した」と見せない）
+        with self.assertRaises(ValueError):
+            self.n.to_v2(v1, ["確率分布"])
+
+    def test_migration_counts(self):
+        # 確かめる対象：製本への移行の残り（progress.py の行。#264）の数え方。
+        # 想定する故障：前提を mathematical と learning に分けずに数える（行き先が M5 と M6 で違う）・名前だけ写せる行を移した（v2）と数える・どれかの行を落とす。
+        # 見つけ方：教材の原本の関係で、名前だけ写せる＋未移行が全部の行数と同じ、v2 は 0、前提は区分ごとに分かれ、合計が前提の行数と同じ。
+        # 既存との違い：進み具合の行は今まで単元と概念だけを数えていた。
+        # 検出の確かめ：前提の区分の分け方を外す（区分なしにまとめる）と、区分ごとの行が見つからず落ちる
+        rels = self.n.load_network()[0]
+        m = self.n.migration_counts(rels)
+        self.assertEqual(m["v2"], 0)
+        self.assertEqual(sum(m["named"].values()) + sum(m["left"].values()), len(rels))
+        premise = sum(1 for r in rels if r["type"] == "前提")
+        self.assertEqual(m["left"].get("前提（mathematical）", 0) + m["left"].get("前提（learning）", 0), premise)
+        self.assertNotIn("前提", m["named"])
 
     def test_concept_checks_pass(self):
         from model import run_check
