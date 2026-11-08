@@ -112,7 +112,7 @@ BREAKS = [
     ("基準の定義に出る概念を扱っていない", lambda d: con(d, "binom")["basis"].pop("excludes"), "どれでも扱っていない"),
     ("除外した概念から定めるも書く", lambda d: d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:prob", "to": "t:binom"}),
      "定めると basis.excludes の両方"),
-    ("移した分類に legacy_type が残る", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"}),
+    ("移した分類に legacy_type が残る", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "mathematical", "from": "t:prob", "to": "t:poisson"}),
      "legacy_type（前提）が残っている"),
 ]
 
@@ -149,6 +149,13 @@ class TestV2Checks(unittest.TestCase):
         con(d, "binom")["basis"].pop("excludes")
         d["course"]["v2_ready"] = []
         self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
+
+    def test_learning_rows_wait_for_m6(self):
+        # 前提（learning）は学ぶ順へ移す M6（#266）まで v1 のまま残してよい（移した分類でも止めない）。
+        # 検出の確かめ：この例外の行を消すと落ちる。mathematical は上の BREAKS で止まる
+        d = base()
+        d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"})
+        self.assertEqual(v2_errors(d), [])
 
     def test_current_export_passes(self):
         # 教材の今の書き出し（v2 の種類の行が0・v2_ready が空）は止まらない（M4 の完了の条件「移していない分類の build の結果が今と同じ」）

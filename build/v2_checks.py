@@ -139,7 +139,10 @@ def v2_errors(data: dict) -> list[str]:
     v2 = [r for r in rels if "type" in r]
 
     # 移した分類に、移していない行を残さない（設計書 8。行き先の概念の分類で見る）
+    # 前提（learning）は学ぶ順のデータへ移す M6（#266）まで v1 のまま残す（⑤ の線ではない。設計書 3.3・6）
     for r in rels:
+        if r.get("legacy_type") == "前提" and r.get("premise") == "learning":
+            continue
         if "legacy_type" in r and (concepts.get(r["to"]) or {}).get("category") in ready:
             err.append(f"{r['id']}: 移した分類（{concepts[r['to']]['category']}）の行に legacy_type（{r['legacy_type']}）が残っている")
 
