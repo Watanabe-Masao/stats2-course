@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figures import build_figures, validate_figures  # noqa: E402
 from legacy import legacy_report, legacy_status  # noqa: E402
 from progress import notion_page as progress_page  # noqa: E402
-from network import export_network, network_checks, schema_errors, validate_network, write_network  # noqa: E402
+from network import export_network, network_checks, schema_errors, to_v2, validate_network, write_network  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
 from model import ROOT, load_course, load_yaml, run_check, run_checks, validate  # noqa: E402
@@ -77,10 +77,10 @@ def main(argv: list[str]) -> int:
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
     if lint:
         return fail("生成物の検査", lint)
-    net = export_network(course, r.t)
+    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"))   # 型 v2 で書き出す（M4。#264）
     net_errors = schema_errors(net)
     if net_errors:
-        return fail("知識ネットワークのデータ（docs/knowledge-net/schema/kn-schema-v1.json）", net_errors)
+        return fail("知識ネットワークのデータ（docs/knowledge-net/schema/kn-schema-v2.json）", net_errors)
     legacy_errors, legacy_lines = legacy_status(pages)
     if legacy_errors:
         return fail("旧版の削除の管理表（publish/legacy.yaml）", legacy_errors)
