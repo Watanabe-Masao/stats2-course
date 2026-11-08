@@ -1,0 +1,2587 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-schema-v2.json",
+  "title": "知識ネットワークの型 v2",
+  "description": "教材ごとの概念・関係・主張・導出・学ぶ順・単元。v2：関係の種類を製本 ⑤ の10種類にし、主張（claims）と学ぶ順（learning）を足した（stats2-course docs/schema-v2-design.md、#262・#263）。移していない関係は legacy_type（v1 の種類）で持つ",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "course",
+    "concepts",
+    "relations",
+    "derivations"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "gid": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+:[A-Za-z0-9-]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "texts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      }
+    },
+    "gids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gid"
+      }
+    },
+    "conditionDetail": {
+      "type": "object",
+      "description": "成立条件の1行の区分（stats2-course #249 ①）。kind：要件＝採用している定義を満たさない（母数が範囲外など。この定義の分布として扱えない）／仮定＝その定理・モデルによる保証が使えない（結論が偽とは限らない）／目安＝この目安では適用を勧められない（精度を別に確かめる）。kind がない行は、データで確かめる手掛かり（scope が data のときだけ）。text は conditions の同じ行の文",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "scope": {
+          "enum": [
+            "math",
+            "data"
+          ],
+          "description": "概念の conditions のどちらの行か（関係では書かない）"
+        },
+        "kind": {
+          "enum": [
+            "要件",
+            "仮定",
+            "目安"
+          ]
+        },
+        "claim": {
+          "$ref": "#/$defs/text",
+          "description": "仮定のとき：何を保証する仮定か（例：成功回数が B(n, p) に従う）"
+        },
+        "outside": {
+          "$ref": "#/$defs/text",
+          "description": "外れたときに何が言えなくなるか（1文）"
+        },
+        "terms": {
+          "$ref": "#/$defs/gids",
+          "description": "文に出る概念（文の下に押せる札で並べる）"
+        },
+        "target": {
+          "$ref": "#/$defs/text",
+          "description": "目安のとき：対象の近似（例：二項分布の正規近似）"
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "$ref": "#/$defs/text"
+            },
+            "locator": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "description": "目安のとき：出典"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "outside"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "仮定"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "claim"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "目安"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "target",
+              "source"
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "required": [
+                "kind"
+              ]
+            }
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "const": "data"
+              }
+            },
+            "required": [
+              "scope"
+            ]
+          }
+        }
+      ]
+    },
+    "conditionDetails": {
+      "type": "array",
+      "description": "成立条件の区分（conditions の行ごと。stats2-course #249）",
+      "items": {
+        "$ref": "#/$defs/conditionDetail"
+      }
+    },
+    "labs": {
+      "type": "array",
+      "description": "数理ラボへの参照（概念・関係で共通の形）。ラボの定義（値・学習目標）はラボの側。url は教材の build が作る",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "url"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^LAB-[A-Za-z0-9-]+$"
+          },
+          "preset": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "tour",
+              "check"
+            ],
+            "description": "tour：ラボで解説（解説付き再生。答えを見せる）／check：ラボで確かめる（予想・法則・自由に動かす）。教材の build が版から判定する（stats2-course #90）"
+          },
+          "play": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode"
+            ],
+            "description": "ネットワークの画面がこの版を JS の部品で描くための形（stats2-course #188 04b・#192）。教材の build がラボの版（tool.yaml）から作る。予想の答えは入れない",
+            "properties": {
+              "mode": {
+                "type": "string"
+              },
+              "modes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "set": {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "string"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "task": {
+                "$ref": "#/$defs/text"
+              },
+              "kmax": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "decimals": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 6
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "title",
+                    "text",
+                    "states"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "type": [
+                                "number",
+                                "string"
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "number",
+                                  "string"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "focus": {
+                      "type": "string"
+                    },
+                    "gist": {
+                      "type": "boolean"
+                    },
+                    "ms": {
+                      "type": "integer",
+                      "minimum": 100
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "formulaNode": {
+      "description": "式の分解の木の節。葉は記号（sym：記号の key）か数（num）。それ以外は演算（op）と引数（args）。記号は formulas[].symbols の key を指し、記号が概念を指せば、木を下にたどって別の概念の式へ開ける（stats2-course #71）",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "sym"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "sym": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "num"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "num": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "op",
+            "args"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "op": {
+              "enum": [
+                "eq",
+                "add",
+                "sub",
+                "mul",
+                "div",
+                "pow",
+                "neg",
+                "sqrt",
+                "abs",
+                "sum",
+                "prod",
+                "int",
+                "fn"
+              ],
+              "description": "eq：等しい（左辺, 右辺, …）・add・sub・mul・div・pow（底, 指数）・neg・sqrt・abs・sum／prod（var の範囲で足す・掛ける）・int（var で積分）・fn（name の関数。E・V・Cov・P・exp・log・Φ・階乗・組合せ など）"
+            },
+            "args": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/formulaNode"
+              }
+            },
+            "name": {
+              "type": "string",
+              "description": "fn の名前（表示に使う。E・V・Cov・P・exp・log・Φ・fact・comb など）"
+            },
+            "var": {
+              "type": "string",
+              "description": "sum・prod・int で動かす記号の key"
+            },
+            "lower": {
+              "$ref": "#/$defs/formulaNode"
+            },
+            "upper": {
+              "$ref": "#/$defs/formulaNode"
+            }
+          }
+        }
+      ]
+    },
+    "figures": {
+      "type": "array",
+      "description": "図への参照（概念・関係で共通の形）。図は教材の build が設定から作り、公開サイトに置く。url は教材の build が作る（stats2-course #88）",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "url"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FIG-[A-Za-z0-9-]+$"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "caption": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "valueTable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "values",
+        "weights"
+      ],
+      "description": "値の表：値（小さい順）と重み（0以上。合計で割って確率にする）",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number"
+          }
+        },
+        "weights": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "labels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "description": "値の呼び名（なければ値と単位）。values と同じ数"
+        }
+      }
+    },
+    "chartDist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "label"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "binom",
+            "hyper",
+            "poisson"
+          ]
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "p": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "success": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lambda": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 60
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "binom"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "n",
+              "p"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "hyper"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "n",
+              "total",
+              "success"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "model": {
+                "const": "poisson"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "lambda"
+            ]
+          }
+        }
+      ]
+    },
+    "form": {
+      "enum": [
+        "number",
+        "event",
+        "rv",
+        "random_set",
+        "distribution",
+        "function",
+        "operation",
+        "property",
+        "proposition",
+        "procedure"
+      ],
+      "description": "概念の姿（製本 ① の 3）：数・事象・集合・確率変数・偶然で決まる区間・関数・分布・関数・演算・性質・命題・手続き"
+    },
+    "claimId": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+:CLM-[0-9]+[a-z]?(-[a-z]+)?$",
+      "description": "主張の id（教材名:CLM-番号。製本 ④-番号と同じ番号。README の運用の決まり 5）"
+    },
+    "condition": {
+      "type": "object",
+      "required": [
+        "text",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "description": "成立条件の1行（製本 ③ の 3。設計書 1）。掛かる先は書く場所で決まり、概念の中では target で分ける",
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "enum": [
+            "要件",
+            "仮定",
+            "目安"
+          ]
+        },
+        "target": {
+          "enum": [
+            "definition",
+            "procedure",
+            "transform",
+            "claim"
+          ]
+        },
+        "subject": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/gid"
+            },
+            {
+              "$ref": "#/$defs/text"
+            }
+          ]
+        },
+        "range": {
+          "$ref": "#/$defs/text"
+        },
+        "outside": {
+          "$ref": "#/$defs/text"
+        },
+        "approx": {
+          "$ref": "#/$defs/text"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "locator": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "description": "目安のとき：出典"
+          }
+        },
+        "terms": {
+          "$ref": "#/$defs/gids"
+        },
+        "data_hints": {
+          "$ref": "#/$defs/texts"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "definition"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "要件"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "claim"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "仮定"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "transform"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "仮定",
+                  "目安"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "propSide": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "命題を作る概念：主語（subjects）と述語（predicates）。どちらも空でよい（設計書 4）",
+      "properties": {
+        "subjects": {
+          "$ref": "#/$defs/gids"
+        },
+        "predicates": {
+          "$ref": "#/$defs/gids"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "kn-schema"
+    },
+    "version": {
+      "const": 2
+    },
+    "course": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "units"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "number",
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/gid"
+              },
+              "number": {
+                "$ref": "#/$defs/text"
+              },
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "group": {
+                "$ref": "#/$defs/text",
+                "description": "単元のまとまり（学習・問題集のタブで分ける。stats2-course #42）"
+              },
+              "problems": {
+                "type": "array",
+                "description": "単元の問題（問題集のタブの一覧。解いた記録は持たない）",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "stage",
+                    "prompt"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/gid"
+                    },
+                    "stage": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "prompt": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "pillars": {
+          "type": "array",
+          "description": "柱（分類の大きなまとまり。例：データを記述する → 確率で考える → 推測する）。上から学ぶ順。入口のライブラリと島の地図に使い、色は画面が順に柱の色（--band-1・--band-2…）を当てる（stats2-course #220）",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "categories"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "categories": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "この柱の分類（概念の category の名前）。どの分類もちょうど1つの柱に入る（教材の build が確かめる）"
+              }
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "description": "意味のまとまり（分類の中の小さなまとまり。例：確率分布の「くり返して数える」）。並べた順が学ぶ順。分類のページで、まとまりごとに区切って語を並べる（stats2-course #228）。まとまりのない分類は区切らない",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "category",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/gid",
+                "description": "教材をまたいで一意（例：stats2:GRP-dist-count）"
+              },
+              "category": {
+                "type": "string",
+                "minLength": 1,
+                "description": "このまとまりが入る分類（概念の category の名前）"
+              },
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "summary": {
+                "$ref": "#/$defs/text",
+                "description": "まとまりを1文で（何を学ぶまとまりか）"
+              }
+            }
+          }
+        },
+        "group_relations": {
+          "type": "array",
+          "description": "まとまりの間の関係（関係図の全体の見え方で、まとまりの組を結ぶ1本の矢印。stats2-course #240）。矢印は「どう移るか」だけで、1本に1つの意味。種類は書かない（指した関係から画面が決める）。教材の build が、指した関係の両端が from と to のまとまりにあることを確かめる",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "label",
+              "relations"
+            ],
+            "properties": {
+              "from": {
+                "$ref": "#/$defs/gid",
+                "description": "元のまとまりの id（groups の id）"
+              },
+              "to": {
+                "$ref": "#/$defs/gid",
+                "description": "先のまとまりの id"
+              },
+              "label": {
+                "$ref": "#/$defs/text",
+                "description": "矢印の言葉（動詞。日常の言葉で短く。例：平均を保って回数を増やす）"
+              },
+              "relations": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/$defs/gid"
+                },
+                "description": "裏付けの関係（REL-…の id。少なくとも1本）"
+              },
+              "note": {
+                "$ref": "#/$defs/text",
+                "description": "矢印を開いた直後に最初に出す1文（実際の分布の組・操作・成り立つ条件。言葉の「確率」「平均」が何を指すかも書く）"
+              }
+            }
+          }
+        },
+        "relation_map_ready": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "関係図の決まり（stats2-course docs/relation-map.md）で書き終えた分類（概念の category）。画面はこの分類だけを、まとまりの関係図で開く。ほかの分類は今の一覧のまま（stats2-course #232・#235）"
+        },
+        "v2_ready": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "v2 の決まりで移した分類（D12）"
+        }
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "name": {
+            "$ref": "#/$defs/text"
+          },
+          "en": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "filled",
+              "skeleton",
+              "stub"
+            ],
+            "description": "filled：説明あり。skeleton：骨格（定義1文と分類だけ。肉付けは段階ごとに）。stub：関係から指されているが、骨格もまだない概念"
+          },
+          "definition": {
+            "$ref": "#/$defs/text"
+          },
+          "principle": {
+            "$ref": "#/$defs/text"
+          },
+          "conditions": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/condition"
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "math"
+                ],
+                "additionalProperties": false,
+                "description": "math：数学的な定義・成立の条件。data：現実のデータに当てはめるときの条件・確かめ方の手掛かり",
+                "properties": {
+                  "math": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/text"
+                    }
+                  },
+                  "data": {
+                    "$ref": "#/$defs/texts"
+                  }
+                }
+              }
+            ],
+            "description": "v2：条件の行の一覧（target は definition か procedure）。移していない概念は v1 の形（math・data）"
+          },
+          "conditions_detail": {
+            "$ref": "#/$defs/conditionDetails"
+          },
+          "basis_formula": {
+            "type": "string",
+            "description": "基準にする定義の式の id（formulas のどれか。確率分布なら確率関数・確率密度の式）。定義1文は学習者向けの導入で、分類と成立条件の区分はこの式を基準にする（stats2-course #249 ③）"
+          },
+          "example": {
+            "$ref": "#/$defs/text"
+          },
+          "counterexample": {
+            "$ref": "#/$defs/text"
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "problems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "formulas": {
+            "type": "array",
+            "description": "式ごとに記号の意味を持つ",
+            "items": {
+              "type": "object",
+              "required": [
+                "tex"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^F-[a-z0-9]+(-[a-z0-9]+)*$",
+                  "description": "式の ID（教材の中で変えない・消さない。要らなくなった式は残す）。#118 D1"
+                },
+                "defined_in": {
+                  "type": "string",
+                  "description": "この式の元がある概念の id（同じ式を2つの概念に出すとき、元でない側に書く。式の ID は元と同じ）。#118 D2"
+                },
+                "tex": {
+                  "$ref": "#/$defs/text"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "symbols": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "symbol",
+                      "meaning"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "symbol": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "meaning": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "range": {
+                        "type": "string"
+                      },
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                        "description": "木の葉（sym）から指す名前"
+                      },
+                      "concept": {
+                        "$ref": "#/$defs/gid",
+                        "description": "この記号が表す概念（教材名:ID）。木をたどって、その概念の式へ開く"
+                      },
+                      "kind": {
+                        "enum": [
+                          "value",
+                          "data",
+                          "rv",
+                          "param",
+                          "index",
+                          "const",
+                          "event"
+                        ],
+                        "description": "value：1つの値・data：データの一覧・rv：確率変数・param：母数・index：添え字・const：定数"
+                      },
+                      "of": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                        "description": "どの確率変数の記号か（同じ式の確率変数の key。μ は X の期待値なら X）。関数を開いて引数を結び付けるとき、この記号も一緒に移す（stats2-course #109）"
+                      },
+                      "domain": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "description": "定義域（値を入れて計算するときの範囲。range は文の説明）。min・max は数か同じ式の記号の key（k ≦ n）、端を含むか（既定は含む）、整数か、0でないか（stats2-course #109）",
+                        "properties": {
+                          "min": {
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
+                          },
+                          "max": {
+                            "oneOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                              }
+                            ],
+                            "description": "数か、同じ式の記号の key（k ≦ n なら max: n）"
+                          },
+                          "minOpen": {
+                            "type": "boolean",
+                            "description": "true なら min を含まない"
+                          },
+                          "maxOpen": {
+                            "type": "boolean",
+                            "description": "true なら max を含まない"
+                          },
+                          "integer": {
+                            "type": "boolean"
+                          },
+                          "nonzero": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "omit": {
+                        "enum": [
+                          "any_real",
+                          "by_bounds"
+                        ],
+                        "description": "範囲を書かない約束（任意の実数・和や積分の上下限から決まる）。未記入と区別する"
+                      }
+                    }
+                  }
+                },
+                "tree": {
+                  "$ref": "#/$defs/formulaNode",
+                  "description": "式の分解の木（任意）。あれば tex はここから作れる"
+                },
+                "parts": {
+                  "type": "array",
+                  "description": "式の意味のかたまり（作業台で押せる部分式。stats2-course #110）。path は木の根からの args の番号（右辺の2つ目の因子なら [1, 1]）",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "name",
+                      "meaning"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "name": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "meaning": {
+                        "$ref": "#/$defs/text"
+                      }
+                    }
+                  }
+                },
+                "conditions": {
+                  "type": "array",
+                  "description": "記号どうしの条件（1つの記号の domain で書けないもの：超幾何の k ≦ M など）。tree は比べる式（le・lt・ge・gt・between）。画面は値がこれを満たさないとき計算せず text を出す。#118",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "text",
+                      "tree"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      },
+                      "tree": {
+                        "$ref": "#/$defs/formulaNode"
+                      }
+                    }
+                  }
+                },
+                "unverified": {
+                  "type": "boolean",
+                  "description": "独立な見本でまだ値を確かめていない式（true のときだけ書く）。画面は「未検証」の印を出す。#118 D4"
+                },
+                "review_pending": {
+                  "type": "boolean",
+                  "description": "数で保証できない観点の個別レビューが済んでいない式（true のときだけ書く）。画面は「レビュー前」の印を出す。#118 D4"
+                },
+                "why": {
+                  "type": "object",
+                  "description": "この式でなぜその値（確率など）が求まるかの段（作業台の読み方「構造」で順に出す。stats2-course #188）。steps の parts は、その段で効く式の部品（parts の番号）。note は前提が崩れたときに、どの段が成り立たなくなるか",
+                  "required": [
+                    "steps"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "steps": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "title",
+                          "text"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "title": {
+                            "$ref": "#/$defs/text"
+                          },
+                          "text": {
+                            "$ref": "#/$defs/text"
+                          },
+                          "parts": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "note": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                },
+                "statement_kind": {
+                  "enum": [
+                    "定義式",
+                    "等式",
+                    "近似式",
+                    "極限",
+                    "分布の式"
+                  ],
+                  "description": "式の種類（製本 ② の 1）"
+                }
+              }
+            }
+          },
+          "misconceptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "misconception",
+                "correction"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "misconception": {
+                  "$ref": "#/$defs/text"
+                },
+                "correction": {
+                  "$ref": "#/$defs/text"
+                },
+                "labs": {
+                  "$ref": "#/$defs/labs",
+                  "description": "この誤解を崩すラボの場面"
+                }
+              }
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "title": {
+                  "$ref": "#/$defs/text"
+                },
+                "locator": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          },
+          "labs": {
+            "$ref": "#/$defs/labs"
+          },
+          "counterexample_labs": {
+            "$ref": "#/$defs/labs",
+            "description": "反例を数で確かめるラボの場面"
+          },
+          "figures": {
+            "$ref": "#/$defs/figures"
+          },
+          "workspace": {
+            "type": "object",
+            "description": "式の作業台（数式・意味・操作・現象を1つの行動で連動させる。stats2-course #110）。formula：主役の式の番号、vary：スライダーで動かす記号、over：分布の横軸の記号（棒を押すと選ぶ）、mean：期待値の式の番号（任意）",
+            "required": [
+              "formula",
+              "vary",
+              "over"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "formula": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "vary": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                }
+              },
+              "over": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "mean": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "linear": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "E(aX＋b) の式の番号（任意。あれば作業台に変換の欄を出す。stats2-course #156）"
+              }
+            }
+          },
+          "short": {
+            "$ref": "#/$defs/text",
+            "description": "定義1文（骨格の段から持つ。説明ありの概念にもあってよい）"
+          },
+          "category": {
+            "$ref": "#/$defs/text",
+            "description": "分類（分布・統計量・手法・性質など。教材が決める言葉）"
+          },
+          "table_workspace": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "formula",
+              "tables"
+            ],
+            "description": "値の表の作業台（stats2-course #119）：棒（重み）を動かすと、確率・x·p(x)・期待値の▲・Σ の展開が一緒に動く。formula：期待値の定義の式の番号、linear：E(aX＋b) の式の番号（任意。あれば a・b のつまみ）、tables：最初に選べる表",
+            "properties": {
+              "formula": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "linear": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "tables": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/valueTable"
+                }
+              }
+            }
+          },
+          "gist": {
+            "$ref": "#/$defs/text",
+            "description": "つまり：日常の言葉で1〜2文（関係の gist と同じ役割）。概念のページの概要の最初の画面に出す（stats2-course #188）"
+          },
+          "question": {
+            "$ref": "#/$defs/text",
+            "description": "この概念で考える問い（1文）。概要の最初に出し、下にこの概念を主にする実験室の問いを並べる（stats2-course #188）"
+          },
+          "chart": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "description": "概要の図：分布の棒をその場で描く設定（数は engine の modelPmf から。画像にしない。stats2-course #188 01b）",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "binom"
+                ]
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 60
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "note": {
+                "$ref": "#/$defs/text",
+                "description": "図の下の一言"
+              }
+            }
+          },
+          "icon": {
+            "type": "string",
+            "pattern": "^https://[^\"'()\\\\\\s<>]+\\.svg$",
+            "description": "語の印（SVG の URL。教材の build が原本の印のファイルから作る。stats2-course #220）。48×48・線 2.4・色は柱の色で、画面は CSS の mask で読み、背景の色で塗る（SVG を本体に入れない）。引用符・括弧・空白を含む URL は型で止める"
+          },
+          "group": {
+            "$ref": "#/$defs/gid",
+            "description": "意味のまとまり（教材の groups の id）。まとまりの分類は概念の category と同じ（教材の build が確かめる。stats2-course #228）"
+          },
+          "forms": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/form"
+            }
+          },
+          "basis": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "基準にする定義（1つ。製本 ① の 2）：式の id か、定義の文。文のときは直接使う概念 terms も",
+            "properties": {
+              "formula": {
+                "type": "string",
+                "pattern": "^F-[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "terms": {
+                "$ref": "#/$defs/gids"
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "formula"
+                ]
+              },
+              {
+                "required": [
+                  "text",
+                  "terms"
+                ]
+              }
+            ]
+          },
+          "aliases": {
+            "$ref": "#/$defs/texts"
+          },
+          "cases": {
+            "$ref": "#/$defs/texts"
+          },
+          "heading_of": {
+            "type": "object",
+            "required": [
+              "concept",
+              "object_diff",
+              "context_diff"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "concept": {
+                "$ref": "#/$defs/gid"
+              },
+              "object_diff": {
+                "$ref": "#/$defs/text"
+              },
+              "context_diff": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          },
+          "alt_definitions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^F-[a-z0-9]+(-[a-z0-9]+)*$"
+            }
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/claimId"
+            }
+          },
+          "data_hints": {
+            "$ref": "#/$defs/texts",
+            "description": "確かめる仮定がまだ移っていない手掛かり（未移行のあいだだけ）"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "filled"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "definition",
+                "principle",
+                "conditions",
+                "example",
+                "counterexample"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "skeleton"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "short",
+                "category"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "from",
+          "to",
+          "description",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "from": {
+            "$ref": "#/$defs/gid"
+          },
+          "to": {
+            "$ref": "#/$defs/gid"
+          },
+          "type": {
+            "enum": [
+              "定める",
+              "一種",
+              "特別な場合",
+              "移る",
+              "従う",
+              "推定する",
+              "導ける",
+              "同値",
+              "根拠",
+              "比べる"
+            ],
+            "description": "関係の種類（製本 ⑤ の 4）"
+          },
+          "description": {
+            "$ref": "#/$defs/text"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/text"
+                },
+                {
+                  "$ref": "#/$defs/condition"
+                }
+              ]
+            }
+          },
+          "conditions_detail": {
+            "$ref": "#/$defs/conditionDetails"
+          },
+          "derivation": {
+            "$ref": "#/$defs/gid"
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "mode": {
+            "enum": [
+              "exact",
+              "approximation",
+              "limit"
+            ],
+            "description": "変換のとき必須。厳密・近似・極限"
+          },
+          "premise": {
+            "enum": [
+              "learning",
+              "mathematical"
+            ],
+            "description": "前提のとき必須。理解に必要な知識／数学的な成立条件"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          },
+          "labs": {
+            "$ref": "#/$defs/labs"
+          },
+          "figures": {
+            "$ref": "#/$defs/figures"
+          },
+          "gist": {
+            "type": "string",
+            "description": "つまり：その関係が言っていることを日常の言葉で1〜2文。説明・図・ラボより先に出す（stats2-course #95）"
+          },
+          "axis": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "description": "比べる軸：対比で、何について違うのかを短い名前で（例：取り出し方）。対比だけに書く。関係図の決まりで移した分類では教材の build が必須にする（stats2-course #232・docs/relation-map.md）"
+          },
+          "stages": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "関係を開いたときの段（stats2-course #188 04）。対比は same（同じ所）・differ（違う所）・so（だから何が違うか）、変換は origin（元の形）・operation（変える操作）・result（行き着く形）。段の名前は画面が付ける",
+            "properties": {
+              "same": {
+                "$ref": "#/$defs/text"
+              },
+              "differ": {
+                "$ref": "#/$defs/text"
+              },
+              "so": {
+                "$ref": "#/$defs/text"
+              },
+              "origin": {
+                "$ref": "#/$defs/text"
+              },
+              "operation": {
+                "$ref": "#/$defs/text"
+              },
+              "result": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          },
+          "chart": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "description": "関係を開いたときの図：その場で描く（数は engine から。画像にしない。stats2-course #188 04）。pair＝2つの分布を並べた棒、normal＝二項分布の棒に平均・分散の同じ正規分布の曲線を重ねる",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "pair",
+                  "normal"
+                ]
+              },
+              "a": {
+                "$ref": "#/$defs/chartDist"
+              },
+              "b": {
+                "$ref": "#/$defs/chartDist"
+              },
+              "n": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200
+              },
+              "p": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "note": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "pair"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "a",
+                    "b"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "n"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "p"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "normal"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "n",
+                    "p"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "a"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "b"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "question": {
+            "$ref": "#/$defs/text",
+            "description": "このつながりで考える問い（概念のページのつながりで、選ぶと最初に出る。例：回数を増やすと、形はどうなる？）（stats2-course #188 07c）"
+          },
+          "focus": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "formula",
+              "parts"
+            ],
+            "description": "このつながりが、両端の概念のどちらかの式のどの部品で効くか（概念の式の id と、その式の parts の番号）。つながりを選ぶと、その部品を光らせる（stats2-course #188 07c）",
+            "properties": {
+              "formula": {
+                "type": "string"
+              },
+              "parts": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "legacy_type": {
+            "enum": [
+              "前提",
+              "導出",
+              "一般化",
+              "特殊化",
+              "変換",
+              "対比",
+              "統合",
+              "応用",
+              "種類",
+              "材料"
+            ],
+            "description": "移していない行の v1 の種類（M7 で外す）"
+          },
+          "fix": {
+            "enum": [
+              "param_value",
+              "equal",
+              "count"
+            ],
+            "description": "特別な場合の固定の仕方：母数を値に・2つを等しく・個数を決める"
+          },
+          "fix_text": {
+            "$ref": "#/$defs/text"
+          },
+          "operation": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/gid"
+              },
+              {
+                "$ref": "#/$defs/text"
+              }
+            ]
+          },
+          "theorem": {
+            "$ref": "#/$defs/gid",
+            "description": "通す定理（定理の点の概念）"
+          },
+          "reversible": {
+            "type": "boolean"
+          },
+          "use_form": {
+            "type": "string",
+            "pattern": "^F-[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "使う形（近似式の式の id。目安は conditions）"
+          },
+          "claim": {
+            "$ref": "#/$defs/claimId"
+          },
+          "properties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/claimId"
+            }
+          },
+          "same": {
+            "$ref": "#/$defs/text"
+          },
+          "differ": {
+            "$ref": "#/$defs/text"
+          },
+          "from_form": {
+            "$ref": "#/$defs/form"
+          },
+          "to_form": {
+            "$ref": "#/$defs/form"
+          }
+        },
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "type"
+                ],
+                "not": {
+                  "required": [
+                    "legacy_type"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "legacy_type"
+                ],
+                "not": {
+                  "required": [
+                    "type"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "const": "変換"
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "mode",
+                "conditions"
+              ],
+              "properties": {
+                "conditions": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "const": "導出"
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "conditions"
+              ],
+              "properties": {
+                "conditions": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "const": "前提"
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "premise"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "not": {
+                    "const": "変換"
+                  }
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "mode"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "not": {
+                    "const": "前提"
+                  }
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "premise"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "const": "対比"
+                }
+              },
+              "required": [
+                "legacy_type",
+                "stages"
+              ]
+            },
+            "then": {
+              "properties": {
+                "stages": {
+                  "required": [
+                    "same",
+                    "differ",
+                    "so"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "origin"
+                        ],
+                        "legacy_type": "object"
+                      },
+                      {
+                        "required": [
+                          "operation"
+                        ],
+                        "legacy_type": "object"
+                      },
+                      {
+                        "required": [
+                          "result"
+                        ],
+                        "legacy_type": "object"
+                      }
+                    ]
+                  },
+                  "legacy_type": "object"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "const": "変換"
+                }
+              },
+              "required": [
+                "legacy_type",
+                "stages"
+              ]
+            },
+            "then": {
+              "properties": {
+                "stages": {
+                  "required": [
+                    "origin",
+                    "operation",
+                    "result"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "same"
+                        ],
+                        "legacy_type": "object"
+                      },
+                      {
+                        "required": [
+                          "differ"
+                        ],
+                        "legacy_type": "object"
+                      },
+                      {
+                        "required": [
+                          "so"
+                        ],
+                        "legacy_type": "object"
+                      }
+                    ]
+                  },
+                  "legacy_type": "object"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "not": {
+                    "enum": [
+                      "対比",
+                      "変換"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "stages"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "legacy_type": {
+                  "not": {
+                    "const": "対比"
+                  }
+                }
+              },
+              "required": [
+                "legacy_type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "axis"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "特別な場合"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "fix",
+                "fix_text"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "移る"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "mode"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "移る"
+                },
+                "mode": {
+                  "const": "limit"
+                }
+              },
+              "required": [
+                "type",
+                "mode"
+              ]
+            },
+            "then": {
+              "required": [
+                "claim"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "enum": [
+                    "従う",
+                    "導ける",
+                    "同値",
+                    "根拠"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "claim"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "推定する"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "properties"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "比べる"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "axis",
+                "same",
+                "differ"
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "premise"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "premises",
+          "conclusion",
+          "steps",
+          "units",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/gid"
+          },
+          "premises": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/gid"
+                },
+                {
+                  "$ref": "#/$defs/claimId"
+                }
+              ]
+            }
+          },
+          "conclusion": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/gid"
+              },
+              {
+                "$ref": "#/$defs/claimId"
+              }
+            ]
+          },
+          "statement": {
+            "$ref": "#/$defs/text"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/text"
+            }
+          },
+          "conditions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/text"
+            }
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "説明を書き直して意味が変わったら1つ上げる。個人の記録はどの版で学んだかを指す"
+          }
+        }
+      }
+    },
+    "schema_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "書き出した教材が使った型の改訂番号（x-revision）"
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "$ref": "kn-experiment-v1.json"
+      }
+    },
+    "experiment_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "教材が使った実験室の拡張（kn-experiment-v1.json）の x-revision。experiments があるときに書く"
+    },
+    "walk_texts": {
+      "$ref": "kn-experiment-v1.json#/$defs/walkTexts"
+    },
+    "apply_texts": {
+      "$ref": "kn-experiment-v1.json#/$defs/applyTexts"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "statement",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/claimId"
+          },
+          "label": {
+            "type": "string",
+            "description": "製本の番号（④-25 など）"
+          },
+          "kind": {
+            "enum": [
+              "等しい",
+              "従う",
+              "極限",
+              "ならば",
+              "同値",
+              "手続きの保証",
+              "推定量の性質",
+              "重なり"
+            ]
+          },
+          "statement": {
+            "type": "object",
+            "required": [
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "tree": {
+                "$ref": "#/$defs/formulaNode"
+              }
+            }
+          },
+          "premises": {
+            "$ref": "#/$defs/propSide"
+          },
+          "conclusion": {
+            "$ref": "#/$defs/propSide"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/condition"
+            }
+          },
+          "grounds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "claim": {
+                  "$ref": "#/$defs/claimId"
+                },
+                "derivation": {
+                  "$ref": "#/$defs/gid"
+                },
+                "source": {
+                  "type": "object",
+                  "required": [
+                    "title"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "title": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "locator": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "description": "目安のとき：出典"
+                },
+                "external": {
+                  "type": "boolean"
+                }
+              },
+              "minProperties": 1
+            }
+          },
+          "converse": {
+            "$ref": "#/$defs/claimId"
+          },
+          "counterexamples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/claimId"
+            }
+          },
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "math": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "method",
+                    "date"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "method": {
+                      "enum": [
+                        "独立な確かめ",
+                        "数の確かめ",
+                        "出典との照合"
+                      ]
+                    },
+                    "by": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "external": {
+                "enum": [
+                  "なし",
+                  "照合済み",
+                  "2次資料",
+                  "未照合"
+                ]
+              },
+              "fingerprint": {
+                "type": "string"
+              }
+            }
+          },
+          "teaching": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "conclusion": {
+                "type": "boolean"
+              },
+              "proof": {
+                "enum": [
+                  "扱う",
+                  "範囲外"
+                ]
+              }
+            }
+          },
+          "units": {
+            "$ref": "#/$defs/gids"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "learning": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "op",
+          "from",
+          "to",
+          "reason",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+:LRN-[A-Za-z0-9-]+$"
+          },
+          "op": {
+            "enum": [
+              "add",
+              "remove"
+            ]
+          },
+          "from": {
+            "$ref": "#/$defs/gid"
+          },
+          "to": {
+            "$ref": "#/$defs/gid"
+          },
+          "reason": {
+            "$ref": "#/$defs/text"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    }
+  },
+  "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
+  "x-revision": 1
+}
