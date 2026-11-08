@@ -2,7 +2,7 @@
 
 確かめる対象：設計書 docs/schema-v2-design.md 3.2 の「機械で止める」のうち、型（kn-schema-v2.json）で書けないもの：
   端の姿（⑤ の 4 の表・姿が2つ以上のときの from_form/to_form）、定めるの from が基準の定義に出ること、導けるの主張の述語の役、
-  参照する主張と通す定理、一種の親の数、1つの組に重ねられる関係、定理の点で2つを結ぶこと（⑤ の 6）、定義の依存の輪、移した分類に残る legacy_type。
+  参照する主張と通す定理、基準の定義に出る概念の扱い（#86）、一種の親の数、1つの組に重ねられる関係、定理の点で2つを結ぶこと（⑤ の 6）、定義の依存の輪、移した分類に残る legacy_type。
 想定する故障：v2 の種類で書いた行が、⑤ と反対の端（確率変数 → 確率変数 の従う など）・構成要素でない定める・前提が2つの導けるを通してしまう。
   あるいは、正しく書いた行や移していない行（legacy_type）を止めて、今の教材の build を落とす。
 見つけ方：手で書いた小さな v2 のデータ（下の base。⑤ の例から取った組）が止まらないことを先に確かめ、1つずつ誤りを入れた写しが、
@@ -36,7 +36,8 @@ def base() -> dict:
     concepts = [
         C("prob", ["number"], basis={"text": "事象に割り当てる数", "terms": []}),
         C("comb", ["number"], basis={"text": "選び方の数", "terms": []}),
-        C("binom", ["distribution"], basis={"formula": "F-binom"}, formulas=[binom_f]),
+        C("binom", ["distribution"], formulas=[binom_f],
+          basis={"formula": "F-binom", "excludes": [{"concept": "t:prob", "kind": "使われる場", "text": "確率関数の値が確率であることは使われる場（テストの見本）"}]}),
         C("bern", ["distribution"], basis={"text": "1回の試行の分布", "terms": ["t:prob"]}),
         C("normal", ["distribution"], basis={"text": "正規分布", "terms": []}),
         C("stdnormal", ["distribution"], basis={"text": "標準正規分布", "terms": []}),
@@ -62,6 +63,7 @@ def base() -> dict:
         {"id": "t:REL-8", "type": "一種", "from": "t:estimator", "to": "t:statistic"},
         {"id": "t:REL-9", "type": "従う", "from": "t:xbar", "to": "t:stdnormal", "claim": "t:CLM-9", "theorem": "t:clt"},
         {"id": "t:REL-10", "type": "定める", "from": "t:expect", "to": "t:mu", "from_form": "operation"},
+        {"id": "t:REL-12", "type": "定める", "from": "t:prob", "to": "t:bern"},
         {"id": "t:REL-11", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:other"},
     ]
     claims = [
@@ -106,6 +108,10 @@ BREAKS = [
     ("定理で結べる組に theorem を添えない", lambda d: rel(d, "REL-9").pop("theorem"), "theorem として添える"),
     ("定めるの輪", lambda d: (con(d, "comb")["basis"].update(terms=["t:binom"]),
                          d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:binom", "to": "t:comb"})), "定めるの輪"),
+    # #86：基準の定義に出る概念は、定める・一種の親・除外のどれかで扱う（移した分類だけ）
+    ("基準の定義に出る概念を扱っていない", lambda d: con(d, "binom")["basis"].pop("excludes"), "どれでも扱っていない"),
+    ("除外した概念から定めるも書く", lambda d: d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:prob", "to": "t:binom"}),
+     "定めると basis.excludes の両方"),
     ("移した分類に legacy_type が残る", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"}),
      "legacy_type（前提）が残っている"),
 ]
@@ -131,6 +137,18 @@ class TestV2Checks(unittest.TestCase):
         d = base()
         self.assertTrue({r["id"] for r in d["relations"]} >= {"t:REL-2", "t:REL-3", "t:REL-6", "t:REL-7", "t:REL-11"})
         self.assertEqual(v2_errors(d), [])
+
+    def test_kind_parent_and_unmigrated_are_not_stopped(self):
+        # #86 の止めは、一種の親を候補から外し、移していない分類の概念には掛けない。
+        # 検出の確かめ：一種の親を外す行（kind_parent）を消すと1つ目が、分類の条件（ready）を消すと2つ目が落ちる
+        d = base()
+        con(d, "binom")["basis"].pop("excludes")
+        d["relations"].append({"id": "t:REL-x", "type": "一種", "from": "t:binom", "to": "t:prob"})
+        self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
+        d = base()
+        con(d, "binom")["basis"].pop("excludes")
+        d["course"]["v2_ready"] = []
+        self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
 
     def test_current_export_passes(self):
         # 教材の今の書き出し（v2 の種類の行が0・v2_ready が空）は止まらない（M4 の完了の条件「移していない分類の build の結果が今と同じ」）

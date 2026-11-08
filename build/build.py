@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figures import build_figures, validate_figures  # noqa: E402
 from legacy import legacy_report, legacy_status  # noqa: E402
 from progress import notion_page as progress_page  # noqa: E402
-from network import export_network, network_checks, schema_errors, to_v2, validate_network, write_network  # noqa: E402
+from network import export_network, network_checks, schema_errors, to_v2, v2_excludes, validate_network, write_network  # noqa: E402
 from v2_checks import v2_errors  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
@@ -54,6 +54,11 @@ def main(argv: list[str]) -> int:
     nofig = relations_without_figures()
     if nofig:
         print(f"⚠ 図のない関係（変換・対比・導出・一般化）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
+    from network import basis_gaps, load_network
+    gaps = basis_gaps(course, load_network()[0])
+    if gaps:
+        print(f"⚠ 定めるの候補（基準の定義の式に出る記号の概念）で、材料・種類の親・basis_excludes のどれもないもの {len(gaps)}件："
+              f"{', '.join(f'{a} → {b}' for a, b in gaps)}（#86。材料にするか、⑤ の理由で basis_excludes に書く。移した分類（v2_ready）では止める）")
     from network import skeleton_gaps
     sk = skeleton_gaps(course)
     if any(sk.values()):
@@ -78,7 +83,7 @@ def main(argv: list[str]) -> int:
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
     if lint:
         return fail("生成物の検査", lint)
-    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"))   # 型 v2 で書き出す（M4。#264）
+    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"), v2_excludes(course))   # 型 v2 で書き出す（M4。#264）
     net_errors = schema_errors(net) or v2_errors(net)   # 型で止められないものは、型が通ってから（設計書 3.2。#264）
     if net_errors:
         return fail("知識ネットワークのデータ（docs/knowledge-net/schema/kn-schema-v2.json）", net_errors)
