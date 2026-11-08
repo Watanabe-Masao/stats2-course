@@ -104,6 +104,9 @@ contracts:
 - formula: F-poisson-moments
   kinds: [恒等式]
   properties: [同値]
+- formula: F-bernoulli-pmf
+  kinds: [確率モデル]
+  properties: [非負, 正規化]
 - formula: F-geom-pmf
   kinds: [確率モデル]
   properties: [非負, 正規化, 単調, 条件しだい]

@@ -12,20 +12,12 @@ claims:
   conclusion:
     predicates:
     - TERM-binom
-  conditions:
-  - text: 0≦p≦1
-    kind: 仮定
-  - text: X₁, …, Xₙ が独立
-    kind: 仮定
-    terms:
-    - TERM-indep
   grounds:
   - source:
       title: 和が k になる並びは ₙCₖ 通りで、どの並びの確率も（独立なので）pᵏ(1−p)ⁿ⁻ᵏ
   verification:
     math:
-    - &id001
-      method: 独立な確かめ
+    - method: 独立な確かめ
       by: C
       date: '2026-11-08'
       version: dc2b65a
@@ -42,9 +34,15 @@ claims:
   conclusion:
     predicates:
     - TERM-poisson
+  grounds:
+  - source:
+      title: ₙCₖp_nᵏ(1−p_n)ⁿ⁻ᵏ＝(λᵏ/k!)·[n(n−1)…(n−k+1)/nᵏ]·(1−λ/n)ⁿ·(1−λ/n)^(−k)。[ ] と最後の因子は 1 に、(1−λ/n)ⁿ は e^(−λ) に近づく
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: なし
   version: 1
 - id: CLM-4
@@ -58,9 +56,15 @@ claims:
   conclusion:
     predicates:
     - TERM-binom
+  grounds:
+  - source:
+      title: 確率関数の各因子の極限
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: なし
   version: 1
 - id: CLM-5a
@@ -79,7 +83,10 @@ claims:
   - claim: CLM-6b
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: 未照合
   version: 1
 - id: CLM-6b
@@ -115,7 +122,10 @@ claims:
     proof: 範囲外
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: 未照合
   version: 1
 - id: CLM-7
@@ -170,7 +180,10 @@ claims:
       title: 独立なら E(XY)＝E(X)E(Y)
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: なし
   version: 1
 - id: CLM-25
@@ -205,9 +218,15 @@ claims:
   figures:
   - FIG-LAB-pois-rel-expo-tour-1
   - FIG-LAB-pois-rel-expo-tour-2
+  grounds:
+  - source:
+      title: 前半はポアソン過程の定義（独立増分と件数の分布）から。後半は P(T＞t)＝P([0, t] の件数が0)＝e^(−λt)
   verification:
     math:
-    - *id001
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
     external: なし
   version: 1
 - id: CLM-31

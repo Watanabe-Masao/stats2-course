@@ -1302,7 +1302,7 @@
       key: p
       kind: param
       range: 0より大きく1以下
-      domain: {min: 0, max: 1}
+      domain: {min: 0, max: 1, minOpen: true}
     - symbol: ₖ₋₁C_{r−1}
       meaning: 前の k−1 回から成功の r−1 回を選ぶ組合せの数
       key: comb
@@ -2045,6 +2045,46 @@
   group: GRP-dist-count
   forms: [distribution]
   short: 1回の試行で、成功（1）を確率 p、失敗（0）を確率 1−p でとる分布
+  definition: 値 1 を確率 p、値 0 を確率 1−p でとる確率変数の分布。成功を1、失敗を0と数えた1回の試行の結果の分布。
+  version: 1
+  principle: とる値が 0 と 1 の2つだけなので、確率 p 1つで分布が決まる。1回の成功の回数（0回か1回）とみると、n 回分を足したものが二項分布になる。
+  formulas:
+  - id: F-bernoulli-pmf
+    symbols:
+    - symbol: P( )
+      meaning: 確率
+      key: P
+      concept: TERM-dist
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: k
+      meaning: X がとる値（成功なら1、失敗なら0）
+      range: 0 か 1
+      key: k
+      kind: value
+      domain: {min: 0, max: 1, integer: true}
+    - symbol: p
+      meaning: 1回の成功確率
+      range: 0以上1以下
+      key: p
+      kind: param
+      domain: {min: 0, max: 1}
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "eq", "args": [{"sym": "X"}, {"sym": "k"}]}], "name": "P"}, {"op": "mul", "args": [{"op": "pow", "args": [{"sym": "p"}, {"sym": "k"}]}, {"op": "pow", "args": [{"op": "sub", "args": [{"num": 1}, {"sym": "p"}]}, {"op": "sub", "args": [{"num": 1}, {"sym": "k"}]}]}]}]}
+  basis_formula: F-bernoulli-pmf
+  conditions:
+    math:
+    - text: 0≦p≦1
+      kind: 要件
+      outside: 母数が範囲の外なら、この定義のベルヌーイ分布として扱えない
+  example: 表が出る確率 0.5 の硬貨を1回投げ、表を1、裏を0とすると、X はベルヌーイ分布に従う。P(X＝1)＝0.5、P(X＝0)＝0.5。
+  counterexample: さいころを1回投げた目そのもの（1〜6）は、値が2つでないのでベルヌーイ分布ではない。「6が出たら1、それ以外は0」と数え直せば、p＝1/6 のベルヌーイ分布になる。
+  sources:
+  - source: 公式2級範囲表
+  checks:
+  - 0.5**1*(1-0.5)**0 == 0.5 and 0.5**0*(1-0.5)**1 == 0.5
+  - Fraction(1,6)**1*(1-Fraction(1,6))**0 == Fraction(1,6)
 - id: TERM-sample-mean
   name: 標本平均
   en: sample mean

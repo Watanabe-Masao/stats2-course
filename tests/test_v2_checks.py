@@ -166,11 +166,11 @@ class TestV2Checks(unittest.TestCase):
         self.assertEqual(v2_errors(d), [])
 
     def test_current_export_passes(self):
-        # 教材の今の書き出し（v2 の種類の行が0・v2_ready が空）は止まらない（M4 の完了の条件「移していない分類の build の結果が今と同じ」）
+        # 教材の今の書き出し（移した分類を含む。#289 から確率分布）は止まらない
         import network
         from model import load_course
         c = load_course()
-        d = network.to_v2(network.export_network(c, {"site_base_url": ""}), c.shared.get("v2_ready"))
+        d = network.export_v2(c, {"site_base_url": ""})
         self.assertEqual(v2_errors(d), [])
 
 

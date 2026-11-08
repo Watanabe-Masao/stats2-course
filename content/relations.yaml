@@ -174,6 +174,7 @@ relations:
     version: 2
     labs:
       - {id: LAB-z, preset: s4-normal, purpose: 標準化すると、どの正規分布も同じ表で読める}
+    figures: [FIG-U16-concept, FIG-U16-stdnormal]
     type: 移る
     gist: どの正規分布も、平均を引いて標準偏差で割れば同じ形（標準正規分布）になる。だから表は1つでよい。
     reversible: true
@@ -2079,6 +2080,7 @@ relations:
     from: TERM-bernoulli
     to: TERM-binom
     version: 1
+    figures: [FIG-U14-concept]
     type: 移る
     mode: exact
     operation: 独立に Bern(p) に従う n 個を足す
@@ -2092,6 +2094,7 @@ relations:
     from: TERM-std-normal
     to: TERM-normal
     version: 1
+    figures: [FIG-U16-stdnormal]
     type: 特別な場合
     fix: param_value
     fix_text: 正規分布 N(μ, σ²) の μ を 0、σ を 1 にすると、標準正規分布 N(0, 1) と同じものになる

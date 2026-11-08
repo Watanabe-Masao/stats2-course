@@ -571,7 +571,7 @@ def relation_map_errors(c: Course, rels: list[dict]) -> list[str]:
         rid = r.get("id", "?")
         if r.get("type") == "前提" and r.get("premise") == "mathematical" and cat_of.get(r.get("to")) in ready:
             err.append(f"{rid}: 分類「{cat_of[r['to']]}」は関係図に移したので、前提（mathematical）を材料か学ぶ順（前提 learning）に分ける")
-        if r.get("type") == "対比" and not r.get("axis") and (cat_of.get(r.get("from")) in ready or cat_of.get(r.get("to")) in ready):
+        if r.get("type") in ("対比", "比べる") and not r.get("axis") and (cat_of.get(r.get("from")) in ready or cat_of.get(r.get("to")) in ready):
             err.append(f"{rid}: 関係図に移した分類の対比には axis（比べる軸）を書く")
     err += group_relation_errors(c, rels, gcat)
     return err
@@ -1401,11 +1401,16 @@ def v2_ids(r: dict, g) -> dict:
     """v2 の関係の項目のうち、id を指すもの（主張・性質・通す定理・通す操作が概念のとき）に教材名を付ける"""
     out = dict(r)
     for k in ("claim", "theorem", "operation"):
-        if out.get(k):
+        if out.get(k) and (k != "operation" or LOCAL_ID.match(out[k])):   # 通す操作は文のこともある（概念の id のときだけ教材名）
             out[k] = g(out[k])
     if out.get("properties"):
         out["properties"] = [g(x) for x in out["properties"]]
     return out
+
+
+def export_v2(c: Course, target: dict) -> dict:
+    """公開する形（型 v2）。build と、書き出しを確かめるテストが使う"""
+    return to_v2(export_network(c, target), c.shared.get("v2_ready"), v2_extras(c, target))
 
 
 def to_v2(data: dict, ready: list[str] | None = None, extras: dict | None = None) -> dict:
@@ -1481,4 +1486,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "inclusion_ancestors", "v2_extras", "load_claims", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "export_v2", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "inclusion_ancestors", "v2_extras", "load_claims", "schema_errors", "write_network", "run_check"]
