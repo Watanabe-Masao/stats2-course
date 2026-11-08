@@ -213,7 +213,8 @@ def v2_errors(data: dict) -> list[str]:
     # 基準の定義に出る概念は、定める・一種の親・除外（basis.excludes）のどれかで扱う（#86。⑤ の構成：名前が出るのは必要条件なので、外すなら理由を書く）。
     # 移した分類の概念だけ。除外した概念から定めるを書いたら、どちらが判断か分からないので止める
     defines = {(r["from"], r["to"]) for r in rels if r.get("type") == "定める" or r.get("legacy_type") == "材料"}
-    kind_parent = {(r["to"], r["from"]) for r in rels if r.get("type") == "一種" or r.get("legacy_type") == "種類"}
+    from network import inclusion_ancestors   # 包含の連なり（一種・特別な場合）の親は全部外す（⑤ の包含。#290）
+    kind_parent = {(a, k) for k in concepts for a in inclusion_ancestors(k, rels)}
     for c in concepts.values():
         used = basis_concepts(c)
         if not used:

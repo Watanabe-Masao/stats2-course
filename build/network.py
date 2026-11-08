@@ -668,10 +668,29 @@ def basis_candidates(t: dict, tid: str) -> set[str]:
     return {s["concept"] for s in f.get("symbols") or [] if s.get("concept") and s.get("key") in used} - {tid}
 
 
+INCLUSION = ("種類", "一般化", "一種", "特別な場合")   # 包含（v1 の一般化は ⑤ の特別な場合。from が to に含まれる）
+
+
+def inclusion_ancestors(k: str, rels: list[dict]) -> set[str]:
+    """包含の連なり（一種・特別な場合。混ざってよい）をたどった親の全部（⑤ の包含：親への一種を重ねて書かない。#290）"""
+    up: dict[str, list[str]] = {}
+    for r in rels:
+        if r.get("type") in INCLUSION or r.get("legacy_type") in INCLUSION:
+            up.setdefault(r["from"], []).append(r["to"])
+    seen: set[str] = set()
+    stack = list(up.get(k, []))
+    while stack:
+        x = stack.pop()
+        if x not in seen:
+            seen.add(x)
+            stack += up.get(x, [])
+    return seen
+
+
 def basis_gaps(c: Course, rels: list[dict]) -> list[tuple[str, str]]:
     """定めるの候補のうち、材料（⑤ の定める）も、種類の親（⑤ の一種）も、除外（basis_excludes）もないもの：(候補の概念, 定義される概念)"""
     linked = {(r["from"], r["to"]) for r in rels if r.get("type") in DEFINES}
-    linked |= {(r["to"], r["from"]) for r in rels if r.get("type") in KIND_OF}   # 種類の親（to）は子（from）の候補から外す
+    linked |= {(a, k) for k in {x for r in rels for x in (r["from"], r["to"])} for a in inclusion_ancestors(k, rels)}   # 包含の親（⑤ の包含。#290）
     out = []
     for tid, t in c.terms.items():
         ex = {x.get("concept") for x in t.get("basis_excludes") or []}
@@ -1430,4 +1449,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "v2_extras", "load_claims", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "inclusion_ancestors", "v2_extras", "load_claims", "schema_errors", "write_network", "run_check"]

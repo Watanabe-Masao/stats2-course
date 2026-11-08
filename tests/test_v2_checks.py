@@ -145,6 +145,14 @@ class TestV2Checks(unittest.TestCase):
         con(d, "binom")["basis"].pop("excludes")
         d["relations"].append({"id": "t:REL-x", "type": "一種", "from": "t:binom", "to": "t:prob"})
         self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
+        # 混ざった包含の連なり（⑤ の包含。#290）：二項分布 →（特別な場合）normal（見本の都合の名前）→（一種）確率 でも親として外す。
+        # 検出の確かめ：連なりをたどらず直接の親だけを見ると落ちる
+        d = base()
+        con(d, "binom")["basis"].pop("excludes")
+        con(d, "normal")["forms"] = ["distribution"]
+        d["relations"] += [{"id": "t:REL-y", "type": "特別な場合", "from": "t:binom", "to": "t:normal", "fix": "count", "fix_text": "見本"},
+                           {"id": "t:REL-z", "type": "一種", "from": "t:normal", "to": "t:prob"}]
+        self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
         d = base()
         con(d, "binom")["basis"].pop("excludes")
         d["course"]["v2_ready"] = []
