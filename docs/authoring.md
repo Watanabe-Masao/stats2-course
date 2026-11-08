@@ -163,6 +163,36 @@ relation_map_ready: [確率分布]   # 書き終えた分類だけ
 - 関係の種類を変えたら version を1つ上げ、description を新しい意味に直す。ID は変えない。
 - 定義の依存（材料）と前提知識は直接の1段だけ。定義の依存の輪と、たどれば着く前提知識の重ね（A → B → C があるのに A → C を前提知識で書く）は build が止める（#249 ③）。
 
+### 製本の形（型 v2）で書く（`type` を ⑤ の種類に・`forms`・`claims`。#287）
+
+製本への移行（M5）で分類ごとに移すときの書き方。意味の判断は製本（関係は ⑤、概念は ①③、主張は ④）、項目の意味は設計書 docs/schema-v2-design.md。
+
+```yaml
+# relations.yaml：移した行は、その場で type を ⑤ の種類にし、⑤ の項目を足す（id は変えない。意味が変わるので version を1つ上げる）
+- {id: REL-bernoulli-binom, from: TERM-bernoulli, to: TERM-binom, type: 特別な場合, fix: param_value, fix_text: 二項分布の n を 1 にする, …}
+- {id: REL-…, type: 導ける, claim: CLM-13, …}            # 主張は claims.yaml の id
+# terms.yaml
+- id: TERM-binom
+  forms: [distribution]          # 姿（① の 3）。2つ以上なら関係の側に from_form・to_form
+  claims: [CLM-6]                # この概念が主語の主張
+- id: TERM-indep
+  basis: {text: P(A∩B)＝P(A)P(B), terms: [TERM-prob]}   # 基準の定義が文のとき（式なら basis_formula）
+# claims.yaml
+claims:
+  - id: CLM-6                    # ④ の番号（④-28b → CLM-28b、13 の反例 → CLM-13-counter）
+    label: ④-6
+    kind: 等しい
+    statement: {text: X ～ B(n, p) なら E(X)＝np}
+    premises: {subjects: [TERM-binom]}
+    conclusion: {subjects: [TERM-expect]}
+    conditions: [{text: …, kind: 仮定}]   # 主張の仮定（掛かる先は claim）
+    version: 1
+```
+
+- v1 の種類（前提・材料など）と ⑤ の種類は名前が重ならないので、build は種類の名前で v1 の決まりと ⑤ の決まりを分ける。⑤ の項目（fix・claim・properties など）は ⑤ の種類の行にだけ書く（build が止める）。
+- 書き出しでは、⑤ の種類の行は `type`、v1 の行は `legacy_type` になる。分類を移し終えたら shared.yaml の `v2_ready` に足す。その分類に v1 の行が残る・姿のない端・基準の定義に出る概念の扱いの漏れなどを build が止める（設計書 3.2）。
+- 主張を claims.yaml に移したら、製本 ④ の §6 からその行を消し、「原本へ移した」と書く（記録の置き場は1つ。README の運用の決まり 5）。
+
 ### 成立条件の区分（`conditions` の行。#249 ①）
 
 成立条件の1行は、文字のままか、区分を書いた形のどちらか。移した分類（`relation_map_ready`）では、概念の `conditions.math` の全部の行と、行き先がその分類の関係の `conditions` の全部の行に区分を書く（build が止める）。`conditions.data` で区分のない行は「データで確かめる手掛かり」になる。
