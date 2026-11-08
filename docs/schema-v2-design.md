@@ -125,7 +125,7 @@
 | `id` | CLM-番号（④-番号と同じ番号。D9） | README の運用の決まり 5・④ の 7 |
 | `kind` | 主張の種類（等しい・従う・極限・ならば・同値・手続きの保証・推定量の性質・重なり） | ④ の 2 |
 | `statement` | 1文（主語・条件・結論）と、任意で式の木。対象と変数の範囲 | ④ の 1 |
-| `premises`・`conclusion` | 前提・結論の命題を作る概念（主語と、当てはめる性質・行き先の分布などの述語の概念）。条件の文に出るだけの概念は conditions の terms に書く。例：④-13「X と Y が独立なら Cov(X, Y)＝0」は premises に確率変数・独立、conclusion に共分散・無相関。中心極限定理は premises に標本平均、conclusion に標本平均・標準正規分布（分散が有限・独立同分布は conditions） | ④ の 3、⑤ の 6、⑥ の 3 |
+| `premises`・`conclusion` | 前提・結論の命題を作る概念（主語と、当てはめる性質・行き先の分布などの述語の概念）。条件の文に出るだけの概念は conditions の terms に書く。例：④-13「X と Y が独立なら Cov(X, Y)＝0」は premises に確率変数・独立、conclusion に共分散・無相関。中心極限定理は premises に標本平均、conclusion に標本平均・標準正規分布（行き先の語が教材にあるとき。分散が有限・独立同分布は conditions） | ④ の 3、⑤ の 6、⑥ の 3 |
 | `conditions` | 条件の行（1）。target は claim（区分は仮定。主張の中の対象の要件は概念の側） | ③ の 2 |
 | `grounds` | 根拠：主張の id・文献（`external: true`）・導き方の id | ④ の 1・5 |
 | `converse`・`counterexamples` | 逆の主張の id、反例の主張の id。逆が成り立つ条件は、逆の主張の conditions に書く（1か所） | ③ の 4、④ の 4 |
