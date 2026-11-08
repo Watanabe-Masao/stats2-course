@@ -1298,7 +1298,7 @@ class TestNetwork(unittest.TestCase):
         q["mode"] = "exact"
         err = self._validate(rels=bad)
         self.assertTrue(any("premise を必ず書く" in e for e in err))
-        self.assertTrue(any("mode は変換だけ" in e for e in err))
+        self.assertTrue(any("mode は変換・移るだけ" in e for e in err))
 
     def test_generalization_one_direction(self):
         rels = copy.deepcopy(self.rels) + [
