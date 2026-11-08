@@ -601,8 +601,18 @@ def group_relation_errors(c: Course, rels: list[dict], gcat: dict[str, str]) -> 
         if not gr.get("label"):
             err.append(f"{at}：label（矢印の言葉）がない")
         rs = gr.get("relations") or []
-        if not rs:
-            err.append(f"{at}：relations（裏付けの関係）を1本以上書く")
+        cs = gr.get("claims") or []
+        if not rs and not cs:
+            err.append(f"{at}：relations（裏付けの関係）か claims（線にしない主張。型 v2 の改訂3）を1つ以上書く")
+        claims = {cl.get("id"): cl for cl in load_claims()}
+        for cid in cs:   # 主張の主語・述語の概念が、from と to のまとまりに1つずつある（概念の段と食い違わない）
+            cl = claims.get(cid)
+            if not cl:
+                err.append(f"{at}：裏付けの主張 {cid} が claims.yaml にない")
+                continue
+            groups = {grp.get(x) for side in ("premises", "conclusion") for v in (cl.get(side) or {}).values() for x in v}
+            if not {f, t} <= groups:
+                err.append(f"{at}：裏付けの主張 {cid} の主語・述語の概念が {f} と {t} のまとまりにない")
         for rid in rs:
             r = by_id.get(rid)
             if not r:
@@ -1117,7 +1127,12 @@ def validate_network(c: Course) -> list[str]:
     for r in rels:
         check_labs(r.get("id", "?"), r.get("labs"))
         check_figs(r.get("id", "?"), r.get("figures"))
-    # 問題 → 確かめる概念・関係（concepts:）。説明のある概念か、ある関係だけを指せる。
+    claim_ids = set()
+    for cl in load_claims():   # 主張のラボ・図（型 v2 の改訂3。線にしない主張の解説の置き場。#289）
+        claim_ids.add(cl.get("id"))
+        check_labs(cl.get("id", "?"), cl.get("labs"))
+        check_figs(cl.get("id", "?"), cl.get("figures"))
+    # 問題 → 確かめる概念・関係・主張（concepts:）。説明のある概念か、ある関係・主張だけを指せる。
     # unit.yaml に concepts_linked: true がある単元は、retired 以外の全問に concepts: を書く。
     for uid, u in c.units.items():
         for qid, q in u["problems"].items():
@@ -1128,10 +1143,10 @@ def validate_network(c: Course) -> list[str]:
             for ref in refs:
                 if NS.match(str(ref)):
                     continue
-                if ref in rel_ids:
+                if ref in rel_ids or ref in claim_ids:
                     continue
                 if ref not in c.terms:
-                    err.append(f"{qid}: concepts の {ref} が用語・関係にない")
+                    err.append(f"{qid}: concepts の {ref} が用語・関係・主張にない")
                 elif not filled(c.terms[ref]):
                     err.append(f"{qid}: concepts の {ref} はまだ説明のない用語（概念にしてから指す）")
             if u.get("concepts_linked") and not q.get("retired") and not refs:
@@ -1161,6 +1176,34 @@ def network_checks(c: Course) -> list[tuple[str, str]]:
         [(r["id"], e) for r in rels for e in r.get("checks", [])]   # 関係を開いたときの段・図の一言の数（#188 04）
 
 
+def lab_refs(c: Course, base: str, items) -> list[dict]:
+    """概念・関係・主張のラボへの参照（公開の形）"""
+    from labs import lab_url
+    out = []
+    for lab in items or []:
+        if not base:
+            continue   # 公開先がない配布先では、ラボへの参照を出さない
+        aid = lab["id"] + (f"@{lab['preset']}" if lab.get("preset") else "")
+        pre = (c.labs[lab["id"]].get("presets") or {}).get(lab.get("preset") or "", {})
+        e = {"id": lab["id"], "url": lab_url(base, c, aid), "title": c.labs[lab["id"]].get("name", lab["id"]),
+             "kind": "tour" if pre.get("tour") else "check"}   # ラボで解説／ラボで確かめる（版から判定。#90）
+        for k in ("preset", "purpose"):
+            if lab.get(k):
+                e[k] = lab[k]
+        if play_of(lab["id"], lab.get("preset"), pre):
+            e["play"] = play_of(lab["id"], lab.get("preset"), pre)
+        out.append(e)
+    return out
+
+
+def fig_refs(c: Course, base: str, ids) -> list[dict]:
+    from labs import fig_url
+    if not base:
+        return []   # 公開先がない配布先では、図への参照を出さない
+    return [{"id": f, "url": fig_url(base, f), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
+            for f in ids or []]
+
+
 def export_network(c: Course, target: dict) -> dict:
     rels, ders = load_network()
     cid = course_id(c)
@@ -1171,29 +1214,10 @@ def export_network(c: Course, target: dict) -> dict:
     base = target.get("site_base_url") or ""
 
     def labs(items) -> list[dict]:
-        from labs import lab_url
-        out = []
-        for lab in items or []:
-            if not base:
-                continue   # 公開先がない配布先では、ラボへの参照を出さない
-            aid = lab["id"] + (f"@{lab['preset']}" if lab.get("preset") else "")
-            pre = (c.labs[lab["id"]].get("presets") or {}).get(lab.get("preset") or "", {})
-            e = {"id": lab["id"], "url": lab_url(base, c, aid), "title": c.labs[lab["id"]].get("name", lab["id"]),
-                 "kind": "tour" if pre.get("tour") else "check"}   # ラボで解説／ラボで確かめる（版から判定。#90）
-            for k in ("preset", "purpose"):
-                if lab.get(k):
-                    e[k] = lab[k]
-            if play_of(lab["id"], lab.get("preset"), pre):
-                e["play"] = play_of(lab["id"], lab.get("preset"), pre)
-            out.append(e)
-        return out
+        return lab_refs(c, base, items)
 
     def figs(ids) -> list[dict]:
-        from labs import fig_url
-        if not base:
-            return []   # 公開先がない配布先では、図への参照を出さない
-        return [{"id": f, "url": fig_url(base, f), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
-                for f in ids or []]
+        return fig_refs(c, base, ids)
 
     units_of: dict[str, list[str]] = {}
     for uid, u in c.units.items():
@@ -1300,7 +1324,8 @@ def export_network(c: Course, target: dict) -> dict:
                                       for gr in c.shared["concept_groups"]]} if c.shared.get("concept_groups") else {}),
                        **({"relation_map_ready": list(c.shared["relation_map_ready"])} if c.shared.get("relation_map_ready") else {}),
                        **({"group_relations": [{"from": g(x["from"]), "to": g(x["to"]), "label": x["label"],
-                                                "relations": [g(rid) for rid in x["relations"]],
+                                                **({"relations": [g(rid) for rid in x["relations"]]} if x.get("relations") else {}),
+                                                **({"claims": [g(cid) for cid in x["claims"]]} if x.get("claims") else {}),
                                                 **({"note": x["note"]} if x.get("note") else {})}
                                                for x in c.shared["group_relations"]]} if c.shared.get("group_relations") else {})},
             "concepts": concepts, "relations": relations, "derivations": derivations, **({"experiments": experiments, "walk_texts": load_walk_texts(), "apply_texts": load_apply_texts()} if experiments else {})}
@@ -1324,10 +1349,15 @@ def _ns(cid: str):
     return lambda x: f"{cid}:{x}" if isinstance(x, str) and LOCAL_ID.match(x) and not NS.match(x) else x
 
 
-def export_claim(cl: dict, g) -> dict:
-    """主張（claims.yaml の1件）を型 v2 の claims の形に。id は教材名つき"""
+def export_claim(cl: dict, g, refs=None) -> dict:
+    """主張（claims.yaml の1件）を型 v2 の claims の形に。id は教材名つき。refs はラボ・図の参照を公開の形にする (labs, figs)"""
     side = lambda x: {k: [g(i) for i in v] for k, v in (x or {}).items()}  # noqa: E731
-    e = {k: v for k, v in cl.items() if k not in ("premises", "conclusion", "conditions", "grounds", "converse", "counterexamples", "units")}
+    e = {k: v for k, v in cl.items() if k not in ("premises", "conclusion", "conditions", "grounds", "converse", "counterexamples", "units", "labs", "figures")}
+    if refs:
+        if refs[0](cl.get("labs")):
+            e["labs"] = refs[0](cl.get("labs"))
+        if refs[1](cl.get("figures")):
+            e["figures"] = refs[1](cl.get("figures"))
     e["id"] = g(cl["id"])
     for k in ("premises", "conclusion"):
         if cl.get(k):
@@ -1345,7 +1375,7 @@ def export_claim(cl: dict, g) -> dict:
     return e
 
 
-def v2_extras(c: Course) -> dict:
+def v2_extras(c: Course, target: dict | None = None) -> dict:
     """原本の v2 だけの項目（v1 の型には置き場がない）を、書き出しの id で。to_v2 が置く。
     概念：姿（forms）・基準の定義の文（basis の text と terms）・除外（basis_excludes。#86）・主張（claims）。教材：主張（claims.yaml）"""
     g = _ns(course_id(c))
@@ -1362,7 +1392,9 @@ def v2_extras(c: Course) -> dict:
             e["claims"] = [g(x) for x in t["claims"]]
         if e:
             concepts[g(tid)] = e
-    return {"concepts": concepts, "claims": [export_claim(cl, g) for cl in load_claims()]}
+    base = (target or {}).get("site_base_url") or ""
+    refs = (lambda x: lab_refs(c, base, x), lambda x: fig_refs(c, base, x))
+    return {"concepts": concepts, "claims": [export_claim(cl, g, refs) for cl in load_claims()]}
 
 
 def v2_ids(r: dict, g) -> dict:

@@ -83,7 +83,7 @@ def main(argv: list[str]) -> int:
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
     if lint:
         return fail("生成物の検査", lint)
-    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"), v2_extras(course))   # 型 v2 で書き出す（M4。#264）
+    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"), v2_extras(course, r.t))   # 型 v2 で書き出す（M4。#264）
     net_errors = schema_errors(net) or v2_errors(net)   # 型で止められないものは、型が通ってから（設計書 3.2。#264）
     if net_errors:
         return fail("知識ネットワークのデータ（docs/knowledge-net/schema/kn-schema-v2.json）", net_errors)

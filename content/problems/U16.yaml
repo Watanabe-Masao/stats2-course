@@ -139,7 +139,7 @@
 
 - id: Q-U16-012
   stage: S2
-  concepts: [REL-poisson-expo, TERM-poisson, TERM-expo]
+  concepts: [CLM-25, TERM-poisson, TERM-expo]
   format: written
   powers: [P1, P3]
   prompt: 問い合わせは1時間に平均3件（ポアソン分布、{{unit:U15}}）。次の問い合わせまで20分以上待つ確率を、① ポアソン分布の「20分間に0件」と ② 指数分布の待ち時間 の2通りで求めて比べよ。

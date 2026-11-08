@@ -41,10 +41,10 @@ def _gists() -> dict:
     """(ラボ, 版) → 関係の gist。relations.yaml は1回だけ読む（版ごとに読み直すと build が数分遅くなっていた。#129）"""
     global _GISTS
     if _GISTS is None:
-        from network import load_network
+        from network import load_claims, load_network
         rels, _ = load_network()
         _GISTS = {}
-        for r in rels:
+        for r in rels + load_claims():   # 主張のラボの解説も、主張の gist で「つまり」の段を足す（#289）
             for lab in r.get("labs") or []:
                 if r.get("gist"):
                     _GISTS.setdefault((lab.get("id"), lab.get("preset")), r["gist"])
