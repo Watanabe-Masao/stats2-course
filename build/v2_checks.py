@@ -88,7 +88,7 @@ def basis_concepts(c: dict) -> set[str] | None:
                 for v in n:
                     walk(v)
         walk(f.get("tree"))
-        return {s["concept"] for s in f.get("symbols") or [] if s.get("concept") and s.get("key") in used} - {c["id"]}
+        return {s["concept"] for s in f.get("symbols") or [] if s.get("concept") and s.get("key") in used} - {c["id"]}   # build/network.py の basis_candidates と同じ読み方
     if basis.get("terms"):
         return set(basis["terms"]) - {c["id"]}
     return None
@@ -206,6 +206,22 @@ def v2_errors(data: dict) -> list[str]:
                 cl = claims.get(cid) or {}
                 if {r["from"], r["to"]} <= (_ends(cl.get("premises")) | _ends(cl.get("conclusion"))):
                     err.append(f"{r['id']}: 定理 {t['id']} の主張 {cid} が同じ2つを結んでいる。関係に theorem として添える（⑤ の 6）")
+
+    # 基準の定義に出る概念は、定める・一種の親・除外（basis.excludes）のどれかで扱う（#86。⑤ の構成：名前が出るのは必要条件なので、外すなら理由を書く）。
+    # 移した分類の概念だけ。除外した概念から定めるを書いたら、どちらが判断か分からないので止める
+    defines = {(r["from"], r["to"]) for r in rels if r.get("type") == "定める" or r.get("legacy_type") == "材料"}
+    kind_parent = {(r["to"], r["from"]) for r in rels if r.get("type") == "一種" or r.get("legacy_type") == "種類"}
+    for c in concepts.values():
+        used = basis_concepts(c)
+        if not used:
+            continue
+        ex = {x["concept"] for x in (c.get("basis") or {}).get("excludes") or []}
+        for k in sorted(ex & {a for a, b in defines if b == c["id"]}):
+            err.append(f"{c['id']}: {k} を定めると basis.excludes の両方に書いている（#86）")
+        if c.get("category") in ready:
+            for k in sorted(used - ex):
+                if (k, c["id"]) not in defines and (k, c["id"]) not in kind_parent:
+                    err.append(f"{c['id']}: 基準の定義に出る {k} を、定める・一種の親・basis.excludes のどれでも扱っていない（#86。⑤ の構成）")
 
     # 定義の依存は輪にならない（⑤ の 構成）
     for cyc in _cycles([(r["from"], r["to"]) for r in v2 if r["type"] == "定める"]):

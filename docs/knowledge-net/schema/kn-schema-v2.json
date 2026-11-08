@@ -1461,6 +1461,41 @@
               },
               "terms": {
                 "$ref": "#/$defs/gids"
+              },
+              "excludes": {
+                "type": "array",
+                "minItems": 1,
+                "description": "基準の定義に名前（式の記号の概念・terms）が出るが、直接の構成要素にしないもの（製本 ⑤ の構成：名前が定義に出るのは必要条件で、十分条件ではない）。定めるの候補から外す理由を、⑤ の「構成要素にしないもの」のどれかと1文で書く（stats2-course #86）",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "concept",
+                    "kind",
+                    "text"
+                  ],
+                  "properties": {
+                    "concept": {
+                      "$ref": "#/$defs/gid"
+                    },
+                    "kind": {
+                      "enum": [
+                        "言い換え",
+                        "使われる場",
+                        "計算の近道の式",
+                        "求める結果",
+                        "成り立つための条件",
+                        "学ぶのに要るだけの知識",
+                        "操作の対象",
+                        "1つの概念の中の式・性質"
+                      ],
+                      "description": "⑤ の構成の「構成要素にしないもの」。一種の親は、一種の関係があれば build が外すので書かない（⑤ の包含）。どれにも合わないときは書かず、⑤ の未決にする（⑤ の 8 の規則3）"
+                    },
+                    "text": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
               }
             },
             "oneOf": [
@@ -2583,5 +2618,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 1
+  "x-revision": 2
 }

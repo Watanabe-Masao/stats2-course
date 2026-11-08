@@ -634,6 +634,81 @@ def condition_errors(c: Course, rels: list[dict]) -> list[str]:
     return err
 
 
+EXCLUDE_KINDS = ("言い換え", "使われる場", "計算の近道の式", "求める結果", "成り立つための条件",
+                 "学ぶのに要るだけの知識", "操作の対象", "1つの概念の中の式・性質")   # ⑤ の構成の「構成要素にしないもの」（型 v2 の改訂2）
+
+
+def tree_names(node) -> set[str]:
+    """式の木に出る記号の key と関数の名前"""
+    out: set[str] = set()
+    if isinstance(node, dict):
+        if "sym" in node:
+            out.add(node["sym"])
+        if node.get("op") == "fn" and node.get("name"):
+            out.add(node["name"])
+        for v in node.values():
+            out |= tree_names(v)
+    elif isinstance(node, list):
+        for v in node:
+            out |= tree_names(v)
+    return out
+
+
+def basis_candidates(t: dict, tid: str) -> set[str]:
+    """基準の定義の式（basis_formula）の木に出る記号が指す概念（自分を除く）。定めるの候補（#86。⑤ では必要条件で、十分条件ではない）"""
+    f = next((x for x in t.get("formulas") or [] if x.get("id") == t.get("basis_formula")), None)
+    if f is None:
+        return set()
+    used = tree_names(f.get("tree"))
+    return {s["concept"] for s in f.get("symbols") or [] if s.get("concept") and s.get("key") in used} - {tid}
+
+
+def basis_gaps(c: Course, rels: list[dict]) -> list[tuple[str, str]]:
+    """定めるの候補のうち、材料（⑤ の定める）も、種類の親（⑤ の一種）も、除外（basis_excludes）もないもの：(候補の概念, 定義される概念)"""
+    linked = {(r["from"], r["to"]) for r in rels if r.get("type") == "材料"}
+    linked |= {(r["to"], r["from"]) for r in rels if r.get("type") == "種類"}   # 種類の親（to）は子（from）の候補から外す
+    out = []
+    for tid, t in c.terms.items():
+        ex = {x.get("concept") for x in t.get("basis_excludes") or []}
+        out += [(k, tid) for k in sorted(basis_candidates(t, tid)) if (k, tid) not in linked and k not in ex]
+    return out
+
+
+def basis_exclude_errors(c: Course, rels: list[dict]) -> list[str]:
+    """基準の定義から外す概念（basis_excludes。型 v2 の basis.excludes。#86）の書き方。
+    外すのは候補（基準の定義の式の木に出る記号の概念）だけで、材料と両方には書かない（どちらが判断か分からなくなる）"""
+    err: list[str] = []
+    mat = {(r["from"], r["to"]) for r in rels if r.get("type") == "材料"}
+    for tid, t in c.terms.items():
+        xs = t.get("basis_excludes")
+        if xs is None:
+            continue
+        if not t.get("basis_formula"):
+            err.append(f"{tid}: basis_excludes は基準の定義の式（basis_formula）がある概念にだけ書く")
+            continue
+        cand = basis_candidates(t, tid)
+        seen = set()
+        for x in xs if isinstance(xs, list) else [xs]:
+            if not isinstance(x, dict):
+                err.append(f"{tid}: basis_excludes の行は concept・kind・text を持つ表で書く")
+                continue
+            k = x.get("concept")
+            if set(x) - {"concept", "kind", "text"}:
+                err.append(f"{tid}: basis_excludes の行は concept・kind・text だけ")
+            if x.get("kind") not in EXCLUDE_KINDS:
+                err.append(f"{tid}: basis_excludes の kind は ⑤ の「構成要素にしないもの」（{'・'.join(EXCLUDE_KINDS)}）のどれか。合わないときは ⑤ の未決にする")
+            if not str(x.get("text") or "").strip():
+                err.append(f"{tid}: basis_excludes の行に、外す理由の1文（text）を書く")
+            if k in seen:
+                err.append(f"{tid}: basis_excludes の {k} が重複")
+            seen.add(k)
+            if k not in cand:
+                err.append(f"{tid}: basis_excludes の {k} は、基準の定義の式の木に出る記号の概念でない（外すものがない）")
+            if (k, tid) in mat:
+                err.append(f"{tid}: {k} を材料と basis_excludes の両方に書いている。どちらか1つにする")
+    return err
+
+
 def dependency_errors(rels: list[dict]) -> list[str]:
     """定義の依存と前提知識は直接の1段だけ（#249 ③）。
     - 定義の依存の輪（材料の輪）は止める：A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない
@@ -1009,6 +1084,7 @@ def validate_network(c: Course) -> list[str]:
     err += skeleton_errors(c)
     err += relation_map_errors(c, rels)
     err += condition_errors(c, rels)
+    err += basis_exclude_errors(c, rels)
     err += dependency_errors(rels)
     return err
 
@@ -1169,13 +1245,27 @@ def export_network(c: Course, target: dict) -> dict:
 NAME_MAP_V2 = {"材料": "定める", "種類": "一種", "一般化": "特別な場合", "変換": "移る", "対比": "比べる"}
 
 
-def to_v2(data: dict, ready: list[str] | None = None) -> dict:
+def v2_excludes(c: Course) -> dict[str, list[dict]]:
+    """原本の basis_excludes（#86）を、書き出しの id（教材名つき）で。to_v2 が v2 の basis.excludes に置く（v1 の型には置き場がない）"""
+    cid = course_id(c)
+    g = lambda x: x if NS.match(x) else f"{cid}:{x}"  # noqa: E731
+    return {g(tid): [{**x, "concept": g(x["concept"])} for x in t["basis_excludes"]] for tid, t in c.terms.items() if t.get("basis_excludes")}
+
+
+def to_v2(data: dict, ready: list[str] | None = None, excludes: dict[str, list[dict]] | None = None) -> dict:
     """v1 の形で組み立てたデータを v2 に写す。v2_ready（移した分類）がなければ、全部の関係を legacy_type で書く。
     移した分類の関係を v2 の種類で書く仕組みは M5 で足す（今は v2_ready が空なので、ここで v2 の種類は作らない）"""
     if ready:
         raise ValueError("v2_ready の分類の書き出しはまだない（M5。#265）")
     out = {**data, "version": 2, "schema_revision": json.loads(SCHEMA_V2.read_text(encoding="utf-8")).get("x-revision", 1)}
     out["relations"] = [{("legacy_type" if k == "type" else k): v for k, v in r.items()} for r in data["relations"]]
+    # 基準の定義（v2 の basis）：basis_formula のある概念は、その式を基準にする（① の 2）。除外（#86）もここに置く
+    out["concepts"] = []
+    for c in data["concepts"]:
+        e = dict(c)
+        if c.get("basis_formula"):
+            e["basis"] = {"formula": c["basis_formula"], **({"excludes": excludes[c["id"]]} if (excludes or {}).get(c["id"]) else {})}
+        out["concepts"].append(e)
     return out
 
 
@@ -1183,6 +1273,7 @@ def from_v2(data: dict, v1_revision: int) -> dict:
     """to_v2 の逆（M4 の完了の条件「今と同じ」を比べるため。設計書 8）：legacy_type を type に戻し、版を v1 にする"""
     out = {**data, "version": 1, "schema_revision": v1_revision}
     out["relations"] = [{("type" if k == "legacy_type" else k): v for k, v in r.items()} for r in data["relations"]]
+    out["concepts"] = [{k: v for k, v in c.items() if k != "basis"} for c in data["concepts"]]   # basis は v2 で足した項目
     return out
 
 
@@ -1220,4 +1311,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "v2_excludes", "schema_errors", "write_network", "run_check"]

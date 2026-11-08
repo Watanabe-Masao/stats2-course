@@ -1364,6 +1364,54 @@ class TestNetwork(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.n.to_v2(v1, ["確率分布"])
 
+    def test_basis_candidates_and_excludes(self):
+        # 確かめる対象：基準の定義の式に出る記号の概念（定めるの候補。#86）を、材料・種類の親・basis_excludes で扱ったかの数え方と、basis_excludes の書き方の止め。
+        # 想定する故障：記号の表にあるだけで木に出ない記号まで候補にする・種類の親や除外を候補に残す（警告が消えない）・
+        #   ⑤ の一覧にない理由や、候補でない概念・材料と重なる概念の除外を通す（判断がどこにあるか分からなくなる）。
+        # 見つけ方：教材の原本の写しで、二項分布の候補（組合せ・確率分布）を見て、除外・種類で候補が消え、書き方の誤り4通りがそれぞれ止まる。
+        # 既存との違い：test_v2_checks は書き出した v2 で、移した分類の止めを見る。ここは原本の書き方と、全部の分類の警告の数え方。
+        # 検出の確かめ：除外を候補から引く所を外すと「除外で消える」が、種類の親を外す所を外すと「種類で消える」が落ちる
+        c = course()
+        rels = self.n.load_network()[0]
+        self.assertEqual(self.n.basis_candidates(c.terms["TERM-binom"], "TERM-binom"), {"TERM-comb", "TERM-dist"})
+        gaps = lambda cc, rr=rels: {a for a, b in self.n.basis_gaps(cc, rr) if b == "TERM-binom"}  # noqa: E731
+        self.assertEqual(gaps(c), {"TERM-dist"})   # 組合せは材料で扱っている
+        c.terms["TERM-binom"]["basis_excludes"] = [{"concept": "TERM-dist", "kind": "使われる場", "text": "確率関数の値の割り当て方は使われる場"}]
+        self.assertEqual(gaps(c), set())
+        self.assertEqual(self.n.basis_exclude_errors(c, rels), [])
+        c2 = course()
+        self.assertEqual(gaps(c2, rels + [{"id": "REL-x", "type": "種類", "from": "TERM-binom", "to": "TERM-dist"}]), set())
+        bad = [
+            ({"concept": "TERM-dist", "kind": "一種の親", "text": "x"}, "kind は ⑤"),
+            ({"concept": "TERM-dist", "kind": "使われる場"}, "理由の1文"),
+            ({"concept": "TERM-normal", "kind": "使われる場", "text": "x"}, "木に出る記号の概念でない"),
+            ({"concept": "TERM-comb", "kind": "使われる場", "text": "x"}, "材料と basis_excludes の両方"),
+        ]
+        for row, msg in bad:
+            with self.subTest(msg):
+                cc = course()
+                cc.terms["TERM-binom"]["basis_excludes"] = [row]
+                self.assertTrue(any(msg in e for e in self.n.basis_exclude_errors(cc, rels)), msg)
+
+    def test_v2_carries_basis_excludes(self):
+        # 確かめる対象：原本の basis_excludes を、v2 の書き出しの概念の basis.excludes（型 v2 の改訂2）に置き、v1 に戻すと今と同じ。
+        # 想定する故障：除外を書き出さない（公開データで判断が追えない）・v1 の書き出しに混ぜて v1 の型を崩す。
+        # 見つけ方：二項分布に除外を書いた原本で、v2 の型に合い、二項分布の basis に formula と excludes があり、v1 に戻すと v1 の書き出しと同じ。
+        # 既存との違い：test_v2_export_is_same_as_v1 は除外のない今の原本だけを見る。
+        # 検出の確かめ：to_v2 で excludes を置かないと basis の比べで落ちる
+        import json as _json
+        c = course()
+        c.terms["TERM-binom"]["basis_excludes"] = [{"concept": "TERM-dist", "kind": "使われる場", "text": "確率関数の値の割り当て方は使われる場"}]
+        v1 = self.n.export_network(c, TARGET)
+        self.assertEqual(self.n.schema_errors(v1), [])
+        v2 = self.n.to_v2(v1, None, self.n.v2_excludes(c))
+        self.assertEqual(self.n.schema_errors(v2), [])
+        b = next(x for x in v2["concepts"] if x["id"] == "stats2:TERM-binom")["basis"]
+        self.assertEqual(b["formula"], c.terms["TERM-binom"]["basis_formula"])
+        self.assertEqual(b["excludes"][0]["concept"], "stats2:TERM-dist")
+        rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
+        self.assertEqual(self.n.from_v2(v2, rev), v1)
+
     def test_migration_counts(self):
         # 確かめる対象：製本への移行の残り（progress.py の行。#264）の数え方。
         # 想定する故障：前提を mathematical と learning に分けずに数える（行き先が M5 と M6 で違う）・名前だけ写せる行を移した（v2）と数える・どれかの行を落とす。
