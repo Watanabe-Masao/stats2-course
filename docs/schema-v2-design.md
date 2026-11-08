@@ -26,7 +26,7 @@
 - 3つ以上の概念・要因の関係（交絡・シンプソンのパラドックス・平方和の分解）は、概念か定理の点にする（⑤ の 6）。
 - 関係を持たない主張（⑤ が線を書かないと決めた ④-25・④-29 など）は claims だけに置き、premises・conclusion で概念につなぐ。
 - 点と概念をつなぐ役（claim の premises・conclusion）は、関係の推移をとるときに数えない（⑤ の 6）。
-- 関係の theorem になっている定理の点は、その関係の両端への premises・conclusion のつなぎを、線として描かない（定理は関係に添えて見せ、点から同じ2つへ重ねて線を引かない。⑤ の 6）。
+- 関係の theorem になっている定理の点は、その関係の両端の両方が premises・conclusion に出るときだけ、その2つへのつなぎを線として描かない（片方だけが出るときは描く。定理は関係に添えて見せ、点から同じ2つへ重ねて線を引かない。⑤ の 6）。
 
 ## 1. 共通：条件の行（condition）
 
@@ -104,7 +104,7 @@
 | 導ける・同値・根拠・従う・移る（limit）で claim がない。推定するで properties がない | 比べるの軸が、ほかの関係の条件で言い尽くせないか（⑤ の 7） |
 | 定めるで、from が to の basis（式の木の記号と演算が指す概念か、basis_terms）に出ない | — |
 | 導けるで、from が claim の premises の predicates にない。to が conclusion の predicates にない。premises の predicates に from 以外の概念がある（前提が2つなら定理の点。役の分け方） | — |
-| 同じ2つの概念の間に従う・移るの関係があるのに、theorem を添えず、定理の点の claim の premises・conclusion だけで2つを結んでいる（⑤ の 6：関係に通す定理として添える） | — |
+| 同じ2つの概念の間に、theorem を持てる種類（移る・従う・推定する）の関係があるのに、theorem を添えず、定理の点の claim の premises・conclusion だけで2つを結んでいる（⑤ の 6：関係に通す定理として添える） | — |
 | 定義の依存の輪。前提知識の重ねと輪（⑥ の 2） | — |
 | 掛かる先ごとに書けない区分（1） | — |
 
@@ -126,7 +126,7 @@
 | `id` | CLM-番号（④-番号と同じ番号。D9） | README の運用の決まり 5・④ の 7 |
 | `kind` | 主張の種類（等しい・従う・極限・ならば・同値・手続きの保証・推定量の性質・重なり） | ④ の 2 |
 | `statement` | 1文（主語・条件・結論）と、任意で式の木。対象と変数の範囲 | ④ の 1 |
-| `premises`・`conclusion` | それぞれ `subjects`（命題の主語の概念）と `predicates`（当てはめる性質・行き先の分布などの述語の概念）に分けて持つ。条件の文に出るだけの概念は conditions の terms。例：④-13「X と Y が独立なら Cov(X, Y)＝0」は premises＝{subjects: 確率変数, predicates: 独立}、conclusion＝{subjects: 共分散, predicates: 無相関}。中心極限定理は premises＝{subjects: 標本平均}、conclusion＝{subjects: 標本平均, predicates: 標準正規分布}（行き先の語が教材にあるとき。分散が有限・独立同分布は conditions） | ④ の 3、⑤ の 6、⑥ の 3 |
+| `premises`・`conclusion` | それぞれ `subjects`（命題の主語の概念）と `predicates`（当てはめる性質・行き先の分布などの述語の概念）に分けて持つ。条件の文に出るだけの概念は conditions の terms。from の姿が命題（定理の点）の導けるでは、その主張の premises の predicates に from 自身を書く。例：④-13「X と Y が独立なら Cov(X, Y)＝0」は premises＝{subjects: 確率変数, predicates: 独立}、conclusion＝{subjects: 共分散, predicates: 無相関}。中心極限定理は premises＝{subjects: 標本平均}、conclusion＝{subjects: 標本平均, predicates: 標準正規分布}（行き先の語が教材にあるとき。分散が有限・独立同分布は conditions） | ④ の 3、⑤ の 6、⑥ の 3 |
 | `conditions` | 条件の行（1）。target は claim（区分は仮定。主張の中の対象の要件は概念の側） | ③ の 2 |
 | `grounds` | 根拠：主張の id・文献（`external: true`）・導き方の id | ④ の 1・5 |
 | `converse`・`counterexamples` | 逆の主張の id、反例の主張の id。逆が成り立つ条件は、逆の主張の conditions に書く（1か所） | ③ の 4、④ の 4 |
@@ -235,5 +235,5 @@
 
 ## 12. 確かめ方
 
-- 設計書を独立なレビューにかける（10 の表の照らし、反対の判断、機械と人の分け方、移行の期間）。1〜5回目の指摘（2026-11-08）を反映したのがこの版。
+- 設計書を独立なレビューにかける（10 の表の照らし、反対の判断、機械と人の分け方、移行の期間）。1〜6回目の指摘（2026-11-08）を反映したのがこの版。
 - M3 の完了の条件に向けて、v1 だけの見本と v2 だけの見本を、この設計書から作る。
