@@ -610,7 +610,7 @@
           ]
         },
         "subject": {
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/gid"
             },
@@ -884,8 +884,7 @@
             "required": [
               "from",
               "to",
-              "label",
-              "relations"
+              "label"
             ],
             "properties": {
               "from": {
@@ -912,8 +911,29 @@
               "note": {
                 "$ref": "#/$defs/text",
                 "description": "矢印を開いた直後に最初に出す1文（実際の分布の組・操作・成り立つ条件。言葉の「確率」「平均」が何を指すかも書く）"
+              },
+              "claims": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/$defs/claimId"
+                },
+                "description": "矢印が指す主張（線にしない主張で、まとまりの間を移る見方を言うとき。例：件数の問いから待ち時間の問いへ）。relations か claims の少なくとも1つ（stats2-course #289）"
               }
-            }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "relations"
+                ]
+              },
+              {
+                "required": [
+                  "claims"
+                ]
+              }
+            ]
           }
         },
         "relation_map_ready": {
@@ -1865,7 +1885,7 @@
             "$ref": "#/$defs/text"
           },
           "operation": {
-            "oneOf": [
+            "anyOf": [
               {
                 "$ref": "#/$defs/gid"
               },
@@ -2572,6 +2592,17 @@
           "version": {
             "type": "integer",
             "minimum": 1
+          },
+          "labs": {
+            "$ref": "#/$defs/labs",
+            "description": "主張を確かめるラボへの参照（関係と同じ形）。線にしない主張（⑤ の 4 の帰結の例など）の解説・図の置き場（stats2-course #289）"
+          },
+          "figures": {
+            "$ref": "#/$defs/figures"
+          },
+          "gist": {
+            "type": "string",
+            "description": "つまり：主張が言っていることを日常の言葉で1〜2文（関係の gist と同じ働き）"
           }
         }
       }
@@ -2618,5 +2649,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 2
+  "x-revision": 3
 }
