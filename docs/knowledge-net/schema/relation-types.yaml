@@ -111,6 +111,59 @@ types:
       - "確率変数 → ベルヌーイ分布（定義に名前が出ない：前提 learning）"
       - "回帰式 → 最小二乗法（操作の対象。材料ではない）"
       - "期待値 → 分散の近道の式 E(X²)−{E(X)}²（計算の近道は概念の中身。関係にしない：製本 ⑤）"
+# 型 v2 の種類（schema/kn-schema-v2.json。stats2-course #263）。意味の正本は stats2-course の製本 ⑤（docs/rules/relations.md の 4）。
+# trace は移行の期間、v1 で近い種類と同じにする（学ぶ順の候補は M6 で ⑥ の表から作り直す）
+types_v2:
+  定める:
+    trace: true
+    definition: A は B の基準の定義の直接の構成要素（製本 ⑤）
+    reading: □ は ■ の定義に使われる
+    required: []
+  一種:
+    trace: true
+    definition: A は B の定義を満たし、性質・目的で区別したもの（製本 ⑤）
+    reading: □ は ■ の一種
+    required: []
+  特別な場合:
+    trace: true
+    definition: B の自由に選べる部分を固定するだけで A と同じものになる（製本 ⑤。固定の仕方は fix）
+    reading: □ は ■ の特別な場合
+    required: [fix, fix_text]
+  移る:
+    trace: false
+    definition: A に操作・極限をとると B になる（製本 ⑤。厳密・極限・近似は mode）
+    reading: □ を移すと ■
+    required: [mode]
+  従う:
+    trace: false
+    definition: 確率変数 A の分布は B（製本 ⑤）
+    reading: □ は ■ に従う
+    required: [claim]
+  推定する:
+    trace: false
+    definition: 標本から作る A は、母集団の B を推定する（製本 ⑤）
+    reading: □ は ■ を推定する
+    required: [properties]
+  導ける:
+    trace: true
+    definition: A から B が導ける（製本 ⑤）
+    reading: □ から ■ が導ける
+    required: [claim]
+  同値:
+    trace: false
+    definition: A と B は互いに導ける（製本 ⑤）
+    reading: □ と ■ は同値
+    required: [claim]
+  根拠:
+    trace: false
+    definition: 定理 A が、手続き B の根拠になる（製本 ⑤）
+    reading: □ は ■ の根拠
+    required: [claim]
+  比べる:
+    trace: false
+    definition: 同じ問いに答える A と B が、ある軸で違う（製本 ⑤）
+    reading: □ と ■ を比べる
+    required: [axis, same, differ]
 modes:
   exact: 厳密（等しい）
   approximation: 近似（有限の条件のもとで近い）
