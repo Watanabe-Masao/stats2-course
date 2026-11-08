@@ -1298,7 +1298,7 @@ class TestNetwork(unittest.TestCase):
         q["mode"] = "exact"
         err = self._validate(rels=bad)
         self.assertTrue(any("premise を必ず書く" in e for e in err))
-        self.assertTrue(any("mode は変換だけ" in e for e in err))
+        self.assertTrue(any("mode は変換・移るだけ" in e for e in err))
 
     def test_generalization_one_direction(self):
         rels = copy.deepcopy(self.rels) + [
@@ -1360,9 +1360,6 @@ class TestNetwork(unittest.TestCase):
         self.assertFalse(any("type" in r for r in v2["relations"]))
         rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
         self.assertEqual(self.n.from_v2(v2, rev), v1)
-        # 移した分類の書き出しは M5 で作る。それまで v2_ready に分類を書いたら止める（v1 の種類のまま「移した」と見せない）
-        with self.assertRaises(ValueError):
-            self.n.to_v2(v1, ["確率分布"])
 
     def test_basis_candidates_and_excludes(self):
         # 確かめる対象：基準の定義の式に出る記号の概念（定めるの候補。#86）を、材料・種類の親・basis_excludes で扱ったかの数え方と、basis_excludes の書き方の止め。
@@ -1404,13 +1401,57 @@ class TestNetwork(unittest.TestCase):
         c.terms["TERM-binom"]["basis_excludes"] = [{"concept": "TERM-dist", "kind": "使われる場", "text": "確率関数の値の割り当て方は使われる場"}]
         v1 = self.n.export_network(c, TARGET)
         self.assertEqual(self.n.schema_errors(v1), [])
-        v2 = self.n.to_v2(v1, None, self.n.v2_excludes(c))
+        v2 = self.n.to_v2(v1, None, self.n.v2_extras(c))
         self.assertEqual(self.n.schema_errors(v2), [])
         b = next(x for x in v2["concepts"] if x["id"] == "stats2:TERM-binom")["basis"]
         self.assertEqual(b["formula"], c.terms["TERM-binom"]["basis_formula"])
         self.assertEqual(b["excludes"][0]["concept"], "stats2:TERM-dist")
         rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
         self.assertEqual(self.n.from_v2(v2, rev), v1)
+
+    def test_v2_rows_in_source(self):
+        # 確かめる対象：原本の relations.yaml に v1 の行と並べて書いた ⑤ の種類の行・terms.yaml の姿・claims.yaml の主張を、
+        #   build が読み、検査し、型 v2 で書き出すこと（#287。M5 で分類ごとに移す前の仕組み）。
+        # 想定する故障：v2 の行を v1 の種類として止める（知らない種類・v1 の必須）・legacy_type に入れてしまう・v2 の項目や主張を書き出さない・
+        #   主張の id に教材名を付けない（画面が未接続にする）・移した分類（v2_ready）に残った v1 の行を通す。
+        # 見つけ方：教材の原本の写しで、ベルヌーイ分布 → 二項分布 を特別な場合（n＝1）に書き替え、姿と主張を足して、
+        #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready に確率分布を書くと移していない行で止まること。
+        # 既存との違い：test_v2_checks は手で書いた書き出しの形だけ、test_v2_export_is_same_as_v1 は v2 の行のない原本だけを見る。
+        # 検出の確かめ：to_v2 で v2 の行も legacy_type にすると型（特別な場合は v1 の種類にない）で落ちる。主張に教材名を付けないと型の claimId で落ちる
+        from v2_checks import v2_errors
+        c = course()
+        rels = copy.deepcopy(self.n.load_network()[0])
+        r = next(x for x in rels if x["id"] == "REL-bernoulli-binom")
+        r.update(type="特別な場合", fix="param_value", fix_text="二項分布の n を 1 にする")
+        for t in ("TERM-bernoulli", "TERM-binom"):
+            c.terms[t]["forms"] = ["distribution"]
+        c.terms["TERM-binom"]["claims"] = ["CLM-6"]
+        claims = [{"id": "CLM-6", "label": "④-6", "kind": "等しい", "version": 1,
+                   "statement": {"text": "X ～ B(n, p) なら E(X)＝np"},
+                   "premises": {"subjects": ["TERM-binom"]}, "conclusion": {"subjects": ["TERM-expect"]}}]
+        orig = (self.n.load_network, self.n.load_claims)
+        self.n.load_network = lambda: (rels, self.ders)
+        self.n.load_claims = lambda: claims
+        try:
+            self.assertEqual(self.n.validate_network(c), [])
+            v2 = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
+            self.assertEqual(self.n.schema_errors(v2), [])
+            self.assertEqual(v2_errors(v2), [])
+            e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-bernoulli-binom")
+            self.assertEqual((e.get("type"), e.get("fix"), "legacy_type" in e), ("特別な場合", "param_value", False))
+            self.assertEqual(v2["claims"][0]["id"], "stats2:CLM-6")
+            self.assertEqual(self.n.migration_counts(rels)["v2"], 1)
+            c.terms["TERM-bernoulli"].pop("forms")
+            v2b = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
+            self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(v2b)))
+            v2c = self.n.to_v2(self.n.export_network(c, TARGET), ["確率分布"], self.n.v2_extras(c))
+            self.assertTrue(any("legacy_type" in x for x in v2_errors(v2c)))
+            c.terms["TERM-binom"]["forms"] = ["箱"]
+            c.terms["TERM-binom"]["claims"] = ["CLM-99"]
+            errs = self.n.v2_source_errors(c)
+            self.assertTrue(any("箱" in x for x in errs) and any("CLM-99" in x for x in errs))
+        finally:
+            self.n.load_network, self.n.load_claims = orig
 
     def test_migration_counts(self):
         # 確かめる対象：製本への移行の残り（progress.py の行。#264）の数え方。

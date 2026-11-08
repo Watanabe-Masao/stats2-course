@@ -21,6 +21,11 @@ EXPERIMENT_SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-experiment-
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
 KIND = load_yaml(RELATION_TYPES)
 TYPES = tuple(KIND["types"])
+TYPES_V2 = tuple(KIND["types_v2"])   # 製本 ⑤ の種類。原本の relations.yaml に v1 の行と並べて書く（v1 と名前は重ならない。#287）
+V2_FIELDS = ("fix", "fix_text", "claim", "properties", "operation", "theorem", "reversible", "use_form", "from_form", "to_form", "same", "differ")
+# 同じ働きの v1 と v2 の種類（build の決まりを両方に当てる所で使う）。意味が ⑤ に合うかは移すときに決める（設計書 3.3）
+DEFINES = ("材料", "定める")
+KIND_OF = ("種類", "一種")
 FILLED_FIELDS = ("definition", "principle", "conditions", "example", "counterexample")
 TEXT_FIELDS = ("definition", "principle", "example", "counterexample")
 OPTIONAL_FIELDS = ("formulas", "misconceptions", "sources")
@@ -551,9 +556,9 @@ def relation_map_errors(c: Course, rels: list[dict]) -> list[str]:
     parents: dict[str, list[str]] = {}
     for r in rels:
         rid = r.get("id", "?")
-        if r.get("axis") and r.get("type") != "対比":
-            err.append(f"{rid}: axis（比べる軸）は対比だけに書く")
-        if r.get("type") == "種類":
+        if r.get("axis") and r.get("type") not in ("対比", "比べる"):
+            err.append(f"{rid}: axis（比べる軸）は対比・比べるだけに書く")
+        if r.get("type") in KIND_OF:
             parents.setdefault(r.get("from"), []).append(r.get("to"))
     for tid, ps in parents.items():
         if len(ps) > 1:
@@ -665,8 +670,8 @@ def basis_candidates(t: dict, tid: str) -> set[str]:
 
 def basis_gaps(c: Course, rels: list[dict]) -> list[tuple[str, str]]:
     """定めるの候補のうち、材料（⑤ の定める）も、種類の親（⑤ の一種）も、除外（basis_excludes）もないもの：(候補の概念, 定義される概念)"""
-    linked = {(r["from"], r["to"]) for r in rels if r.get("type") == "材料"}
-    linked |= {(r["to"], r["from"]) for r in rels if r.get("type") == "種類"}   # 種類の親（to）は子（from）の候補から外す
+    linked = {(r["from"], r["to"]) for r in rels if r.get("type") in DEFINES}
+    linked |= {(r["to"], r["from"]) for r in rels if r.get("type") in KIND_OF}   # 種類の親（to）は子（from）の候補から外す
     out = []
     for tid, t in c.terms.items():
         ex = {x.get("concept") for x in t.get("basis_excludes") or []}
@@ -678,7 +683,7 @@ def basis_exclude_errors(c: Course, rels: list[dict]) -> list[str]:
     """基準の定義から外す概念（basis_excludes。型 v2 の basis.excludes。#86）の書き方。
     外すのは候補（基準の定義の式の木に出る記号の概念）だけで、材料と両方には書かない（どちらが判断か分からなくなる）"""
     err: list[str] = []
-    mat = {(r["from"], r["to"]) for r in rels if r.get("type") == "材料"}
+    mat = {(r["from"], r["to"]) for r in rels if r.get("type") in DEFINES}
     for tid, t in c.terms.items():
         xs = t.get("basis_excludes")
         if xs is None:
@@ -709,13 +714,49 @@ def basis_exclude_errors(c: Course, rels: list[dict]) -> list[str]:
     return err
 
 
+def v2_source_errors(c: Course) -> list[str]:
+    """原本の v2 だけの項目（#287）の書き方：概念の姿・基準の定義の文・主張の参照と、claims.yaml の id。
+    中身の形（主張の種類・条件の行など）は書き出しのあと型 v2 が、関係とのつながりは v2_checks が止める"""
+    forms = set(json.loads(SCHEMA_V2.read_text(encoding="utf-8"))["$defs"]["form"]["enum"])
+    claims = load_claims()
+    ids = [cl.get("id") for cl in claims]
+    err: list[str] = []
+    for i in ids:
+        if not re.match(r"^CLM-[0-9]+[a-z]?(-[a-z]+)?$", str(i)):
+            err.append(f"claims.yaml：主張の id {i} は CLM-番号（④ の番号。例：CLM-13・CLM-28b・CLM-13-converse）")
+    for i in {x for x in ids if ids.count(x) > 1}:
+        err.append(f"claims.yaml：主張の id {i} が重複")
+    for cl in claims:
+        for side in ("premises", "conclusion"):
+            for k, v in (cl.get(side) or {}).items():
+                for tid in v:
+                    if not NS.match(tid) and tid not in c.terms:
+                        err.append(f"claims.yaml：{cl.get('id')} の {side}.{k} の {tid} が terms.yaml にない")
+    for tid, t in c.terms.items():
+        bad = set(t.get("forms") or []) - forms
+        if bad:
+            err.append(f"{tid}: forms の {'・'.join(sorted(bad))} は姿（① の 3：{'・'.join(sorted(forms))}）にない")
+        if t.get("basis"):
+            if t.get("basis_formula"):
+                err.append(f"{tid}: 基準の定義は basis_formula（式）か basis（文）のどちらか1つ（① の 2）")
+            if not str(t["basis"].get("text") or "").strip():
+                err.append(f"{tid}: basis に定義の文（text）を書く")
+            for x in t["basis"].get("terms") or []:
+                if not NS.match(x) and x not in c.terms:
+                    err.append(f"{tid}: basis.terms の {x} が terms.yaml にない")
+        for x in t.get("claims") or []:
+            if x not in ids:
+                err.append(f"{tid}: claims の {x} が claims.yaml にない")
+    return err
+
+
 def dependency_errors(rels: list[dict]) -> list[str]:
     """定義の依存と前提知識は直接の1段だけ（#249 ③）。
     - 定義の依存の輪（材料の輪）は止める：A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない
     - 重ねた前提知識は止める：A → D の前提知識があるのに、D から「前提をさかのぼる」種類をたどって A に着くなら、A → D は書かない
       （A → B → C → D なら D は C だけを持ち、A・B は C をたどって出す）"""
     err = [f"定義の依存の輪：{' → '.join(x)}（どちらかの材料が定義の構成要素でない。#249 ③）" for x in material_cycles(rels)]
-    trace = {k for k, v in (KIND.get("types") or {}).items() if v.get("trace")}
+    trace = {k for key in ("types", "types_v2") for k, v in (KIND.get(key) or {}).items() if v.get("trace")}
     back: dict[str, list[tuple[str, str]]] = {}
     for r in rels:
         if r.get("type") in trace:
@@ -743,7 +784,7 @@ def material_cycles(rels: list[dict] | None = None) -> list[list[str]]:
         rels, _ = load_network()
     nxt: dict[str, list[str]] = {}
     for r in rels:
-        if r.get("type") == "材料":
+        if r.get("type") in DEFINES:
             nxt.setdefault(r["from"], []).append(r["to"])
     cycles: list[list[str]] = []
     seen: set = set()
@@ -773,11 +814,12 @@ def material_cycles(rels: list[dict] | None = None) -> list[list[str]]:
 
 # 図とラボで補う関係の種類（#95）。gist は必須、図がなければ build が警告する
 VISUAL_TYPES = ("変換", "対比", "導出", "一般化")
+VISUAL_TYPES_V2 = ("移る", "比べる", "導ける", "特別な場合")   # gist・図の決まり（#95）を v2 の行にも当てる
 
 
 def relations_without_figures() -> list[str]:
     rels, _ = load_network()
-    return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES and not r.get("figures")]
+    return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES + VISUAL_TYPES_V2 and not r.get("figures")]
 
 
 def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
@@ -984,19 +1026,23 @@ def validate_network(c: Course) -> list[str]:
             known(str(r.get(k, "")), k, rid)
         if r.get("from") == r.get("to"):
             err.append(f"{rid}: from と to が同じ")
-        if r.get("type") not in TYPES:
-            err.append(f"{rid}: type「{r.get('type')}」は {'・'.join(TYPES)} のどれか")
+        if r.get("type") not in TYPES + TYPES_V2:
+            err.append(f"{rid}: type「{r.get('type')}」は {'・'.join(TYPES)}（v1）か {'・'.join(TYPES_V2)}（製本 ⑤）のどれか")
+        v2 = r.get("type") in TYPES_V2
+        extra = [k for k in V2_FIELDS if k in r]
+        if extra and not v2:
+            err.append(f"{rid}: {'・'.join(extra)} は製本 ⑤ の種類（v2）の行にだけ書く")
         if not (isinstance(r.get("version"), int) and r["version"] >= 1):
             err.append(f"{rid}: version（1以上の整数）を書く")
         if not r.get("description"):
             err.append(f"{rid}: description がない")
-        if r.get("type") in VISUAL_TYPES and not r.get("gist"):   # つまりどういうことか（#95）
+        if r.get("type") in VISUAL_TYPES + VISUAL_TYPES_V2 and not r.get("gist"):   # つまりどういうことか（#95）
             err.append(f"{rid}: {r.get('type')}の関係には gist（つまり：日常の言葉で1〜2文）を書く")
-        for need in (KIND["types"].get(r.get("type")) or {}).get("required", []):
+        for need in ((KIND["types_v2"] if v2 else KIND["types"]).get(r.get("type")) or {}).get("required", []):
             if not r.get(need):
                 err.append(f"{rid}: {r.get('type')} には {need} を必ず書く（relation-types.yaml）")
-        if r.get("mode") and (r.get("type") != "変換" or r["mode"] not in KIND["modes"]):
-            err.append(f"{rid}: mode は変換だけに、{'・'.join(KIND['modes'])} のどれかで書く")
+        if r.get("mode") and (r.get("type") not in ("変換", "移る") or r["mode"] not in KIND["modes"]):
+            err.append(f"{rid}: mode は変換・移るだけに、{'・'.join(KIND['modes'])} のどれかで書く")
         if r.get("premise") and (r.get("type") != "前提" or r["premise"] not in KIND["premises"]):
             err.append(f"{rid}: premise は前提だけに、{'・'.join(KIND['premises'])} のどれかで書く")
     pairs = {(r.get("from"), r.get("to")) for r in rels if r.get("type") in ("一般化", "特殊化")}
@@ -1085,6 +1131,7 @@ def validate_network(c: Course) -> list[str]:
     err += relation_map_errors(c, rels)
     err += condition_errors(c, rels)
     err += basis_exclude_errors(c, rels)
+    err += v2_source_errors(c)
     err += dependency_errors(rels)
     return err
 
@@ -1196,7 +1243,7 @@ def export_network(c: Course, target: dict) -> dict:
     for r in rels:
         e = {"id": g(r["id"]), "version": r["version"], "from": g(r["from"]), "to": g(r["to"]), "type": r["type"],
              "description": r["description"], "units": [g(u) for u in (r.get("basis") or {}).get("units", [])]}
-        for k in ("conditions", "mode", "premise", "axis", "gist", "question", "focus", "stages", "chart"):   # axis は対比の比べる軸（改訂36）   # stages・chart は開いたときの段と図（#188 04）
+        for k in ("conditions", "mode", "premise", "axis", "gist", "question", "focus", "stages", "chart") + V2_FIELDS:   # axis は対比の比べる軸（改訂36）   # stages・chart は開いたときの段と図（#188 04）
             if r.get(k):
                 e[k] = r[k]
         if (r.get("basis") or {}).get("derivation"):
@@ -1207,7 +1254,7 @@ def export_network(c: Course, target: dict) -> dict:
             e["labs"] = labs(r.get("labs"))
         if figs(r.get("figures")):
             e["figures"] = figs(r.get("figures"))
-        relations.append(e)
+        relations.append(v2_ids(e, g) if r["type"] in TYPES_V2 else e)
     derivations = [{"id": g(d["id"]), "version": d["version"], "premises": [g(p) for p in d["premises"]], "conclusion": g(d["conclusion"]),
                     "statement": d["statement"], "steps": d["steps"], "conditions": d["conditions"],
                     "units": [g(u) for u in (d.get("basis") or {}).get("units", [])]} for d in ders]
@@ -1245,27 +1292,95 @@ def export_network(c: Course, target: dict) -> dict:
 NAME_MAP_V2 = {"材料": "定める", "種類": "一種", "一般化": "特別な場合", "変換": "移る", "対比": "比べる"}
 
 
-def v2_excludes(c: Course) -> dict[str, list[dict]]:
-    """原本の basis_excludes（#86）を、書き出しの id（教材名つき）で。to_v2 が v2 の basis.excludes に置く（v1 の型には置き場がない）"""
-    cid = course_id(c)
-    g = lambda x: x if NS.match(x) else f"{cid}:{x}"  # noqa: E731
-    return {g(tid): [{**x, "concept": g(x["concept"])} for x in t["basis_excludes"]] for tid, t in c.terms.items() if t.get("basis_excludes")}
+CLAIMS = CONTENT / "claims.yaml"   # 主張（製本 ④ の単位。原本へ移したもの。#287）
+LOCAL_ID = re.compile(r"^(TERM|REL|DER|CLM|U[0-9])")
 
 
-def to_v2(data: dict, ready: list[str] | None = None, excludes: dict[str, list[dict]] | None = None) -> dict:
-    """v1 の形で組み立てたデータを v2 に写す。v2_ready（移した分類）がなければ、全部の関係を legacy_type で書く。
-    移した分類の関係を v2 の種類で書く仕組みは M5 で足す（今は v2_ready が空なので、ここで v2 の種類は作らない）"""
-    if ready:
-        raise ValueError("v2_ready の分類の書き出しはまだない（M5。#265）")
+def load_claims() -> list[dict]:
+    return (load_yaml(CLAIMS) or {}).get("claims", []) if CLAIMS.exists() else []
+
+
+def _ns(cid: str):
+    """教材の中の id に教材名を付ける（文はそのまま）"""
+    return lambda x: f"{cid}:{x}" if isinstance(x, str) and LOCAL_ID.match(x) and not NS.match(x) else x
+
+
+def export_claim(cl: dict, g) -> dict:
+    """主張（claims.yaml の1件）を型 v2 の claims の形に。id は教材名つき"""
+    side = lambda x: {k: [g(i) for i in v] for k, v in (x or {}).items()}  # noqa: E731
+    e = {k: v for k, v in cl.items() if k not in ("premises", "conclusion", "conditions", "grounds", "converse", "counterexamples", "units")}
+    e["id"] = g(cl["id"])
+    for k in ("premises", "conclusion"):
+        if cl.get(k):
+            e[k] = side(cl[k])
+    if cl.get("conditions"):
+        e["conditions"] = [{**x, **({"terms": [g(t) for t in x["terms"]]} if x.get("terms") else {}),
+                            **({"subject": g(x["subject"])} if x.get("subject") else {}), "target": x.get("target", "claim")} for x in cl["conditions"]]
+    if cl.get("grounds"):
+        e["grounds"] = [{k: (g(v) if k in ("claim", "derivation") else v) for k, v in x.items()} for x in cl["grounds"]]
+    if cl.get("converse"):
+        e["converse"] = g(cl["converse"])
+    for k in ("counterexamples", "units"):
+        if cl.get(k):
+            e[k] = [g(x) for x in cl[k]]
+    return e
+
+
+def v2_extras(c: Course) -> dict:
+    """原本の v2 だけの項目（v1 の型には置き場がない）を、書き出しの id で。to_v2 が置く。
+    概念：姿（forms）・基準の定義の文（basis の text と terms）・除外（basis_excludes。#86）・主張（claims）。教材：主張（claims.yaml）"""
+    g = _ns(course_id(c))
+    concepts = {}
+    for tid, t in c.terms.items():
+        e = {}
+        if t.get("forms"):
+            e["forms"] = list(t["forms"])
+        if t.get("basis"):
+            e["basis"] = {"text": t["basis"]["text"], "terms": [g(x) for x in t["basis"].get("terms") or []]}
+        if t.get("basis_excludes"):
+            e["excludes"] = [{**x, "concept": g(x["concept"])} for x in t["basis_excludes"]]
+        if t.get("claims"):
+            e["claims"] = [g(x) for x in t["claims"]]
+        if e:
+            concepts[g(tid)] = e
+    return {"concepts": concepts, "claims": [export_claim(cl, g) for cl in load_claims()]}
+
+
+def v2_ids(r: dict, g) -> dict:
+    """v2 の関係の項目のうち、id を指すもの（主張・性質・通す定理・通す操作が概念のとき）に教材名を付ける"""
+    out = dict(r)
+    for k in ("claim", "theorem", "operation"):
+        if out.get(k):
+            out[k] = g(out[k])
+    if out.get("properties"):
+        out["properties"] = [g(x) for x in out["properties"]]
+    return out
+
+
+def to_v2(data: dict, ready: list[str] | None = None, extras: dict | None = None) -> dict:
+    """v1 の形で組み立てたデータを v2 に写す。v1 の種類の行は legacy_type（移していない行）、⑤ の種類の行は type のまま。
+    移した分類（v2_ready）に legacy_type が残っていないかなどは v2_checks が止める"""
+    extras = extras or {}
     out = {**data, "version": 2, "schema_revision": json.loads(SCHEMA_V2.read_text(encoding="utf-8")).get("x-revision", 1)}
-    out["relations"] = [{("legacy_type" if k == "type" else k): v for k, v in r.items()} for r in data["relations"]]
-    # 基準の定義（v2 の basis）：basis_formula のある概念は、その式を基準にする（① の 2）。除外（#86）もここに置く
+    out["relations"] = [r if r.get("type") in TYPES_V2 else {("legacy_type" if k == "type" else k): v for k, v in r.items()}
+                        for r in data["relations"]]
+    # 基準の定義（v2 の basis）：basis_formula のある概念は、その式を基準にする（① の 2）。文の基準・除外（#86）・姿・主張もここに置く
+    ex = extras.get("concepts") or {}
     out["concepts"] = []
     for c in data["concepts"]:
-        e = dict(c)
+        e, x = dict(c), ex.get(c["id"], {})
         if c.get("basis_formula"):
-            e["basis"] = {"formula": c["basis_formula"], **({"excludes": excludes[c["id"]]} if (excludes or {}).get(c["id"]) else {})}
+            e["basis"] = {"formula": c["basis_formula"], **({"excludes": x["excludes"]} if x.get("excludes") else {})}
+        elif x.get("basis"):
+            e["basis"] = {**x["basis"], **({"excludes": x["excludes"]} if x.get("excludes") else {})}
+        for k in ("forms", "claims"):
+            if x.get(k):
+                e[k] = x[k]
         out["concepts"].append(e)
+    if extras.get("claims"):
+        out["claims"] = extras["claims"]
+    if ready:
+        out["course"] = {**out["course"], "v2_ready": list(ready)}
     return out
 
 
@@ -1273,22 +1388,26 @@ def from_v2(data: dict, v1_revision: int) -> dict:
     """to_v2 の逆（M4 の完了の条件「今と同じ」を比べるため。設計書 8）：legacy_type を type に戻し、版を v1 にする"""
     out = {**data, "version": 1, "schema_revision": v1_revision}
     out["relations"] = [{("type" if k == "legacy_type" else k): v for k, v in r.items()} for r in data["relations"]]
-    out["concepts"] = [{k: v for k, v in c.items() if k != "basis"} for c in data["concepts"]]   # basis は v2 で足した項目
+    out["concepts"] = [{k: v for k, v in c.items() if k not in ("basis", "forms", "claims")} for c in data["concepts"]]   # v2 で足した項目
+    out.pop("claims", None)
+    out["course"] = {k: v for k, v in data["course"].items() if k != "v2_ready"}
     return out
 
 
 def migration_counts(rels: list[dict]) -> dict:
     """製本への移行の残り（#264）：v1 の関係を、名前だけ機械で写せるもの（M5 で意味を振り分け直す）と、写せないもの（未移行）に分けて数える。
     前提は premise（mathematical・learning）ごとに分ける（mathematical は M5 で定める・条件・主張へ、learning は M6 で学ぶ順へ）"""
-    named, left = {}, {}
+    named, left, v2 = {}, {}, 0
     for r in rels:
         t = r["type"]
-        if t in NAME_MAP_V2:
+        if t in TYPES_V2:
+            v2 += 1
+        elif t in NAME_MAP_V2:
             named[t] = named.get(t, 0) + 1
         else:
             key = f"{t}（{r.get('premise') or '区分なし'}）" if t == "前提" else t
             left[key] = left.get(key, 0) + 1
-    return {"total": len(rels), "v2": 0, "named": named, "left": left}
+    return {"total": len(rels), "v2": v2, "named": named, "left": left}
 
 
 def schema_errors(data: dict) -> list[str]:
@@ -1311,4 +1430,4 @@ def write_network(data: dict) -> str:
     return str(path.relative_to(ROOT))
 
 
-__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "v2_excludes", "schema_errors", "write_network", "run_check"]
+__all__ = ["relation_map_errors", "condition_errors", "dependency_errors", "material_cycles", "validate_network", "network_checks", "export_network", "to_v2", "from_v2", "migration_counts", "basis_gaps", "basis_candidates", "v2_extras", "load_claims", "schema_errors", "write_network", "run_check"]
