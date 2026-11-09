@@ -276,12 +276,6 @@ claims:
     - TERM-cov
     predicates:
     - TERM-uncorr
-  conditions:
-  - text: X・Y の分散が有限
-    kind: 仮定
-    terms:
-    - TERM-var
-    outside: 共分散が定まらない
   grounds:
   - source:
       title: 独立なら E(XY)＝E(X)E(Y)

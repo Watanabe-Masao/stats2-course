@@ -922,9 +922,8 @@
   conditions:
     math:
     - text: X・Y の分散が有限
-      kind: 仮定
-      claim: 共分散が有限の値に定まる
-      outside: 共分散が定まるとは限らない（ずれの積の期待値が存在しないことがある）
+      kind: 要件
+      outside: この教材の有限分散を前提とする共分散の定義域として扱えない（一般には共分散が存在する場合もある）
       terms:
       - TERM-var
     data:
