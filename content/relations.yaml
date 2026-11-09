@@ -671,73 +671,50 @@ relations:
   - id: REL-estimator-statistic
     from: TERM-estimator
     to: TERM-statistic
-    type: 一般化
+    type: 一種
     description: 推定量は、母数を推定する目的で使う統計量。統計量は推定量を含む、より広いもの（検定統計量なども統計量）。
     gist: 標本から計算する値はみな統計量。そのうち「母数を当てる」ために使うと決めたものが推定量。
     basis:
       units:
       - U18
       - U21
-    version: 1
+    version: 2
   - id: REL-estimator-pointest
     from: TERM-estimator
     to: TERM-point-est
-    type: 応用
+    type: 定める
     description: 点推定は、推定量に標本の値を入れて1つの値を出すこと。
     basis:
       units:
       - U21
-    version: 1
+    version: 2
   - id: REL-estimator-unbiased
     from: TERM-estimator
     to: TERM-unbiased
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 不偏性は推定量の性質。
     basis:
       units:
       - U21
-    version: 1
+    version: 2
   - id: REL-estimator-consistency
     from: TERM-estimator
     to: TERM-consistency
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 一致性は推定量の性質。
     basis:
       units:
       - U21
-    version: 1
-  - id: REL-estimator-efficiency
-    from: TERM-estimator
-    to: TERM-efficiency
-    type: 前提
-    premise: mathematical
-    description: 有効性は推定量どうしを分散で比べる性質。
-    basis:
-      units:
-      - U21
-    version: 1
-  - id: REL-bias-unbiased
-    from: TERM-bias
-    to: TERM-unbiased
-    type: 前提
-    premise: mathematical
-    description: 不偏性は、推定量の偏り（期待値と母数の差）が0であること。
-    basis:
-      units:
-      - U21
-    version: 1
+    version: 2
   - id: REL-unbiased-efficiency
     from: TERM-unbiased
     to: TERM-efficiency
-    type: 前提
-    premise: learning
+    type: 定める
     description: 有効性は、不偏な推定量の中で比べる。まず不偏性を知る。
     basis:
       units:
       - U21
-    version: 1
+    version: 2
   - id: REL-unbiased-unbvar
     from: TERM-unbiased
     to: TERM-unbvar
@@ -759,67 +736,29 @@ relations:
       - U19
       - U21
     version: 1
-  - id: REL-bias-mse
-    from: TERM-bias
-    to: TERM-mse
-    type: 前提
-    premise: mathematical
-    description: 平均二乗誤差は、推定量の分散と偏りの2乗の和。
-    basis:
-      units:
-      - U21
-    version: 1
-  - id: REL-var-mse
-    from: TERM-var
-    to: TERM-mse
-    type: 前提
-    premise: mathematical
-    description: 平均二乗誤差は、推定量の分散と偏りの2乗の和。
-    basis:
-      units:
-      - U21
-    version: 1
   - id: REL-point-interval-contrast
     from: TERM-point-est
     to: TERM-interval-est
-    type: 対比
+    type: 比べる
+    differ: 点推定は推定量の値1つで θ を示し、その値がどれだけ確かかは示さない。区間推定は信頼区間 [L, U] で θ を示し、区間が θ を含む確率の下限（信頼係数）で推定の確かさを言える。信頼係数を上げると区間は広くなる
+    same: どちらも、標本から作るもので、分からない母数 θ の値を推定する手続き
+    axis: 母数の値を、標本から何の形で示すか（1つの値か、区間か）
     description: 点推定は1つの値で、区間推定は幅をもった区間で母数を推定する。区間推定は、推定がどれだけばらつくか（標準誤差）を幅で示す。
     gist: 「たぶん50」と1つの値で言うのが点推定、「45〜55のどこか」と幅で言うのが区間推定。幅があると、推定の確かさまで伝わる。
     basis:
       units:
       - U21
       - U22
-    version: 1
-  - id: REL-intervalest-ci
-    from: TERM-interval-est
-    to: TERM-ci
-    type: 前提
-    premise: mathematical
-    description: 信頼区間は、区間推定で求める区間。
-    basis:
-      units:
-      - U22
-    version: 1
+    version: 2
   - id: REL-conflevel-ci
-    from: TERM-conf-level
-    to: TERM-ci
-    type: 前提
-    premise: mathematical
-    description: 信頼区間の幅は、信頼係数（95%など）を決めてから決まる。
+    from: TERM-ci
+    to: TERM-conf-level
+    type: 定める
+    description: 信頼係数は、信頼区間を作る方法について、母数のすべての値でとった、区間が母数を含む確率の下限。信頼区間が定義に直接出る。
     basis:
       units:
       - U22
-    version: 1
-  - id: REL-se-ci
-    from: TERM-se
-    to: TERM-ci
-    type: 前提
-    premise: mathematical
-    description: 平均の信頼区間は、推定値 ± 係数 × 標準誤差 で作る。
-    basis:
-      units:
-      - U22
-    version: 1
+    version: 2
   - id: REL-clt-ci
     from: TERM-clt
     to: TERM-ci
@@ -829,25 +768,6 @@ relations:
     basis:
       units:
       - U19
-      - U22
-    version: 1
-  - id: REL-t-ci
-    from: TERM-t
-    to: TERM-ci
-    type: 前提
-    premise: mathematical
-    description: 母分散が分からないときの平均の信頼区間は、t 分布の値で作る。
-    basis:
-      units:
-      - U22
-    version: 1
-  - id: REL-sampleprop-ci
-    from: TERM-sample-prop
-    to: TERM-ci
-    type: 応用
-    description: 割合の信頼区間は、標本比率と、その標準誤差 √(p̂(1−p̂)÷n) から作る。
-    basis:
-      units:
       - U22
     version: 1
   - id: REL-t-pairedt
@@ -1184,14 +1104,13 @@ relations:
   - id: REL-parameter-estimator
     from: TERM-parameter
     to: TERM-estimator
-    type: 前提
-    premise: learning
+    type: 定める
     description: 推定量は、母数を推定するためのもの。何を推定するか（母数）を先に知る。
     basis:
       units:
       - U03
       - U21
-    version: 1
+    version: 2
   - id: REL-scale-qual
     from: TERM-scale
     to: TERM-qual
@@ -2178,3 +2097,102 @@ relations:
     description: 確率分布のうち、確率変数の作り方（正規分布に従う確率変数の関数）で区別される族の1つ。
     basis:
       units: [U20]
+
+  - id: REL-expect-unbiased
+    from: TERM-expect
+    to: TERM-unbiased
+    version: 1
+    type: 定める
+    from_form: operation
+    description: 不偏性は E(θ̂)＝θ で決める。期待値が定義に直接出る。
+    basis:
+      units: [U21]
+
+  - id: REL-prob-consistency
+    from: TERM-prob
+    to: TERM-consistency
+    version: 1
+    type: 定める
+    from_form: function
+    description: 一致性は P(|θ̂ₙ−θ|≧ε)→0 で決める。確率が定義に直接出る。
+    basis:
+      units: [U21]
+
+  - id: REL-var-efficiency
+    from: TERM-var
+    to: TERM-efficiency
+    version: 1
+    type: 定める
+    from_form: operation
+    description: 有効性は、不偏推定量どうしを分散 V(θ̂) の小ささで比べて決める。分散が定義に直接出る。
+    basis:
+      units: [U21]
+
+  - id: REL-estimator-mse
+    from: TERM-estimator
+    to: TERM-mse
+    version: 1
+    type: 定める
+    description: 平均二乗誤差は、推定量 θ̂ と母数 θ のずれの2乗の期待値。推定量が定義に直接出る。
+    basis:
+      units: [U21]
+
+  - id: REL-expect-mse
+    from: TERM-expect
+    to: TERM-mse
+    version: 1
+    type: 定める
+    from_form: operation
+    description: 平均二乗誤差は E[(θ̂−θ)²]。期待値が定義に直接出る。
+    basis:
+      units: [U21]
+
+  - id: REL-statistic-ci
+    from: TERM-statistic
+    to: TERM-ci
+    version: 1
+    type: 定める
+    description: 信頼区間は、標本から作る2つの統計量 L≦U でつくる区間。統計量が定義に直接出る。
+    basis:
+      units: [U22]
+
+  - id: REL-param-ci
+    from: TERM-parameter
+    to: TERM-ci
+    version: 1
+    type: 定める
+    description: 信頼区間は、母数 θ を区間で推定するためにつくる区間。母数が定義に直接出る。
+    basis:
+      units: [U22]
+
+  - id: REL-prob-conflevel
+    from: TERM-prob
+    to: TERM-conf-level
+    version: 1
+    type: 定める
+    from_form: function
+    description: 信頼係数は、区間が母数を含む確率 P(L≦θ≦U) の下限。確率が定義に直接出る。
+    basis:
+      units: [U22]
+
+  - id: REL-conflevel-intervalest
+    from: TERM-conf-level
+    to: TERM-interval-est
+    version: 1
+    type: 定める
+    description: 区間推定は、信頼係数を決め、信頼係数がそれ以上になる信頼区間を標本から求めて示す手続き。信頼係数が定義に直接出る（信頼区間は信頼係数をたどって着く）。
+    basis:
+      units: [U22]
+
+  - id: REL-unbiased-consistency-contrast
+    from: TERM-unbiased
+    to: TERM-consistency
+    version: 1
+    type: 比べる
+    axis: 決まった n での平均の位置か、n を増やしたときの近づき方か
+    same: どちらも、推定量が母数をどう捉えるかを言う、推定量の性質
+    differ: 不偏性は決まった n で E(θ̂)＝θ（ばらつきは問わない）。一致性は n→∞ で θ̂ₙ が θ に確率収束する（有限の n での偏りは問わない）。どちらも他方を導かない（例：標本分散は不偏でないが一致。最初の1個 X₁ だけを使う推定量は不偏だが一致しない）
+    description: 不偏性は平均で母数に当たること、一致性は標本を大きくすると母数に近づくこと。どちらも他方を導かない。
+    gist: 「平均すれば当たる」と「たくさん取れば近づく」は別の性質。片方だけを満たす推定量がある。
+    basis:
+      units: [U21]

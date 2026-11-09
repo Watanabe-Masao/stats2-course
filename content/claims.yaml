@@ -293,6 +293,38 @@ claims:
       version: dc2b65a
     external: なし
   version: 1
+- id: CLM-19
+  label: ④-19
+  kind: 極限
+  statement:
+    text: X₁, …, Xₙ が独立に Bern(p)（0＜p＜1 を固定）に従うとき、n→∞ で (p̂−p)/√(p̂(1−p̂)/n) の分布は N(0, 1) に近づく。だから、各 p（固定）での p̂ ± z_{α/2}·√(p̂(1−p̂)/n) の被覆確率は、n→∞ で 1−α に近づく（有限の n では近似）。信頼係数（p についての被覆確率の下限）は、どの n でも 0 で、1−α には近づかない（X＝0 のとき区間は {0} なので、被覆確率は 1−(1−p)ⁿ 以下）
+  premises:
+    subjects:
+    - TERM-sample-prop
+  conclusion:
+    subjects:
+    - TERM-ci
+    predicates:
+    - TERM-conf-level
+  grounds:
+  - claim: CLM-6b
+  - claim: CLM-20b
+  - source:
+      title: スルツキーの定理
+    external: true
+  - source:
+      title: p̂ が 0 か 1 のとき分母は 0 になるが、その確率は n→∞ で 0 に近づくので、その場合の値をどう決めても極限は同じ（区間の幅は 0 になる。④ §8）
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: D
+      date: '2026-11-08'
+      version: 525bbdb
+    external: 未照合
+  version: 1
 - id: CLM-20b
   label: ④-20b
   kind: 推定量の性質

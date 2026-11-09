@@ -123,6 +123,7 @@
   name: 母数
   en: parameter
   category: データと変数
+  forms: [number]
   short: 母集団の性質を表す値（母平均・母分散など）で、ふつうは分からないので標本から推定する
 - id: TERM-statistic
   name: 統計量
@@ -365,6 +366,10 @@
   name: 不偏性
   en: unbiasedness
   category: 推定
+  forms: [property]
+  basis:
+    text: 母数 θ の推定量 θ̂ について、θ のすべての値で E(θ̂)＝θ が成り立つこと（偏り E(θ̂)−θ が0）
+    terms: [TERM-estimator, TERM-expect]
   short: 推定量の期待値が、推定したい母数と一致する性質
 - id: TERM-std
   name: 標準化
@@ -1849,36 +1854,63 @@
   en: estimator
   category: 推定
   forms: [rv]
+  basis:
+    text: 母数 θ を推定する目的で使う統計量 θ̂（標本 X₁, …, Xₙ の関数で、分からない母数を含まないもの。観測したあとの値は推定値と呼ぶ）
+    terms: [TERM-statistic, TERM-parameter]
   short: 母数を推定するために使う統計量（標本から値が決まる式）
 - id: TERM-point-est
   name: 点推定
   en: point estimation
   category: 推定
+  forms: [procedure]
+  basis:
+    text: 標本の値を推定量 θ̂ に入れて得た1つの値（推定値）を、母数 θ の値の推定とする手続き
+    terms: [TERM-estimator]
   short: 母数の値を、推定量から求めた1つの値で推定すること
 - id: TERM-consistency
   name: 一致性
   en: consistency
   category: 推定
+  forms: [property]
+  basis:
+    text: 標本の大きさ n ごとの母数 θ の推定量 θ̂ₙ が、θ のすべての値で、どの ε＞0 についても n→∞ で P(|θ̂ₙ−θ|≧ε)→0 となること（θ̂ₙ は θ に確率収束する）
+    terms: [TERM-estimator, TERM-prob]
   short: 標本の大きさを大きくすると、推定量が母数に近づいていく性質
 - id: TERM-efficiency
   name: 有効性
   en: efficiency
   category: 推定
+  forms: [property]
+  basis:
+    text: 同じ母数 θ の2つの不偏推定量 θ̂₁・θ̂₂ について、θ のすべての値で V(θ̂₁)≦V(θ̂₂) のとき、θ̂₁ は θ̂₂ より有効という（分散の小さい不偏推定量ほどよいとする比べ方）
+    terms: [TERM-unbiased, TERM-var]
   short: 不偏な推定量のうち、分散が小さい（ばらつきが小さい）ものほどよいとする性質
 - id: TERM-mse
   name: 平均二乗誤差（MSE）
   en: mean squared error
   category: 推定
+  forms: [number]
+  basis:
+    text: 母数 θ の推定量 θ̂ について、E[(θ̂−θ)²]（推定量と母数のずれの2乗の期待値。θ の値ごとに決まる）
+    terms: [TERM-estimator, TERM-expect]
   short: 推定量と母数のずれの2乗の期待値で、推定量の分散と偏りの2乗の和になる
 - id: TERM-ci
   name: 信頼区間
   en: confidence interval
   category: 推定
+  forms: [random_set]
+  basis:
+    text: 母数 θ を区間で推定するために、標本から作る2つの統計量 L≦U でつくる区間 [L, U]（観測したあとの区間も同じ名前で呼ぶ）
+    terms: [TERM-statistic, TERM-parameter]
   short: 区間推定で求める区間で、同じ方法をくり返すと決めた割合で母数を含む
 - id: TERM-conf-level
   name: 信頼係数
   en: confidence level
   category: 推定
+  forms: [number]
+  basis:
+    text: 信頼区間 [L, U] を作る方法について、母数 θ のすべての値でとった、区間が θ を含む確率 P(L≦θ≦U) の下限（これが 1−α のとき、信頼係数 1−α の信頼区間という。95% など）
+    terms: [TERM-ci, TERM-prob]
   short: 信頼区間を作る方法が、くり返したときに母数を含む割合（95%など）
 - id: TERM-paired-t
   name: 対応のある t 検定
@@ -2203,6 +2235,10 @@
   name: 区間推定
   en: interval estimation
   category: 推定
+  forms: [procedure]
+  basis:
+    text: 信頼係数 1−α を決め、信頼係数がそれ以上になる信頼区間を標本から求めて、母数 θ の値の範囲として示す手続き
+    terms: [TERM-conf-level, TERM-ci, TERM-parameter]
   short: 母数の値を、幅をもった区間で推定すること
 - id: TERM-test
   name: 仮説検定
