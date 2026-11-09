@@ -113,23 +113,36 @@
   name: 母集団
   en: population
   category: データと変数
+  forms: [event]
+  basis:
+    text: 調べたい性質をもつ対象（人・物・出来事）の全部の要素の集まり（要素の数 N。限りなく多いとみなすこともある）。推測統計で「母集団の分布」と言うときは、母集団から1つ無作為に取り出した要素の値（確率変数）の分布を指し、母集団そのものとは別のもの
   short: 調べたい対象の全体（知りたい性質をもつ人・物のすべて）
 - id: TERM-sample
   name: 標本
   en: sample
   category: データと変数
+  forms: [rv]
+  basis:
+    text: 母集団から選んだ n 個の個体について、調べる変数の値を並べた組 X₁, …, Xₙ（どの個体が選ばれるかの偶然で値が決まる。選ばれた個体の集まり S も標本と呼ぶ。n を標本の大きさと呼び、観測したあとの値 x₁, …, xₙ も同じ名前で呼ぶ）
+    terms: [TERM-population]
   short: 母集団から、調べるために取り出した一部
 - id: TERM-parameter
   name: 母数
   en: parameter
   category: データと変数
   forms: [number]
+  basis:
+    text: 母集団の性質を表す数 θ（母平均 μ・母分散 σ² など）。母集団の全部の要素の値から決まり、標本からは決まらないので、ふつうは分からない（母集団の分布を分布の族で表すときは、その族を区別する数（二項分布の p など）を同じ名前で呼ぶ）
+    terms: [TERM-population]
   short: 母集団の性質を表す値（母平均・母分散など）で、ふつうは分からないので標本から推定する
 - id: TERM-statistic
   name: 統計量
   en: statistic
   category: データと変数
   forms: [rv]
+  basis:
+    text: 標本 X₁, …, Xₙ の値だけで値が決まる関数 T＝t(X₁, …, Xₙ) として作る確率変数（分からない母数を含まないことは定義の要件。観測したあとの値も同じ名前で呼ぶ。標本を取り直すたびに値が変わる。手元の統計量から、分からない母数を推し量るのが推定）
+    terms: [TERM-sample, TERM-rv]
   short: 標本のデータから計算して求める値（標本平均・標本分散など）
 - id: TERM-sample-space
   name: 標本空間
@@ -154,6 +167,8 @@
   en: sampling frame
   category: データと変数
   forms: [event]
+  basis:
+    text: 標本を選ぶ元にする、要素を1つずつ並べた一覧（名簿・台帳・地図の区画など）に載っている要素の集まり。母集団の要素の全部を1回ずつ含むのが望ましいが、漏れ・重複・対象外の要素を含むことがある
   short: 標本を選ぶときに使う、母集団の名簿や一覧
 - id: TERM-random-sampling
   name: 無作為抽出
@@ -177,17 +192,27 @@
   name: 質的変数
   en: qualitative variable
   category: データと変数
-  forms: [rv]
+  forms: [function]
+  basis:
+    text: 個体（調べる対象の1つ1つ）ごとに値を1つ対応させる変数のうち、尺度が名義尺度か順序尺度のもの。値は分類（カテゴリ）を表し、数字で書いても値どうしの足し算・引き算に意味がない
+    terms: [TERM-scale]
   short: 値が分類（性別・血液型など）を表し、そのままでは足したり平均したりできない変数
 - id: TERM-quant
   name: 量的変数
   en: quantitative variable
   category: データと変数
+  forms: [function]
+  basis:
+    text: 個体（調べる対象の1つ1つ）ごとに値を1つ対応させる変数のうち、尺度が間隔尺度か比例尺度のもの。値は数量を表し、値どうしの差に意味がある（比例尺度なら比にも意味がある）
+    terms: [TERM-scale]
   short: 値が数量（長さ・金額など）を表し、足したり平均したりできる変数
 - id: TERM-scale
   name: 尺度
   en: level of measurement
   category: データと変数
+  forms: [property]
+  basis:
+    text: 変数の値について、意味をもつ比べ方・計算で分けた4つの段階。名義尺度（同じか違うかだけ）、順序尺度（大小の順まで）、間隔尺度（差まで。0 の位置は決め方による）、比例尺度（比まで。0 が「無い」を表す）。上の段階は、下の段階の比べ方を全部含む
   short: データの値がもつ情報の段階で、名義・順序・間隔・比例の4つがある
 - id: TERM-mode
   name: 最頻値
@@ -253,11 +278,18 @@
   name: 割合
   en: ratio
   category: データと変数
+  forms: [number]
+  basis:
+    text: 基準にする量 B に対する、部分の量 A の比 A/B（B を1とみた A の大きさ。100倍すると百分率（%））。B＞0 は定義の要件
   short: 全体に対する部分の大きさを、全体を1（または100%）として表した値
 - id: TERM-point
   name: パーセントポイント
   en: percentage point
   category: データと変数
+  forms: [number]
+  basis:
+    text: 2つの割合 p₁・p₂ を百分率で表したときの差 p₂−p₁ を、その数で表したもの（単位はポイント。10% から 12% は 2 ポイント。前の割合を基準にした相対的な変化 (p₂−p₁)/p₁ とは別）
+    terms: [TERM-ratio]
   short: 2つの割合（%）の差を、%どうしの引き算で表した単位
 - id: TERM-dev
   name: 偏差
@@ -2209,7 +2241,7 @@
   name: ダミー変数
   en: dummy variable
   category: 相関・回帰
-  forms: [rv]
+  forms: [function]
   basis:
     text: 質的変数の1つのカテゴリについて、そのカテゴリに当てはまる個体で1、当てはまらない個体で0をとる変数
     terms: [TERM-qual]

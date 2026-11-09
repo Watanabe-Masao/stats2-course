@@ -462,14 +462,13 @@ relations:
   - id: REL-population-sample
     from: TERM-population
     to: TERM-sample
-    type: 前提
-    premise: learning
-    description: 標本は母集団の一部。何の一部か（母集団）を先に決めないと、標本から何を言うのかが決まらない。
+    type: 定める
+    description: 標本は、母集団から選んだ個体の値の組。母集団が定義に直接出る。
     basis:
       units:
       - U03
       - U17
-    version: 1
+    version: 2
   - id: REL-sample-random
     from: TERM-sample
     to: TERM-random-sampling
@@ -504,14 +503,13 @@ relations:
   - id: REL-sample-statistic
     from: TERM-sample
     to: TERM-statistic
-    type: 前提
-    premise: mathematical
-    description: 統計量は標本のデータから計算する値。
+    type: 定める
+    description: 統計量は、標本の値だけで決まる関数として作る確率変数。標本が定義に直接出る。
     basis:
       units:
       - U03
       - U18
-    version: 1
+    version: 2
   - id: REL-statistic-sampdist
     from: TERM-statistic
     to: TERM-sampdist
@@ -933,34 +931,22 @@ relations:
   - id: REL-ratio-point
     from: TERM-ratio
     to: TERM-point
-    type: 前提
-    premise: mathematical
-    description: パーセントポイントは、2つの割合（%）の差。割合が分かってから、その差の言い方として学ぶ。
+    type: 定める
+    description: パーセントポイントは、% で表した2つの割合の差。割合が定義に直接出る。
     basis:
       units:
       - U01
       - U05T
-    version: 1
+    version: 2
   - id: REL-population-parameter
     from: TERM-population
     to: TERM-parameter
-    type: 前提
-    premise: mathematical
-    description: 母数は母集団の性質を表す値。
+    type: 定める
+    description: 母数は、母集団の個体の値の全体から決まる数。母集団が定義に直接出る。
     basis:
       units:
       - U03
-    version: 1
-  - id: REL-parameter-statistic-contrast
-    from: TERM-parameter
-    to: TERM-statistic
-    type: 対比
-    description: 母数は母集団の値でふつうは分からない。統計量は標本から計算する値で、標本を取り直すたびに変わる。統計量で母数を推定する。
-    gist: 母数は「本当の値（分からない）」、統計量は「手元のデータから出した値（取り直すと変わる）」。手元の値から本当の値を推し量るのが推定。
-    basis:
-      units:
-      - U03
-    version: 1
+    version: 2
   - id: REL-parameter-estimator
     from: TERM-parameter
     to: TERM-estimator
@@ -974,33 +960,34 @@ relations:
   - id: REL-scale-qual
     from: TERM-scale
     to: TERM-qual
-    type: 前提
-    premise: learning
-    description: 名義尺度・順序尺度のデータが質的変数になる。
+    type: 定める
+    description: 質的変数は、名義尺度か順序尺度の値をとる変数。尺度が定義に直接出る。
     basis:
       units:
       - U04
-    version: 1
+    version: 2
   - id: REL-scale-quant
     from: TERM-scale
     to: TERM-quant
-    type: 前提
-    premise: learning
-    description: 間隔尺度・比例尺度のデータが量的変数になる。
+    type: 定める
+    description: 量的変数は、間隔尺度か比例尺度の値をとる変数。尺度が定義に直接出る。
     basis:
       units:
       - U04
-    version: 1
+    version: 2
   - id: REL-qual-quant-contrast
     from: TERM-qual
     to: TERM-quant
-    type: 対比
+    type: 比べる
+    differ: 質的変数は名義尺度か順序尺度で、値は分類を表し、数字で書いても値どうしの足し算・引き算に意味がない。度数・割合で要約し、順序尺度なら大小の順で中央値まで言える。量的変数は間隔尺度か比例尺度で、値は数量を表し、差に意味がある（比例尺度なら比も）ので、平均・分散で要約できる
+    same: どちらも個体の1つ1つに値を1つ対応させる変数で、調べた個体の値を並べるとデータの列になる
+    axis: 尺度の段階（値が分類か数量か）と、それで意味をもつ計算・要約
     description: 質的変数は分類を、量的変数は数量を表す。量的変数は平均や分散を計算できるが、質的変数は度数や割合で要約する。
     gist: 「何の種類か」を表すのが質的、「どれだけか」を表すのが量的。数字で書いてあっても、背番号のように分類なら質的。
     basis:
       units:
       - U04
-    version: 1
+    version: 2
   - id: REL-freqtable-mode
     from: TERM-freqtable
     to: TERM-mode
@@ -2299,3 +2286,12 @@ relations:
     basis:
       units:
       - U31
+
+  - id: REL-statistic-rv
+    from: TERM-statistic
+    to: TERM-rv
+    version: 1
+    type: 一種
+    description: 統計量は、標本の関数として作る確率変数の1つ（分からない母数を含まないもの）。
+    basis:
+      units: [U03, U18]
