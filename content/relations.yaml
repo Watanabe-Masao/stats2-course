@@ -770,39 +770,20 @@ relations:
       - U19
       - U22
     version: 1
-  - id: REL-t-pairedt
-    from: TERM-t
-    to: TERM-paired-t
-    type: 前提
-    premise: mathematical
-    description: 対応のある t 検定は、差の平均を t 分布で調べる。
-    basis:
-      units:
-      - U23
-      - U25
-    version: 1
-  - id: REL-t-welch
-    from: TERM-t
-    to: TERM-welch
-    type: 前提
-    premise: mathematical
-    description: ウェルチの t 検定は、2群の平均の差を t 分布（自由度を近似で決める）で調べる。
-    basis:
-      units:
-      - U23
-      - U25
-    version: 1
   - id: REL-pairedt-welch-contrast
     from: TERM-paired-t
     to: TERM-welch
-    type: 対比
+    type: 比べる
+    differ: 対応のある t 検定は、同じ対象の対の差 Dᵢ を1つの標本として扱い（対の中の個体差が消える）、t(n−1) で棄却域を決める。ウェルチの t 検定は、独立な2群を母分散が等しいと仮定せずに比べ、自由度を近似で決めた t 分布で棄却域を決める
+    same: どちらも「2つの母平均が等しい」という帰無仮説を、平均の差を標準誤差で割った t の形の統計量で調べる仮説検定
+    axis: 2つの平均の差を調べるときの、データの取り方とばらつきの扱い
     description: どちらも2つの平均の差を t 分布で調べる。対応のある t 検定は同じ対象の前後の差を1つの列として扱い、ウェルチの t 検定は別々の2群を、分散が違ってもよいとして比べる。
     gist: 同じ人の前と後なら、差を1人ずつ取って比べる（対応あり）。別の人たちの2群なら、群ごとのばらつきの違いも込みで比べる（ウェルチ）。データの取り方で方法が決まる。
     basis:
       units:
       - U23
       - U25
-    version: 1
+    version: 2
   # ---- P1 骨格：W4（U24〜U27 検定）。#105
   - id: REL-sampdist-test
     from: TERM-sampdist
@@ -814,171 +795,123 @@ relations:
       units:
       - U24
     version: 1
-  - id: REL-test-h0
-    from: TERM-test
-    to: TERM-h0
-    type: 前提
-    premise: mathematical
-    description: 帰無仮説は検定の出発点として立てる仮説。
-    basis:
-      units:
-      - U24
-    version: 1
   - id: REL-h0-h1
     from: TERM-h0
     to: TERM-h1
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 対立仮説は、帰無仮説を棄却したときに採る仮説として決める。
     basis:
       units:
       - U24
-    version: 1
+    version: 2
   - id: REL-h0-teststat
     from: TERM-h0
     to: TERM-test-stat
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 検定統計量は、帰無仮説のもとでの分布が分かるように作る。
     basis:
       units:
       - U24
       - U25
       - U26
-    version: 1
+    version: 2
   - id: REL-teststat-pvalue
     from: TERM-test-stat
     to: TERM-pvalue
-    type: 前提
-    premise: mathematical
+    type: 定める
+    to_form: rv
     description: p値は、検定統計量が観測した値より極端になる確率。
     basis:
       units:
       - U24
       - U26
-    version: 1
+    version: 2
   - id: REL-teststat-reject
     from: TERM-test-stat
     to: TERM-reject
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 棄却域は、検定統計量のとる値の範囲として決める。
     basis:
       units:
       - U24
       - U25
-    version: 1
-  - id: REL-alpha-reject
-    from: TERM-alpha
-    to: TERM-reject
-    type: 前提
-    premise: mathematical
-    description: 棄却域は、帰無仮説のもとで入る確率が有意水準になるように決める。
-    basis:
-      units:
-      - U24
-      - U25
-    version: 1
+    version: 2
   - id: REL-pvalue-alpha-contrast
     from: TERM-pvalue
     to: TERM-alpha
-    type: 対比
+    type: 比べる
+    differ: 有意水準はデータを見る前に決める数（第1種の過誤の確率の上限）。p値は検定統計量の観測値から計算する値で、標本を取り直すと変わる（確率変数の値）
+    same: どちらも帰無仮説のもとでの確率の大きさで、2つを比べて帰無仮説を棄却するかを決める
+    axis: いつ・何から決まるか
+    from_form: number
     description: どちらも確率で、比べて帰無仮説を棄却するか決める。有意水準はデータを見る前に決める基準、p値はデータから計算する値。p値が有意水準以下なら棄却する。
     gist: 有意水準は前もって引いておく線、p値はデータが出した数。線より小さければ「偶然とは考えにくい」と判断する。
     basis:
       units:
       - U24
-    version: 1
-  - id: REL-h1-sides
-    from: TERM-h1
-    to: TERM-sides
-    type: 前提
-    premise: mathematical
-    description: 片側か両側かは、対立仮説が差の向きを決めているかどうかで決まる。
-    basis:
-      units:
-      - U24
-    version: 1
-  - id: REL-reject-sides
-    from: TERM-reject
-    to: TERM-sides
-    type: 前提
-    premise: learning
-    description: 片側・両側は、棄却域を分布のどちらの端に置くかの違いとして理解する。
-    basis:
-      units:
-      - U24
-    version: 1
-  - id: REL-h0-type1
-    from: TERM-h0
-    to: TERM-type1
-    type: 前提
-    premise: mathematical
-    description: 第1種の過誤は、正しい帰無仮説を棄却する誤り。
-    basis:
-      units:
-      - U24
-    version: 1
+    version: 2
   - id: REL-type1-alpha
     from: TERM-type1
     to: TERM-alpha
-    type: 前提
-    premise: mathematical
+    type: 定める
+    from_form: number
     description: 有意水準は、第1種の過誤が起こる確率の上限として決める。
     basis:
       units:
       - U24
-    version: 1
+    version: 2
   - id: REL-type1-type2-contrast
     from: TERM-type1
     to: TERM-type2
-    type: 対比
+    type: 比べる
+    differ: 第1種の過誤は、帰無仮説が正しいのに棄却する誤り。第2種の過誤は、帰無仮説が誤っているのに棄却しない誤り。標本の大きさが同じなら、棄却域を狭めて第1種の過誤の確率を下げると、第2種の過誤の確率は上がる（下がらない）
+    same: どちらも検定の判定の誤りで、棄却域から決まる事象（とその確率）
+    axis: 帰無仮説が正しいか誤っているか と、判定（棄却する・しない）の組
+    to_form: event
+    from_form: event
     description: 第1種の過誤は正しい帰無仮説を棄却する誤り、第2種の過誤は誤った帰無仮説を棄却しない誤り。データの数が同じなら、有意水準を小さくして第1種を減らすと、第2種は増える。
     gist: 「無実の人を有罪にする」のが第1種、「犯人を見逃す」のが第2種。片方を厳しくすると、もう片方が起こりやすくなる。
     basis:
       units:
       - U24
-    version: 1
+    version: 2
   - id: REL-type2-power
     from: TERM-type2
     to: TERM-power
-    type: 前提
-    premise: mathematical
+    type: 定める
+    from_form: number
     description: 検出力は1から第2種の過誤の確率を引いたもの。
     basis:
       units:
       - U24
-    version: 1
+    version: 2
   - id: REL-test-pairedt
-    from: TERM-test
-    to: TERM-paired-t
-    type: 前提
-    premise: learning
+    from: TERM-paired-t
+    to: TERM-test
+    type: 一種
     description: 対応のある t 検定は、仮説検定の手順を差の平均に当てはめたもの。
     basis:
       units:
       - U25
-    version: 1
+    version: 2
   - id: REL-test-welch
-    from: TERM-test
-    to: TERM-welch
-    type: 前提
-    premise: learning
+    from: TERM-welch
+    to: TERM-test
+    type: 一種
     description: ウェルチの t 検定は、仮説検定の手順を2群の平均の差に当てはめたもの。
     basis:
       units:
       - U25
-    version: 1
+    version: 2
   - id: REL-sampleprop-pool
     from: TERM-sample-prop
     to: TERM-pool
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: プールした比率は、2群の標本比率を、標本の大きさで重みを付けて合わせたもの。
     basis:
       units:
       - U26
-    version: 1
+    version: 2
   - id: REL-h0-pool
     from: TERM-h0
     to: TERM-pool
@@ -992,84 +925,50 @@ relations:
   - id: REL-crosstab-indeptest
     from: TERM-crosstab
     to: TERM-indep-test
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 独立性検定は、クロス集計表の度数から行う。
     basis:
       units:
       - U27
-    version: 1
-  - id: REL-indep-expected
-    from: TERM-indep
-    to: TERM-expected
-    type: 前提
-    premise: mathematical
-    description: 独立性検定の期待度数は、独立なら同時確率が積になることから、行の合計×列の合計÷総数で求める。
-    basis:
-      units:
-      - U27
-    version: 1
+    version: 2
   - id: REL-h0-expected
     from: TERM-h0
     to: TERM-expected
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 期待度数は、帰無仮説（適合度検定なら仮定した分布、独立性検定なら独立）が正しいとしたときに、各欄に入ると見込む度数。帰無仮説を決めないと求められない。
     basis:
       units:
       - U27
-    version: 1
+    version: 2
   - id: REL-expect-expected
     from: TERM-expect
     to: TERM-expected
-    type: 応用
+    type: 定める
+    from_form: operation
     description: 期待度数は、各欄に入る数の期待値（総数×その欄の確率）。名前は似ているが、確率変数の平均（期待値）を度数に当てはめたもの。
     basis:
       units:
       - U13
       - U27
-    version: 1
+    version: 2
   - id: REL-expected-gof
     from: TERM-expected
     to: TERM-gof
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 適合度検定は、観測度数と期待度数のずれから統計量を作る。
     basis:
       units:
       - U27
-    version: 1
+    version: 2
   - id: REL-expected-indeptest
     from: TERM-expected
     to: TERM-indep-test
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 独立性検定は、観測度数と期待度数のずれから統計量を作る。
     basis:
       units:
       - U27
-    version: 1
-  - id: REL-chi2-gof
-    from: TERM-chi2
-    to: TERM-gof
-    type: 前提
-    premise: mathematical
-    description: 適合度検定の統計量は、近似的にカイ二乗分布に従う。
-    basis:
-      units:
-      - U27
-    version: 1
-  - id: REL-chi2-indeptest
-    from: TERM-chi2
-    to: TERM-indep-test
-    type: 前提
-    premise: mathematical
-    description: 独立性検定の統計量は、近似的にカイ二乗分布に従う。
-    basis:
-      units:
-      - U27
-    version: 1
-  # ---- P1 骨格：W2（U01〜U08・U05T 記述統計）。#105
+    version: 2
   - id: REL-ratio-point
     from: TERM-ratio
     to: TERM-point
@@ -1640,60 +1539,37 @@ relations:
   - id: REL-df-ms
     from: TERM-df
     to: TERM-ms
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 平均平方は、平方和を自由度で割ったもの。
     basis:
       units:
       - U30
       - U32
-    version: 1
+    version: 2
   - id: REL-ms-anova
     from: TERM-ms
     to: TERM-anova
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 分散分析の F 値は、群間の平均平方を群内の平均平方で割ったもの。
     basis:
       units:
       - U32
-    version: 1
-  - id: REL-f-anova
-    from: TERM-f
-    to: TERM-anova
-    type: 前提
-    premise: mathematical
-    description: 分散分析の F 値は、帰無仮説のもとで F 分布に従う。
-    basis:
-      units:
-      - U32
-    version: 1
+    version: 2
   - id: REL-test-anova
-    from: TERM-test
-    to: TERM-anova
-    type: 前提
-    premise: learning
+    from: TERM-anova
+    to: TERM-test
+    type: 一種
     description: 分散分析は、仮説検定の手順を3つ以上の群の平均に当てはめたもの。
     basis:
       units:
       - U32
-    version: 1
+    version: 2
   - id: REL-anova-multcomp
     from: TERM-anova
     to: TERM-multcomp
     type: 前提
     premise: learning
     description: 分散分析で「どこかに差がある」と分かったあと、どの群の間かを調べるのが多重比較。
-    basis:
-      units:
-      - U32
-    version: 1
-  - id: REL-type1-multcomp
-    from: TERM-type1
-    to: TERM-multcomp
-    type: 前提
-    premise: mathematical
-    description: 検定をくり返すと、どれかで第1種の過誤が起こる確率が大きくなる。多重比較はそれを抑える調整。
     basis:
       units:
       - U32
@@ -2196,3 +2072,140 @@ relations:
     gist: 「平均すれば当たる」と「たくさん取れば近づく」は別の性質。片方だけを満たす推定量がある。
     basis:
       units: [U21]
+
+  - id: REL-reject-type1
+    from: TERM-reject
+    to: TERM-type1
+    version: 1
+    type: 定める
+    to_form: event
+    description: 第1種の過誤は、帰無仮説が正しいときに検定統計量が棄却域に入る判定の誤り。棄却域が定義に直接出る。
+    basis:
+      units: [U24]
+
+  - id: REL-reject-type2
+    from: TERM-reject
+    to: TERM-type2
+    version: 1
+    type: 定める
+    to_form: event
+    description: 第2種の過誤は、帰無仮説が誤っているときに検定統計量が棄却域に入らない判定の誤り。棄却域が定義に直接出る。
+    basis:
+      units: [U24]
+
+  - id: REL-alpha-test
+    from: TERM-alpha
+    to: TERM-test
+    version: 1
+    type: 定める
+    description: 仮説検定は、有意水準 α を前もって決め、それに合わせて棄却域を選ぶ手続き。有意水準が定義に直接出る。
+    basis:
+      units: [U24]
+
+  - id: REL-h1-test
+    from: TERM-h1
+    to: TERM-test
+    version: 1
+    type: 定める
+    description: 仮説検定は、対立仮説の向きに合わせて棄却域を選ぶ。対立仮説が定義に直接出る。
+    basis:
+      units: [U24]
+
+  - id: REL-dist-h0
+    from: TERM-dist
+    to: TERM-h0
+    version: 1
+    type: 定める
+    description: 帰無仮説は、母集団の分布（その母数）についての仮説。確率分布が定義に直接出る。
+    basis:
+      units: [U24]
+
+  - id: REL-test-multcomp
+    from: TERM-test
+    to: TERM-multcomp
+    version: 1
+    type: 定める
+    description: 多重比較は、複数の帰無仮説をそれぞれ仮説検定するときの判定の手続き。仮説検定が定義に直接出る。
+    basis:
+      units: [U29]
+
+  - id: REL-indep-indeptest
+    from: TERM-indep
+    to: TERM-indep-test
+    version: 1
+    type: 定める
+    description: 独立性検定の帰無仮説は「2つの変数は独立」。独立が定義に直接出る。
+    basis:
+      units: [U27]
+
+  - id: REL-samplemean-pairedt
+    from: TERM-sample-mean
+    to: TERM-paired-t
+    version: 1
+    type: 定める
+    description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
+    basis:
+      units: [U26]
+
+  - id: REL-unbvar-pairedt
+    from: TERM-unbvar
+    to: TERM-paired-t
+    version: 1
+    type: 定める
+    description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。不偏分散が定義に直接出る。
+    basis:
+      units: [U26]
+
+  - id: REL-samplemean-welch
+    from: TERM-sample-mean
+    to: TERM-welch
+    version: 1
+    type: 定める
+    description: ウェルチの t 検定は、群ごとの標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
+    basis:
+      units: [U26]
+
+  - id: REL-unbvar-welch
+    from: TERM-unbvar
+    to: TERM-welch
+    version: 1
+    type: 定める
+    description: ウェルチの t 検定は、群ごとの標本平均と不偏分散で作る t で検定する。不偏分散が定義に直接出る。
+    basis:
+      units: [U26]
+
+  - id: REL-teststat-statistic
+    from: TERM-test-stat
+    to: TERM-statistic
+    version: 1
+    type: 一種
+    description: 検定統計量は、帰無仮説を棄却するかを決めるために使う統計量。
+    basis:
+      units: [U24]
+
+  - id: REL-sides-test
+    from: TERM-sides
+    to: TERM-test
+    version: 1
+    type: 一種
+    description: 片側検定・両側検定は、対立仮説の向きで棄却域の置き方を決めた仮説検定。
+    basis:
+      units: [U24]
+
+  - id: REL-gof-test
+    from: TERM-gof
+    to: TERM-test
+    version: 1
+    type: 一種
+    description: 適合度検定は、区分ごとの度数が決めた確率に合うかを調べる仮説検定。
+    basis:
+      units: [U27]
+
+  - id: REL-indeptest-test
+    from: TERM-indep-test
+    to: TERM-test
+    version: 1
+    type: 一種
+    description: 独立性検定は、クロス集計表の2つの変数が独立かを調べる仮説検定。
+    basis:
+      units: [U27]

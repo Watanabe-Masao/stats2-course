@@ -293,6 +293,75 @@ claims:
       version: dc2b65a
     external: なし
   version: 1
+- id: CLM-17
+  label: ④-17
+  kind: 同値
+  statement:
+    text: 同じデータ（n≧2、s＞0）と同じ α で、1標本の両側 t 検定が H₀：μ＝μ₀ を棄却しない（|X̄−μ₀|/(s/√n)≦t_{α/2}(n−1)）ことと、μ₀ が区間 X̄ ± t_{α/2}(n−1)·s/√n に入ることは同値
+  premises:
+    subjects:
+    - TERM-sides
+  conclusion:
+    subjects:
+    - TERM-ci
+  grounds:
+  - source:
+      title: 不等式を μ₀ について解く（データの値についての恒等式。正規性は、検定と区間が約束する性質の側の仮定）
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-18a
+  label: ④-18a
+  kind: 等しい
+  statement:
+    text: 2群のデータ（n₁＋n₂≧3、群内平方和 SSW＞0）で、一元配置分散分析の F 統計量は、プールした分散を使う2標本 t 統計量の2乗に等しい
+  premises:
+    subjects:
+    - TERM-anova
+  conclusion:
+    subjects:
+    - TERM-anova
+  grounds:
+  - source:
+      title: 平方和の計算（データの値についての恒等式。独立・正規性などの分布の仮定は条件にしない。それは 18b の手続きの保証の側）
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-18b
+  label: ④-18b
+  kind: 等しい
+  statement:
+    text: F(1, ν) の上側 α 点は t(ν) の上側 α/2 点の2乗に等しいので、水準 α の F 検定と両側 t 検定の判定は一致する（ν＝n₁＋n₂−2）
+  premises:
+    subjects:
+    - TERM-anova
+  conclusion:
+    predicates:
+    - TERM-f
+    - TERM-t
+  grounds:
+  - claim: CLM-18a
+  - claim: CLM-9
+  - source:
+      title: 独立・正規性・等分散は、2つの検定が水準 α を守るための仮定（③）。判定の一致そのものは、仮定によらない
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
 - id: CLM-19
   label: ④-19
   kind: 極限
@@ -362,6 +431,32 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    external: なし
+  version: 1
+- id: CLM-22
+  label: ④-22
+  kind: 同値
+  statement:
+    text: H₀ が単純仮説（1つの分布。合成なら P_H₀ を H₀ の中での上限に替える）で、極端さを測る量（片側なら T、両側なら |T−中心| など）が連続分布か、値が離散で上から集まらない分布（整数値など）のとき、同じ検定統計量と同じ極端さの向きで、p 値を P_H₀(T が観測値と同じかそれより極端)、水準 α の棄却域を P_H₀(T∈棄却域)≦α となる最大の「c 以上に極端」の集合と定めると、p 値≦α であることと、観測値が棄却域に入ることは同値
+  premises:
+    subjects:
+    - TERM-pvalue
+    predicates:
+    - TERM-alpha
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-reject
+  grounds:
+  - source:
+      title: p 値と棄却域の定義から
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: D
+      date: '2026-11-08'
+      version: 525bbdb
     external: なし
   version: 1
 - id: CLM-23
@@ -461,6 +556,74 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    external: 未照合
+  version: 1
+- id: CLM-28a
+  label: ④-28a
+  kind: 従う
+  statement:
+    text: n≧2 の正規母集団（σ＞0）の無作為標本で、H₀：μ＝μ₀ が正しいとき、t 統計量 (X̄−μ₀)/(s/√n) は t(n−1) に従う
+  premises:
+    subjects:
+    - TERM-sample-mean
+    - TERM-unbvar
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-t
+  grounds:
+  - claim: CLM-6a
+  - claim: CLM-10
+  - source:
+      title: 正規母集団の標本で X̄ と s² は独立
+    external: true
+  - source:
+      title: t 分布の定義から
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: 未照合
+  version: 1
+- id: CLM-28b
+  label: ④-28b
+  kind: 極限
+  statement:
+    text: n 個の観測が独立に k 個の区分に入り（区分の境目はデータを見る前に決める。どの区分の確率も正）、H₀ が正しく、m 個の母数を区分の度数から最尤法（または修正した最小カイ二乗法）で推定し、Cramér（1946、pp.477–479）の正則条件を満たすとき、Σ(O−E)²/E の分布は n→∞ で χ²(k−1−m) に近づく（教材では k−1−m≧1 の場合だけを扱う。適用の目安「期待度数が5以上」は、主張ではなく適合度検定（手続き）の条件。③ の 2。#278）。正則条件の中身（真の母数が内点・区分の確率が母数で微分でき、そのヤコビ行列の階数が m、など）は記憶によるもので、原典でも2次資料でも確かめていない。確定した条件に数えない
+  premises:
+    subjects:
+    - TERM-expected
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-chi2
+  grounds:
+  - source:
+      title: Cramér 1946（原典は未照合。2次資料で結論と頁まで確かめた）
+    external: true
+  - source:
+      title: 生のデータから最尤法で推定すると極限は χ²(k−1−m) と χ²(k−1) の間になる（Chernoff・Lehmann 1954。原典は未照合、2次資料で確かめた）。境目をデータから決める場合は範囲外
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: D
+      date: '2026-11-08'
+      version: 525bbdb
+    - method: 独立な確かめ
+      by: E
+      date: '2026-11-08'
+      version: 10c901e
     external: 未照合
   version: 1
 - id: CLM-31
@@ -574,4 +737,66 @@ claims:
       date: '2026-11-09'
       version: 1dd9337
     external: なし
+  version: 1
+- id: CLM-35
+  label: ④-35
+  kind: 従う
+  statement:
+    text: n≧2 で、対の差 D₁, …, Dₙ が独立に同じ正規分布 N(μ_D, σ_D²)（σ_D＞0）に従い、H₀：μ_D＝0 が正しいとき、t＝D̄/(s_D/√n) は t(n−1) に従う
+  premises:
+    subjects:
+    - TERM-paired-t
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-t
+  conditions:
+  - text: D₁, …, Dₙ が独立に同じ正規分布に従う
+    kind: 仮定
+    outside: t(n−1) に従うとは保証できない
+  - text: H₀（μ_D＝0）が正しい
+    kind: 仮定
+    outside: t(n−1) に従うとは保証できない（H₀ が誤りなら、中心がずれた分布になる）
+  grounds:
+  - claim: CLM-28a
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  version: 1
+- id: CLM-36
+  label: ④-36
+  kind: 従う
+  statement:
+    text: g 群（g≧2、全体の大きさ n＞g）の観測が独立で、各群が同じ分散 σ²（σ＞0）の正規分布に従い、H₀：g 個の母平均がすべて等しい が正しいとき、F＝群間の平均平方÷群内の平均平方 は F(g−1, n−g) に従う
+  premises:
+    subjects:
+    - TERM-anova
+    - TERM-ms
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-f
+  conditions:
+  - text: 観測がすべて独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: F(g−1, n−g) に従うとは保証できない
+  - text: 各群が正規分布に従い、分散が等しい
+    kind: 仮定
+    outside: F(g−1, n−g) に従うとは保証できない
+  - text: H₀ が正しい
+    kind: 仮定
+    outside: F(g−1, n−g) に従うとは保証できない（H₀ が誤りなら、大きい側にずれた分布になる）
+  grounds:
+  - source:
+      title: 群間平方和/σ²・群内平方和/σ² が独立に χ²(g−1)・χ²(n−g) に従う（Cochran の定理）
+    external: true
+  - source:
+      title: F 分布の定義
+  teaching:
+    conclusion: true
+    proof: 範囲外
   version: 1
