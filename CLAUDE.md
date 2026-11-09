@@ -217,6 +217,7 @@
 ## 公開
 
 - 公開サイト（deploy_site.sh）と Notion への公開は、全部が通った main から行う。手順は docs/authoring.md の「公開」。
+- **データの意味が変わる公開は、画面を先に公開する**（#293。2026-11-09、⑤ の種類を描けない画面のまま確率分布を公開した）。新しい種類・項目を画面（knowledge-net）が描けるようにして公開してから、教材を公開する。build/screen_check.py が公開中の画面の型の改訂と描ける ⑤ の種類（src/screen-kinds.json）を見て止める。
 - 公開されるのは out/site/ だけ（原本・予測の答え・個人データは出ない）。ラボの `slug` と図の ID は URL の一部なので変えない。
 - 旧版（Notion）の残りは `publish/legacy.yaml` で管理する。旧版を新しく参照しない（refs に足さない）。削除済みの ID が戻ると build が止まる。
 - 個人用の学習記録（publish/notion.yaml の personal_root）は教材の生成物から読み書きしない。

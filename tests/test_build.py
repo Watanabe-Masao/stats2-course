@@ -704,6 +704,14 @@ class TestNetwork(unittest.TestCase):
         from screen_check import schemas_for
         self.assertEqual(schemas_for(2)["schema_revision"][1], "schema/kn-schema-v2.json")
         self.assertEqual(schemas_for(1)["schema_revision"][1], "schema/kn-schema-v1.json")
+        # 意味の確かめ（#293）：型の改訂が同じでも、画面が ⑤ の種類を描けなければ止める（2026-11-09、確率分布の公開ですり抜けた）。
+        # 想定する故障：⑤ の種類を描けない画面のまま公開する。移していない行（legacy_type）まで描けないと数えて止める。
+        # 検出の確かめ：kinds_check が type を見ないと1つ目が、legacy_type も数えると3つ目が落ちる
+        from screen_check import kinds_check
+        data = {"relations": [{"type": "定める"}, {"type": "移る"}, {"legacy_type": "前提"}]}
+        self.assertIn("移る", kinds_check(data, {"定める"}) or "")
+        self.assertIsNone(kinds_check(data, {"定める", "移る"}))
+        self.assertIsNone(kinds_check({"relations": [{"legacy_type": "前提"}]}, set()))
 
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
