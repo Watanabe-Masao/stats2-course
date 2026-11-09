@@ -23,6 +23,34 @@ claims:
       version: dc2b65a
     external: なし
   version: 1
+- id: CLM-2
+  label: ④-2
+  kind: 従う
+  statement:
+    text: X が N(μ, σ²)（σ＞0）に従うとき、(X−μ)/σ は N(0, 1) に従う
+  premises:
+    subjects:
+    - TERM-normal
+  conclusion:
+    subjects:
+    - TERM-std
+    predicates:
+    - TERM-std-normal
+  grounds:
+  - source:
+      title: 密度の変数変換
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 3eaf05a
+    external: なし
+  version: 1
 - id: CLM-3
   label: ④-3
   kind: 極限
@@ -233,9 +261,6 @@ claims:
     predicates:
     - TERM-chi2
   conditions:
-  - text: n≧2
-    kind: 仮定
-    outside: 不偏分散が定まらない
   - text: X₁, …, Xₙ が独立に同じ N(μ, σ²)（σ＞0）に従う
     kind: 仮定
     terms:
@@ -259,7 +284,48 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 3eaf05a
     external: 未照合
+  version: 1
+- id: CLM-11
+  label: ④-11
+  kind: 推定量の性質
+  statement:
+    text: n≧2 で X₁, …, Xₙ が独立に同じ分布に従い、分散 σ² が有限のとき、すべての母数の値で E(s²)＝σ²
+  premises:
+    subjects:
+    - TERM-unbvar
+  conclusion:
+    subjects:
+    - TERM-unbvar
+    predicates:
+    - TERM-unbiased
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ分布に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: E(s²)＝σ² とは保証できない（平均が違うと大きい側にずれ、相関があると一般にずれる（共分散の和が正なら小さい側に）。分散が違うと E(s²) は分散の平均になる）
+  grounds:
+  - source:
+      title: E(ΣXᵢ²)−nE(X̄²)＝n(σ²＋μ²)−n(σ²/n＋μ²)＝(n−1)σ²（根拠の計算で使うのは、各 Xᵢ が同じ平均・同じ分散で互いに無相関なこと。これで足りる。独立同分布は教材で置く十分条件）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 91f0acc
+    external: なし
   version: 1
 - id: CLM-13
   label: ④-13
