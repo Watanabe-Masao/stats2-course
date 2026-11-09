@@ -168,6 +168,7 @@
   name: 質的変数
   en: qualitative variable
   category: データと変数
+  forms: [rv]
   short: 値が分類（性別・血液型など）を表し、そのままでは足したり平均したりできない変数
 - id: TERM-quant
   name: 量的変数
@@ -705,6 +706,10 @@
   name: 相関係数
   en: correlation coefficient
   category: 相関・回帰
+  forms: [number]
+  basis:
+    text: 量的な2変数のデータ (x₁, y₁), …, (xₙ, yₙ)（n≧2。x と y のデータの標準偏差がどちらも0でないことは定義の要件）について、データの共分散を x と y のデータの標準偏差の積で割った値 r＝s_xy/(s_x·s_y)（割る数は分子と分母で消えるので、r＝Σ(xᵢ−x̄)(yᵢ−ȳ)/√{Σ(xᵢ−x̄)²·Σ(yᵢ−ȳ)²} と同じ値）
+    terms: [TERM-data-cov, TERM-data-sd]
   short: 2つの量的変数の直線的な関係の強さと向きを、−1から1の数で表した値
 - id: TERM-complement
   name: 余事象
@@ -2125,51 +2130,89 @@
   name: 偏相関係数
   en: partial correlation coefficient
   category: 相関・回帰
+  forms: [number]
+  basis:
+    text: 3つの量的変数 x・y・z のデータについて、2つずつの相関係数 r_xy・r_xz・r_yz から求める r_xy・z＝(r_xy−r_xz r_yz)/√{(1−r_xz²)(1−r_yz²)}（r_xz²＜1 かつ r_yz²＜1 は定義の要件）
+    terms: [TERM-corr]
   short: 第3の変数の影響を取り除いたあとの、2つの変数の相関係数
 - id: TERM-spurious
   name: 擬相関
   en: spurious correlation
   category: 相関・回帰
+  forms: [property]
+  basis:
+    text: 2つの変数の間に直接の因果の関係がないのに、両方に関係する第3の変数などのために、2つの変数の相関係数が0から離れて見えること
+    terms: [TERM-corr]
   short: 2つの変数に直接の関係がないのに、共通の第3の変数などのために見かけ上あらわれる相関
 - id: TERM-ols
   name: 最小二乗法
   en: least squares method
   category: 相関・回帰
+  forms: [procedure]
+  basis:
+    text: 回帰式の係数を、データの残差の2乗の和 Σeᵢ² が最小になるように決める方法（最小にする係数が1つに決まることは、切片の列（すべて1）と説明変数の値の列が1次独立であること（単回帰では x が全部同じでないこと）で保たれる）
+    terms: [TERM-resid]
   short: 残差の2乗の和が最小になるように、回帰式の係数を決める方法
 - id: TERM-regcoef
   name: 回帰係数
   en: regression coefficient
   category: 相関・回帰
+  forms: [number]
+  basis:
+    text: 目的変数 y を説明変数 x₁, …, x_k の1次式 ŷ＝b₀＋b₁x₁＋…＋b_kx_k で表す回帰式を最小二乗法で求めたときの、説明変数 x_j に掛かる係数 b_j（切片の列（すべて1）と説明変数の値の列が1次独立であることは定義の要件。そうでないと係数が1つに決まらない。単回帰では x が全部同じでないこと）
+    terms: [TERM-ols]
   short: 回帰式で、説明変数が1増えたときに目的変数がどれだけ変わると見込むかを表す係数
 - id: TERM-resid
   name: 残差
   en: residual
   category: 相関・回帰
+  forms: [number]
+  basis:
+    text: データに当てはめた回帰式について、i 番目の観測値 yᵢ から、その説明変数の値での回帰式の予測値 ŷᵢ を引いた値 eᵢ＝yᵢ−ŷᵢ
   short: 観測した値から、回帰式で予測した値を引いた値
 - id: TERM-r2
   name: 決定係数
   en: coefficient of determination
   category: 相関・回帰
-  short: 目的変数のばらつきのうち、回帰式で説明できる割合（0〜1）
+  forms: [number]
+  basis:
+    text: 回帰式を当てはめたデータで、残差の2乗の和を目的変数の偏差の2乗の和で割り、1から引いた値 R²＝1−Σeᵢ²/Σ(yᵢ−ȳ)²（Σ(yᵢ−ȳ)²＞0 は定義の要件）
+    terms: [TERM-resid, TERM-dev]
+  short: 目的変数のばらつきのうち、回帰式で説明できる割合（切片を含む最小二乗では0〜1）
 - id: TERM-extrap
   name: 外挿
   en: extrapolation
   category: 相関・回帰
+  forms: [procedure]
+  basis:
+    text: 回帰式を、当てはめに使ったデータの説明変数の値の範囲の外の値に当てはめて、目的変数を予測すること
   short: 回帰式を、データのある範囲の外の説明変数の値に当てはめて予測すること
 - id: TERM-mreg
   name: 重回帰分析
   en: multiple regression analysis
   category: 相関・回帰
+  forms: [procedure]
+  basis:
+    text: 目的変数 y を k 個（k≧1）の説明変数 x₁, …, x_k の1次式 ŷ＝b₀＋b₁x₁＋…＋b_kx_k で表す回帰式を、最小二乗法で求める分析（名前の「重」は k≧2 の場合を指して使う）
+    terms: [TERM-ols]
   short: 2つ以上の説明変数で目的変数を表す式を求める分析
 - id: TERM-dummy
   name: ダミー変数
   en: dummy variable
   category: 相関・回帰
+  forms: [rv]
+  basis:
+    text: 質的変数の1つのカテゴリについて、そのカテゴリに当てはまる個体で1、当てはまらない個体で0をとる変数
+    terms: [TERM-qual]
   short: 質的変数を回帰分析で使うため、当てはまれば1・当てはまらなければ0とした変数
 - id: TERM-adjr2
   name: 自由度調整済み決定係数
   en: adjusted coefficient of determination
   category: 相関・回帰
+  forms: [number]
+  basis:
+    text: k 個の説明変数の回帰式を n 個のデータに当てはめたとき（n−k−1≧1 は定義の要件）、決定係数 R² を全体の自由度 n−1 と残差の自由度 n−k−1 で補正した 1−(1−R²)(n−1)/(n−k−1)
+    terms: [TERM-r2, TERM-df]
   short: 説明変数を増やすだけでは大きくならないように、自由度で補正した決定係数
 - id: TERM-ms
   name: 平均平方
@@ -2184,6 +2227,10 @@
   name: 多重共線性
   en: multicollinearity
   category: 相関・回帰
+  forms: [property]
+  basis:
+    text: 重回帰分析で、説明変数どうしの間に強い1次の関係がある（ある説明変数が、ほかの説明変数の1次式でほぼ表せる）こと
+    terms: [TERM-mreg]
   short: 重回帰分析で、説明変数どうしの相関が強く、回帰係数の推定が不安定になること
 - id: TERM-strat-sampling
   name: 層化抽出
@@ -2405,6 +2452,10 @@
   name: 単回帰
   en: simple linear regression
   category: 相関・回帰
+  forms: [procedure]
+  basis:
+    text: 1つの説明変数 x で目的変数 y を表す直線の式 ŷ＝a＋bx（回帰直線）を、最小二乗法で求める分析
+    terms: [TERM-ols]
   short: 1つの説明変数で目的変数を表す直線の式（回帰直線）を求める分析
 - id: TERM-std-normal
   name: 標準正規分布
@@ -2438,3 +2489,12 @@
     text: データの分散の正の平方根（データの値と同じ単位のばらつき）
     terms: [TERM-data-var]
   short: データの分散の正の平方根で、データのばらつきを元の単位で表す
+- id: TERM-data-cov
+  name: データの共分散
+  en: covariance of data
+  category: 相関・回帰
+  forms: [number]
+  basis:
+    text: 量的な2変数のデータ (x₁, y₁), …, (xₙ, yₙ)（n≧1）の、x と y の偏差の積の平均 {(x₁−x̄)(y₁−ȳ)＋…＋(xₙ−x̄)(yₙ−ȳ)}/n
+    terms: [TERM-dev]
+  short: 2つの量的変数のデータで、偏差の積を平均した値で、2つが同じ向きにずれるか逆向きにずれるかを表す

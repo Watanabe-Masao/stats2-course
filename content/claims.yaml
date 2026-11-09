@@ -357,6 +357,32 @@ claims:
       version: dc2b65a
     external: なし
   version: 1
+- id: CLM-15
+  label: ④-15
+  kind: 等しい
+  statement:
+    text: 切片を含む単回帰を最小二乗で当てはめ、S_xx＞0 かつ S_yy＞0 のとき、決定係数 R² は相関係数 r の2乗に等しい
+  premises:
+    subjects:
+    - TERM-slr
+    predicates:
+    - TERM-ols
+  conclusion:
+    subjects:
+    - TERM-r2
+    predicates:
+    - TERM-corr
+  grounds:
+  - source:
+      title: 平方和の分解 S_yy＝回帰平方和＋残差平方和（切片があるので成り立つ）。回帰平方和＝b²S_xx＝S_xy²/S_xx
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
 - id: CLM-17
   label: ④-17
   kind: 同値
@@ -924,4 +950,34 @@ claims:
       date: '2026-11-09'
       version: 60d6f01
     external: 未照合
+  version: 1
+- id: CLM-37
+  label: ④-37
+  kind: 等しい
+  statement:
+    text: 単回帰 ŷ＝a＋bx の傾き b は、相関係数 r に x・y の標準偏差の比 s_y/s_x を掛けたものに等しい
+  premises:
+    subjects:
+    - TERM-slr
+    predicates:
+    - TERM-ols
+  conclusion:
+    subjects:
+    - TERM-regcoef
+    predicates:
+    - TERM-corr
+  grounds:
+  - source:
+      title: 最小二乗の解 b＝S_xy/S_xx（正規方程式）と r の定義 S_xy/√(S_xx·S_yy) から b＝r·√(S_yy/S_xx)。s_y/s_x＝√(S_yy/S_xx)（割る数が比で消える）
+  conditions:
+  - text: s_x・s_y を同じ割る数（n か n−1）で求める
+    kind: 仮定
+    outside: 割る数が違うと比 s_y/s_x がずれ、√(n/(n−1)) 倍などの違いが出る
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: Q
+      date: '2026-11-10'
+      version: c69a6d9
+    external: なし
   version: 1
