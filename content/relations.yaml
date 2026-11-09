@@ -8,20 +8,13 @@
 #   「前提をさかのぼる」でたどるのは前提・導出・一般化・特殊化・統合だけ。変換・対比・応用はたどらない。学ぶ順に要るもの（例：ポアソン分布を二項分布の極限として学ぶ）は、変換とは別に「前提」（premise: learning）で書く。
 # basis：根拠（その関係を扱う単元 units、導出 derivation）。
 relations:
-  - id: REL-rv-expect
-    from: TERM-rv
-    to: TERM-expect
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 期待値は、確率変数のとる値とその確率から作る。
-    basis: {units: [U13]}
   - id: REL-expect-var
     from: TERM-expect
     to: TERM-var
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
+    to_form: operation
+    from_form: operation
     description: 分散は「期待値からのずれ」の2乗の期待値。期待値がなければ測る基準がない。
     basis: {units: [U13]}
   - id: REL-fact-comb
@@ -152,22 +145,6 @@ relations:
       - {id: LAB-pois, preset: rel-contrast, purpose: n・p を自分で動かし、二項とポアソンの棒の切れ方と広がりを比べる}
     figures: [FIG-LAB-pois-rel-contrast-tour-1, FIG-LAB-pois-rel-contrast-tour-2]
     basis: {units: [U15]}
-  - id: REL-var-std
-    from: TERM-var
-    to: TERM-std
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 標準化では、分散の平方根（標準偏差）で割る。
-    basis: {units: [U16]}
-  - id: REL-expect-std
-    from: TERM-expect
-    to: TERM-std
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 標準化では、まず期待値（平均）を引く。
-    basis: {units: [U16]}
   - id: REL-std-normal
     from: TERM-normal
     to: TERM-std-normal
@@ -176,6 +153,7 @@ relations:
       - {id: LAB-z, preset: s4-normal, purpose: 標準化すると、どの正規分布も同じ表で読める}
     figures: [FIG-U16-concept, FIG-U16-stdnormal]
     type: 移る
+    claim: CLM-2
     gist: どの正規分布も、平均を引いて標準偏差で割れば同じ形（標準正規分布）になる。だから表は1つでよい。
     reversible: true
     operation: TERM-std
@@ -201,17 +179,18 @@ relations:
   - id: REL-dist-expect
     from: TERM-dist
     to: TERM-expect
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
+    to_form: operation
     description: 期待値は、確率分布の「値×確率」を全部足して作る。分布を1つの数に要約したもの。
     basis: {units: [U13]}
   - id: REL-var-sd
     from: TERM-var
     to: TERM-sd
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
+    to_form: operation
+    from_form: operation
     description: 標準偏差は分散の正の平方根。2乗した単位を元の単位に戻す。
     basis: {units: [U13]}
   - id: REL-var-cov
@@ -343,9 +322,9 @@ relations:
   - id: REL-sd-std
     from: TERM-sd
     to: TERM-std
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
+    from_form: operation
     description: 標準化では、平均を引いたあと標準偏差で割り、単位のない「標準偏差いくつ分」にする。
     basis: {units: [U16]}
   - id: REL-geom-negbinom
@@ -596,17 +575,6 @@ relations:
       - U19
     version: 1
     question: 整数の棒を曲線で近似するとき、なぜ境目を 0.5 ずらす？   # このつながりで考える問い（#188 07c）
-  - id: REL-var-unbvar
-    from: TERM-var
-    to: TERM-unbvar
-    type: 前提
-    premise: mathematical
-    description: 不偏分散は分散の計算で割る数を n から n−1 にしたもの。
-    basis:
-      units:
-      - U07
-      - U18
-    version: 1
   - id: REL-unbvar-df
     from: TERM-unbvar
     to: TERM-df
@@ -715,16 +683,6 @@ relations:
       units:
       - U21
     version: 2
-  - id: REL-unbiased-unbvar
-    from: TERM-unbiased
-    to: TERM-unbvar
-    type: 応用
-    description: 不偏分散は、不偏性をもつように割る数を n−1 にした分散の推定量。
-    basis:
-      units:
-      - U18
-      - U21
-    version: 1
   - id: REL-lln-consistency
     from: TERM-lln
     to: TERM-consistency
@@ -1044,39 +1002,6 @@ relations:
       units:
       - U04
     version: 1
-  - id: REL-sigma-mean
-    from: TERM-sigma
-    to: TERM-mean
-    type: 前提
-    premise: mathematical
-    description: 平均は総和記号で（1/n）Σ xᵢ と書く。
-    basis:
-      units:
-      - U02
-      - U06
-    version: 1
-  - id: REL-quant-mean
-    from: TERM-quant
-    to: TERM-mean
-    type: 前提
-    premise: mathematical
-    description: 平均は値を足して求めるので、量的変数で使う。
-    basis:
-      units:
-      - U04
-      - U06
-    version: 1
-  - id: REL-quant-median
-    from: TERM-quant
-    to: TERM-median
-    type: 前提
-    premise: mathematical
-    description: 中央値は値を小さい順に並べて求めるので、順序のある値で使う。
-    basis:
-      units:
-      - U04
-      - U06
-    version: 1
   - id: REL-freqtable-mode
     from: TERM-freqtable
     to: TERM-mode
@@ -1091,77 +1016,71 @@ relations:
   - id: REL-median-mean-contrast
     from: TERM-median
     to: TERM-mean
-    type: 対比
-    description: どちらもデータの中心を表す。平均はすべての値を足すので外れ値に引っ張られ、中央値は並び順だけで決まるので外れ値の影響を受けにくい。右に裾が長い分布では平均が中央値より大きくなる。
+    type: 比べる
+    differ: 平均はすべての値の和から決まるので、外れ値1つで大きく動く。中央値は並び順だけで決まるので、外れ値の影響を受けにくい。右に裾が長い分布では、平均が中央値より大きくなることが多い（いつもではない）
+    same: どちらもデータの中心（代表値）を元の単位の1つの数で表す
+    axis: 何で中心を決めるか（値の並び順か、値の和か）
+    description: どちらもデータの中心を表す。平均はすべての値を足すので外れ値に引っ張られ、中央値は並び順だけで決まるので外れ値の影響を受けにくい。右に裾が長い分布では平均が中央値より大きくなることが多い（いつもではない）。
     gist: 年収のように一部にとても大きな値があると、平均は上に引っ張られる。「ふつうの人」に近いのは中央値のほう。
     basis:
       units:
       - U06
-    version: 1
-  - id: REL-mean-expect
-    from: TERM-mean
-    to: TERM-expect
-    type: 一般化
-    description: 期待値は、データの平均を確率の重みの平均に広げたもの。データの平均は、各値に「出た割合」の重みを付けた期待値と見られる。
-    gist: データの平均は「出た値を出た割合で重み付けした平均」。期待値はその割合を確率に置き換えたもので、何度もくり返したときの平均の行き先。
-    basis:
-      units:
-      - U06
-      - U13
-    version: 1
+    version: 2
   - id: REL-mean-dev
     from: TERM-mean
     to: TERM-dev
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 偏差は値から平均を引いたもの。
     basis:
       units:
       - U02
       - U07
-    version: 1
+    version: 2
   - id: REL-dev-var
     from: TERM-dev
-    to: TERM-var
-    type: 前提
-    premise: mathematical
+    to: TERM-data-var
+    type: 定める
     description: 分散は偏差の2乗の平均。
     basis:
       units:
       - U07
-    version: 1
+    version: 2
   - id: REL-median-quantile
     from: TERM-median
     to: TERM-quantile
-    type: 前提
-    premise: learning
+    type: 特別な場合
+    fix_text: 量的なデータでは、分位点の割合 p を 0.5 にすると中央値（線形補間で位置を 1＋p(n−1) 番目とする決め方では、n が奇数でも偶数でも一致する）
+    fix: param_value
     description: 分位点は、中央値（真ん中＝50%の位置）を、ほかの割合の位置に広げたもの。
+    gist: 中央値は、ちょうど真ん中（50%）の位置の分位点。分位点の割合を0.5に決めたものが中央値。
     basis:
       units:
       - U06
-    version: 1
+    version: 2
   - id: REL-quantile-quartile
     from: TERM-quantile
     to: TERM-quartile
-    type: 前提
-    premise: mathematical
+    type: 比べる
+    differ: この教材の四分位数は、中央値と、その下と上の半分それぞれの中央値で決める。分位点（線形補間）は 1＋p(n−1) 番目の値を前後の値の比例で埋める。第2四分位数はどちらでも中央値に一致するが、第1・第3四分位数は p＝0.25・0.75 の分位点と違うことがある（1〜10 の10個では Q₁＝3、0.25 の分位点は 3.25）
+    same: どちらも、データを小さい順に並べたときの、決めた割合の位置（四分位数は 25%・50%・75%）の値
+    axis: 割合の位置の値の決め方
     description: 四分位数は、25%・50%・75%の位置の分位点。
+    gist: 四分位数も分位点も「小さい順に並べて、決めた割合の位置の値」。ただし真ん中以外の決め方には流儀があり、同じデータでも値が少し違うことがある。
     basis:
       units:
       - U05
       - U06
-    version: 1
+    version: 2
   - id: REL-quartile-iqr
     from: TERM-quartile
     to: TERM-iqr
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 四分位範囲は、第3四分位数と第1四分位数の差。
     basis:
       units:
       - U05
       - U07
-    version: 1
+    version: 2
   - id: REL-quartile-boxplot
     from: TERM-quartile
     to: TERM-boxplot
@@ -1185,24 +1104,26 @@ relations:
   - id: REL-iqr-outlier
     from: TERM-iqr
     to: TERM-outlier
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 箱ひげ図では、箱から四分位範囲の1.5倍より外の値を外れ値の目安にする。
     basis:
       units:
       - U05
       - U08
-    version: 1
+    version: 2
   - id: REL-range-iqr-contrast
     from: TERM-range
     to: TERM-iqr
-    type: 対比
+    type: 比べる
+    differ: 範囲は最大値と最小値だけで決まるので、外れ値1つで大きく変わる。四分位範囲は真ん中の半分の幅なので、外れ値の影響を受けにくい
+    same: どちらもデータの広がりを、2つの値の差として元の単位の1つの数で表す
+    axis: 広がりをどの2つの値の差で測るか（両端か、真ん中の半分の両端か）
     description: どちらもデータの広がり。範囲は最大値と最小値だけで決まるので外れ値1つで大きく変わる。四分位範囲は真ん中の半分の広がりなので、外れ値の影響を受けにくい。
     gist: 範囲は「いちばん端どうしの距離」、四分位範囲は「真ん中の半分の幅」。極端な1人がいると範囲だけが大きく変わる。
     basis:
       units:
       - U07
-    version: 1
+    version: 2
   - id: REL-freqtable-hist
     from: TERM-freqtable
     to: TERM-hist
@@ -1214,25 +1135,14 @@ relations:
       - U05
     version: 1
   - id: REL-sd-cv
-    from: TERM-sd
+    from: TERM-unbvar
     to: TERM-cv
-    type: 前提
-    premise: mathematical
-    description: 変動係数は標準偏差を平均で割ったもの。
+    type: 定める
+    description: 変動係数は、不偏分散の平方根を平均で割ったもの（単元 U07 の求め方。#310）。不偏分散が定義に直接出る。
     basis:
       units:
       - U07
-    version: 1
-  - id: REL-mean-cv
-    from: TERM-mean
-    to: TERM-cv
-    type: 前提
-    premise: mathematical
-    description: 変動係数は標準偏差を平均で割ったもの。
-    basis:
-      units:
-      - U07
-    version: 1
+    version: 2
   - id: REL-std-outlier
     from: TERM-std
     to: TERM-outlier
@@ -1244,36 +1154,37 @@ relations:
       - U08
     version: 1
   - id: REL-sd-skew
-    from: TERM-sd
+    from: TERM-data-sd
     to: TERM-skew
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 歪度は、偏差を標準偏差で割った値の3乗の平均。
     basis:
       units:
       - U08
-    version: 1
+    version: 2
   - id: REL-sd-kurt
-    from: TERM-sd
+    from: TERM-data-sd
     to: TERM-kurt
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 尖度は、偏差を標準偏差で割った値の4乗の平均（から3を引くこともある）。
     basis:
       units:
       - U08
-    version: 1
+    version: 2
   - id: REL-mean-geomean-contrast
     from: TERM-mean
     to: TERM-geomean
-    type: 対比
-    description: 算術平均は値を足して個数で割り、幾何平均は値を掛けて個数の乗根をとる。伸び率のように掛け算で積み重なる量の平均は、幾何平均で求める。
+    type: 比べる
+    differ: 算術平均は値の和を n で割る。幾何平均は正の値の積の n 乗根で、倍率（1＋伸び率）のように掛け算で積み重なる量では、幾何平均の倍率を n 回掛けると全体の倍率に戻る（2倍と半分なら幾何平均は1倍、算術平均は1.25倍）。正の値では幾何平均は算術平均以下（等しいのは全部の値が同じとき）
+    same: どちらも n 個の値を1つの代表の値にまとめる
+    axis: 値を足して平均するか、掛けて平均するか
+    description: 算術平均は値を足して個数で割り、幾何平均は値を掛けて個数の乗根をとる。倍率（1＋伸び率）のように掛け算で積み重なる量の平均は、幾何平均で求める。
     gist: 1年目に2倍、2年目に半分になったら、元に戻っている。足し算の平均（1.25倍）では合わず、掛け算の平均（1倍）が合う。
     basis:
       units:
       - U05T
       - U06
-    version: 1
+    version: 2
   - id: REL-mean-ma
     from: TERM-mean
     to: TERM-ma
@@ -2142,30 +2053,12 @@ relations:
     basis:
       units: [U27]
 
-  - id: REL-samplemean-pairedt
-    from: TERM-sample-mean
-    to: TERM-paired-t
-    version: 1
-    type: 定める
-    description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
-    basis:
-      units: [U25]
-
   - id: REL-unbvar-pairedt
     from: TERM-unbvar
     to: TERM-paired-t
     version: 1
     type: 定める
     description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。不偏分散が定義に直接出る。
-    basis:
-      units: [U25]
-
-  - id: REL-samplemean-welch
-    from: TERM-sample-mean
-    to: TERM-welch
-    version: 1
-    type: 定める
-    description: ウェルチの t 検定は、群ごとの標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
     basis:
       units: [U25]
 
@@ -2213,3 +2106,61 @@ relations:
     description: 独立性検定は、クロス集計表の2つの変数が独立かを調べる仮説検定。
     basis:
       units: [U27]
+
+  - id: REL-median-quartile
+    from: TERM-median
+    to: TERM-quartile
+    version: 1
+    type: 定める
+    description: この教材の四分位数は、中央値と、その下と上の半分それぞれの中央値で決める。中央値が定義に直接出る。
+    basis:
+      units: [U05]
+
+  - id: REL-samplemean-unbvar
+    from: TERM-sample-mean
+    to: TERM-unbvar
+    version: 1
+    type: 定める
+    description: 不偏分散は、標本平均からのずれの2乗の和を n−1 で割った統計量。標本平均が定義に直接出る。
+    basis:
+      units: [U07]
+
+  - id: REL-unbvar-statistic
+    from: TERM-unbvar
+    to: TERM-statistic
+    version: 1
+    type: 一種
+    description: 不偏分散は、標本から作る統計量の1つ。
+    basis:
+      units: [U07]
+
+  - id: REL-datavar-datasd
+    from: TERM-data-var
+    to: TERM-data-sd
+    version: 1
+    type: 定める
+    description: データの標準偏差は、データの分散の正の平方根。データの分散が定義に直接出る。
+    basis:
+      units: [U07]
+
+  - id: REL-sigma-mean
+    from: TERM-sigma
+    to: TERM-mean
+    type: 前提
+    premise: learning
+    description: 平均の式は総和記号で（1/n）Σ xᵢ と書く。総和記号は記法なので定義の構成要素にはせず、式を読むための前提知識とする（#310）。
+    basis:
+      units:
+      - U02
+      - U06
+    version: 2
+
+  - id: REL-mean-cv
+    from: TERM-mean
+    to: TERM-cv
+    version: 2
+    type: 定める
+    description: 変動係数は、不偏分散の平方根を平均で割ったもの。平均が定義に直接出る。
+    basis:
+      units:
+      - U07
