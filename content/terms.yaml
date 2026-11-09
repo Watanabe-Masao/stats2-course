@@ -183,11 +183,19 @@
   name: 最頻値
   en: mode
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データに現れる値のうち、現れる回数（度数）がいちばん多い値（いちばん多い値が2つ以上あれば、それぞれが最頻値）
+    terms: []
   short: データの中でいちばん多く現れる値（度数分布では度数が最大の階級の値）
 - id: TERM-median
   name: 中央値
   en: median
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: 値に順序があるデータ x₁, …, xₙ（n≧1。順序があることは定義の要件）を小さい順に並べたとき、真ん中の位置の値（n が奇数なら (n＋1)/2 番目、偶数なら n/2 番目と n/2＋1 番目の2つの値の和の半分）
+    terms: []
   short: データを小さい順に並べたとき、真ん中にくる値
 - id: TERM-freqtable
   name: 度数分布表
@@ -208,16 +216,28 @@
   name: 四分位数
   en: quartile
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データを小さい順に並べ、中央値を第2四分位数 Q₂、中央値より下の半分の中央値を第1四分位数 Q₁、上の半分の中央値を第3四分位数 Q₃ とする（n が奇数のときは、真ん中の値を両方の半分から除く）
+    terms: [TERM-median]
   short: データを小さい順に並べて4等分する位置の値（第1・第2・第3四分位数）
 - id: TERM-iqr
   name: 四分位範囲
   en: interquartile range
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: 第3四分位数から第1四分位数を引いた値 Q₃−Q₁（真ん中の半分のデータの広がり）
+    terms: [TERM-quartile]
   short: 第3四分位数から第1四分位数を引いた値で、真ん中の半分のデータの広がり
 - id: TERM-outlier
   name: 外れ値
   en: outlier
   category: 要約（代表値・ばらつき）
+  forms: [property]
+  basis:
+    text: データの値のうち、決めた基準でほかの値から大きく離れているとみなすもの。この教材の基準は箱ひげ図の柵で、Q₁−1.5×(Q₃−Q₁) より小さいか、Q₃＋1.5×(Q₃−Q₁) より大きい値
+    terms: [TERM-iqr]
   short: ほかのデータから大きく離れた値（箱ひげ図では、箱から四分位範囲の1.5倍より外の値など）
 - id: TERM-ratio
   name: 割合
@@ -233,12 +253,17 @@
   name: 偏差
   en: deviation
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データ x₁, …, xₙ の各値 xᵢ から平均 x̄ を引いた値 xᵢ−x̄（平均からのずれ）
+    terms: [TERM-mean]
   short: 1つのデータの値から平均を引いた値（平均からのずれ）
 - id: TERM-var
   name: 分散
   en: variance
   category: 要約（代表値・ばらつき）
   forms: [operation, number]
+  basis_formula: F-var-def
   definition: 確率変数が期待値からどれだけばらつくかを、ずれの2乗の期待値で表した量。
   version: 1
   labs:
@@ -288,7 +313,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "V"}, {"op": "mul", "args": [{"op": "pow", "args": [{"sym": "a"}, {"num": 2}]}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   conditions:
     math:
-    - 期待値と、2乗の期待値が有限
+    - text: 2乗の期待値 E(X²) が有限（このとき E(X) も有限になり、E((X−μ)²) が有限の値に定まる）
+      kind: 要件
+      outside: この定義の分散（有限の値）としては扱えない（∞ になるか定まらない）
     data:
     - 外れ値が1つあると大きく変わる（2乗で効く）ので、分布の形も一緒に見る
   example: さいころの目の分散は 91÷6−3.5²＝35/12≒2.92。
@@ -310,12 +337,16 @@
   en: unbiased variance
   category: 要約（代表値・ばらつき）
   forms: [rv]
+  basis:
+    text: 標本 X₁, …, Xₙ（n≧2。n≧2 は定義の要件）から作る統計量 s²＝{(X₁−X̄)²＋…＋(Xₙ−X̄)²}/(n−1)（X̄ は標本平均。観測したあとの値も同じ名前で呼ぶ）
+    terms: [TERM-statistic, TERM-sample-mean]
   short: 偏差の2乗の和を n−1 で割った分散で、その期待値が母分散に一致する
 - id: TERM-sd
   name: 標準偏差
   en: standard deviation
   category: 要約（代表値・ばらつき）
   forms: [operation, number]
+  basis_formula: F-sd-def
   definition: 分散の正の平方根。ばらつきを元の単位で表す。
   version: 1
   labs:
@@ -342,7 +373,9 @@
     tree: {"op": "eq", "args": [{"sym": "sigma"}, {"op": "sqrt", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   conditions:
     math:
-    - 分散が有限
+    - text: 分散が有限
+      kind: 要件
+      outside: √V(X) が有限の値に定まらないので、この定義の標準偏差として扱えない
     data:
     - 外れ値に強く引っ張られる（2乗が効く）。山が2つあるときや裾が長いときは、分布の形と一緒に見る
   example: さいころの目の標準偏差は √(35/12)≒1.71。
@@ -361,6 +394,10 @@
   name: 変動係数
   en: coefficient of variation
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: 平均 x̄ が正のデータについて、データの標準偏差 s を平均で割った値 s/x̄（x̄＞0 は定義の要件）
+    terms: [TERM-data-sd]
   short: 標準偏差を平均で割った値で、平均の大きさが違うデータどうしのばらつきを比べるのに使う
 - id: TERM-unbiased
   name: 不偏性
@@ -376,6 +413,7 @@
   en: standardization
   category: 要約（代表値・ばらつき）
   forms: [operation]
+  basis_formula: F-std-def
   definition: 値から平均を引き、標準偏差で割って、平均0・標準偏差1 の尺度に直すこと。
   version: 1
   labs:
@@ -433,7 +471,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "Z"}], "name": "V"}, {"num": 1}]}
   conditions:
     math:
-    - 分散が有限で、標準偏差が0でない
+    - text: 分散が有限で、標準偏差が0でない
+      kind: 要件
+      outside: σ で割れない（σ＝0）か σ が定まらないので、標準化した値が定まらない
     data:
     - 平均と標準偏差を、比べたい集団から出しているか（別の集団の値で割らない。偏差値のように基準集団の値を使うと、平均0・標準偏差1 にはならない）
   example: 平均60点・標準偏差10点のテストで、80点は z＝2。
@@ -450,11 +490,19 @@
   name: 歪度
   en: skewness
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データ x₁, …, xₙ（データの標準偏差 s＞0 は定義の要件）について、標準化した値 (xᵢ−x̄)/s の3乗の平均 (1/n)Σ{(xᵢ−x̄)/s}³。右に裾が長いと正になりやすい
+    terms: [TERM-data-sd]
   short: 分布の左右の非対称さを表す値で、右に裾が長いと正になる
 - id: TERM-kurt
   name: 尖度
   en: kurtosis
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データ x₁, …, xₙ（s＞0 は定義の要件）について、標準化した値 (xᵢ−x̄)/s の4乗の平均 (1/n)Σ{(xᵢ−x̄)/s}⁴（正規分布で3になる決め方）
+    terms: [TERM-data-sd]
   short: 分布の山のとがり具合と、裾の重さを表す値
 - id: TERM-normal
   name: 正規分布
@@ -542,6 +590,7 @@
   en: expected value
   category: 要約（代表値・ばらつき）
   forms: [operation, number]
+  basis_formula: F-expect-def
   definition: 確率変数がとる値を、その確率で重み付けした平均。
   version: 1
   table_workspace:
@@ -616,7 +665,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "E"}, {"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"op": "fn", "args": [{"sym": "X"}], "name": "E"}]}, {"sym": "b"}]}]}
   conditions:
     math:
-    - 値の大きさ×確率の和（連続なら積分）が有限の値になる（絶対収束：足す順序で値が変わらない）
+    - text: 値の大きさ×確率の和（連続なら積分）が有限の値になる（絶対収束：足す順序で値が変わらない）
+      kind: 要件
+      outside: 期待値が定まらない（足す順序で値が変わるか、∞ になる）ので、この定義の期待値としては扱えない
     data:
     - くり返しの平均として読むには、同じ条件の試行がくり返せること
   example: さいころの目の期待値は (1＋2＋…＋6)÷6＝3.5。
@@ -635,6 +686,10 @@
   name: 幾何平均
   en: geometric mean
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: n 個の正の値 x₁, …, xₙ（正であることは定義の要件）を掛け合わせた積の n 乗根 (x₁x₂⋯xₙ)^(1/n)
+    terms: []
   short: n 個の正の値を掛け合わせて n 乗根をとった値で、伸び率の平均に使う
 - id: TERM-ma
   name: 移動平均
@@ -2201,6 +2256,10 @@
   name: 平均（算術平均）
   en: arithmetic mean
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: 足すことに意味のある値（量的変数）のデータ x₁, …, xₙ（n≧1。量的変数であることは定義の要件）の値をすべて足し、個数 n で割った値 x̄＝(x₁＋…＋xₙ)/n
+    terms: []
   short: データの値をすべて足し、データの個数で割った値
 - id: TERM-prob
   name: 確率（確率の公理）
@@ -2328,11 +2387,19 @@
   name: 分位点
   en: quantile
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データを小さい順に並べた x₍₁₎≦…≦x₍ₙ₎ と割合 p（0≦p≦1）について、1＋p(n−1) 番目の位置の値（位置が整数でないときは、前後の2つの値を比例で埋める。線形補間の決め方）
+    terms: []
   short: データを小さい順に並べ、決めた割合の位置にくる値（下から10%の位置など）
 - id: TERM-range
   name: 範囲
   en: range
   category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データの最大値から最小値を引いた値
+    terms: []
   short: データの最大値から最小値を引いた値
 - id: TERM-slr
   name: 単回帰
@@ -2353,3 +2420,21 @@
   group: GRP-dist-base
   forms: [property]
   short: 2つの確率変数の共分散が0で、直線的に一緒に増える・減る傾向がないこと
+- id: TERM-data-var
+  name: データの分散
+  en: variance of data
+  category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: 量的変数のデータ x₁, …, xₙ（n≧1）の偏差の2乗の平均 {(x₁−x̄)²＋…＋(xₙ−x̄)²}/n
+    terms: [TERM-dev]
+  short: データの各値の偏差を2乗して平均した値で、データのばらつきの大きさを表す
+- id: TERM-data-sd
+  name: データの標準偏差
+  en: standard deviation of data
+  category: 要約（代表値・ばらつき）
+  forms: [number]
+  basis:
+    text: データの分散の正の平方根（データの値と同じ単位のばらつき）
+    terms: [TERM-data-var]
+  short: データの分散の正の平方根で、データのばらつきを元の単位で表す

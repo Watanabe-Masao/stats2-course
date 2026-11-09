@@ -502,11 +502,11 @@ class TestNetwork(unittest.TestCase):
         c = course()
         qid = next(iter(c.units["U13"]["problems"]))
         q = c.units["U13"]["problems"][qid]
-        q["concepts"] = ["TERM-nothing", "TERM-perm", "REL-rv-expect", "TERM-expect"]
+        q["concepts"] = ["TERM-nothing", "TERM-perm", "REL-expect-var", "TERM-expect"]
         err = self._validate(c)
         self.assertTrue(any(f"{qid}: concepts の TERM-nothing が用語・関係・主張にない" in e for e in err))
         self.assertTrue(any(f"{qid}: concepts の TERM-perm はまだ説明のない用語" in e for e in err))
-        self.assertFalse(any("REL-rv-expect" in e or "TERM-expect" in e for e in err))
+        self.assertFalse(any("REL-expect-var" in e or "TERM-expect" in e for e in err))
         # 主張（#289）：claims.yaml にある主張は指せる。ない主張は止める。主張のラボの参照も関係と同じに確かめる。
         # 検出の確かめ：主張の id を受け付ける所を外すと1つ目が、主張のラボを確かめる所を外すと3つ目が落ちる
         q["concepts"] = ["CLM-25", "CLM-999"]
