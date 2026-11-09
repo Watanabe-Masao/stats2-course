@@ -1457,21 +1457,21 @@ class TestNetwork(unittest.TestCase):
         #   build が読み、検査し、型 v2 で書き出すこと（#287。M5 で分類ごとに移す仕組み）。
         # 想定する故障：v2 の行を v1 の種類として止める（知らない種類・v1 の必須）・legacy_type に入れてしまう・v2 の項目や主張を書き出さない・
         #   主張の id に教材名を付けない（画面が未接続にする）・移した分類（v2_ready）に残った v1 の行を通す。
-        # 見つけ方：教材の原本の写しで、まだ移していない 質的変数 と 量的変数（対比）を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
-        #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready にデータと変数を書くと移していない行で止まること。
-        #   （分類を移すたびに例が移るので、まだ移していない分類の行を使う。#317 で単回帰 → 重回帰から、#321 で 無作為抽出 → 層化抽出 から替えた）
+        # 見つけ方：教材の原本の写しで、まだ移していない 順列 と 組合せ（対比）を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
+        #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready に数学の道具を書くと移していない行で止まること。
+        #   （分類を移すたびに例が移るので、まだ移していない分類の行を使う。#317 で単回帰 → 重回帰から、#321 で 無作為抽出 → 層化抽出 から、#323 で 質的変数 と 量的変数 から替えた）
         # 既存との違い：test_v2_checks は手で書いた書き出しの形だけ、test_v2_export_is_same_as_v1 は今の原本だけを見る。
         # 検出の確かめ：to_v2 で v2 の行も legacy_type にすると型（比べるは v1 の種類にない）で落ちる。主張に教材名を付けないと型の claimId で落ちる
         from v2_checks import v2_errors
         c = course()
         rels = copy.deepcopy(self.n.load_network()[0])
-        r = next(x for x in rels if x["id"] == "REL-qual-quant-contrast")
-        r.update(type="比べる", axis="値が数か分類か", same="どちらも個体ごとに値をとる変数", differ="量的変数は足して平均できる")
-        for t in ("TERM-qual", "TERM-quant"):
-            c.terms[t]["forms"] = ["rv"]
-        c.terms["TERM-quant"]["claims"] = ["CLM-90"]
+        r = next(x for x in rels if x["id"] == "REL-perm-comb-contrast")
+        r.update(type="比べる", axis="順番を区別するか", same="どちらも n 個から k 個を取り出す数", differ="順列は順番を区別する")
+        for t in ("TERM-perm", "TERM-comb"):
+            c.terms[t]["forms"] = ["number"]
+        c.terms["TERM-perm"]["claims"] = ["CLM-90"]
         claims = self.n.load_claims() + [{"id": "CLM-90", "label": "④-90", "kind": "等しい", "version": 1,
-                                          "statement": {"text": "テストの主張"}, "premises": {"subjects": ["TERM-quant"]}}]
+                                          "statement": {"text": "テストの主張"}, "premises": {"subjects": ["TERM-perm"]}}]
         orig = (self.n.load_network, self.n.load_claims)
         self.n.load_network = lambda: (rels, self.ders)
         self.n.load_claims = lambda: claims
@@ -1481,17 +1481,17 @@ class TestNetwork(unittest.TestCase):
             v2 = self.n.to_v2(self.n.export_network(c, TARGET), c.shared.get("v2_ready"), self.n.v2_extras(c))
             self.assertEqual(self.n.schema_errors(v2), [])
             self.assertEqual(v2_errors(v2), [])
-            e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-qual-quant-contrast")
-            self.assertEqual((e.get("type"), e.get("axis"), "legacy_type" in e), ("比べる", "値が数か分類か", False))
+            e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-perm-comb-contrast")
+            self.assertEqual((e.get("type"), e.get("axis"), "legacy_type" in e), ("比べる", "順番を区別するか", False))
             self.assertIn("stats2:CLM-90", [x["id"] for x in v2["claims"]])
             self.assertEqual(self.n.migration_counts(rels)["v2"], base_v2 + 1)
-            c.terms["TERM-quant"].pop("forms")
+            c.terms["TERM-perm"].pop("forms")
             v2b = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
             self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(v2b)))
-            v2c = self.n.to_v2(self.n.export_network(c, TARGET), ["データと変数"], self.n.v2_extras(c))
+            v2c = self.n.to_v2(self.n.export_network(c, TARGET), ["数学の道具"], self.n.v2_extras(c))
             self.assertTrue(any("legacy_type" in x for x in v2_errors(v2c)))
-            c.terms["TERM-quant"]["forms"] = ["箱"]
-            c.terms["TERM-quant"]["claims"] = ["CLM-99"]
+            c.terms["TERM-perm"]["forms"] = ["箱"]
+            c.terms["TERM-perm"]["claims"] = ["CLM-99"]
             errs = self.n.v2_source_errors(c)
             self.assertTrue(any("箱" in x for x in errs) and any("CLM-99" in x for x in errs))
         finally:
