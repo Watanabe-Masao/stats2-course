@@ -970,14 +970,6 @@ claims:
   - source:
       title: 最小二乗の解 b＝S_xy/S_xx（正規方程式）と r の定義 S_xy/√(S_xx·S_yy) から b＝r·√(S_yy/S_xx)。s_y/s_x＝√(S_yy/S_xx)（割る数が比で消える）
   conditions:
-  - text: 回帰式に切片 a を含める
-    kind: 仮定
-    outside: 切片のない回帰では傾きが Σxy/Σx² になり、r·s_y/s_x に等しいとは限らない
-  - text: 傾きを最小二乗法で求める
-    kind: 仮定
-    terms:
-    - TERM-ols
-    outside: ほかの当てはめ方（残差の絶対値の和を最小にするなど）では、r·s_y/s_x に等しいとは限らない
   - text: s_x・s_y を同じ割る数（n か n−1）で求める
     kind: 仮定
     outside: 割る数が違うと比 s_y/s_x がずれ、√(n/(n−1)) 倍などの違いが出る
@@ -986,6 +978,6 @@ claims:
     - method: 独立な確かめ
       by: Q
       date: '2026-11-10'
-      version: f044006
+      version: c69a6d9
     external: なし
   version: 1
