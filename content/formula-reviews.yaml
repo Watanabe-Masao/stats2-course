@@ -85,3 +85,38 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-08'
   fingerprint: 96127a0d0ace0228
+- formula: F-var-def
+  points:
+  - 単位（元の単位の2乗）
+  judgement: '#310 で概念の成立条件を ③ の行の形（text・kind・outside）にし、basis_formula: F-var-def を付けたためのやり直し。前の記録（2026-11-01、12d172441ee0eff3）のあとの差分を git diff 0efe289 main で確かめた。式の木・記号の表・principle・誤解・反例は変わっていない。E((X−μ)²)・E(X²)・(E(X))² はどれも X の単位の2乗で、引き算の両側がそろう。μ は of: X で X と同じ単位。principle の「単位は元の単位の2乗」と誤解の訂正の「分散は元の単位の2乗」は前と同じ文（『統計学入門』5章、Casella & Berger Def. 2.3.2）。記号の表に単位の項目はないので、型では保証せず本文で確かめる点も前と同じ。basis_formula の式は定義（1つ目の等号）と恒等式（2つ目）の連なりで、契約の kinds [定義, 恒等式] と合い、単位の判断には影響しない'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-10'
+  fingerprint: c96e7dfe4712999a
+- formula: F-var-def
+  points:
+  - 前提（2乗の期待値が有限）
+  judgement: '#310 で conditions.math を「期待値と、2乗の期待値が有限」から要件の行「2乗の期待値 E(X²) が有限（このとき E(X) も有限になり、E((X−μ)²) が有限の値に定まる）」に書き直したためのやり直し。新しい条件は前の条件と同値：|x|≦1＋x² から E|X|≦1＋E(X²)＜∞、(X−μ)²≦2X²＋2μ² から E((X−μ)²)＜∞。2つ目の等号 E((X−μ)²)＝E(X²)−μ² は展開と線形性で、E(X²) が有限でないと ∞−∞ になるので、この前提が要り、これで足りる（Casella & Berger Thm 2.3.4）。outside（∞ になるか定まらない）は E(X²)＝∞ の場合と E(X) が定まらない場合の両方に当たる。要件の区分でよい'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-10'
+  fingerprint: c96e7dfe4712999a
+- formula: F-var-linear
+  points:
+  - 導き方
+  judgement: '#310 で概念 TERM-var の conditions.math を ③ の行の形にし、basis_formula を付けたためのやり直し。前の記録（2026-11-04、546fb4416b20cbfc）のあとで、式の木・記号・DER-var-linear・REL-expect-var・契約は変わっていない。DER-var-linear の3段（期待値の線形性で E(aX＋b)＝aμ＋b → ずれが a(X−μ) になり b が消える → 2乗の期待値で a² が外に出る）は Casella & Berger Thm 2.3.4 の証明と一致する。導出の前提「V(X) が有限」は新しい要件「E(X²) が有限」と同値で食い違わない（E(X²)＜∞ なら V(X)＝E(X²)−μ²＜∞、逆に E(X²)＝V(X)＋μ²＜∞）。前提は期待値と分散の定義で、結論の概念を前提に入れない。a・b は実数のどの値でも成り立つ'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-10'
+  fingerprint: 111adff59a2a1edf
+- formula: F-std-def
+  points:
+  - 別の集団の μ・σ で割らない（conditions.data）
+  judgement: '#310 で TERM-std の conditions.math を要件の行（文はそのまま）にし、outside と basis_formula: F-std-def を付けたためのやり直し。前の記録（2026-11-01、bb2a09050b19c8cd）のあとで、式の木・記号の表・conditions.data・反例・誤解は変わっていない。μ・σ は of: X・concept TERM-expect・TERM-sd で X 自身の値に縛られ、σ の domain は σ＞0 で要件と合う。conditions.data は基準集団の μ₀・σ₀ で割ると平均 (μ−μ₀)/σ₀・標準偏差 σ/σ₀ になり 0・1 にならないことを書いている（前と同じ文）。新しい outside は math の要件の説明で、data の観点と混ざっていない'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-10'
+  fingerprint: eff41f659e8fdc6e
+- formula: F-expect-def
+  points:
+  - 無限の台で和が収束する前提
+  judgement: '#310 で conditions.math を文はそのままで要件の行にし、outside「期待値が定まらない（足す順序で値が変わるか、∞ になる）」と basis_formula: F-expect-def を付けたためのやり直し。前の記録（2026-11-01、b9afc8b21c3bade6）のあとで、式の木・記号の表・data の行・反例・誤解・契約は変わっていない。条件は絶対収束 Σ|x|p(x)＜∞（連続なら ∫|x|f(x)dx＜∞）で、Casella & Berger Def. 2.2.1 の存在の条件と一致する。実数の級数では足す順序で値が変わらないことと絶対収束は同値（リーマンの再配列定理）。outside は崩れる場合（正負の部分がどちらも ∞、片方だけ ∞）を言っている。倍々のくじは +∞ の例'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-10'
+  fingerprint: 3f6b2362920815d5
