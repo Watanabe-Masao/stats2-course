@@ -1195,27 +1195,6 @@ relations:
       units:
       - U05T
     version: 1
-  - id: REL-cov-corr
-    from: TERM-cov
-    to: TERM-corr
-    type: 前提
-    premise: mathematical
-    description: 相関係数は、共分散をそれぞれの標準偏差で割ったもの。
-    basis:
-      units:
-      - U05T
-      - U28
-    version: 1
-  - id: REL-sd-corr
-    from: TERM-sd
-    to: TERM-corr
-    type: 前提
-    premise: mathematical
-    description: 相関係数は、共分散をそれぞれの標準偏差で割ったもの。
-    basis:
-      units:
-      - U28
-    version: 1
   - id: REL-corr-acf
     from: TERM-corr
     to: TERM-acf
@@ -1274,32 +1253,21 @@ relations:
   - id: REL-corr-partialcorr
     from: TERM-corr
     to: TERM-partial-corr
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 偏相関係数は、3つの変数の相関係数から計算する。
     basis:
       units:
       - U28
-    version: 1
+    version: 2
   - id: REL-corr-spurious
     from: TERM-corr
     to: TERM-spurious
-    type: 前提
-    premise: learning
+    type: 定める
     description: 擬相関は「相関があっても直接の関係とは限らない」という、相関の読み方の注意。
     basis:
       units:
       - U28
-    version: 1
-  - id: REL-partialcorr-spurious
-    from: TERM-partial-corr
-    to: TERM-spurious
-    type: 応用
-    description: 偏相関係数で第3の変数の影響を取り除くと、擬相関かどうかの手掛かりになる。
-    basis:
-      units:
-      - U28
-    version: 1
+    version: 2
   - id: REL-scatter-slr
     from: TERM-scatter
     to: TERM-slr
@@ -1310,57 +1278,47 @@ relations:
       units:
       - U29
     version: 1
-  - id: REL-slr-resid
-    from: TERM-slr
-    to: TERM-resid
-    type: 前提
-    premise: mathematical
-    description: 残差は、回帰式の予測からのずれ。
-    basis:
-      units:
-      - U29
-    version: 1
   - id: REL-resid-ols
     from: TERM-resid
     to: TERM-ols
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 最小二乗法は、残差の2乗の和を最小にする。
     basis:
       units:
       - U29
-    version: 1
+    version: 2
   - id: REL-ols-regcoef
     from: TERM-ols
     to: TERM-regcoef
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 回帰係数は最小二乗法で求める。
     basis:
       units:
       - U29
-    version: 1
+    version: 2
   - id: REL-dev-resid-contrast
     from: TERM-dev
     to: TERM-resid
-    type: 対比
-    description: どちらも観測値から何かを引いたずれ。偏差は平均を、残差は回帰式の予測値を引く。回帰式が使えると、残差は偏差より小さくなる（その減り方が決定係数）。
+    type: 比べる
+    differ: 偏差は目的変数の平均 ȳ を引き、説明変数を使わない。残差は回帰式の予測値 ŷᵢ を引き、説明変数の値ごとに基準が変わる。 切片を含む回帰式を最小二乗で当てはめると、残差の2乗和は偏差の2乗和以下で、減った割合が決定係数。 1つ1つの残差が偏差より小さいとは限らない
+    same: どちらも1つの観測値から基準の値を引いたずれで、データ全体で足すと0になる（残差は、切片を含む回帰式を最小二乗で当てはめたとき）
+    axis: 観測値から何を引いたずれか（全体の平均か、説明変数の値ごとの回帰式の予測値か）
+    description: どちらも観測値から基準の値を引いたずれ。偏差は平均を、残差は回帰式の予測値を引く。切片を含む回帰式を最小二乗で当てはめると、残差の2乗和は偏差の2乗和以下になる（その減った割合が決定係数）。
     gist: 偏差は「みんなの平均」からのずれ、残差は「その人の条件から見込んだ値」からのずれ。見込みが当たるほど残差は小さい。
     basis:
       units:
       - U07
       - U29
-    version: 1
+    version: 2
   - id: REL-resid-r2
     from: TERM-resid
     to: TERM-r2
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 決定係数は、1から（残差の2乗和÷偏差の2乗和）を引いたもの。
     basis:
       units:
       - U29
-    version: 1
+    version: 2
   - id: REL-slr-extrap
     from: TERM-slr
     to: TERM-extrap
@@ -1374,53 +1332,43 @@ relations:
   - id: REL-slr-mreg
     from: TERM-slr
     to: TERM-mreg
-    type: 一般化
-    description: 重回帰分析は、単回帰の説明変数を2つ以上に広げたもの。説明変数が1つの重回帰が単回帰。
+    type: 特別な場合
+    fix_text: 重回帰分析の説明変数の個数 k を1にすると、1つの説明変数 x で y を表す直線 ŷ＝b₀＋b₁x を最小二乗法で求める単回帰と同じものになる
+    fix: count
+    description: 単回帰は、重回帰分析の説明変数の個数を1にしたもの。
     gist: 身長だけで体重を見込むのが単回帰、身長と年齢と運動量で見込むのが重回帰。手掛かりを増やしても、考え方（残差を小さく）は同じ。
     basis:
       units:
       - U29
       - U30
-    version: 1
+    version: 2
   - id: REL-qual-dummy
     from: TERM-qual
     to: TERM-dummy
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: ダミー変数は、質的変数を0と1の数にしたもの。
     basis:
       units:
       - U30
-    version: 1
-  - id: REL-dummy-mreg
-    from: TERM-dummy
-    to: TERM-mreg
-    type: 応用
-    description: ダミー変数を使うと、質的変数も重回帰分析の説明変数に入れられる。
-    basis:
-      units:
-      - U30
-    version: 1
+    version: 2
   - id: REL-r2-adjr2
     from: TERM-r2
     to: TERM-adjr2
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 自由度調整済み決定係数は、決定係数を自由度で補正したもの。
     basis:
       units:
       - U30
-    version: 1
+    version: 2
   - id: REL-df-adjr2
     from: TERM-df
     to: TERM-adjr2
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 補正には、残差と全体の自由度を使う。
     basis:
       units:
       - U30
-    version: 1
+    version: 2
   - id: REL-mreg-adjr2
     from: TERM-mreg
     to: TERM-adjr2
@@ -1434,13 +1382,12 @@ relations:
   - id: REL-mreg-multicol
     from: TERM-mreg
     to: TERM-multicol
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 多重共線性は、重回帰分析の説明変数どうしの関係で起こる。
     basis:
       units:
       - U30
-    version: 1
+    version: 2
   - id: REL-corr-multicol
     from: TERM-corr
     to: TERM-multicol
@@ -2164,3 +2111,110 @@ relations:
     basis:
       units:
       - U07
+
+  - id: REL-datacov-corr
+    from: TERM-data-cov
+    to: TERM-corr
+    version: 1
+    type: 定める
+    description: 相関係数は、データの共分散を x と y のデータの標準偏差の積で割った値。データの共分散が定義に直接出る。
+    basis:
+      units:
+      - U28
+  - id: REL-datasd-corr
+    from: TERM-data-sd
+    to: TERM-corr
+    version: 1
+    type: 定める
+    description: 相関係数は、データの共分散を x と y のデータの標準偏差の積で割った値。データの標準偏差が定義に直接出る。
+    basis:
+      units:
+      - U28
+  - id: REL-dev-datacov
+    from: TERM-dev
+    to: TERM-data-cov
+    version: 1
+    type: 定める
+    description: データの共分散は、x と y の偏差の積の平均。偏差が定義に直接出る。
+    basis:
+      units:
+      - U28
+
+  - id: REL-dev-r2
+    from: TERM-dev
+    to: TERM-r2
+    version: 1
+    type: 定める
+    description: 決定係数は、1から（残差の2乗和÷目的変数の偏差の2乗和）を引いた値。偏差が定義に直接出る。
+    basis:
+      units: [U29]
+
+  - id: REL-ols-slr
+    from: TERM-ols
+    to: TERM-slr
+    version: 1
+    type: 定める
+    description: 単回帰は、回帰直線の係数を最小二乗法で求める分析。最小二乗法が定義に直接出る。
+    basis:
+      units: [U29]
+
+  - id: REL-ols-mreg
+    from: TERM-ols
+    to: TERM-mreg
+    version: 1
+    type: 定める
+    description: 重回帰分析は、回帰式の係数を最小二乗法で求める分析。最小二乗法が定義に直接出る。
+    basis:
+      units: [U30]
+
+  - id: REL-corr-r2
+    from: TERM-corr
+    to: TERM-r2
+    version: 1
+    type: 移る
+    mode: exact
+    operation: 2乗する
+    claim: CLM-15
+    description: 切片を含む単回帰を最小二乗で当てはめると、決定係数は相関係数の2乗に等しい。
+    gist: 単回帰では、相関係数を2乗すると、y のばらつきのうち直線で説明できる割合（決定係数）になる。r＝0.9 なら 81%。
+    basis:
+      units: [U28, U29]
+
+  - id: REL-corr-regcoef
+    from: TERM-corr
+    to: TERM-regcoef
+    version: 1
+    type: 移る
+    mode: exact
+    operation: y と x の標準偏差の比 s_y/s_x を掛ける（同じ割る数で求めた s_x・s_y）
+    claim: CLM-37
+    description: 切片を含む単回帰を最小二乗で当てはめると、傾きは相関係数に s_y/s_x を掛けたものに等しい。
+    gist: 相関係数は単位のない「そろい方」。y と x のばらつきの比を掛けると、x が1増えたとき y がいくつ増えるかという傾きになる。
+    basis:
+      units: [U28, U29]
+
+  - id: REL-corr-regcoef-contrast
+    from: TERM-corr
+    to: TERM-regcoef
+    version: 1
+    type: 比べる
+    axis: 単位のない対称な強さか、単位つきの向きのある傾きか
+    same: どちらも偏差の積の和 S_xy から作り、符号が同じ（x と y が一緒に増えると正、逆なら負）
+    differ: 相関係数は −1〜1 で単位によらず、x と y を入れ替えても変わらない（直線へのそろい方）。 回帰係数（単回帰の傾き）は「y の単位 ÷ x の単位」を持ち、大きさに上限がなく、x と y を入れ替えると変わる （y を x で回帰した傾きと x を y で回帰した傾きの積が r²）。r が大きくても傾きが小さいことも、その逆もある
+    description: 相関係数は単位のない対称な強さ、回帰係数は単位つきの向きのある傾き。
+    gist: どちらも x と y の直線的な関係を表すが、相関係数は単位によらない「そろい方」、回帰係数は単位つきの「傾き」。そろい方が同じでも、傾きは違うことがある。
+    basis:
+      units: [U28, U29]
+
+  - id: REL-r2-adjr2-contrast
+    from: TERM-r2
+    to: TERM-adjr2
+    version: 1
+    type: 比べる
+    axis: 説明変数を足したときに下がりうるか（説明変数の数で補正するか）
+    same: どちらも、回帰式が目的変数のばらつきをどれだけ説明するかを1つの数で表す
+    differ: 決定係数は、同じデータで説明変数を足して最小二乗で当てはめ直すと下がらない（0〜1）。自由度調整済み決定係数は、説明変数の数 k の分を自由度で補正するので、 役に立たない変数を足すと下がり、負にもなる。説明変数の数が違う式どうしを比べるときは自由度調整済みを使う
+    description: 決定係数は説明変数を足すと下がらない。自由度調整済み決定係数は、変数の数で補正するので下がりうる。
+    gist: 決定係数は、説明変数を足すだけで上がる（下がらない）。自由度調整済みは変数の数の分を差し引くので、役に立たない変数を足すと下がる。
+    basis:
+      units: [U30]

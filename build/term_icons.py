@@ -146,6 +146,7 @@ add("TERM-normal", AX() + f'<path d="{bell(24, 13, 10, 40)}" fill="currentColor"
 add("TERM-rv", T("X", 12, 31, 16) + arrow(19, 25, 30, 25) + T("x", 38, 31, 14) + T("?", 38, 15, 9))
 add("TERM-dist", AXES() + P("M10 34 C16 34 18 14 24 14 S34 30 40 32") + T("P", 30, 13, 9))
 add("TERM-cov", P("M24 6v36 M6 24h36", stroke_opacity=".45") + scatter([(30, 16), (34, 12), (14, 32), (18, 30)]) + R(24, 12, 10, 12, 0, op=".25") + R(14, 24, 10, 8, 0, op=".25"))
+add("TERM-data-cov", P("M24 6v36 M6 24h36", stroke_opacity=".45") + scatter([(30, 16), (34, 12), (14, 32), (18, 30)]) + R(24, 12, 10, 12, 0, op=".25") + R(14, 24, 10, 8, 0, op=".25") + T("s", 38, 40, 10))
 # 標準正規分布：中心を0にそろえた山と、0の位置の縦線（#289）
 add("TERM-std-normal", AX() + f'<path d="{bell(24, 13, 10, 40)}" fill="currentColor" fill-opacity=".18"/>' + P("M24 10v30", stroke_opacity=".55") + T("0", 24, 47, 9))
 # 無相関：直線の傾きがない散らばり（横に寝た点の帯）（#289）
