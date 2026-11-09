@@ -1915,87 +1915,151 @@
   name: 対応のある t 検定
   en: paired t-test
   category: 検定
+  forms: [procedure]
+  basis:
+    text: 同じ対象の2つの測定値の対 (Xᵢ, Yᵢ)（i＝1, …, n）の差 Dᵢ＝Xᵢ−Yᵢ について、H₀：差の母平均が 0 を、t＝D̄/(s_D/√n)（D̄・s_D² は差の標本平均・不偏分散）で検定する仮説検定
+    terms: [TERM-test, TERM-sample-mean, TERM-unbvar]
   short: 同じ対象の2つの測定値の差をとり、差の平均が0かどうかを t 分布で調べる方法
 - id: TERM-welch
   name: ウェルチの t 検定
   en: Welch's t-test
   category: 検定
+  forms: [procedure]
+  basis:
+    text: 独立な2群の標本について、H₀：2つの母平均が等しい を、2群の母分散が等しいと仮定せずに、t＝(X̄₁−X̄₂)/√(s₁²/n₁＋s₂²/n₂)（X̄ⱼ・sⱼ² は群ごとの標本平均・不偏分散）で検定する仮説検定
+    terms: [TERM-test, TERM-sample-mean, TERM-unbvar]
   short: 2群の分散が等しいと仮定せずに、2群の平均の差を t 分布で調べる方法
 - id: TERM-h0
   name: 帰無仮説
   en: null hypothesis
   category: 検定
+  forms: [proposition]
+  basis:
+    text: 母集団の分布（その母数）について置く仮説（真か偽かが決まる命題）で、データがそれと食い違うかを調べる対象にするもの。分布をただ1つに決める形（単純仮説。μ＝μ₀ など）か、決めた集まりに置く形（複合仮説）で立てる
+    terms: [TERM-dist]
   short: 検定で「差がない・効果がない」などとして立て、データで棄却されるかを調べる仮説
 - id: TERM-h1
   name: 対立仮説
   en: alternative hypothesis
   category: 検定
+  forms: [proposition]
+  basis:
+    text: 帰無仮説 H₀ が偽のときに母集団の分布がとりうるもの（の全部か一部）についての仮説で、H₀ を棄却したときに採るもの。ずれの向きを決める形（μ＞μ₀）と決めない形（μ≠μ₀）がある
+    terms: [TERM-h0]
   short: 帰無仮説を棄却したときに採る仮説で、調べたい差や効果があるとするもの
 - id: TERM-test-stat
   name: 検定統計量
   en: test statistic
   category: 検定
+  forms: [rv]
+  basis:
+    text: 帰無仮説 H₀ を棄却するかを決めるために使う統計量 T（H₀ のもとでの T の分布が分かるか、近似できるように作る。観測したあとの値も同じ名前で呼ぶ）
+    terms: [TERM-statistic, TERM-h0]
   short: 帰無仮説のもとでの分布が分かるように作った統計量で、データのずれの大きさを1つの数にしたもの
 - id: TERM-pvalue
   name: p値
   en: p-value
   category: 検定
+  forms: [rv, number]
+  basis:
+    text: 検定統計量 T の観測値について、H₀ が正しいとしたとき T が観測値と同じかそれより極端な値（極端さの向きは前もって決める）をとる確率。H₀ が複合仮説なら H₀ の中での上限（T の関数とみると確率変数、観測したあとの値も p 値と呼ぶ）
+    terms: [TERM-test-stat, TERM-h0, TERM-prob]
   short: 帰無仮説が正しいとしたとき、観測した値か、それより極端な値が出る確率
 - id: TERM-alpha
   name: 有意水準
   en: significance level
   category: 検定
+  forms: [number]
+  basis:
+    text: 第1種の過誤の確率に、データを見る前に置く上限 α（5%・1% など）
+    terms: [TERM-type1]
   short: 帰無仮説を棄却する基準の確率で、正しい帰無仮説を誤って棄却する確率の上限（5%など）
 - id: TERM-reject
   name: 棄却域
   en: rejection region
   category: 検定
+  forms: [event]
+  basis:
+    text: 検定統計量 T のとる値の集合 R で、T の観測値が R に入れば帰無仮説を棄却すると、データを見る前に決めたもの
+    terms: [TERM-test-stat]
   short: 検定統計量がその範囲に入ったら帰無仮説を棄却すると、前もって決めた範囲
 - id: TERM-sides
   name: 片側検定・両側検定
   en: one-sided and two-sided tests
   category: 検定
-  short: 対立仮説の向きによって、棄却域を分布の片方の端だけに置くか、両端に置くかの違い
+  forms: [procedure]
+  basis:
+    text: 仮説検定のうち、対立仮説 H₁ が母数のずれの向きを1つに決めるもの（片側検定）と、向きを決めないもの（両側検定）。棄却域はそれに合わせて置く（片側なら検定統計量の分布のその向きの端、両側ならふつう両端。ずれの向きによらず大きい値が出る統計量では、両側でも上側だけ）
+    terms: [TERM-test, TERM-h1, TERM-reject]
+  short: 対立仮説が母数のずれの向きを1つに決めるか（片側）、決めないか（両側）の違いで、棄却域の置き方はそれで決まる
 - id: TERM-type1
   name: 第1種の過誤
   en: type I error
   category: 検定
+  forms: [event, number]
+  basis:
+    text: 帰無仮説 H₀ が正しいときに、検定統計量が棄却域に入る（H₀ を棄却する）という判定の誤り（事象）。その確率も同じ名前で呼ぶ（その確率は H₀ の中のどの分布かで変わり、有意水準はその上限）
+    terms: [TERM-reject, TERM-h0, TERM-prob]
   short: 帰無仮説が正しいのに、誤って棄却してしまう誤り
 - id: TERM-type2
   name: 第2種の過誤
   en: type II error
   category: 検定
+  forms: [event, number]
+  basis:
+    text: 帰無仮説 H₀ が誤っているとき（分布が H₀ の外にあるとき）に、検定統計量が棄却域に入らない（H₀ を棄却しない）という判定の誤り（事象）。その確率 β も同じ名前で呼ぶ（β は H₀ の外のどの分布かで変わる）
+    terms: [TERM-reject, TERM-h0, TERM-prob]
   short: 帰無仮説が誤っているのに、棄却されない誤り
 - id: TERM-power
   name: 検出力
   en: power
   category: 検定
+  forms: [number]
+  basis:
+    text: 帰無仮説 H₀ が誤っているときに H₀ を棄却する確率 1−β（β は第2種の過誤の確率。H₀ の外のどの分布かで値が変わる）
+    terms: [TERM-type2]
   short: 帰無仮説が誤っているときに、正しく棄却される確率（1−第2種の過誤の確率）
 - id: TERM-pool
   name: プールした比率
   en: pooled proportion
   category: 検定
+  forms: [rv]
+  basis:
+    text: 2群の標本の大きさ n₁・n₂ と標本比率 p̂₁・p̂₂ から作る (n₁p̂₁＋n₂p̂₂)/(n₁＋n₂)（2群を合わせた標本の中で性質をもつものの割合。観測したあとの値も同じ名前で呼ぶ）
+    terms: [TERM-sample-prop]
   short: 2群の割合の差を検定するとき、帰無仮説（割合が等しい）のもとで2群を合わせて求めた割合
 - id: TERM-expected
   name: 期待度数
   en: expected frequency
   category: 検定
-  forms: [number]
+  forms: [number, rv]
+  basis:
+    text: 帰無仮説 H₀ のもとでの各欄（区分）の度数 Oᵢ の期待値 n·pᵢ（n は総数、pᵢ は H₀ のもとでその欄に入る確率）。H₀ が確率を1つに決めないとき（独立性検定、母数を推定する適合度検定）は、pᵢ の代わりに度数から推定した p̂ᵢ を使った n·p̂ᵢ（その期待値の推定値）（独立性検定では 行の合計×列の合計÷総数）
+    terms: [TERM-h0, TERM-expect]
   short: 帰無仮説（独立・決めた割合どおり）が正しいとしたとき、各欄に入ると見込まれる度数
 - id: TERM-indep-test
   name: 独立性検定
   en: test of independence
   category: 検定
+  forms: [procedure]
+  basis:
+    text: クロス集計表の2つの質的変数について、H₀：2つの変数は独立 を、統計量 Σ(O−E)²/E（O は観測度数、E は期待度数）で検定する仮説検定
+    terms: [TERM-test, TERM-crosstab, TERM-indep, TERM-expected]
   short: クロス集計表の2つの変数が独立かどうかを、期待度数とのずれからカイ二乗分布で調べる検定
 - id: TERM-gof
   name: 適合度検定
   en: goodness-of-fit test
   category: 検定
+  forms: [procedure]
+  basis:
+    text: k 個の区分に入った観測度数 O₁, …, O_k について、H₀：各区分の確率が決めた値（または決めた分布の族から出る値）である を、統計量 Σ(Oᵢ−Eᵢ)²/Eᵢ（Eᵢ は期待度数）で検定する仮説検定
+    terms: [TERM-test, TERM-expected]
   short: 観測した度数が、決めた理論の割合に合っているかを、カイ二乗分布で調べる検定
 - id: TERM-crosstab
   name: クロス集計表
   en: cross tabulation
   category: 図表
+  forms: [random_set]
   short: 2つの質的変数の組合せごとに度数を数えて並べた表
 - id: TERM-scatter
   name: 散布図
@@ -2056,6 +2120,10 @@
   name: 平均平方
   en: mean square
   category: 検定
+  forms: [rv]
+  basis:
+    text: 平方和をその自由度で割った値（群間・群内・回帰・残差などの平方和ごとに作る）
+    terms: [TERM-df]
   short: 平方和をその自由度で割った値で、分散分析や回帰でばらつきの大きさを比べるのに使う
 - id: TERM-multicol
   name: 多重共線性
@@ -2106,11 +2174,19 @@
   name: 分散分析
   en: analysis of variance
   category: 検定
+  forms: [procedure]
+  basis:
+    text: g 個の群の母平均がすべて等しいという H₀ を、F＝群間の平均平方÷群内の平均平方 で検定する仮説検定（教材の範囲は一元配置。g≧2 で定義でき、2級では主に g≧3 で使う）
+    terms: [TERM-test, TERM-ms]
   short: 3つ以上の群の平均に差があるかを、群の間と群の中のばらつきの比（F 分布）で調べる方法
 - id: TERM-multcomp
   name: 多重比較
   en: multiple comparisons
   category: 検定
+  forms: [procedure]
+  basis:
+    text: 複数の帰無仮説（群の組ごとなど）をそれぞれ仮説検定するとき、正しい帰無仮説のうちどれか1つでも第1種の過誤を起こす確率（ファミリーワイズの誤り率）が決めた有意水準 α 以下になるように、各検定の基準を調整して判定する手続き（ボンフェローニの方法など）
+    terms: [TERM-test, TERM-type1, TERM-alpha]
   short: 多くの群の組を検定するとき、全体として誤る確率が大きくならないように調整して比べる方法
 - id: TERM-posterior
   name: 事後確率
@@ -2243,6 +2319,10 @@
   name: 仮説検定
   en: hypothesis testing
   category: 検定
+  forms: [procedure]
+  basis:
+    text: 母集団の分布についての帰無仮説 H₀ と対立仮説 H₁ を立て、有意水準 α を前もって決め、H₀ が正しいときに検定統計量 T が入る確率が α 以下になる棄却域 R を（H₁ の向きに合わせて）選び、T の観測値が R に入れば H₀ を棄却し、入らなければ棄却しない手続き
+    terms: [TERM-h0, TERM-h1, TERM-alpha, TERM-test-stat, TERM-reject]
   short: 母集団についての仮説を立て、その仮説のもとでデータが起こりにくいかどうかで、仮説を棄却するかを決める方法
 - id: TERM-quantile
   name: 分位点
