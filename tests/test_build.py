@@ -1170,6 +1170,16 @@ class TestNetwork(unittest.TestCase):
         err = n.dependency_errors(rels)
         self.assertTrue(any(e.startswith("定義の依存の輪") and "TERM-rv" in e and "TERM-dist" in e for e in err), err)
         self.assertTrue(any(e.startswith("REL-x-twice:") for e in err), err)
+        # ⑤ の一種は from が子で to が親（v1 の種類は親 → 子で逆向き）。学ぶ順では親が先なので、子から親へさかのぼる（#298）。
+        # 想定する故障：v1 の種類と同じ向きでたどり、子が親の前提に入る。標本分布・極限の移行で、二項分布 → 連続修正 の前提知識が
+        #   「連続修正 ← 確率密度関数 ← 確率分布 ← 二項分布（一種を逆にたどる）」で重ねと誤って止まった。
+        # 検出の確かめ（2026-11-09）：一種の向きの分け方を外すと、今の原本（二項分布 → 連続修正）と1つ目で誤って止まり、2つ目（親から子の前提知識の重ね）を見逃して落ちる
+        rels = copy.deepcopy(self.rels)
+        rels.append({"id": "REL-x-kind", "from": "TERM-binom", "to": "TERM-pdf", "type": "前提", "premise": "learning", "description": "x", "version": 1})
+        self.assertFalse([e for e in n.dependency_errors(rels) if e.startswith("REL-x-kind:")])
+        rels = copy.deepcopy(self.rels)
+        rels.append({"id": "REL-x-parent", "from": "TERM-dist", "to": "TERM-binom", "type": "前提", "premise": "learning", "description": "x", "version": 1})
+        self.assertTrue([e for e in n.dependency_errors(rels) if e.startswith("REL-x-parent:")])
 
     def test_relation_map_ready(self):
         # 確かめる対象：関係図の決まり（docs/relation-map.md・#233）の build の止め。

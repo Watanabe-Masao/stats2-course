@@ -89,6 +89,45 @@ claims:
       version: dc2b65a
     external: 未照合
   version: 1
+- id: CLM-6a
+  label: ④-6a
+  kind: 従う
+  statement:
+    text: X₁, …, Xₙ が独立に N(μ, σ²)（σ＞0）に従うとき、標本平均 X̄ は N(μ, σ²/n) に従う
+  premises:
+    subjects:
+    - TERM-sample-mean
+  conclusion:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-normal
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ N(μ, σ²)（σ＞0）に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    - TERM-normal
+    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。CLM-6b）
+  grounds:
+  - source:
+      title: 独立な正規分布の和は正規分布（再生性）
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
+    external: 未照合
+  version: 1
 - id: CLM-6b
   label: ④-6b
   kind: 極限
@@ -154,6 +193,74 @@ claims:
       version: 525bbdb
     external: 未照合
   version: 1
+- id: CLM-9
+  label: ④-9
+  kind: 従う
+  statement:
+    text: T が t(ν) に従うとき、T² は F(1, ν) に従う
+  premises:
+    subjects:
+    - TERM-t
+  conclusion:
+    predicates:
+    - TERM-f
+  grounds:
+  - source:
+      title: T＝Z/√(V/ν) と書くと T²＝(Z²/1)/(V/ν)。Z² は χ²(1) に従い、V と独立なので、F 分布の定義から
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
+    external: なし
+  version: 1
+- id: CLM-10
+  label: ④-10
+  kind: 従う
+  statement:
+    text: n≧2 で X₁, …, Xₙ が独立に N(μ, σ²)（σ＞0）に従うとき、(n−1)s²/σ² は χ²(n−1) に従う（s² は不偏分散）
+  premises:
+    subjects:
+    - TERM-unbvar
+  conclusion:
+    subjects:
+    - TERM-unbvar
+    predicates:
+    - TERM-chi2
+  conditions:
+  - text: n≧2
+    kind: 仮定
+    outside: 不偏分散が定まらない
+  - text: X₁, …, Xₙ が独立に同じ N(μ, σ²)（σ＞0）に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    - TERM-normal
+    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる）
+  grounds:
+  - source:
+      title: Helmert の直交変換で Σ(Xᵢ−X̄)²/σ² を n−1 個の独立な N(0, 1) の2乗の和に書く（Cochran の定理）
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
+    external: 未照合
+  version: 1
 - id: CLM-13
   label: ④-13
   kind: ならば
@@ -184,6 +291,41 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-20b
+  label: ④-20b
+  kind: 推定量の性質
+  statement:
+    text: X₁, …, Xₙ が独立に同じ分布に従い、平均が μ、分散 σ² が有限のとき、どの ε＞0 についても n→∞ で P(|X̄−μ|≧ε)→0（標本平均 X̄ は μ に確率収束する。一致）
+  premises:
+    subjects:
+    - TERM-sample-mean
+  conclusion:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-consistency
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ分布に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 標本平均が μ に近づくとは保証できない
+  - text: 分散 σ² が有限
+    kind: 仮定
+    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外・未照合）
+    terms:
+    - TERM-var
+  grounds:
+  - source:
+      title: V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
     external: なし
   version: 1
 - id: CLM-23
@@ -255,6 +397,35 @@ claims:
       date: '2026-11-08'
       version: dc2b65a
     external: なし
+  version: 1
+- id: CLM-27
+  label: ④-27
+  kind: 重なり
+  statement:
+    text: 自由度2のカイ二乗分布の密度は (1/2)e^(−x/2)（x＞0）で、平均2の指数分布の密度と等しい
+  premises:
+    subjects:
+    - TERM-chi2
+  conclusion:
+    predicates:
+    - TERM-expo
+  grounds:
+  - source:
+      title: χ²(k) の密度の一般式に k＝2 を代入
+    external: true
+  teaching:
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
+    external: 未照合
   version: 1
 - id: CLM-31
   label: ④-31

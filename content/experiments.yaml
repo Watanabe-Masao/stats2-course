@@ -579,8 +579,8 @@ experiments:
           - id: binom-C-01
             title: 理論分布と実験結果は一致する？
             finds: 理論確率と実測割合
-            concept: REL-samplingerror-se-contrast
-            related: [TERM-binom]
+            concept: TERM-binom   # 主だった標本誤差と標準誤差の対比は、姿が違うので ⑤ の線にしなかった（#298）。標準誤差は骨格なので、説明のある二項分布を主にし、2つは関連にした
+            related: [TERM-se, TERM-sampling-error]
             predict: 同じ条件の実験をくり返すと、実測の割合が理論と一致するか
             operate: 同じ条件の実験の回数
             judge: 実測の割合が実験ごとにばらつく理由を標本変動（SE）で説明し、ばらつきの目安と比べて理論を疑うかを判断できる

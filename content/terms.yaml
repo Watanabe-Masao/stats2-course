@@ -128,6 +128,7 @@
   name: 統計量
   en: statistic
   category: データと変数
+  forms: [rv]
   short: 標本のデータから計算して求める値（標本平均・標本分散など）
 - id: TERM-sample-space
   name: 標本空間
@@ -307,6 +308,7 @@
   name: 不偏分散
   en: unbiased variance
   category: 要約（代表値・ばらつき）
+  forms: [rv]
   short: 偏差の2乗の和を n−1 で割った分散で、その期待値が母分散に一致する
 - id: TERM-sd
   name: 標準偏差
@@ -1763,16 +1765,29 @@
   name: 標本分布
   en: sampling distribution
   category: 標本分布・極限
+  forms: [distribution]
+  basis:
+    text: 母集団から大きさ n の標本を取ることをくり返すとき、標本から計算する統計量を確率変数とみたときの確率分布
+    terms: [TERM-statistic, TERM-dist]
   short: 同じ大きさの標本を何度も取ったときに、統計量がとる値の分布
 - id: TERM-se
   name: 標準誤差
   en: standard error
   category: 標本分布・極限
+  forms: [number]
+  basis:
+    text: 推定量 θ̂ の標本分布の標準偏差 √V(θ̂)（例：独立に同じ分布に従う標本で、標本平均の標準誤差は σ/√n）
+    terms: [TERM-estimator, TERM-sampdist, TERM-sd]
   short: 推定量の標本分布の標準偏差で、推定値がくり返しでどれだけばらつくかの大きさ
 - id: TERM-lln
   name: 大数の法則
   en: law of large numbers
   category: 標本分布・極限
+  forms: [proposition]
+  claims: [CLM-20b]
+  basis:
+    text: X₁, …, Xₙ が独立に同じ分布に従い、平均が μ、分散 σ² が有限のとき、どの ε＞0 でも n→∞ で P(|X̄−μ|≧ε)→0（標本平均 X̄ は μ に確率収束する。④-20b）
+    terms: [TERM-sample-mean]
   short: 標本の大きさを大きくすると、標本平均が母平均に近づくという法則
 - id: TERM-clt
   name: 中心極限定理
@@ -1780,37 +1795,60 @@
   category: 標本分布・極限
   forms: [proposition]
   claims: [CLM-6b]
+  basis:
+    text: X₁, …, Xₙ が独立に同じ分布に従い、平均が μ、分散 σ² が 0＜σ²＜∞ のとき、n→∞ で √n(X̄−μ)/σ の分布は N(0, 1) に近づく（④-6b）
+    terms: [TERM-sample-mean, TERM-std-normal]
   short: 独立に同じ分布から取った標本平均の分布は、n が大きいと正規分布に近づくという定理
 - id: TERM-cc
   name: 連続修正
   en: continuity correction
   category: 標本分布・極限
+  forms: [operation]
+  basis:
+    text: 整数値をとる確率変数 X の確率を、確率密度で表される分布に従う Y の確率で近似するとき、P(X≦k) を P(Y≦k＋0.5)、P(X≧k) を P(Y≧k−0.5) で近似する（境目を 0.5 ずらす）操作
+    terms: [TERM-pdf]
   short: 離散分布を連続分布で近似するとき、区間の端を0.5ずらして近似をよくする工夫
 - id: TERM-t
   name: t 分布
   en: t distribution
   category: 標本分布・極限
   forms: [distribution]
+  basis:
+    text: Z が N(0, 1) に従い、V が χ²(k) に従い、Z と V が独立なとき、T＝Z/√(V/k) の分布を自由度 k の t 分布 t(k) とする（k は1以上の整数）
+    terms: [TERM-chi2]
   short: 母分散を不偏分散で置き換えて標準化した標本平均が従う分布で、自由度が大きいと標準正規分布に近づく
 - id: TERM-chi2
   name: カイ二乗分布
   en: chi-squared distribution
   category: 標本分布・極限
+  forms: [distribution]
+  basis:
+    text: Z₁, …, Z_k が独立に N(0, 1) に従うとき、Z₁²＋…＋Z_k² の分布を自由度 k のカイ二乗分布 χ²(k) とする（k は1以上の整数。独立は定義の要件）
+    terms: [TERM-std-normal, TERM-df]
   short: 独立な標準正規分布の確率変数を2乗して足した値が従う分布
 - id: TERM-f
   name: F 分布
   en: F distribution
   category: 標本分布・極限
+  forms: [distribution]
+  basis:
+    text: U が χ²(m)、V が χ²(n) に従い、U と V が独立なとき、(U/m)/(V/n) の分布を自由度 (m, n) の F 分布 F(m, n) とする（m・n は1以上の整数）
+    terms: [TERM-chi2]
   short: 独立な2つのカイ二乗分布の確率変数を、それぞれ自由度で割った比が従う分布
 - id: TERM-df
   name: 自由度
   en: degrees of freedom
   category: 標本分布・極限
+  forms: [number]
+  basis:
+    text: n 個の値に k 個の互いに独立な1次の制約（例：偏差の和が0）があるとき、自由に動ける値の個数 n−k。t・カイ二乗・F 分布では、族を区別する正の整数の母数を同じ名前で呼ぶ
+    terms: []
   short: 統計量を計算するときに自由に動ける値の個数で、t・カイ二乗・F 分布の形を決める
 - id: TERM-estimator
   name: 推定量
   en: estimator
   category: 推定
+  forms: [rv]
   short: 母数を推定するために使う統計量（標本から値が決まる式）
 - id: TERM-point-est
   name: 点推定
@@ -2148,12 +2186,18 @@
   en: sample mean
   category: 標本分布・極限
   forms: [rv]
+  basis:
+    text: 標本 X₁, …, Xₙ（n は1以上）から作る統計量 X̄＝(X₁＋…＋Xₙ)/n（観測したあとの値も同じ名前で呼ぶ）
+    terms: [TERM-statistic]
   short: 標本のデータの値を足し、データの個数で割った値
 - id: TERM-sample-prop
   name: 標本比率
   en: sample proportion
   category: 標本分布・極限
   forms: [rv]
+  basis:
+    text: 各個体が性質をもてば1、もたなければ0とした標本 X₁, …, Xₙ の標本平均 p̂＝(X₁＋…＋Xₙ)/n（性質をもつ個数÷n）
+    terms: [TERM-sample-mean]
   short: 標本の中で、ある性質をもつものの割合
 - id: TERM-interval-est
   name: 区間推定

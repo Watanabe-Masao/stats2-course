@@ -779,6 +779,9 @@ def v2_source_errors(c: Course) -> list[str]:
     return err
 
 
+INCLUSION_V2 = ("一種",)   # ⑤ の一種は from＝子・to＝親で、v1 の種類（親 → 子）と向きが逆。特別な場合は v1 の一般化と同じ向き（特別な場合 → 一般）なので、移行の期間は v1 のままたどる（relation-types.yaml の trace。学ぶ順は M6 で ⑥ から作り直す）
+
+
 def dependency_errors(rels: list[dict]) -> list[str]:
     """定義の依存と前提知識は直接の1段だけ（#249 ③）。
     - 定義の依存の輪（材料の輪）は止める：A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない
@@ -788,7 +791,9 @@ def dependency_errors(rels: list[dict]) -> list[str]:
     trace = {k for key in ("types", "types_v2") for k, v in (KIND.get(key) or {}).items() if v.get("trace")}
     back: dict[str, list[tuple[str, str]]] = {}
     for r in rels:
-        if r.get("type") in trace:
+        if r.get("type") in INCLUSION_V2:   # ⑤ の一種は from が子・to が親。学ぶ順では親が先なので、子から親へさかのぼる（#298）
+            back.setdefault(r["from"], []).append((r["to"], r.get("id", "?")))
+        elif r.get("type") in trace:
             back.setdefault(r["to"], []).append((r["from"], r.get("id", "?")))
     for r in rels:
         if not (r.get("type") == "前提" and r.get("premise") == "learning"):

@@ -534,80 +534,47 @@ relations:
       - U03
       - U18
     version: 1
-  - id: REL-sample-samplemean
-    from: TERM-sample
-    to: TERM-sample-mean
-    type: 前提
-    premise: mathematical
-    description: 標本平均は標本のデータの平均。
-    basis:
-      units:
-      - U18
-    version: 1
   - id: REL-statistic-sampdist
     from: TERM-statistic
     to: TERM-sampdist
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 標本分布は、標本を取り直したときに統計量がとる値の分布。
     basis:
       units:
       - U17
       - U18
-    version: 1
+    version: 2
   - id: REL-dist-sampdist
-    from: TERM-dist
-    to: TERM-sampdist
-    type: 前提
-    premise: learning
-    description: 標本分布も確率分布の1つ。統計量を確率変数として見る。
+    from: TERM-sampdist
+    to: TERM-dist
+    type: 一種
+    description: 標本分布は、統計量（標本から計算する確率変数）の確率分布。確率分布の1つ。
     basis:
       units:
       - U17
       - U18
-    version: 1
+    version: 2
   - id: REL-sampdist-se
     from: TERM-sampdist
     to: TERM-se
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: 標準誤差は、推定量の標本分布の標準偏差。
     basis:
       units:
       - U18
       - U20
-    version: 1
+    version: 2
   - id: REL-sd-se
-    from: TERM-sd
-    to: TERM-se
-    type: 前提
-    premise: mathematical
-    description: 標準誤差は標準偏差の一種（標本分布の標準偏差）。平均の標準誤差は σ÷√n。
+    from: TERM-se
+    to: TERM-sd
+    type: 一種
+    to_form: number
+    description: 標準誤差は、推定量の標本分布の標準偏差。標準偏差の1つ。平均の標準誤差は σ÷√n。
     basis:
       units:
       - U18
       - U20
-    version: 1
-  - id: REL-samplemean-lln
-    from: TERM-sample-mean
-    to: TERM-lln
-    type: 前提
-    premise: mathematical
-    description: 大数の法則は、標本平均が母平均に近づくという主張。
-    basis:
-      units:
-      - U19
-    version: 1
-  - id: REL-samplemean-clt
-    from: TERM-sample-mean
-    to: TERM-clt
-    type: 前提
-    premise: mathematical
-    description: 中心極限定理は、標本平均の分布の形についての主張。
-    basis:
-      units:
-      - U19
-    version: 1
+    version: 2
   - id: REL-lln-clt
     from: TERM-lln
     to: TERM-clt
@@ -652,65 +619,41 @@ relations:
       - U20
     version: 1
   - id: REL-normal-chi2
-    from: TERM-normal
+    from: TERM-std-normal
     to: TERM-chi2
-    type: 前提
-    premise: mathematical
-    description: カイ二乗分布は、標準正規分布の確率変数の2乗の和の分布。
+    type: 定める
+    description: カイ二乗分布は、独立に標準正規分布に従う k 個の確率変数の2乗の和の分布。
     basis:
       units:
       - U20
-    version: 1
+    version: 2
   - id: REL-df-chi2
     from: TERM-df
     to: TERM-chi2
-    type: 前提
-    premise: mathematical
+    type: 定める
     description: カイ二乗分布の形は自由度で決まる。
     basis:
       units:
       - U20
-    version: 1
+    version: 2
   - id: REL-chi2-t
     from: TERM-chi2
     to: TERM-t
-    type: 前提
-    premise: mathematical
-    description: t 分布は、標準正規分布の確率変数を、カイ二乗分布の確率変数を自由度で割った値の平方根で割った分布。
+    type: 定める
+    description: t 分布は、互いに独立な標準正規分布の確率変数 Z とカイ二乗分布の確率変数 V について、Z を「V を自由度で割った値の平方根」で割った分布。
     basis:
       units:
       - U20
-    version: 1
+    version: 2
   - id: REL-chi2-f
     from: TERM-chi2
     to: TERM-f
-    type: 前提
-    premise: mathematical
-    description: F 分布は、2つのカイ二乗分布の確率変数をそれぞれ自由度で割った比の分布。
+    type: 定める
+    description: F 分布は、互いに独立な2つのカイ二乗分布の確率変数を、それぞれ自由度で割った比の分布。
     basis:
       units:
       - U20
-    version: 1
-  - id: REL-df-t
-    from: TERM-df
-    to: TERM-t
-    type: 前提
-    premise: mathematical
-    description: t 分布の形は自由度で決まる。
-    basis:
-      units:
-      - U20
-    version: 1
-  - id: REL-df-f
-    from: TERM-df
-    to: TERM-f
-    type: 前提
-    premise: mathematical
-    description: F 分布の形は2つの自由度で決まる。
-    basis:
-      units:
-      - U20
-    version: 1
+    version: 2
   - id: REL-t-normal
     from: TERM-t
     to: TERM-std-normal
@@ -897,17 +840,6 @@ relations:
     basis:
       units:
       - U22
-    version: 1
-  - id: REL-ratio-sampleprop
-    from: TERM-ratio
-    to: TERM-sample-prop
-    type: 前提
-    premise: mathematical
-    description: 標本比率は、標本の中での割合。
-    basis:
-      units:
-      - U22
-      - U26
     version: 1
   - id: REL-sampleprop-ci
     from: TERM-sample-prop
@@ -1907,17 +1839,6 @@ relations:
       units:
       - U31
     version: 1
-  - id: REL-samplingerror-se-contrast
-    from: TERM-sampling-error
-    to: TERM-se
-    type: 対比
-    description: 標本誤差は、標本を選ぶことで結果が真の値からずれる現象そのもの。標準誤差は、そのずれがくり返しでどれくらいの大きさになるかを測る数（推定量の標準偏差）。
-    gist: 標本誤差は「一部だけ見たせいで起きるずれ」、標準誤差は「そのずれのふつうの大きさ」。標準誤差で標本誤差の大きさを見積もる。
-    basis:
-      units:
-      - U18
-      - U31
-    version: 1
   - id: REL-sampling-nonsampling-contrast
     from: TERM-sampling-error
     to: TERM-nonsampling-error
@@ -2148,3 +2069,112 @@ relations:
     description: 事前確率は、結果を見る前に原因（仮説）H に割り当てる確率 P(H)。確率の値の1つ。
     basis:
       units: [U12]
+
+  - id: REL-samplemean-normal
+    from: TERM-sample-mean
+    to: TERM-normal
+    version: 1
+    type: 従う
+    claim: CLM-6a
+    description: 正規母集団 N(μ, σ²) から独立に取った大きさ n の標本の標本平均 X̄ は、N(μ, σ²/n) に従う。
+    basis:
+      units: [U18]
+
+  - id: REL-unbvar-chi2
+    from: TERM-unbvar
+    to: TERM-chi2
+    version: 1
+    type: 従う
+    claim: CLM-10
+    description: 正規母集団から独立に取った大きさ n（n≧2）の標本の不偏分散 s² について、(n−1)s²/σ² は自由度 n−1 のカイ二乗分布に従う。
+    basis:
+      units: [U20]
+
+  - id: REL-t-f
+    from: TERM-t
+    to: TERM-f
+    version: 1
+    type: 移る
+    mode: exact
+    operation: t(ν) に従う確率変数を2乗する
+    claim: CLM-9
+    description: T が自由度 ν の t 分布に従うとき、T² は自由度 (1, ν) の F 分布に従う。
+    gist: t 分布に従う量を2乗すると、F 分布（分子の自由度1）に従う。だから、F 統計量が t 統計量の2乗になる場面（2群の一元配置分散分析とプールした t 検定など）では、両側の t 検定と F 検定は同じ判定になる。
+    basis:
+      units: [U20]
+
+  - id: REL-lln-clt-contrast
+    from: TERM-lln
+    to: TERM-clt
+    version: 1
+    type: 比べる
+    axis: 標本平均の何が、n を大きくするとどうなるか
+    same: どちらも、独立に同じ分布に従う標本の標本平均 X̄ について、n を大きくしたときのふるまいを言う定理
+    differ: 大数の法則は、X̄ そのものが平均 μ に近づく（ずれは0に縮む）と言う。中心極限定理は、ずれを √n 倍に拡大して σ で割った √n(X̄−μ)/σ の分布が、（分散が有限で正なら）元の分布によらず標準正規分布に近づくと言う
+    description: 大数の法則は標本平均が平均に近づくこと、中心極限定理はそのずれの分布の形が正規分布に近づくことを言う。
+    gist: n を大きくすると、標本平均は平均に近づき（大数の法則）、近づくときのずれ方は釣鐘の形になる（中心極限定理）。
+    basis:
+      units: [U19]
+
+  - id: REL-sampmean-statistic
+    from: TERM-sample-mean
+    to: TERM-statistic
+    version: 1
+    type: 一種
+    description: 標本平均は、標本から計算する統計量の1つ。
+    basis:
+      units: [U18]
+
+  - id: REL-sampleprop-samplemean
+    from: TERM-sample-prop
+    to: TERM-sample-mean
+    version: 1
+    type: 一種
+    description: 標本比率は、性質をもつ個体を1、もたない個体を0とした標本の標本平均。
+    basis:
+      units: [U22]
+
+  - id: REL-estimator-se
+    from: TERM-estimator
+    to: TERM-se
+    version: 1
+    type: 定める
+    description: 標準誤差は、推定量の標本分布の標準偏差。推定量が定義に直接出る。
+    basis:
+      units: [U18]
+
+  - id: REL-pdf-cc
+    from: TERM-pdf
+    to: TERM-cc
+    version: 1
+    type: 定める
+    description: 連続修正は、整数値の確率を確率密度で表される分布の確率で近似するとき、境目を 0.5 ずらす操作。確率密度関数が定義に直接出る。
+    basis:
+      units: [U16]
+
+  - id: REL-chi2-dist
+    from: TERM-chi2
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率変数の作り方（正規分布に従う確率変数の関数）で区別される族の1つ。
+    basis:
+      units: [U20]
+
+  - id: REL-t-dist
+    from: TERM-t
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率変数の作り方（正規分布に従う確率変数の関数）で区別される族の1つ。
+    basis:
+      units: [U20]
+
+  - id: REL-f-dist
+    from: TERM-f
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率変数の作り方（正規分布に従う確率変数の関数）で区別される族の1つ。
+    basis:
+      units: [U20]
