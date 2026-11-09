@@ -153,16 +153,25 @@
   name: 抽出枠
   en: sampling frame
   category: データと変数
+  forms: [event]
   short: 標本を選ぶときに使う、母集団の名簿や一覧
 - id: TERM-random-sampling
   name: 無作為抽出
   en: random sampling
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 抽出枠の中から標本を選ぶとき、どの標本をどの確率で選ぶかを前もって決め（枠のどの要素も選ばれる確率が0より大きい）、その確率に従うくじ（乱数）で選ぶ手続き。大きさ n のどの組み合わせも同じ確率で選ぶものを単純無作為抽出と呼び、そのとき各要素の選ばれる確率は n/N（N は枠の要素の数）
+    terms: [TERM-frame, TERM-prob]
   short: 母集団のどの要素も決まった確率で選ばれるように、くじ引きのように標本を選ぶこと
 - id: TERM-bias
   name: バイアス（偏り）
   en: bias
   category: 調査・実験
+  forms: [number]
+  basis:
+    text: 母数 θ の推定量 θ̂ について E(θ̂)−θ（母数の値ごとに決まる。期待値は、標本の選び方と、測り方・回答を含むデータの取り方の全体についてとる）。0 でなければ、推定値はくり返したときに平均として一方の向きにずれる。選ばれ方の確率が分からない取り方（応募した人だけを調べるなど）でも、選ばれ方の確率はあり、偏りは定まるが、大きさを見積もれない
+    terms: [TERM-estimator, TERM-expect]
   short: 調査や推定の結果が、真の値から一定の向きにずれること
 - id: TERM-qual
   name: 質的変数
@@ -2236,41 +2245,73 @@
   name: 層化抽出
   en: stratified sampling
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 抽出枠（母集団）を重ならない層に分け、すべての層のそれぞれから、層ごとに先に決めた大きさの標本を無作為抽出で選ぶ手続き（母集団の値は、層の推定値を母集団で層が占める割合 N_h/N で重み付けて足して推定する）
+    terms: [TERM-random-sampling]
   short: 母集団をいくつかの層に分け、各層から無作為に標本を選ぶ方法
 - id: TERM-cluster-sampling
   name: 集落抽出
   en: cluster sampling
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 抽出枠（母集団）を集落（学校・地区・店など、要素の集まり）に分け、集落を単位にして無作為抽出で選び、選んだ集落の要素を全部調べる手続き
+    terms: [TERM-random-sampling]
   short: 母集団を集落（学校・地区など）に分け、無作為に選んだ集落の全員を調べる方法
 - id: TERM-systematic-sampling
   name: 系統抽出
   en: systematic sampling
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 抽出枠の名簿の並びで、抽出間隔 k を決め、最初の1つを1〜k 番目から等しい確率で選び、そこから k おきに選ぶ手続き
+    terms: [TERM-random-sampling]
   short: 名簿の最初の1人を無作為に選び、そこから一定の間隔で選んでいく方法
 - id: TERM-multistage-sampling
   name: 多段抽出
   en: multistage sampling
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 母集団を大きさの違う単位の段（地域→店→客など）に分け、大きな単位から順に、各段で前の段で選んだ単位の中から無作為抽出で選ぶ手続き（各要素の選ばれる確率は各段の確率の積）
+    terms: [TERM-random-sampling]
   short: 大きな単位から順に、何段階かに分けて無作為に選んでいく方法
 - id: TERM-sampling-error
   name: 標本誤差
   en: sampling error
   category: 調査・実験
+  forms: [rv]
+  basis:
+    text: 測り方・回答に誤りがなく抽出枠が母集団と一致するとき、標本から求めた推定量 θ̂ と母数 θ の差 θ̂−θ（どの標本が選ばれたかで値が決まる）
+    terms: [TERM-estimator]
   short: 母集団の一部（標本）だけを調べることで生じる、結果と真の値のずれ
 - id: TERM-nonsampling-error
   name: 非標本誤差
   en: non-sampling error
   category: 調査・実験
+  forms: [rv]
+  basis:
+    text: 実際に得たデータで求めた推定量の値と、同じ標本を誤りなく測った（抽出枠が母集団と一致し、無回答・回答の誤り・記入の誤りがない）ときに求まる推定量の値の差
+    terms: [TERM-estimator]
   short: 回答の誤り・無回答・抽出枠の不備など、標本を選ぶこと以外で生じるずれ
 - id: TERM-randomize
   name: 無作為化
   en: randomization
   category: 調査・実験
+  forms: [procedure]
+  basis:
+    text: 実験で、各対象をどの処理の群に入れるかを、対象の性質や実験者の判断でなく、前もって決めた確率に従うくじ（乱数）で決める手続き。完全無作為化は、群の大きさを先に決め、その大きさの割り当てを全部同じ確率で選ぶ形
+    terms: [TERM-prob]
   short: 実験で、対象をくじ引きのように処理の群へ割り当てること
 - id: TERM-confound
   name: 交絡
   en: confounding
   category: 調査・実験
+  forms: [property]
+  basis:
+    text: 処理（調べたい要因）T の群どうしで結果 Y を比べるとき、T と関係し（無作為に選んだ1個体の T と Z が独立でない）、Y にも影響する別の要因 Z があるために、比べた差に T の効果と Z の効果が混ざって分けられないこと （Y への影響・効果は因果の見立てで、統計の外の判断を含む）
+    terms: [TERM-indep]
   short: 調べたい要因と結果の両方に関係する別の要因があり、その効果を区別できなくなること
 - id: TERM-anova
   name: 分散分析
