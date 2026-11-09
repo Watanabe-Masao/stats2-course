@@ -108,7 +108,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: 標本平均が正規分布に従うとは保証できない（一般の母集団では、n が大きいとき中心極限定理で標準化したものが近づくだけ）
+    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。CLM-6b）
   grounds:
   - source:
       title: 独立な正規分布の和は正規分布（再生性）
@@ -233,10 +233,10 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、形が変わる）
+    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる）
   grounds:
   - source:
-      title: 正規母集団の標本の平方和の分布
+      title: Helmert の直交変換で Σ(Xᵢ−X̄)²/σ² を n−1 個の独立な N(0, 1) の2乗の和に書く（Cochran の定理）
     external: true
   teaching:
     conclusion: true
@@ -293,7 +293,7 @@ claims:
     subjects:
     - TERM-sample-mean
     predicates:
-    - TERM-lln
+    - TERM-consistency
   conditions:
   - text: X₁, …, Xₙ が独立に同じ分布に従う
     kind: 仮定
@@ -302,7 +302,9 @@ claims:
     outside: 標本平均が μ に近づくとは保証できない
   - text: 分散 σ² が有限
     kind: 仮定
-    outside: この根拠（チェビシェフの不等式）では示せない（平均だけが有限でも成り立つが、教材の範囲外：ヒンチンの大数の法則）
+    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外・未照合）
+    terms:
+    - TERM-var
   grounds:
   - source:
       title: V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
@@ -392,6 +394,8 @@ claims:
   - source:
       title: χ²(k) の密度の一般式に k＝2 を代入
     external: true
+  teaching:
+    proof: 範囲外
   verification:
     math:
     - method: 独立な確かめ
