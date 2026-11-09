@@ -158,6 +158,21 @@ class TestV2Checks(unittest.TestCase):
         d["course"]["v2_ready"] = []
         self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
 
+    def test_reached_and_theorem_terms_are_handled(self):
+        # ⑤ の構成（#290）：ほかの直接の構成要素をたどって着く概念は線を書かないので、扱ったと数える。
+        # 定理の点（姿が命題）の基準の定義に出る概念は、その主張の前提・結論・条件に出してつなぐ（⑤ の 5 の表。#295 の確率で、事象・条件付き確率などが当たった）。
+        # 想定する故障：たどって着く概念や定理の主張に出る概念まで「扱っていない」と止め、⑤ に合う原本の build を落とす。逆に、主張にも出ない概念を通す。
+        # 検出の確かめ：たどる所（reach）を直接の親だけにすると1つ目が、定理の主張を見る所を消すと2つ目が落ち、主張に出ない概念は3つ目で止まる（2026-11-09 に手元で確かめた）
+        d = base()
+        d["concepts"].append(C("mix", ["distribution"], basis={"text": "ベルヌーイ分布を混ぜたもの", "terms": ["t:bern", "t:prob"]}))
+        d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:bern", "to": "t:mix"})   # 確率は ベルヌーイ分布 ← 確率 でたどって着く
+        self.assertEqual([e for e in v2_errors(d) if "扱っていない" in e], [])
+        d = base()
+        con(d, "clt")["basis"]["terms"] = ["t:xbar", "t:stdnormal"]   # 主張 CLM-9 の前提・結論に出る
+        self.assertEqual([e for e in v2_errors(d) if "扱っていない" in e], [])
+        con(d, "clt")["basis"]["terms"].append("t:mu")   # 主張に出ず、たどっても着かない
+        self.assertTrue([e for e in v2_errors(d) if "t:mu を、定める" in e])
+
     def test_learning_rows_wait_for_m6(self):
         # 前提（learning）は学ぶ順へ移す M6（#266）まで v1 のまま残してよい（移した分類でも止めない）。
         # 検出の確かめ：この例外の行を消すと落ちる。mathematical は上の BREAKS で止まる

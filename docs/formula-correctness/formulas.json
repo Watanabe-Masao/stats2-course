@@ -1089,7 +1089,7 @@
     "symbol": "P( )",
     "meaning": "確率",
     "key": "P",
-    "concept": "TERM-dist"
+    "concept": "TERM-prob"
    },
    {
     "symbol": "A",

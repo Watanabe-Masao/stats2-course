@@ -215,6 +215,29 @@ def v2_errors(data: dict) -> list[str]:
     defines = {(r["from"], r["to"]) for r in rels if r.get("type") == "定める" or r.get("legacy_type") == "材料"}
     from network import inclusion_ancestors   # 包含の連なり（一種・特別な場合）の親は全部外す（⑤ の包含。#290）
     kind_parent = {(a, k) for k in concepts for a in inclusion_ancestors(k, rels)}
+    # 構成（⑤ の 構成。#290）：ほかの直接の構成要素の構成要素としてたどって着くものは書かない。だから、直接に扱った概念（定める・一種の親）から
+    # 定める・包含をさかのぼって着く概念は扱ったと数える。定理の点（姿が命題）の基準の定義に出る概念は、その主張の前提・結論・条件に出してつなぐ（⑤ の 5 の表「定めると、定理の主張に出る」。#295）
+    into: dict[str, set[str]] = {}
+    for a, b in defines | kind_parent:
+        into.setdefault(b, set()).add(a)
+
+    def reach(start: set[str]) -> set[str]:
+        seen, todo = set(start), list(start)
+        while todo:
+            for a in into.get(todo.pop(), ()):
+                if a not in seen:
+                    seen.add(a)
+                    todo.append(a)
+        return seen
+
+    def direct(c: dict) -> set[str]:
+        out = set(into.get(c["id"], ()))
+        if "proposition" in _forms(c):
+            for cid in c.get("claims") or []:
+                cl = claims.get(cid) or {}
+                out |= _ends(cl.get("premises")) | _ends(cl.get("conclusion"))
+                out |= {t for row in cl.get("conditions") or [] for t in row.get("terms") or []}
+        return out
     for c in concepts.values():
         used = basis_concepts(c)
         if not used:
@@ -223,8 +246,9 @@ def v2_errors(data: dict) -> list[str]:
         for k in sorted(ex & {a for a, b in defines if b == c["id"]}):
             err.append(f"{c['id']}: {k} を定めると basis.excludes の両方に書いている（#86）")
         if c.get("category") in ready:
+            handled = reach(direct(c))
             for k in sorted(used - ex):
-                if (k, c["id"]) not in defines and (k, c["id"]) not in kind_parent:
+                if k not in handled:
                     err.append(f"{c['id']}: 基準の定義に出る {k} を、定める・一種の親・basis.excludes のどれでも扱っていない（#86。⑤ の構成）")
 
     # 定義の依存は輪にならない（⑤ の 構成）

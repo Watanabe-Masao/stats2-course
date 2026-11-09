@@ -134,11 +134,18 @@
   en: sample space
   category: 確率
   forms: [event]
+  basis:
+    text: 1回の試行で起こりうる結果を、重なりなく漏れなく全部集めた集合 Ω
+    terms: []
   short: 1回の試行で起こりうる結果を、すべて集めた集合
 - id: TERM-event
   name: 事象
   en: event
   category: 確率
+  forms: [event]
+  basis:
+    text: 標本空間 Ω の部分集合（起こりうる結果のうち、注目するものの集まり）
+    terms: [TERM-sample-space]
   short: 標本空間の中で、注目する結果を集めた部分集合
 - id: TERM-frame
   name: 抽出枠
@@ -641,17 +648,26 @@
   name: 余事象
   en: complement
   category: 確率
+  forms: [event]
+  basis:
+    text: 事象 A に対して、標本空間 Ω のうち A に入らない結果を全部集めた事象 Aᶜ＝Ω∖A
+    terms: [TERM-event, TERM-sample-space]
   short: ある事象が起こらないという事象で、標本空間からその事象を除いた残り
 - id: TERM-exclusive
   name: 排反
   en: mutually exclusive
   category: 確率
+  forms: [property]
+  basis:
+    text: 2つの事象 A・B が共通の結果を持たない（A∩B＝∅）こと
+    terms: [TERM-event]
   short: 2つの事象が同時には起こらないこと（共通部分がない）
 - id: TERM-indep
   name: 独立
   en: independence
   category: 確率
   forms: [property]
+  basis_formula: F-indep-def
   definition: 一方が起きたかどうかで、もう一方の起こりやすさが変わらないこと。
   version: 1
   labs:
@@ -663,7 +679,7 @@
     - symbol: P( )
       meaning: 確率
       key: P
-      concept: TERM-dist
+      concept: TERM-prob
     - symbol: A
       meaning: 事象
       key: A
@@ -679,7 +695,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "AB"}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "A"}], "name": "P"}, {"op": "fn", "args": [{"sym": "B"}], "name": "P"}]}]}
   conditions:
     math:
-    - 確率が決まった2つの事象（または確率変数）について言う
+    - text: A・B は、同じ標本空間の上の同じ確率 P で確率が決まった2つの事象（確率変数 X・Y の独立は、値の事象 {X∈A}・{Y∈B} のどの組も独立なこと）
+      kind: 要件
+      outside: この定義の独立として扱えない
     data:
     - データで「独立」と言うには、仕組み（別々のさいころ・別々の客）から言えるか、検定などで確かめる。相関が0でも独立とは限らない
   example: さいころを2回投げると、1回目と2回目の目は独立。両方6になる確率は 1/6×1/6＝1/36。
@@ -696,21 +714,38 @@
   name: 条件付き確率
   en: conditional probability
   category: 確率
+  forms: [number]
+  basis:
+    text: P(A)＞0 の事象 A と事象 B について、A が起きたもとでの B の確率 P(B|A)＝P(A∩B)/P(A)
+    terms: [TERM-prob, TERM-event]
   short: ある事象が起きたと分かったうえで、別の事象が起こる確率
 - id: TERM-bayes
   name: ベイズの定理
   en: Bayes' theorem
   category: 確率
+  forms: [proposition]
+  claims: [CLM-23]
+  basis:
+    text: P(H)＞0・P(D)＞0 の事象 H・D について、P(H|D)＝P(D|H)P(H)/P(D)（④-23）
+    terms: [TERM-cond, TERM-prob, TERM-event]
   short: 結果が分かったときに、その原因の確率を、条件付き確率を逆向きにして求める式
 - id: TERM-prior
   name: 事前確率
   en: prior probability
   category: 確率
+  forms: [number]
+  basis:
+    text: 結果 D を見る前に、原因・仮説 H（事象）に割り当てる確率 P(H)
+    terms: [TERM-prob, TERM-event]
   short: データ（結果）を見る前に、原因や仮説について持っている確率
 - id: TERM-likelihood
   name: 尤度
   en: likelihood
   category: 確率
+  forms: [number]
+  basis:
+    text: 原因・仮説 H のもとで、観測した結果 D が起こる条件付き確率 P(D|H)（D を固定し、H を替えて比べる）
+    terms: [TERM-cond]
   short: ある原因や仮説のもとで、実際に得られた結果が起こる確率
 - id: TERM-rv
   name: 確率変数
@@ -1876,6 +1911,7 @@
   name: 期待度数
   en: expected frequency
   category: 検定
+  forms: [number]
   short: 帰無仮説（独立・決めた割合どおり）が正しいとしたとき、各欄に入ると見込まれる度数
 - id: TERM-indep-test
   name: 独立性検定
@@ -2011,6 +2047,10 @@
   name: 事後確率
   en: posterior probability
   category: 確率
+  forms: [number]
+  basis:
+    text: 結果 D を見たあとの、原因・仮説 H の条件付き確率 P(H|D)
+    terms: [TERM-cond]
   short: データ（結果）を見たあとで、ベイズの定理で更新した原因や仮説の確率
 - id: TERM-mean
   name: 平均（算術平均）
@@ -2022,21 +2062,39 @@
   en: probability (axioms)
   category: 確率
   forms: [function, number]
+  basis:
+    text: 標本空間の事象 A のそれぞれに数 P(A) を対応させる関数で、どの A でも P(A)≧0、P(Ω)＝1、互いに排反な事象 A₁, A₂, … では P(A₁∪A₂∪…)＝P(A₁)＋P(A₂)＋…（確率の公理）を満たすもの。その値 P(A) も確率と呼ぶ
+    terms: [TERM-event, TERM-sample-space, TERM-exclusive]
   short: 事象の起こりやすさを0〜1の数で表したもので、全体は1、排反な事象では確率を足せる
 - id: TERM-addition
   name: 加法定理
   en: addition rule
   category: 確率
+  forms: [proposition]
+  claims: [CLM-32]
+  basis:
+    text: どの2つの事象 A・B についても P(A∪B)＝P(A)＋P(B)−P(A∩B)（④-32）
+    terms: [TERM-prob, TERM-event]
   short: 2つの事象のどちらかが起こる確率は、それぞれの確率の和から両方が起こる確率を引いたもの
 - id: TERM-multiplication
   name: 乗法定理
   en: multiplication rule
   category: 確率
+  forms: [proposition]
+  claims: [CLM-33]
+  basis:
+    text: P(A)＞0 の事象 A とどの事象 B についても P(A∩B)＝P(A)P(B|A)（④-33）
+    terms: [TERM-prob, TERM-cond, TERM-event]
   short: 2つの事象が両方起こる確率は、一方の確率と、それが起きたときの他方の条件付き確率の積
 - id: TERM-total-prob
   name: 全確率の公式
   en: law of total probability
   category: 確率
+  forms: [proposition]
+  claims: [CLM-34]
+  basis:
+    text: 事象 A₁, …, A_k が互いに排反で合わせると Ω になり、どれも P(Aᵢ)＞0 のとき、どの事象 B についても P(B)＝Σ P(Aᵢ)P(B|Aᵢ)（④-34）
+    terms: [TERM-prob, TERM-cond, TERM-event, TERM-exclusive]
   short: 起こり方を排反な場合に分け、場合ごとの確率×条件付き確率を足して全体の確率を求める式
 - id: TERM-bernoulli
   name: ベルヌーイ分布

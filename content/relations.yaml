@@ -382,44 +382,24 @@ relations:
   - id: REL-ss-event
     from: TERM-sample-space
     to: TERM-event
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
     description: 事象は標本空間の部分集合として決める。まず起こりうる結果の全体を決める。
     basis: {units: [U10]}
   - id: REL-event-complement
     from: TERM-event
     to: TERM-complement
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
     description: 余事象は、事象を標本空間の中で裏返したもの。
     basis: {units: [U10]}
   - id: REL-event-exclusive
     from: TERM-event
     to: TERM-exclusive
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
     description: 排反は2つの事象の関係（共通部分がない）として決める。
     basis: {units: [U10, U11]}
-  - id: REL-event-prob
-    from: TERM-event
-    to: TERM-prob
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 確率は事象ごとに決める数。何についての確率か（事象）がないと決められない。
-    basis: {units: [U10]}
-  - id: REL-prob-addition
-    from: TERM-prob
-    to: TERM-addition
-    version: 1
-    type: 導出
-    description: 確率の公理（排反なら足せる）から、重なりのある2つの事象でも、重なりを1回引けば和の確率が出る。
-    gist: 2つの円が重なっているとき、面積を足すと重なりを2回数えてしまう。だから重なりを1回引く。
-    conditions: [確率の公理（全体は1・排反な事象の確率は足せる）]
-    basis: {units: [U10]}
   - id: REL-exclusive-addition
     from: TERM-exclusive
     to: TERM-addition
@@ -431,19 +411,10 @@ relations:
   - id: REL-prob-cond
     from: TERM-prob
     to: TERM-cond
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 定める
+    from_form: function
     description: 条件付き確率は、両方が起こる確率を、条件の事象の確率で割って決める。
-    basis: {units: [U11]}
-  - id: REL-cond-multiplication
-    from: TERM-cond
-    to: TERM-multiplication
-    version: 1
-    type: 導出
-    description: 条件付き確率の定義 P(B|A)＝P(A∩B)÷P(A) の両辺に P(A) を掛けると、P(A∩B)＝P(A)×P(B|A) になる。
-    gist: 両方起こる確率は「まず A が起こり、そのうえで B も起こる」と2段に分けて掛ければよい。
-    conditions: [P(A)＞0]
     basis: {units: [U11]}
   - id: REL-cond-indep
     from: TERM-cond
@@ -456,86 +427,59 @@ relations:
   - id: REL-exclusive-indep-contrast
     from: TERM-exclusive
     to: TERM-indep
-    version: 1
-    type: 対比
-    description: 排反は同時に起こらないこと、独立は互いの確率に影響しないこと。確率が0でない2つの事象が排反なら、一方が起きると他方は起こらないので、独立ではない。
+    version: 2
+    type: 比べる
+    differ: 排反は A∩B＝∅ で、確率によらず集合だけで決まる。独立は P(A∩B)＝P(A)P(B) で、確率で決まる。どちらの確率も0でない2つの事象が排反なら、P(A∩B)＝0 だが P(A)P(B)＞0 なので、独立ではない
+    same: どちらも、2つの事象の組について、その2つがどう関わるかを言う性質
+    axis: 2つの事象の関わりを、集合の重なりで言うか、確率の掛け算で言うか
+    description: 排反は同時に起こらないこと、独立は互いの確率に影響しないこと。どちらも確率が0でない2つの事象が排反なら、一方が起きると他方は起こらないので、独立ではない。
     gist: 「同時に起きない」と「影響しない」は別のこと。むしろ排反なら、一方が起きたと分かれば他方は起きないと分かるので、強く影響し合っている。
     basis: {units: [U10, U11]}
   - id: REL-multiplication-total
     from: TERM-multiplication
     to: TERM-total-prob
-    version: 1
-    type: 前提
-    premise: mathematical
+    version: 2
+    type: 導ける
+    claim: CLM-34
+    gist: 起こり方を重ならない場合に分け、「その場合になる確率×その場合で起こる確率」を全部足すと、全体の確率になる。各項が乗法定理の形。
     description: 全確率の公式の各項は、乗法定理で「場合の確率×その場合の条件付き確率」と書いたもの。
-    basis: {units: [U12]}
-  - id: REL-exclusive-total
-    from: TERM-exclusive
-    to: TERM-total-prob
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 起こり方を、重なりのない（排反な）場合に分けるから、各場合の確率を足して全体が出る。
     basis: {units: [U12]}
   - id: REL-total-bayes
     from: TERM-total-prob
     to: TERM-bayes
-    version: 1
+    version: 2
     type: 前提
-    premise: mathematical
-    description: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。
+    premise: learning
+    description: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
     basis: {units: [U12]}
   - id: REL-cond-bayes
     from: TERM-cond
     to: TERM-bayes
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。
-    basis: {units: [U12]}
-  - id: REL-cond-likelihood
-    from: TERM-cond
-    to: TERM-likelihood
-    version: 1
+    version: 2
     type: 前提
     premise: learning
-    description: 尤度は「その原因のもとで、この結果が起こる条件付き確率」として読む。
+    description: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
     basis: {units: [U12]}
-  - id: REL-prior-bayes
-    from: TERM-prior
-    to: TERM-bayes
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: ベイズの定理は、事前確率に尤度を掛けて更新する。事前確率がないと始められない。
-    basis: {units: [U12]}
-  - id: REL-likelihood-bayes
+  - id: REL-cond-likelihood
     from: TERM-likelihood
-    to: TERM-bayes
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 尤度は、データが原因の確率をどれだけ動かすかを決める。
-    basis: {units: [U12]}
-  - id: REL-bayes-posterior
-    from: TERM-bayes
-    to: TERM-posterior
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: 事後確率はベイズの定理で求める確率。
+    to: TERM-cond
+    version: 2
+    type: 一種
+    description: 尤度は、原因（仮説）H のもとで観測した結果 D が起こる条件付き確率 P(D|H)。D を固定し、H を替えて比べるときの呼び名。
     basis: {units: [U12]}
   - id: REL-prior-posterior
     from: TERM-prior
     to: TERM-posterior
-    version: 1
-    type: 変換
+    version: 2
+    type: 移る
+    operation: 尤度 P(D|H) を掛け、結果 D が起こる確率 P(D) で割る（P(H|D)＝P(D|H)P(H)/P(D)）
+    theorem: TERM-bayes
     mode: exact
     description: 事前確率に尤度を掛け、結果が起こる全体の確率（全確率）で割ると、事後確率になる。
     gist: データを見る前の見込みを、データの起こりやすさで重み付けし直したのが、データを見たあとの見込み。
-    conditions: [尤度（各原因のもとで結果が起こる確率）が分かっている, 結果が起こる確率が0でない]
     basis: {units: [U12]}
   # ---- P1 骨格：W3（U17〜U23 標本分布・推定）。#105
+
   - id: REL-population-sample
     from: TERM-population
     to: TERM-sample
@@ -2165,3 +2109,42 @@ relations:
     description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
     basis:
       units: [U16]
+
+  - id: REL-exclusive-prob
+    from: TERM-exclusive
+    to: TERM-prob
+    version: 1
+    type: 定める
+    to_form: function
+    description: 確率の公理の3つ目（互いに排反な事象の和の確率は、確率の和）に排反が直接出る。事象・標本空間は排反をたどって着くので、線にしない。
+    basis:
+      units: [U10]
+
+  - id: REL-prob-indep
+    from: TERM-prob
+    to: TERM-indep
+    version: 1
+    type: 定める
+    from_form: function
+    description: 独立は P(A∩B)＝P(A)P(B) で決める。確率が定義の式に直接出る。
+    basis:
+      units: [U11]
+
+  - id: REL-posterior-cond
+    from: TERM-posterior
+    to: TERM-cond
+    version: 1
+    type: 一種
+    description: 事後確率は、結果 D を見たあとの原因（仮説）H の条件付き確率 P(H|D)。
+    basis:
+      units: [U12]
+
+  - id: REL-prior-prob
+    from: TERM-prior
+    to: TERM-prob
+    version: 1
+    type: 一種
+    to_form: number
+    description: 事前確率は、結果を見る前に原因（仮説）H に割り当てる確率 P(H)。確率の値の1つ。
+    basis:
+      units: [U12]
