@@ -122,6 +122,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
     external: 未照合
   version: 1
 - id: CLM-6b
@@ -209,6 +213,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
     external: なし
   version: 1
 - id: CLM-10
@@ -247,6 +255,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
     external: 未照合
   version: 1
 - id: CLM-13
@@ -308,6 +320,13 @@ claims:
   grounds:
   - source:
       title: V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
+    external: なし
   version: 1
 - id: CLM-23
   label: ④-23
@@ -402,6 +421,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: L
+      date: '2026-11-09'
+      version: 02c937b
     external: 未照合
   version: 1
 - id: CLM-31
