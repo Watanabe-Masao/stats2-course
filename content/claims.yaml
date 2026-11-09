@@ -313,6 +313,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: なし
   version: 1
 - id: CLM-18a
@@ -335,6 +339,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: なし
   version: 1
 - id: CLM-18b
@@ -360,6 +368,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: なし
   version: 1
 - id: CLM-19
@@ -457,6 +469,10 @@ claims:
       by: D
       date: '2026-11-08'
       version: 525bbdb
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: なし
   version: 1
 - id: CLM-23
@@ -599,6 +615,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: 未照合
   version: 1
 - id: CLM-28b
@@ -639,6 +659,10 @@ claims:
       by: '#278 の PR の確かめ'
       date: '2026-11-08'
       version: 94d80c2
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
     external: 未照合
   version: 1
 - id: CLM-31
@@ -781,6 +805,13 @@ claims:
   teaching:
     conclusion: true
     proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
+    external: 未照合
   version: 1
 - id: CLM-36
   label: ④-36
@@ -822,4 +853,11 @@ claims:
   teaching:
     conclusion: true
     proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: N
+      date: '2026-11-09'
+      version: 60d6f01
+    external: 未照合
   version: 1

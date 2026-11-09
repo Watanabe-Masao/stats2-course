@@ -967,7 +967,7 @@ relations:
     from: TERM-expected
     to: TERM-indep-test
     type: 定める
-    from_form: number
+    from_form: rv
     description: 独立性検定は、観測度数と期待度数のずれから統計量を作る。
     basis:
       units:
