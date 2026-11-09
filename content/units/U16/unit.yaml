@@ -40,6 +40,17 @@ figures:
         - {from: 90, to: 110, label: 約68%}
         - {outside: [80, 120], label: 合わせて約5%}
       note: 平均±標準偏差に約68%、±2標準偏差に約95%。この割合は正規分布のときだけ。
+  - id: FIG-U16-stdnormal
+    caption: 標準正規分布 N(0, 1)。どの正規分布も、平均を引いて標準偏差で割ると、この形になる。−1〜1 に約68%。
+    spec:
+      type: dist
+      family: normal
+      mu: 0
+      sigma: 1
+      ticks: [-3, 3, 1]
+      shade:
+        - {from: -1, to: 1, label: 約68%}
+      note: 平均0・標準偏差1。正規分布の μ＝0・σ＝1 の場合で、標準化した値 Z はこの分布に従う。
 checks:
   # 発展：対数正規（σ＝1）を同じ平均・標準偏差にそろえたときの割合・平均＋2σ の外
   - 'abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+2*math.sqrt((math.e-1)*math.e))) - 0.963) < 0.0005 and math.exp(0.5)-2*math.sqrt((math.e-1)*math.e) < 0 and abs(1-statistics.NormalDist().cdf(2) - 0.023) < 0.0005 and abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+math.sqrt((math.e-1)*math.e))) - 0.91) < 0.005 and 80+2*12 == 104 and abs(1-statistics.NormalDist().cdf(1.96) - 0.025) < 0.0005'

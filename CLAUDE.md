@@ -113,7 +113,7 @@
 
 ### 問題・式の決まり
 
-- 問題の `concepts:` には、その問題を**解く・解説を理解するのに必要な**概念か関係を書く。選択肢や文中に名前が出るだけの概念は書かない。unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に書く。
+- 問題の `concepts:` には、その問題を**解く・解説を理解するのに必要な**概念か関係か主張（content/claims.yaml の CLM-。線にしない主張。#289）を書く。選択肢や文中に名前が出るだけの概念は書かない。unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に書く。
 - 概念・関係からラボ・図を指すときに書けるのは、ラボへの参照（`labs:`。id・preset・purpose）と図の id（`figures:`）だけ。URL・説明は build が作る（その場で描く図の設定 `chart` は別。数は engine が出す）。
 - 式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。
 - **式の元は木だけ**（#118 単位 A、2026-11-01）。原本に `tex` を書かない。公開の JSON の tex は build が math-lab の `toTex` で木から作る（build/formula_tex.mjs が docs/math-lab/formula.mjs の写しを読む。写しは型と同じく `python3 build/sync_schema.py --update` で取り込む）。木と tex の食い違い（M1）はこれで起きない。単元の「式の構造」の表は手書きのままなので、記号を概念に合わせる。

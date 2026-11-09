@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figures import build_figures, validate_figures  # noqa: E402
 from legacy import legacy_report, legacy_status  # noqa: E402
 from progress import notion_page as progress_page  # noqa: E402
-from network import export_network, network_checks, schema_errors, to_v2, v2_extras, validate_network, write_network  # noqa: E402
+from network import export_v2, network_checks, schema_errors, validate_network, write_network  # noqa: E402
 from v2_checks import v2_errors  # noqa: E402
 from labs import build_labs, build_site, validate_labs  # noqa: E402
 from lint import lint_page  # noqa: E402
@@ -83,7 +83,7 @@ def main(argv: list[str]) -> int:
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
     if lint:
         return fail("生成物の検査", lint)
-    net = to_v2(export_network(course, r.t), course.shared.get("v2_ready"), v2_extras(course))   # 型 v2 で書き出す（M4。#264）
+    net = export_v2(course, r.t)   # 型 v2 で書き出す（M4。#264）
     net_errors = schema_errors(net) or v2_errors(net)   # 型で止められないものは、型が通ってから（設計書 3.2。#264）
     if net_errors:
         return fail("知識ネットワークのデータ（docs/knowledge-net/schema/kn-schema-v2.json）", net_errors)

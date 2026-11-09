@@ -144,6 +144,10 @@ add("TERM-normal", AX() + f'<path d="{bell(24, 13, 10, 40)}" fill="currentColor"
 add("TERM-rv", T("X", 12, 31, 16) + arrow(19, 25, 30, 25) + T("x", 38, 31, 14) + T("?", 38, 15, 9))
 add("TERM-dist", AXES() + P("M10 34 C16 34 18 14 24 14 S34 30 40 32") + T("P", 30, 13, 9))
 add("TERM-cov", P("M24 6v36 M6 24h36", stroke_opacity=".45") + scatter([(30, 16), (34, 12), (14, 32), (18, 30)]) + R(24, 12, 10, 12, 0, op=".25") + R(14, 24, 10, 8, 0, op=".25"))
+# 標準正規分布：中心を0にそろえた山と、0の位置の縦線（#289）
+add("TERM-std-normal", AX() + f'<path d="{bell(24, 13, 10, 40)}" fill="currentColor" fill-opacity=".18"/>' + P("M24 10v30", stroke_opacity=".55") + T("0", 24, 47, 9))
+# 無相関：直線の傾きがない散らばり（横に寝た点の帯）（#289）
+add("TERM-uncorr", P("M24 6v36 M6 24h36", stroke_opacity=".45") + scatter([(12, 20), (17, 28), (22, 21), (27, 27), (32, 22), (37, 26)]))
 add("TERM-binom", AX() + bars([4, 12, 22, 28, 22, 12, 4], 8, 5))
 add("TERM-poisson", AX() + bars([16, 28, 24, 14, 7, 3, 1], 8, 5))
 add("TERM-geom", AX() + bars([28, 20, 14, 10, 7, 5, 3], 8, 5))

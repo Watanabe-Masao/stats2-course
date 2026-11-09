@@ -2558,7 +2558,8 @@
     "range": "0より大きく1以下",
     "domain": {
      "min": 0,
-     "max": 1
+     "max": 1,
+     "minOpen": true
     }
    },
    {
@@ -3749,6 +3750,123 @@
     "非負",
     "不変",
     "同値"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-bernoulli",
+  "index": 0,
+  "id": "F-bernoulli-pmf",
+  "tex": "P(X=k)=p^{k}(1-p)^{1-k}",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "k",
+    "meaning": "X がとる値（成功なら1、失敗なら0）",
+    "range": "0 か 1",
+    "key": "k",
+    "kind": "value",
+    "domain": {
+     "min": 0,
+     "max": 1,
+     "integer": true
+    }
+   },
+   {
+    "symbol": "p",
+    "meaning": "1回の成功確率",
+    "range": "0以上1以下",
+    "key": "p",
+    "kind": "param",
+    "domain": {
+     "min": 0,
+     "max": 1
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "args": [
+      {
+       "op": "eq",
+       "args": [
+        {
+         "sym": "X"
+        },
+        {
+         "sym": "k"
+        }
+       ]
+      }
+     ],
+     "name": "P"
+    },
+    {
+     "op": "mul",
+     "args": [
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "p"
+        },
+        {
+         "sym": "k"
+        }
+       ]
+      },
+      {
+       "op": "pow",
+       "args": [
+        {
+         "op": "sub",
+         "args": [
+          {
+           "num": 1
+          },
+          {
+           "sym": "p"
+          }
+         ]
+        },
+        {
+         "op": "sub",
+         "args": [
+          {
+           "num": 1
+          },
+          {
+           "sym": "k"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "確率モデル"
+   ],
+   "properties": [
+    "非負",
+    "正規化"
    ]
   }
  }

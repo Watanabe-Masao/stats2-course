@@ -112,7 +112,7 @@ BREAKS = [
     ("基準の定義に出る概念を扱っていない", lambda d: con(d, "binom")["basis"].pop("excludes"), "どれでも扱っていない"),
     ("除外した概念から定めるも書く", lambda d: d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:prob", "to": "t:binom"}),
      "定めると basis.excludes の両方"),
-    ("移した分類に legacy_type が残る", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"}),
+    ("移した分類に legacy_type が残る", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "mathematical", "from": "t:prob", "to": "t:poisson"}),
      "legacy_type（前提）が残っている"),
 ]
 
@@ -145,17 +145,32 @@ class TestV2Checks(unittest.TestCase):
         con(d, "binom")["basis"].pop("excludes")
         d["relations"].append({"id": "t:REL-x", "type": "一種", "from": "t:binom", "to": "t:prob"})
         self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
+        # 混ざった包含の連なり（⑤ の包含。#290）：二項分布 →（特別な場合）normal（見本の都合の名前）→（一種）確率 でも親として外す。
+        # 検出の確かめ：連なりをたどらず直接の親だけを見ると落ちる
+        d = base()
+        con(d, "binom")["basis"].pop("excludes")
+        con(d, "normal")["forms"] = ["distribution"]
+        d["relations"] += [{"id": "t:REL-y", "type": "特別な場合", "from": "t:binom", "to": "t:normal", "fix": "count", "fix_text": "見本"},
+                           {"id": "t:REL-z", "type": "一種", "from": "t:normal", "to": "t:prob"}]
+        self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
         d = base()
         con(d, "binom")["basis"].pop("excludes")
         d["course"]["v2_ready"] = []
         self.assertFalse([e for e in v2_errors(d) if "扱っていない" in e])
 
+    def test_learning_rows_wait_for_m6(self):
+        # 前提（learning）は学ぶ順へ移す M6（#266）まで v1 のまま残してよい（移した分類でも止めない）。
+        # 検出の確かめ：この例外の行を消すと落ちる。mathematical は上の BREAKS で止まる
+        d = base()
+        d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"})
+        self.assertEqual(v2_errors(d), [])
+
     def test_current_export_passes(self):
-        # 教材の今の書き出し（v2 の種類の行が0・v2_ready が空）は止まらない（M4 の完了の条件「移していない分類の build の結果が今と同じ」）
+        # 教材の今の書き出し（移した分類を含む。#289 から確率分布）は止まらない
         import network
         from model import load_course
         c = load_course()
-        d = network.to_v2(network.export_network(c, {"site_base_url": ""}), c.shared.get("v2_ready"))
+        d = network.export_v2(c, {"site_base_url": ""})
         self.assertEqual(v2_errors(d), [])
 
 

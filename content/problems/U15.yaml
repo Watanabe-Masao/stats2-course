@@ -305,7 +305,7 @@
 
 - id: Q-U15-040
   stage: S3
-  concepts: [REL-poisson-expo, TERM-expo]
+  concepts: [CLM-25, TERM-expo]
   tag: 待ち時間
   format: written
   powers: [P1, P3]

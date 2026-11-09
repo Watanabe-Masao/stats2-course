@@ -35,10 +35,10 @@ relations:
   - id: REL-comb-binom
     from: TERM-comb
     to: TERM-binom
-    version: 2
+    version: 3
     question: なぜ ₙCₖ を掛けるのか？   # このつながりで考える問い（#188 07c）
     focus: {formula: F-binom-pmf, parts: [0]}   # このつながりが効く式の部品（#188 07c）
-    type: 材料
+    type: 定める
     description: 成功が k 回ある並びは、n 回のうちどの k 回を成功にするかの選び方の数 ₙCₖ 通りあり、どれも同じ確率なので、1つの並びの確率に ₙCₖ を掛ける。
     basis: {units: [U14]}
   - id: REL-indep-binom
@@ -54,13 +54,15 @@ relations:
   - id: REL-binom-poisson
     from: TERM-binom
     to: TERM-poisson
-    version: 1
+    version: 2
     question: めったに起きない事を、たくさんの機会で数えると？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-pois, preset: rel-approx-tour, purpose: 平均3を保って n を 10→1000 にし、二項分布がポアソン分布に重なるまでを段ごとに見る}
       - {id: LAB-pois, preset: rel-approx, purpose: np を保って n を大きくすると、二項分布がポアソン分布に重なる}
     figures: [FIG-LAB-pois-rel-approx-tour-1, FIG-LAB-pois-rel-approx-tour-2, FIG-LAB-pois-rel-approx-tour-3]
-    type: 変換
+    type: 移る
+    operation: λ＞0 を決め、p＝λ/n（np＝λ）を保って n→∞ とする（各 k の確率が近づく）
+    claim: CLM-3
     mode: limit
     description: 二項分布で n を大きく、p を小さくして np＝λ を保つと、ポアソン分布に近づく。
     gist: めったに起きない事をたくさんの機会で数えると、回数の上限が効かなくなる。平均 λ だけで確率をおよそ出せる。   # つまり（#95）
@@ -77,29 +79,26 @@ relations:
       - abs(50*0.06-3) < 1e-12
       - sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))/2 < 0.02
       - sum(abs(comb(200,k)*0.015**k*0.985**(200-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(41)) < sum(abs(comb(50,k)*0.06**k*0.94**(50-k) - math.exp(-3)*3**k/math.factorial(k)) for k in range(51))
-    conditions:
-      - text: n を大きくし、np＝λ を一定に保つ（p は小さくなる）
-        kind: 仮定
-        claim: 二項分布 B(n, p) がポアソン分布 Po(λ) に近づく
-        outside: 近づくとは保証できない。n が小さい・p が大きいままなら差を別に確かめる
     basis: {units: [U15]}
   - id: REL-binom-normal
     from: TERM-binom
-    to: TERM-normal
-    version: 1
+    to: TERM-std-normal
+    version: 2
     question: 回数を増やすと、形はどうなる？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-binom, preset: rel-norm-tour, purpose: n を 10→100 にして棒が曲線に重なり、p が小さいとずれるのを段ごとに見る}
       - {id: LAB-binom, preset: s5-norm, purpose: n を大きくすると、棒が正規分布の曲線に重なる（p が小さいと崩れる）}
     figures: [FIG-LAB-binom-rel-norm-tour-1, FIG-LAB-binom-rel-norm-tour-2, FIG-LAB-binom-rel-norm-tour-3]
-    type: 変換
-    mode: approximation
-    description: n が大きいと、二項分布は平均 np・分散 np(1−p) の正規分布で近似できる（正規近似）。
+    type: 移る
+    operation: p を固定して n→∞ とし、成功回数 X を標準化する（(X−np)/√(np(1−p))）
+    claim: CLM-5a
+    mode: limit
+    description: 成功回数を標準化した量 (X−np)/√(np(1−p)) の分布は、n を大きくすると標準正規分布に近づく。有限の n では、二項分布を平均 np・分散 np(1−p) の正規分布で近似して使う（正規近似）。
     gist: 試行回数が多く、成功も失敗もある程度起きるなら、成功回数の分布はなめらかな山（正規分布）でよく近似できる。平均と標準偏差だけで、範囲の確率をおよそ出せる。   # つまり（#95）
     stages:
       origin: 二項分布 B(n, p)。0〜n の飛び飛びの棒。
       operation: 平均 np・分散 np(1−p) が同じ正規分布の曲線を重ねる。
-      result: 正規分布 N(np, np(1−p))。なめらかな山。
+      result: 標準化した量は標準正規分布へ近づく。有限の n では、正規分布 N(np, np(1−p)) のなめらかな山で近似して使う。
     chart:
       kind: normal
       n: 30
@@ -117,24 +116,23 @@ relations:
           locator: Approximating a Binomial Distribution with a Normal Curve（境目は教科書によって違うと注記）
     basis: {units: [U14, U16]}
   - id: REL-binom-sampleprop
-    from: TERM-binom
-    to: TERM-sample-prop
-    version: 1
+    from: TERM-sample-prop
+    to: TERM-binom
+    version: 2
     question: 回数を割合に直すと、分布はどう変わる？   # このつながりで考える問い（#188 07c）
-    type: 変換
-    mode: exact
-    description: 成功の回数 X が二項分布 B(n, p) に従うとき、X を n で割った標本比率 p̂＝X÷n は、同じ形の分布を横に 1/n に縮めたもの。平均は p、分散は p(1−p)÷n。
+    type: 従う
+    claim: CLM-31
+    description: 成功の回数 X が二項分布 B(n, p) に従うとき、標本比率 p̂＝X÷n の分布は B(n, p) を横に 1/n に縮めたもの（n·p̂ が B(n, p) に従う）。平均は p、分散は p(1−p)÷n。
     gist: 回数を割合に直しても、分布の形は変わらず目盛りが縮むだけ。だから割合の標準偏差は、回数の標準偏差を n で割った大きさになる（分散なら n² で割る）。   # つまり（#95）
-    conditions:
-      - X は二項分布 B(n, p) に従う（各回が独立・毎回同じ p）
-      - n は決まった数
     basis: {units: [U14, U22]}
   - id: REL-binom-poisson-contrast
     from: TERM-binom
     to: TERM-poisson
-    version: 1
+    version: 2
     question: 回数に上限があると、何が違う？   # このつながりで考える問い（#188 07c）
-    type: 対比
+    type: 比べる
+    differ: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい（0＜p のとき）。ポアソン分布は上限がなく、分散と平均がどちらも λ
+    same: どちらも、出来事が起きた回数（0以上の整数）の分布で、平均をそろえて（np＝λ）比べられる
     axis: 回数の上限と、分散と平均の関係
     description: 二項分布は回数に上限 n があり、分散 np(1−p) は平均 np より小さい。ポアソン分布は上限がなく、分散と平均が同じ λ。
     gist: 平均が同じなら、回数に上限がある数え方（二項）は、上限のない数え方（ポアソン）よりばらつきが小さく、外れ方が違う。   # つまり（#95）
@@ -171,48 +169,33 @@ relations:
     description: 標準化では、まず期待値（平均）を引く。
     basis: {units: [U16]}
   - id: REL-std-normal
-    from: TERM-std
-    to: TERM-normal
-    version: 1
+    from: TERM-normal
+    to: TERM-std-normal
+    version: 2
     labs:
       - {id: LAB-z, preset: s4-normal, purpose: 標準化すると、どの正規分布も同じ表で読める}
-    type: 応用
-    description: 正規分布に従う値を標準化すると標準正規分布 N(0, 1) になり、1つの表で確率が読める。
-    conditions:
-      - text: X が正規分布に従う
-        kind: 仮定
-        claim: 標準化した値 Z が標準正規分布 N(0, 1) に従う
-        outside: 標準化はできるが、Z が N(0, 1) に従うとは保証できない（正規分布の表で確率を読めない）
+    figures: [FIG-U16-concept, FIG-U16-stdnormal]
+    type: 移る
+    gist: どの正規分布も、平均を引いて標準偏差で割れば同じ形（標準正規分布）になる。だから表は1つでよい。
+    reversible: true
+    operation: TERM-std
+    mode: exact
+    description: 正規分布 N(μ, σ²) に従う値を標準化（(X−μ)/σ）すると、標準正規分布 N(0, 1) に従う。逆に Z から μ＋σZ に戻せる。だから1つの表で、どの正規分布の確率も読める。
     basis: {units: [U16]}
   - id: REL-clt-normal
-    from: TERM-clt
-    to: TERM-normal
-    version: 1
-    type: 応用
-    description: 独立な要因の和や平均は、元の分布によらず正規分布に近づく。正規分布がよく使われる理由。
-    conditions:
-      - text: 足し合わせる量が独立
-        kind: 仮定
-        claim: 和や平均の分布が正規分布に近づく
-        outside: 正規分布で近似できるとは保証できない
-        terms:
-        - TERM-indep
-      - text: 分散が有限
-        kind: 仮定
-        claim: 和や平均の分布が正規分布に近づく
-        outside: 正規分布で近似できるとは保証できない（裾の重い分布では近づかない）
-        terms:
-        - TERM-var
-      - text: 個数が十分多い
-        kind: 仮定
-        claim: 和や平均の分布が正規分布に近づく
-        outside: 近似の精度は保証できない。元の分布の偏りが強いほど多くの個数が要る
+    from: TERM-sample-mean
+    to: TERM-std-normal
+    version: 2
+    type: 従う
+    theorem: TERM-clt
+    claim: CLM-6b
+    description: 独立に同じ分布に従う n 個の標本平均を標準化した量 √n(X̄−μ)/σ の分布は、元の分布によらず、n を大きくすると標準正規分布に近づく（中心極限定理）。
     basis: {units: [U19]}
   - id: REL-rv-dist
     from: TERM-rv
     to: TERM-dist
-    version: 2
-    type: 材料
+    version: 3
+    type: 定める
     description: 確率分布は、確率変数がとる値と、それぞれの値をとる確率の対応。確率変数がなければ分布は作れない。
     basis: {units: [U13]}
   - id: REL-dist-expect
@@ -234,8 +217,12 @@ relations:
   - id: REL-var-cov
     from: TERM-var
     to: TERM-cov
-    version: 1
-    type: 一般化
+    version: 2
+    type: 特別な場合
+    to_form: operation
+    from_form: operation
+    fix_text: 共分散 Cov(X, Y) で Y＝X とすると Cov(X, X)＝V(X)（分散）
+    fix: equal
     description: 分散は1つの変数のずれの2乗の期待値。2つの変数のずれの積に広げると共分散になる（Cov(X, X)＝V(X)）。
     gist: 分散は「1つの量が平均からどれだけずれるか」。共分散は「2つの量が一緒にずれるか」。同じものどうしの共分散が分散。   # つまり（#95）
     labs:
@@ -245,27 +232,15 @@ relations:
     basis: {units: [U13]}
   - id: REL-indep-cov
     from: TERM-indep
-    to: TERM-cov
-    version: 1
+    to: TERM-uncorr
+    version: 2
     labs:
       - {id: LAB-expect, preset: rel-indep-tour, purpose: X と Y の割合は同じまま、両方の確率だけを変えて共分散の符号を見る}
       - {id: LAB-expect, preset: s5-free, purpose: 独立なら共分散が0。0でも独立とは限らないことも確かめる}
-    type: 導出
-    description: 独立なら E(XY)＝E(X)E(Y) なので、共分散は0になる。逆（共分散0なら独立）は成り立たない。
+    type: 導ける
+    claim: CLM-13
+    description: X と Y が独立なら E(XY)＝E(X)E(Y) なので Cov(X, Y)＝0、つまり無相関。逆（無相関なら独立）は一般には成り立たない。
     gist: お互いに影響しない2つの量は、一緒にずれる傾向がないので共分散は0。ただし共分散が0でも、影響し合っていることはある。   # つまり（#95）
-    conditions:
-      - text: X と Y が独立
-        kind: 仮定
-        claim: E(XY)＝E(X)E(Y) なので Cov(X, Y)＝0
-        outside: 共分散が0になるとは保証できない（独立でなくても0になることはある）
-        terms:
-        - TERM-indep
-      - text: 期待値が有限
-        kind: 仮定
-        claim: E(XY)＝E(X)E(Y) が使える
-        outside: 期待値が存在しなければ、共分散も定まらない
-        terms:
-        - TERM-expect
     figures: [FIG-LAB-expect-rel-indep-tour-1, FIG-LAB-expect-rel-indep-tour-2, FIG-LAB-expect-rel-indep-tour-3]
     basis: {units: [U13]}
   - id: REL-indep-geom
@@ -279,9 +254,11 @@ relations:
   - id: REL-binom-geom-contrast
     from: TERM-binom
     to: TERM-geom
-    version: 1
+    version: 2
     question: 何を数えているかが、どう違う？   # このつながりで考える問い（#188 07c）
-    type: 対比
+    type: 比べる
+    differ: 二項分布は試行の回数 n を決めて、成功の回数を数える（上限 n）。幾何分布は成功を1回と決めて、そこまでの試行の回数を数える（上限なし）
+    same: どちらも、成功確率 p が毎回同じで独立な試行のくり返しから、ある回数を数える分布
     axis: 何を決めて、何を数えるか
     description: 二項分布は回数 n を決めて成功の数を数える。幾何分布は成功を1回と決めて、そこまでの回数を数える。何を固定し、何を数えるかが逆。
     gist: 二項は「回数を決めて、当たりの数を数える」。幾何は「当たり1回を決めて、そこまでの回数を数える」。決める物と数える物が逆。   # つまり（#95）
@@ -293,32 +270,27 @@ relations:
   - id: REL-hyper-binom
     from: TERM-hyper
     to: TERM-binom
-    version: 1
+    version: 2
     question: 箱を大きくすると、戻さない取り方はどう近づく？   # このつながりで考える問い（#188 07c）
     labs:
       - {id: LAB-pois, preset: rel-hyper-tour, purpose: 割合0.3を保って箱を大きくし、補正 (N−n)/(N−1) が1に近づくのを段ごとに見る}
       - {id: LAB-pois, preset: rel-hyper, purpose: 箱を大きくすると、戻さないときの分布が二項分布（戻すとき）に近づく}
-    type: 変換
+    type: 移る
+    operation: 取り出す数 n を固定し、当たりの割合 M/N→p を保って N→∞ とする
+    claim: CLM-4
     mode: limit
-    description: 集団 N を大きくして当たりの割合 M/N を保つと、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。
+    description: 取り出す数 n を固定し、当たりの割合 M/N を保って集団 N を大きくすると、超幾何分布は二項分布 B(n, M/N) に近づく（戻すか戻さないかの違いが消える）。N が n に比べて十分大きければ、二項分布で代えてよい（数の目安は出典がないので書かない）。
     gist: 箱がとても大きければ、取り出して戻さなくても中身の割合はほとんど変わらない。戻しても戻さなくても同じとみなせる。   # つまり（#95）
-    conditions:
-      - text: N が取り出す数 n に比べて十分大きい
-        kind: 仮定
-        claim: 超幾何分布が二項分布 B(n, M/N) に近づく
-        outside: 近づくとは保証できない。取り出す割合 n/N が大きいと、二項分布より散らばりが小さい
-      - text: 当たりの割合 M/N を一定に保つ
-        kind: 仮定
-        claim: 超幾何分布が二項分布 B(n, M/N) に近づく
-        outside: 近づく先の二項分布が決まらない
     figures: [FIG-LAB-pois-rel-hyper-tour-1, FIG-LAB-pois-rel-hyper-tour-2]
     basis: {units: [U15]}
   - id: REL-binom-hyper-contrast
     from: TERM-binom
     to: TERM-hyper
-    version: 1
+    version: 2
     question: 戻さずに取ると、何が変わる？   # このつながりで考える問い（#188 07c）
-    type: 対比
+    type: 比べる
+    differ: 二項分布は各回が独立で確率が一定。超幾何分布は取るたびに残りの割合が変わり、分散が二項分布の (N−n)/(N−1) 倍になる
+    same: 取る数 n と当たりの割合が同じなら、当たりの数の平均はどちらも np
     axis: 取り出し方（戻すか、戻さないか）
     description: 二項分布は戻して取り出す（各回が独立で確率が一定）。超幾何分布は戻さずに取り出す（取るたびに確率が変わる）。超幾何分布の分散は、二項分布の分散の (N−n)/(N−1) 倍（2 個以上取れば 1 より小さい）。
     gist: 戻さずに取り出すと、取った結果によって残りの割合が変わり、結果のばらつきが小さくなる。小さな箱から多く取るほど差が大きい。   # つまり（#95）
@@ -340,55 +312,32 @@ relations:
       - {id: LAB-pois, preset: rel-hyper, purpose: 箱を大きくすると、戻さないときの分布が二項分布（戻すとき）に近づく}
     figures: [FIG-LAB-pois-rel-hyper-contrast-tour-1, FIG-LAB-pois-rel-hyper-contrast-tour-2, FIG-LAB-pois-rel-hyper-contrast-tour-3]
     basis: {units: [U15]}
-  - id: REL-poisson-expo
-    from: TERM-poisson
-    to: TERM-expo
-    version: 1
-    labs:
-      - {id: LAB-pois, preset: rel-expo-tour, purpose: t 時間に0件の確率が、次の1件まで t より長く待つ確率になることを段ごとに見る}
-      - {id: LAB-pois, preset: s5-free, purpose: 0件の確率を時間を延ばして見ると、待ち時間の確率になる}
-    type: 導出
-    description: 一定の割合 λ で独立に起きる出来事では、一定時間の件数がポアソン分布、次に起きるまでの待ち時間が指数分布になる。
-    gist: 同じ出来事を「一定時間に何件来るか」で見るとポアソン、「次の1件まで何分待つか」で見ると指数分布。見方が違うだけ。   # つまり（#95）
-    conditions:
-      - text: 出来事が一定の割合 λ で起きる
-        kind: 仮定
-        claim: 件数がポアソン分布、待ち時間が指数分布に従う
-        outside: どちらの分布も使えるとは保証できない（時間帯で割合が変わるなら分けて見る）
-      - text: 重ならない時間の件数が互いに独立
-        kind: 仮定
-        claim: 件数がポアソン分布、待ち時間が指数分布に従う
-        outside: どちらの分布も使えるとは保証できない
-        terms:
-        - TERM-indep
-    figures: [FIG-LAB-pois-rel-expo-tour-1, FIG-LAB-pois-rel-expo-tour-2]
-    basis: {units: [U15, U16]}
   - id: REL-dist-pdf
     from: TERM-dist
     to: TERM-pdf
-    version: 3
-    type: 材料
+    version: 4
+    type: 定める
     description: 確率密度関数は、確率分布のうち区間の確率を積分で表せるもの（連続な確率変数の分布）について使う関数で、その定義に確率分布を使う。離散の分布には密度はない（すべての確率分布に密度があるわけではない）。
     basis: {units: [U16]}
   - id: REL-pdf-normal
     from: TERM-pdf
     to: TERM-normal
-    version: 2
-    type: 材料
+    version: 3
+    type: 定める
     description: 正規分布は確率密度関数 f(x) で定義され、確率は曲線の下の面積で読む。
     basis: {units: [U16]}
   - id: REL-pdf-uniform
     from: TERM-pdf
     to: TERM-uniform
-    version: 2
-    type: 材料
+    version: 3
+    type: 定める
     description: 一様分布は、密度が一定の確率密度関数 1/(b−a) で定義される。
     basis: {units: [U16]}
   - id: REL-pdf-expo
     from: TERM-pdf
     to: TERM-expo
-    version: 2
-    type: 材料
+    version: 3
+    type: 定める
     description: 指数分布は、確率密度関数 λe^(−λx) で定義される。
     basis: {units: [U16]}
   - id: REL-sd-std
@@ -402,8 +351,10 @@ relations:
   - id: REL-geom-negbinom
     from: TERM-geom
     to: TERM-negbinom
-    version: 1
-    type: 一般化
+    version: 2
+    type: 特別な場合
+    fix_text: 負の二項分布の r を 1 にすると、幾何分布（初めて成功するまでの試行回数）と同じものになる
+    fix: param_value
     description: 幾何分布は「1回目の成功」まで待つ。待つ成功を r 回に広げると負の二項分布（r＝1 が幾何分布）。
     gist: 幾何は「最初の当たりまで」待つ。負の二項は「r 回目の当たりまで」待つ。r＝1 にすると幾何に戻る。   # つまり（#95）
     labs:
@@ -818,21 +769,18 @@ relations:
     version: 1
   - id: REL-t-normal
     from: TERM-t
-    to: TERM-normal
-    type: 変換
+    to: TERM-std-normal
+    type: 移る
+    operation: 自由度 k→∞ とする
+    claim: CLM-7
     mode: limit
     description: 自由度を大きくすると、t 分布は標準正規分布に近づく。
     gist: データが多いと、不偏分散で σ を置き換えたばらつきがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
-    conditions:
-      - text: 自由度を大きくする
-        kind: 仮定
-        claim: t 分布が標準正規分布に近づく
-        outside: 近づくとは保証できない。自由度が小さいと裾が重く、正規分布の値を使うと区間が狭すぎる
     basis:
       units:
       - U20
       - U22
-    version: 1
+    version: 2
   - id: REL-estimator-statistic
     from: TERM-estimator
     to: TERM-statistic
@@ -1684,13 +1632,15 @@ relations:
     from: TERM-bernoulli
     to: TERM-binom
     figures: [FIG-U14-concept]
-    type: 一般化
+    type: 特別な場合
+    fix_text: 二項分布 B(n, p) の n を 1 にすると、ベルヌーイ分布 Bern(p) と同じものになる
+    fix: param_value
     description: 二項分布は、独立なベルヌーイ試行を n 回くり返したときの成功の数の分布。n＝1 の二項分布がベルヌーイ分布。
     gist: 1回の当たり外れがベルヌーイ分布。それを n 回くり返して当たりの数を数えると二項分布になる。
     basis:
       units:
       - U14
-    version: 1
+    version: 2
     question: 1回の試行から、分布はどう生まれる？   # このつながりで考える問い（#188 07c）
   - id: REL-quant-scatter
     from: TERM-quant
@@ -2078,94 +2028,140 @@ relations:
     version: 1
 
   # ---- 関係図の見本：確率分布の材料（定義の構成要素。docs/relation-map-design.md 4・#234）
-  - id: REL-prob-rv
-    from: TERM-prob
-    to: TERM-rv
-    version: 1
-    type: 材料
-    description: 確率変数は、試行の結果に応じて値が決まり、どの値が出るかが確率で表される量。確率がなければ作れない。
-    basis: {units: [U13]}
   - id: REL-prob-dist
     from: TERM-prob
     to: TERM-dist
-    version: 1
-    type: 材料
-    description: 確率分布は、確率変数のそれぞれの値に、その値をとる確率を対応させたもの。
-    basis: {units: [U13]}
-  - id: REL-rv-pdf
-    from: TERM-rv
-    to: TERM-pdf
-    version: 1
-    type: 材料
-    description: 確率密度関数は、連続な確率変数が区間に入る確率を表す関数。
-    basis: {units: [U16]}
-  - id: REL-prob-pdf
-    from: TERM-prob
-    to: TERM-pdf
-    version: 1
-    type: 材料
-    description: 確率密度関数は、区間に入る確率を、その区間の下の面積で表す。値そのものは確率ではない。
-    basis: {units: [U16]}
-  - id: REL-rv-cov
-    from: TERM-rv
-    to: TERM-cov
-    version: 1
-    type: 材料
-    description: 共分散は、2つの確率変数が同じ向きにずれるか逆向きにずれるかを表す量。
+    version: 2
+    type: 定める
+    from_form: function
+    description: 確率分布は、確率変数の値の範囲ごとに確率を対応させたもの。確率は確率分布の定義に直接出る。
     basis: {units: [U13]}
   - id: REL-expect-cov
     from: TERM-expect
     to: TERM-cov
-    version: 1
-    type: 材料
+    version: 2
+    type: 定める
+    to_form: operation
+    from_form: operation
     description: 共分散は、それぞれの期待値からのずれを掛け合わせた値の期待値。
     basis: {units: [U13]}
-  - id: REL-prob-bernoulli
-    from: TERM-prob
-    to: TERM-bernoulli
-    version: 1
-    type: 材料
-    description: ベルヌーイ分布は、成功（1）を確率 p、失敗（0）を確率 1−p でとる分布。
-    basis: {units: [U14]}
-  - id: REL-prob-binom
-    from: TERM-prob
-    to: TERM-binom
-    version: 1
-    type: 材料
-    description: 二項分布は、成功確率 p の試行をくり返したときに、成功の回数がどんな確率で現れるかを表す。
-    basis: {units: [U14]}
-  - id: REL-prob-geom
-    from: TERM-prob
-    to: TERM-geom
-    version: 1
-    type: 材料
-    description: 幾何分布は、成功確率 p の試行を、初めて成功するまでくり返したときの回数の分布。
-    basis: {units: [U15]}
-  - id: REL-prob-negbinom
-    from: TERM-prob
-    to: TERM-negbinom
-    version: 1
-    type: 材料
-    description: 負の二項分布は、成功確率 p の試行を、r 回目の成功が起きるまでくり返したときの回数の分布。
-    basis: {units: [U15]}
   - id: REL-comb-hyper
     from: TERM-comb
     to: TERM-hyper
-    version: 1
-    type: 材料
+    version: 2
+    type: 定める
     description: 超幾何分布の確率は、当たりからの選び方と外れからの選び方の積を、全体からの選び方で割る。3つとも組合せの数。
     basis: {units: [U15]}
   - id: REL-comb-negbinom
     from: TERM-comb
     to: TERM-negbinom
-    version: 1
-    type: 材料
+    version: 2
+    type: 定める
     description: 負の二項分布の確率は、最後の1回が r 回目の成功で、それまでの k−1 回のどこで r−1 回成功するかの選び方（組合せ）を掛ける。
     basis: {units: [U15]}
   - id: REL-fact-poisson
     from: TERM-fact
     to: TERM-poisson
-    version: 1
-    type: 材料
+    version: 2
+    type: 定める
     description: ポアソン分布の確率 e^(−λ)λᵏ／k! は、分母に k の階乗を持つ。
     basis: {units: [U15]}
+
+  - id: REL-sample-space-rv
+    from: TERM-sample-space
+    to: TERM-rv
+    version: 1
+    type: 定める
+    description: 確率変数は、標本空間の要素（試行の結果）の1つ1つに実数を対応させる関数。標本空間が定義に直接出る。
+    basis:
+      units: [U13]
+
+  - id: REL-bernoulli-binom-sum
+    from: TERM-bernoulli
+    to: TERM-binom
+    version: 1
+    figures: [FIG-U14-concept]
+    type: 移る
+    mode: exact
+    operation: 独立に Bern(p) に従う n 個を足す
+    claim: CLM-1
+    description: 独立に Bern(p) に従う n 個の和は、二項分布 B(n, p) に従う。1回ごとの成功（1）・失敗（0）を足すと成功の回数になる。
+    gist: 成功を1、失敗を0として n 回分を足せば、成功の回数になる。だから二項分布は、ベルヌーイ分布を n 個足したもの。
+    basis:
+      units: [U14]
+
+  - id: REL-stdnormal-normal
+    from: TERM-std-normal
+    to: TERM-normal
+    version: 1
+    figures: [FIG-U16-stdnormal]
+    type: 特別な場合
+    fix: param_value
+    fix_text: 正規分布 N(μ, σ²) の μ を 0、σ を 1 にすると、標準正規分布 N(0, 1) と同じものになる
+    description: 標準正規分布は、平均0・標準偏差1の正規分布。
+    gist: 正規分布の中で、平均0・標準偏差1に決めたものが標準正規分布。
+    basis:
+      units: [U16]
+
+  - id: REL-binom-dist
+    from: TERM-binom
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U14]
+
+  - id: REL-poisson-dist
+    from: TERM-poisson
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U15]
+
+  - id: REL-negbinom-dist
+    from: TERM-negbinom
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U14]
+
+  - id: REL-hyper-dist
+    from: TERM-hyper
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U14]
+
+  - id: REL-normal-dist
+    from: TERM-normal
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U16]
+
+  - id: REL-expo-dist
+    from: TERM-expo
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U15]
+
+  - id: REL-uniform-dist
+    from: TERM-uniform
+    to: TERM-dist
+    version: 1
+    type: 一種
+    description: 確率分布のうち、確率関数（連続なら確率密度）の形で区別される族の1つ。
+    basis:
+      units: [U16]

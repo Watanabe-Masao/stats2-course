@@ -1,0 +1,255 @@
+# 主張（製本 ④ の単位。原本へ移したもの。#287・#289）。id は ④ の番号（④-25 → CLM-25）。書き方は docs/authoring.md。
+# 確かめの記録（verification）は、ここが正本（README の運用の決まり 6）。④ の §9 からは行を外す。
+claims:
+- id: CLM-1
+  label: ④-1
+  kind: 従う
+  statement:
+    text: 0≦p≦1 とし、X₁, …, Xₙ が独立に Bern(p) に従うとき、和 X₁＋…＋Xₙ は B(n, p) に従う（値は k＝0, 1, …, n）
+  premises:
+    subjects:
+    - TERM-bernoulli
+  conclusion:
+    predicates:
+    - TERM-binom
+  grounds:
+  - source:
+      title: 和が k になる並びは ₙCₖ 通りで、どの並びの確率も（独立なので）pᵏ(1−p)ⁿ⁻ᵏ
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-3
+  label: ④-3
+  kind: 極限
+  statement:
+    text: λ＞0 とし、X_n が B(n, λ/n)（n≧λ）に従うとき、n→∞ で、各 k＝0, 1, 2, … について P(X_n＝k) は e^(−λ)λᵏ/k! に近づく
+  premises:
+    subjects:
+    - TERM-binom
+  conclusion:
+    predicates:
+    - TERM-poisson
+  grounds:
+  - source:
+      title: ₙCₖp_nᵏ(1−p_n)ⁿ⁻ᵏ＝(λᵏ/k!)·[n(n−1)…(n−k+1)/nᵏ]·(1−λ/n)ⁿ·(1−λ/n)^(−k)。[ ] と最後の因子は 1 に、(1−λ/n)ⁿ は e^(−λ) に近づく
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-4
+  label: ④-4
+  kind: 極限
+  statement:
+    text: 取り出す数 n を固定し、M/N → p を保って N→∞ とすると、超幾何分布の確率関数は B(n, p) の確率関数に近づく
+  premises:
+    subjects:
+    - TERM-hyper
+  conclusion:
+    predicates:
+    - TERM-binom
+  grounds:
+  - source:
+      title: 確率関数の各因子の極限
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-5a
+  label: ④-5a
+  kind: 極限
+  statement:
+    text: X が B(n, p)（0＜p＜1 を固定）に従うとき、n→∞ で (X−np)/√(np(1−p)) の分布は N(0, 1) に近づく
+  premises:
+    subjects:
+    - TERM-binom
+  conclusion:
+    predicates:
+    - TERM-std-normal
+  grounds:
+  - claim: CLM-1
+  - claim: CLM-6b
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: 未照合
+  version: 1
+- id: CLM-6b
+  label: ④-6b
+  kind: 極限
+  statement:
+    text: X₁, …, Xₙ が独立に同じ分布に従い、平均が μ、分散 σ² が 0＜σ²＜∞ のとき、n→∞ で √n(X̄−μ)/σ の分布は N(0, 1) に近づく
+  premises:
+    subjects:
+    - TERM-sample-mean
+  conclusion:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-std-normal
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ分布に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 標準化した標本平均が標準正規分布に近づくとは保証できない
+  - text: 分散 σ² が 0＜σ²＜∞
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: 近づくとは保証できない（裾の重い分布では近づかない）
+  grounds:
+  - source:
+      title: 中心極限定理
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: 未照合
+  version: 1
+- id: CLM-7
+  label: ④-7
+  kind: 極限
+  statement:
+    text: T_k が t(k) に従うとき、k→∞ で T_k の分布は N(0, 1) に近づく
+  premises:
+    subjects:
+    - TERM-t
+  conclusion:
+    predicates:
+    - TERM-std-normal
+  grounds:
+  - source:
+      title: スルツキーの定理
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: D
+      date: '2026-11-08'
+      version: 525bbdb
+    external: 未照合
+  version: 1
+- id: CLM-13
+  label: ④-13
+  kind: ならば
+  statement:
+    text: X と Y が独立で、どちらも分散が有限のとき、Cov(X, Y)＝0
+  premises:
+    subjects:
+    - TERM-rv
+    predicates:
+    - TERM-indep
+  conclusion:
+    subjects:
+    - TERM-cov
+    predicates:
+    - TERM-uncorr
+  conditions:
+  - text: X・Y の分散が有限
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: 共分散が定まらない
+  grounds:
+  - source:
+      title: 独立なら E(XY)＝E(X)E(Y)
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-25
+  label: ④-25
+  kind: 従う
+  statement:
+    text: 単位時間あたりの平均件数が λ（λ＞0）のポアソン過程で、長さ t の区間の件数は Po(λt) に従い、時刻0から次に起きるまでの待ち時間 T は、平均 1/λ の指数分布に従う
+  conclusion:
+    predicates:
+    - TERM-poisson
+    - TERM-expo
+  conditions:
+  - text: 出来事が一定の割合 λ で起きる
+    kind: 仮定
+    outside: どちらの分布も使えるとは保証できない（時間帯で割合が変わるなら分けて見る）
+  - text: 重ならない時間の件数が互いに独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: どちらの分布も使えるとは保証できない
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  gist: 同じ出来事を「一定時間に何件来るか」で見るとポアソン、「次の1件まで何分待つか」で見ると指数分布。見方が違うだけ。
+  labs:
+  - id: LAB-pois
+    preset: rel-expo-tour
+    purpose: t 時間に0件の確率が、次の1件まで t より長く待つ確率になることを段ごとに見る
+  - id: LAB-pois
+    preset: s5-free
+    purpose: 0件の確率を時間を延ばして見ると、待ち時間の確率になる
+  figures:
+  - FIG-LAB-pois-rel-expo-tour-1
+  - FIG-LAB-pois-rel-expo-tour-2
+  grounds:
+  - source:
+      title: 前半はポアソン過程の定義（独立増分と件数の分布）から。後半は P(T＞t)＝P([0, t] の件数が0)＝e^(−λt)
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
+- id: CLM-31
+  label: ④-31
+  kind: 従う
+  statement:
+    text: 0≦p≦1 とし、X₁, …, Xₙ が独立に Bern(p) に従い、n が決まった数のとき、標本比率 p̂＝(X₁＋…＋Xₙ)/n について n·p̂ は B(n, p) に従う（p̂ の分布は B(n, p) を 1/n 倍の尺度にしたもの）
+  premises:
+    subjects:
+    - TERM-sample-prop
+  conclusion:
+    subjects:
+    - TERM-sample-prop
+    predicates:
+    - TERM-binom
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ Bern(p) に従う（各回が独立・毎回同じ p）
+    kind: 仮定
+    terms:
+    - TERM-indep
+    - TERM-bernoulli
+  - text: n は決まった数
+    kind: 仮定
+  grounds:
+  - claim: CLM-1
+  version: 1

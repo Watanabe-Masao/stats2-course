@@ -139,7 +139,10 @@ def v2_errors(data: dict) -> list[str]:
     v2 = [r for r in rels if "type" in r]
 
     # 移した分類に、移していない行を残さない（設計書 8。行き先の概念の分類で見る）
+    # 前提（learning）は学ぶ順のデータへ移す M6（#266）まで v1 のまま残す（⑤ の線ではない。設計書 3.3・6）
     for r in rels:
+        if r.get("legacy_type") == "前提" and r.get("premise") == "learning":
+            continue
         if "legacy_type" in r and (concepts.get(r["to"]) or {}).get("category") in ready:
             err.append(f"{r['id']}: 移した分類（{concepts[r['to']]['category']}）の行に legacy_type（{r['legacy_type']}）が残っている")
 
@@ -210,7 +213,8 @@ def v2_errors(data: dict) -> list[str]:
     # 基準の定義に出る概念は、定める・一種の親・除外（basis.excludes）のどれかで扱う（#86。⑤ の構成：名前が出るのは必要条件なので、外すなら理由を書く）。
     # 移した分類の概念だけ。除外した概念から定めるを書いたら、どちらが判断か分からないので止める
     defines = {(r["from"], r["to"]) for r in rels if r.get("type") == "定める" or r.get("legacy_type") == "材料"}
-    kind_parent = {(r["to"], r["from"]) for r in rels if r.get("type") == "一種" or r.get("legacy_type") == "種類"}
+    from network import inclusion_ancestors   # 包含の連なり（一種・特別な場合）の親は全部外す（⑤ の包含。#290）
+    kind_parent = {(a, k) for k in concepts for a in inclusion_ancestors(k, rels)}
     for c in concepts.values():
         used = basis_concepts(c)
         if not used:
