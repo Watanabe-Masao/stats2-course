@@ -71,7 +71,7 @@ claims:
   label: ④-5a
   kind: 極限
   statement:
-    text: n→∞ で (X−np)/√(np(1−p)) の分布は N(0, 1) に近づく
+    text: X が B(n, p)（0＜p＜1）に従うとき、n→∞ で (X−np)/√(np(1−p)) の分布は N(0, 1) に近づく
   premises:
     subjects:
     - TERM-binom
@@ -79,11 +79,9 @@ claims:
     predicates:
     - TERM-std-normal
   conditions:
-  - text: X が B(n, p) に従い、0＜p＜1 を固定する
+  - text: p は n によらず固定する
     kind: 仮定
-    subject: X の分布と p
-    range: 各 n で同じ p を固定し、n→∞ とする
-    outside: 標準化した X の分布が N(0, 1) に近づくとは保証できない
+    outside: p が n とともに変わる場合、この正規極限は保証されない（np が正の定数に近づく場合はポアソン極限となる）
   grounds:
   - claim: CLM-1
   - claim: CLM-6b
@@ -172,19 +170,13 @@ claims:
   label: ④-7
   kind: 極限
   statement:
-    text: k→∞ で T_k の分布は N(0, 1) に近づく
+    text: T_k が t(k) に従うとき、k→∞ で T_k の分布は N(0, 1) に近づく
   premises:
     subjects:
     - TERM-t
   conclusion:
     predicates:
     - TERM-std-normal
-  conditions:
-  - text: 各 k で T_k が t(k) に従う
-    kind: 仮定
-    subject: T_k の分布
-    range: k→∞
-    outside: T_k の分布が N(0, 1) に近づくとは保証できない
   grounds:
   - source:
       title: スルツキーの定理
@@ -193,6 +185,11 @@ claims:
     conclusion: true
     proof: 範囲外
   verification:
+    math:
+    - method: 独立な確かめ
+      by: D
+      date: '2026-11-08'
+      version: 525bbdb
     external: 未照合
   version: 1
 - id: CLM-9
