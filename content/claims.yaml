@@ -87,7 +87,7 @@ claims:
   - claim: CLM-6b
   verification:
     math:
-    - method: 独立な確かめ（PR #311 Claude再レビュー）
+    - method: 独立な確かめ
       by: Claude
       date: '2026-11-09'
       version: 51a388a
