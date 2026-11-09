@@ -45,6 +45,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 3eaf05a
     external: なし
   version: 1
 - id: CLM-3
@@ -280,6 +284,10 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 3eaf05a
     external: 未照合
   version: 1
 - id: CLM-11
@@ -313,6 +321,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: O
+      date: '2026-11-09'
+      version: 91f0acc
     external: なし
   version: 1
 - id: CLM-13
