@@ -1303,10 +1303,14 @@ class TestNetwork(unittest.TestCase):
         self.assertFalse(any(x.get("figures") for x in d["concepts"]))
 
     def test_transform_needs_conditions(self):
+        # 原本の v1 の変換の行は、確率の移行（#295）で全部 ⑤ の移るにした。v1 の決まり（変換には mode と conditions）は、
+        # 移していない分類で変換を書いたときにまだ効くので、v1 の行を1つ写して変換にした行で確かめる
         bad = copy.deepcopy(self.rels)
-        r = next(x for x in bad if x["type"] == "変換")
-        r.pop("conditions")
-        r.pop("mode")
+        r = copy.deepcopy(next(x for x in bad if x.get("type") == "前提"))
+        r.update(id="REL-test-transform", type="変換")
+        for k in ("premise", "mode", "conditions"):
+            r.pop(k, None)
+        bad.append(r)
         err = self._validate(rels=bad)
         self.assertTrue(any("conditions を必ず書く" in e for e in err))
         self.assertTrue(any("mode を必ず書く" in e for e in err))
