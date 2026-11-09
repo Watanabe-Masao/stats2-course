@@ -99,22 +99,26 @@ claims:
   label: ④-5a
   kind: 極限
   statement:
-    text: X が B(n, p)（0＜p＜1 を固定）に従うとき、n→∞ で (X−np)/√(np(1−p)) の分布は N(0, 1) に近づく
+    text: X が B(n, p)（0＜p＜1）に従うとき、n→∞ で (X−np)/√(np(1−p)) の分布は N(0, 1) に近づく
   premises:
     subjects:
     - TERM-binom
   conclusion:
     predicates:
     - TERM-std-normal
+  conditions:
+  - text: p は n によらず固定する
+    kind: 仮定
+    outside: p が n とともに変わる場合、この正規極限は保証されない（np が正の定数に近づく場合はポアソン極限となる）
   grounds:
   - claim: CLM-1
   - claim: CLM-6b
   verification:
     math:
     - method: 独立な確かめ
-      by: C
-      date: '2026-11-08'
-      version: dc2b65a
+      by: P
+      date: '2026-11-09'
+      version: 51a388a
     external: 未照合
   version: 1
 - id: CLM-6a
