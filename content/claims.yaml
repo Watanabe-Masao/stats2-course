@@ -116,7 +116,7 @@ claims:
   verification:
     math:
     - method: 独立な確かめ
-      by: Claude
+      by: P
       date: '2026-11-09'
       version: 51a388a
     external: 未照合
