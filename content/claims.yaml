@@ -572,6 +572,16 @@ claims:
     - TERM-test-stat
     predicates:
     - TERM-t
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ N(μ, σ²) に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    - TERM-normal
+    outside: t(n−1) に従うとは保証できない
+  - text: H₀（μ＝μ₀）が正しい
+    kind: 仮定
+    outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる）
   grounds:
   - claim: CLM-6a
   - claim: CLM-10
@@ -609,7 +619,8 @@ claims:
       title: Cramér 1946（原典は未照合。2次資料で結論と頁まで確かめた）
     external: true
   - source:
-      title: 生のデータから最尤法で推定すると極限は χ²(k−1−m) と χ²(k−1) の間になる（Chernoff・Lehmann 1954。原典は未照合、2次資料で確かめた）。境目をデータから決める場合は範囲外
+      title: 区分の境目を前もって決め、生のデータ（区分する前の値）から最尤法で推定すると、極限は χ²(k−1−m)＋Σ_{j=1}^{m} λⱼZⱼ²（Z は独立に N(0, 1)、0≦λⱼ＜1、λ は未知の母数による）の形で、確率の大小の意味で χ²(k−1−m) と χ²(k−1) の間になり、分布によらない検定にならない（Chernoff・Lehmann 1954。原典は未照合）。境目をデータから決める場合は範囲外
+      locator: 照合した2次資料：Cornell BU-503-M、core.ac.uk 85220922
     external: true
   teaching:
     conclusion: true
@@ -624,6 +635,10 @@ claims:
       by: E
       date: '2026-11-08'
       version: 10c901e
+    - method: 独立な確かめ
+      by: '#278 の PR の確かめ'
+      date: '2026-11-08'
+      version: 94d80c2
     external: 未照合
   version: 1
 - id: CLM-31
@@ -754,10 +769,13 @@ claims:
   conditions:
   - text: D₁, …, Dₙ が独立に同じ正規分布に従う
     kind: 仮定
+    terms:
+    - TERM-indep
+    - TERM-normal
     outside: t(n−1) に従うとは保証できない
   - text: H₀（μ_D＝0）が正しい
     kind: 仮定
-    outside: t(n−1) に従うとは保証できない（H₀ が誤りなら、中心がずれた分布になる）
+    outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる。t(n−1) をずらしただけの形ではない）
   grounds:
   - claim: CLM-28a
   teaching:
@@ -784,12 +802,17 @@ claims:
     terms:
     - TERM-indep
     outside: F(g−1, n−g) に従うとは保証できない
-  - text: 各群が正規分布に従い、分散が等しい
+  - text: 各群が正規分布に従う
+    kind: 仮定
+    terms:
+    - TERM-normal
+    outside: F(g−1, n−g) に従うとは保証できない
+  - text: 各群の分散が等しい
     kind: 仮定
     outside: F(g−1, n−g) に従うとは保証できない
   - text: H₀ が正しい
     kind: 仮定
-    outside: F(g−1, n−g) に従うとは保証できない（H₀ が誤りなら、大きい側にずれた分布になる）
+    outside: F(g−1, n−g) に従うとは保証できない（H₀ が誤りなら非心 F 分布になり、確率の大小の意味で大きい側にずれる）
   grounds:
   - source:
       title: 群間平方和/σ²・群内平方和/σ² が独立に χ²(g−1)・χ²(n−g) に従う（Cochran の定理）

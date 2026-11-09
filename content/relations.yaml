@@ -774,7 +774,7 @@ relations:
     from: TERM-paired-t
     to: TERM-welch
     type: 比べる
-    differ: 対応のある t 検定は、同じ対象の対の差 Dᵢ を1つの標本として扱い（対の中の個体差が消える）、t(n−1) で棄却域を決める。ウェルチの t 検定は、独立な2群を母分散が等しいと仮定せずに比べ、自由度を近似で決めた t 分布で棄却域を決める
+    differ: 対応のある t 検定は、同じ対象の対の差 Dᵢ を1つの標本として扱い（対に共通する個体の効果が差で打ち消される）、t(n−1) で棄却域を決める。ウェルチの t 検定は、独立な2群を母分散が等しいと仮定せずに比べ、自由度を近似で決めた t 分布で棄却域を決める
     same: どちらも「2つの母平均が等しい」という帰無仮説を、平均の差を標準誤差で割った t の形の統計量で調べる仮説検定
     axis: 2つの平均の差を調べるときの、データの取り方とばらつきの扱い
     description: どちらも2つの平均の差を t 分布で調べる。対応のある t 検定は同じ対象の前後の差を1つの列として扱い、ウェルチの t 検定は別々の2群を、分散が違ってもよいとして比べる。
@@ -864,12 +864,12 @@ relations:
     from: TERM-type1
     to: TERM-type2
     type: 比べる
-    differ: 第1種の過誤は、帰無仮説が正しいのに棄却する誤り。第2種の過誤は、帰無仮説が誤っているのに棄却しない誤り。標本の大きさが同じなら、棄却域を狭めて第1種の過誤の確率を下げると、第2種の過誤の確率は上がる（下がらない）
+    differ: 第1種の過誤は、帰無仮説が正しいのに棄却する誤り。第2種の過誤は、帰無仮説が誤っているのに棄却しない誤り。同じ検定統計量・同じ標本の大きさで、棄却域を今の棄却域の一部に狭めると、第1種の過誤の確率は上がらず、第2種の過誤の確率は下がらない（ふつうは上がる）
     same: どちらも検定の判定の誤りで、棄却域から決まる事象（とその確率）
     axis: 帰無仮説が正しいか誤っているか と、判定（棄却する・しない）の組
     to_form: event
     from_form: event
-    description: 第1種の過誤は正しい帰無仮説を棄却する誤り、第2種の過誤は誤った帰無仮説を棄却しない誤り。データの数が同じなら、有意水準を小さくして第1種を減らすと、第2種は増える。
+    description: 第1種の過誤は正しい帰無仮説を棄却する誤り、第2種の過誤は誤った帰無仮説を棄却しない誤り。同じ検定統計量・同じデータの数で、棄却域を狭めて第1種を減らすと、第2種は減らない（ふつうは増える）。
     gist: 「無実の人を有罪にする」のが第1種、「犯人を見逃す」のが第2種。片方を厳しくすると、もう片方が起こりやすくなる。
     basis:
       units:
@@ -935,6 +935,7 @@ relations:
     from: TERM-h0
     to: TERM-expected
     type: 定める
+    to_form: number
     description: 期待度数は、帰無仮説（適合度検定なら仮定した分布、独立性検定なら独立）が正しいとしたときに、各欄に入ると見込む度数。帰無仮説を決めないと求められない。
     basis:
       units:
@@ -944,8 +945,9 @@ relations:
     from: TERM-expect
     to: TERM-expected
     type: 定める
+    to_form: number
     from_form: operation
-    description: 期待度数は、各欄に入る数の期待値（総数×その欄の確率）。名前は似ているが、確率変数の平均（期待値）を度数に当てはめたもの。
+    description: 期待度数は、帰無仮説のもとで各欄に入ると見込む数（総数×その欄の確率。確率が決まらないときは推定した確率）。名前は似ているが、確率変数の平均（期待値）を度数に当てはめたもの。
     basis:
       units:
       - U13
@@ -955,6 +957,7 @@ relations:
     from: TERM-expected
     to: TERM-gof
     type: 定める
+    from_form: number
     description: 適合度検定は、観測度数と期待度数のずれから統計量を作る。
     basis:
       units:
@@ -964,6 +967,7 @@ relations:
     from: TERM-expected
     to: TERM-indep-test
     type: 定める
+    from_form: number
     description: 独立性検定は、観測度数と期待度数のずれから統計量を作る。
     basis:
       units:
@@ -2127,7 +2131,7 @@ relations:
     type: 定める
     description: 多重比較は、複数の帰無仮説をそれぞれ仮説検定するときの判定の手続き。仮説検定が定義に直接出る。
     basis:
-      units: [U29]
+      units: [U32]
 
   - id: REL-indep-indeptest
     from: TERM-indep
@@ -2145,7 +2149,7 @@ relations:
     type: 定める
     description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
     basis:
-      units: [U26]
+      units: [U25]
 
   - id: REL-unbvar-pairedt
     from: TERM-unbvar
@@ -2154,7 +2158,7 @@ relations:
     type: 定める
     description: 対応のある t 検定は、対の差の標本平均と不偏分散で作る t で検定する。不偏分散が定義に直接出る。
     basis:
-      units: [U26]
+      units: [U25]
 
   - id: REL-samplemean-welch
     from: TERM-sample-mean
@@ -2163,7 +2167,7 @@ relations:
     type: 定める
     description: ウェルチの t 検定は、群ごとの標本平均と不偏分散で作る t で検定する。標本平均が定義に直接出る。
     basis:
-      units: [U26]
+      units: [U25]
 
   - id: REL-unbvar-welch
     from: TERM-unbvar
@@ -2172,7 +2176,7 @@ relations:
     type: 定める
     description: ウェルチの t 検定は、群ごとの標本平均と不偏分散で作る t で検定する。不偏分散が定義に直接出る。
     basis:
-      units: [U26]
+      units: [U25]
 
   - id: REL-teststat-statistic
     from: TERM-test-stat
