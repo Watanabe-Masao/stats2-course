@@ -323,6 +323,10 @@ claims:
       by: D
       date: '2026-11-08'
       version: 525bbdb
+    - method: 独立な確かめ
+      by: M
+      date: '2026-11-09'
+      version: 6a03c21
     external: 未照合
   version: 1
 - id: CLM-20b
