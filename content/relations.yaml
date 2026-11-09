@@ -483,20 +483,19 @@ relations:
   - id: REL-frame-random
     from: TERM-frame
     to: TERM-random-sampling
-    type: 前提
-    premise: mathematical
-    description: 無作為抽出は、抽出枠（名簿）の中からくじ引きで選ぶ。枠がないと選べない。
+    type: 定める
+    description: 無作為抽出は、抽出枠（名簿）の中から、前もって決めた確率に従うくじで選ぶ。抽出枠が定義に直接出る。
     basis:
       units:
       - U17
       - U31
-    version: 1
+    version: 2
   - id: REL-frame-bias
     from: TERM-frame
     to: TERM-bias
     type: 前提
     premise: learning
-    description: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏る。偏りが生まれる場所の1つ。
+    description: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏りうる。偏りが生まれる場所の1つ。
     basis:
       units:
       - U17
@@ -1437,102 +1436,96 @@ relations:
       - U32
     version: 1
   - id: REL-random-strat
-    from: TERM-random-sampling
-    to: TERM-strat-sampling
-    type: 前提
-    premise: mathematical
-    description: 層化抽出は、層の中で無作為抽出を行う。
+    from: TERM-strat-sampling
+    to: TERM-random-sampling
+    type: 一種
+    description: 層化抽出は、無作為抽出の1つ（層ごとに無作為抽出で選ぶ）。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-random-cluster
-    from: TERM-random-sampling
-    to: TERM-cluster-sampling
-    type: 前提
-    premise: mathematical
-    description: 集落抽出は、集落を無作為に選ぶ。
+    from: TERM-cluster-sampling
+    to: TERM-random-sampling
+    type: 一種
+    description: 集落抽出は、無作為抽出の1つ（集落を単位に無作為抽出で選び、選んだ集落を全部調べる）。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-random-systematic
-    from: TERM-random-sampling
-    to: TERM-systematic-sampling
-    type: 前提
-    premise: mathematical
-    description: 系統抽出は、最初の1人を無作為に選ぶ。
+    from: TERM-systematic-sampling
+    to: TERM-random-sampling
+    type: 一種
+    description: 系統抽出は、無作為抽出の1つ（最初の1つだけをくじで選び、あとは一定の間隔で選ぶ）。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-random-multistage
-    from: TERM-random-sampling
-    to: TERM-multistage-sampling
-    type: 前提
-    premise: mathematical
-    description: 多段抽出は、各段で無作為抽出を行う。
+    from: TERM-multistage-sampling
+    to: TERM-random-sampling
+    type: 一種
+    description: 多段抽出は、無作為抽出の1つ（大きな単位から順に、段ごとに無作為抽出で選ぶ）。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-strat-cluster-contrast
     from: TERM-strat-sampling
     to: TERM-cluster-sampling
-    type: 対比
+    type: 比べる
+    differ: 層化抽出はすべての層からそれぞれ選ぶので、層の間の平均の違いは推定量の分散に入らず（各層で単純無作為抽出なら V(x̄_st)＝Σ(N_h/N)²·(σ_h²/n_h)·(N_h−n_h)/(N_h−1)。σ_h² は層の値の2乗の偏差の和を N_h で割ったもの）、層の中が似ているほど精度が上がる。集落抽出は一部の集落を丸ごと調べるので、どの集落を引いたかの違い（集落の間の違い）がそのまま推定量の分散に入り、集落の中が多様で全体の縮図に近いほど損が小さい
+    same: どちらも母集団（抽出枠）を重ならないグループに分けてから選ぶ無作為抽出
+    axis: グループの間の違いが推定の誤差に入るか
     description: どちらも母集団をグループに分ける。層化抽出はすべての層から少しずつ選び、集落抽出は選んだ集落の全員を調べる。層は中が似た者どうし、集落は中にいろいろな人がいる分け方がよい。
     gist: 層化は「どのグループからも少しずつ」、集落は「選んだグループは全員」。層化は精度を上げる工夫、集落は手間を減らす工夫。
     basis:
       units:
       - U31
-    version: 1
-  - id: REL-sample-samplingerror
-    from: TERM-sample
-    to: TERM-sampling-error
-    type: 前提
-    premise: mathematical
-    description: 標本誤差は、一部だけを調べることで生じるずれ。
-    basis:
-      units:
-      - U31
-    version: 1
+    version: 2
   - id: REL-sampling-nonsampling-contrast
     from: TERM-sampling-error
     to: TERM-nonsampling-error
-    type: 対比
-    description: 標本誤差は標本を大きくすると小さくなる。非標本誤差（無回答・回答の誤り・枠の不備）は標本を大きくしても減らず、偏りになりやすい。
-    gist: 人数を増やせば減るずれ（標本誤差）と、人数を増やしても減らないずれ（非標本誤差）がある。後ろのほうは調べ方を変えないと直らない。
+    type: 比べる
+    differ: 標本誤差は、どの標本が選ばれたかだけから来るずれで、無作為抽出なら確率で扱え、その散らばり（標準誤差）は n を増やすと小さくなる（単純無作為抽出の標本平均なら分散 (σ²/n)·(N−n)/(N−1)。N・σ² は抽出枠の要素の数と、枠の上の分散）。非標本誤差は、選び方以外（抽出枠の不備・無回答・回答の誤り）から来るずれで、その一定の向きの部分は、同じ取り方のまま n を増やしても小さくならない
+    same: どちらも、母集団の値を標本から推定したときの推定値と真の値のずれの一部（実際のずれ＝標本誤差＋非標本誤差）で、データの取り方で値が決まる確率変数
+    axis: ずれの出どころと、n を増やすと小さくなるか
+    description: 標本誤差は標本を大きくすると小さくなる。非標本誤差（無回答・回答の誤り・枠の不備）のうち一定の向きの部分（偏り）は、標本を大きくしても減らない。
+    gist: 人数を増やせば減るずれ（標本誤差）と、調べ方から来るずれ（非標本誤差）がある。調べ方から来る一定の向きのずれは、人数を増やしても減らず、調べ方を変えないと直らない。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-frame-nonsampling
     from: TERM-frame
     to: TERM-nonsampling-error
-    type: 前提
-    premise: learning
-    description: 抽出枠の不備は、非標本誤差の代表的な原因の1つ。
+    type: 定める
+    description: 非標本誤差の後ろの項は、抽出枠の上の母数と母集団の母数のずれ θ_F−θ。抽出枠が定義に直接出る。
     basis:
       units:
       - U31
-    version: 1
+    version: 2
   - id: REL-random-randomize-contrast
     from: TERM-random-sampling
     to: TERM-randomize
-    type: 対比
-    description: 無作為抽出は「誰を調べるか」をくじで選ぶ（結果を母集団に広げるため）。無作為化は「誰にどの処理をするか」をくじで割り当てる（処理の効果を他の要因と分けるため）。
-    gist: 無作為抽出は「調べる人を選ぶくじ」、無作為化は「調べる人を組に分けるくじ」。前者で一般化でき、後者で因果を言える。
+    type: 比べる
+    differ: 無作為抽出は、枠の中の誰を調べるか（標本）をくじで選び、各要素の選ばれる確率が決まるので、標本から母集団の値を推定するときの誤差を確率で扱える。無作為化は、調べる対象の誰にどの処理をするか（群）をくじで割り当て、完全無作為化なら各対象が処理群に入る確率がどれも等しく、割り当ての前に決まっている共変量の群の平均の差の期待値が0になる（④-29）
+    same: どちらも、人の判断や対象の性質でなく、前もって決めた確率に従うくじ（乱数）でデータの取り方を決める手続き
+    axis: くじ（前もって決めた確率）で何を決めるか
+    description: 無作為抽出は「誰を調べるか」をくじで選ぶ。無作為化は「誰にどの処理をするか」をくじで割り当てる。
+    gist: 無作為抽出は「調べる人を選ぶくじ」、無作為化は「調べる人を組に分けるくじ」。くじを使う場所が違う。
     basis:
       units:
       - U17
       - U32
-    version: 1
+    version: 2
   - id: REL-confound-randomize
     from: TERM-confound
     to: TERM-randomize
     type: 前提
     premise: learning
-    description: 無作為化は、交絡する要因を群の間でそろえるために行う。交絡を知ってから、その断ち方を学ぶ。
+    description: 無作為化は、交絡しうる要因が群の間で平均として（期待値で）そろうように行う（1回の割り当てでは偶然に偏りうる）。交絡を知ってから、その断ち方を学ぶ。
     basis:
       units:
       - U32
@@ -2231,3 +2224,78 @@ relations:
       units:
       - U07
       - U28
+
+  - id: REL-estimator-bias
+    from: TERM-estimator
+    to: TERM-bias
+    version: 1
+    type: 定める
+    description: 偏りは、推定量の期待値と母数の差 E(θ̂)−θ。推定量が定義に直接出る。
+    basis:
+      units: [U17, U21]
+
+  - id: REL-expect-bias
+    from: TERM-expect
+    to: TERM-bias
+    version: 1
+    type: 定める
+    from_form: operation
+    description: 偏りは、推定量の期待値と母数の差 E(θ̂)−θ。期待値が定義に直接出る。
+    basis:
+      units: [U17, U21]
+
+  - id: REL-estimator-samplingerror
+    from: TERM-estimator
+    to: TERM-sampling-error
+    version: 1
+    type: 定める
+    description: 標本誤差は、誤りなく測ったときの推定量と母数の差 θ̂−θ。推定量が定義に直接出る。
+    basis:
+      units: [U31]
+
+  - id: REL-estimator-nonsampling
+    from: TERM-estimator
+    to: TERM-nonsampling-error
+    version: 1
+    type: 定める
+    description: 非標本誤差は、実際に得た推定量の値と、同じ標本を誤りなく測ったときの推定量の値の差。推定量が定義に直接出る。
+    basis:
+      units: [U31]
+
+  - id: REL-prob-random
+    from: TERM-prob
+    to: TERM-random-sampling
+    version: 1
+    type: 定める
+    from_form: function
+    description: 無作為抽出は、前もって決めた確率に従うくじで選ぶ手続き。確率が定義に直接出る。
+    basis:
+      units: [U17]
+
+  - id: REL-prob-randomize
+    from: TERM-prob
+    to: TERM-randomize
+    version: 1
+    type: 定める
+    from_form: function
+    description: 無作為化は、前もって決めた確率に従うくじで群を割り当てる手続き。確率が定義に直接出る。
+    basis:
+      units: [U32]
+
+  - id: REL-indep-confound
+    from: TERM-indep
+    to: TERM-confound
+    version: 1
+    type: 定める
+    description: 交絡は、処理と別の要因が独立でない（群によって別の要因の分布が違う）ために、差が分けられないこと。独立が定義に直接出る（影響の部分は統計の外の判断）。
+    basis:
+      units: [U32]
+  - id: REL-frame-samplingerror
+    from: TERM-frame
+    to: TERM-sampling-error
+    version: 1
+    type: 定める
+    description: 標本誤差は、誤りなく測った推定量の値と、抽出枠の上の母数 θ_F の差。抽出枠が定義に直接出る。
+    basis:
+      units:
+      - U31
