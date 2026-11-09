@@ -955,7 +955,7 @@ claims:
   label: ④-37
   kind: 等しい
   statement:
-    text: 切片を含む単回帰 ŷ＝a＋bx を最小二乗で当てはめ、S_xx＞0 かつ S_yy＞0 のとき、傾き b は相関係数 r に s_y/s_x を掛けたものに等しい（s_x・s_y は x・y の標準偏差で、同じ割る数（n か n−1）で求めたもの）
+    text: 単回帰 ŷ＝a＋bx の傾き b は、相関係数 r に x・y の標準偏差の比 s_y/s_x を掛けたものに等しい
   premises:
     subjects:
     - TERM-slr
@@ -969,4 +969,23 @@ claims:
   grounds:
   - source:
       title: 最小二乗の解 b＝S_xy/S_xx（正規方程式）と r の定義 S_xy/√(S_xx·S_yy) から b＝r·√(S_yy/S_xx)。s_y/s_x＝√(S_yy/S_xx)（割る数が比で消える）
+  conditions:
+  - text: 回帰式に切片 a を含める
+    kind: 仮定
+    outside: 切片のない回帰では傾きが Σxy/Σx² になり、r·s_y/s_x に等しいとは限らない
+  - text: 傾きを最小二乗法で求める
+    kind: 仮定
+    terms:
+    - TERM-ols
+    outside: ほかの当てはめ方（残差の絶対値の和を最小にするなど）では、r·s_y/s_x に等しいとは限らない
+  - text: s_x・s_y を同じ割る数（n か n−1）で求める
+    kind: 仮定
+    outside: 割る数が違うと比 s_y/s_x がずれ、√(n/(n−1)) 倍などの違いが出る
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: Q
+      date: '2026-11-10'
+      version: f044006
+    external: なし
   version: 1

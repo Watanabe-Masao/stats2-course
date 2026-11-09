@@ -7,7 +7,7 @@ prev: U27
 next: U29
 prereq: [U07, U13]
 used_by: [U29, U30, U32]
-terms: [TERM-scatter, TERM-dev, TERM-cov, TERM-corr, TERM-partial-corr, TERM-spurious]
+terms: [TERM-scatter, TERM-dev, TERM-data-cov, TERM-cov, TERM-corr, TERM-partial-corr, TERM-spurious]
 labs: [LAB-corr]
 goal: 散布図を平均の十字で4つに分けて偏差の積の符号を読み、共分散と相関係数を計算し、単位・外れ値・層・範囲・共通の原因で r がどう変わるかを、点を動かして確かめながら説明できる。
 stage_goals:
