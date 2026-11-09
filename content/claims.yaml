@@ -210,7 +210,7 @@ claims:
     - method: 独立な確かめ
       by: K
       date: '2026-11-09'
-      version: 8ba5c64
+      version: 1dd9337
     external: なし
   version: 1
 - id: CLM-25
@@ -303,7 +303,7 @@ claims:
     - method: 独立な確かめ
       by: K
       date: '2026-11-09'
-      version: 8ba5c64
+      version: 1dd9337
     external: なし
   version: 1
 - id: CLM-33
@@ -330,7 +330,7 @@ claims:
     - method: 独立な確かめ
       by: K
       date: '2026-11-09'
-      version: 8ba5c64
+      version: 1dd9337
     external: なし
   version: 1
 - id: CLM-34
@@ -365,6 +365,6 @@ claims:
     - method: 独立な確かめ
       by: K
       date: '2026-11-09'
-      version: 8ba5c64
+      version: 1dd9337
     external: なし
   version: 1
