@@ -1902,7 +1902,7 @@
   basis:
     text: 母数 θ を区間で推定するために、標本から作る2つの統計量 L≦U でつくる区間 [L, U]（観測したあとの区間も同じ名前で呼ぶ）
     terms: [TERM-statistic, TERM-parameter]
-  short: 標本から作る、母数を推定するための区間。作り方ごとに母数を含む確率（信頼係数）が決まる
+  short: 標本から作る、母数を推定するための区間で、作り方ごとに母数を含む確率（信頼係数）が決まる
 - id: TERM-conf-level
   name: 信頼係数
   en: confidence level

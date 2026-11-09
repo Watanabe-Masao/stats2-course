@@ -310,7 +310,7 @@ claims:
   - claim: CLM-6b
   - claim: CLM-20b
   - source:
-      title: スルツキーの定理
+      title: スルツキーの定理（p̂(1−p̂) → p(1−p) の平方根をとる所は連続写像定理）
     external: true
   - source:
       title: p̂ が 0 か 1 のとき分母は 0 になるが、その確率は n→∞ で 0 に近づくので、その場合の値をどう決めても極限は同じ（区間の幅は 0 になる。④ §8）
