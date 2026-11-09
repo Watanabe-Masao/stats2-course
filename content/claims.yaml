@@ -190,7 +190,7 @@ claims:
   label: ④-23
   kind: 等しい
   statement:
-    text: P(D)＞0 かつ P(H)＞0 のとき、P(H|D)＝P(D|H)P(H)/P(D)
+    text: 同じ確率 P のもとの事象 H・D で、P(D)＞0 かつ P(H)＞0 のとき、P(H|D)＝P(D|H)P(H)/P(D)
   premises:
     subjects:
     - TERM-prior
@@ -207,6 +207,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: K
+      date: '2026-11-09'
+      version: 8ba5c64
     external: なし
   version: 1
 - id: CLM-25
@@ -293,13 +297,20 @@ claims:
     - TERM-addition
   grounds:
   - source:
-      title: A∪B＝A∪(B∖A)、B＝(A∩B)∪(B∖A) はどちらも排反な和なので、確率の公理の加法性から
+      title: A∪B＝A∪(B∖A)、B＝(A∩B)∪(B∖A) はどちらも排反な和なので、確率の公理の加法性（残りを ∅ にした有限の形。P(∅)＝0 は Ω＝Ω∪∅∪∅∪… と P(Ω)＝1 から）から
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: K
+      date: '2026-11-09'
+      version: 8ba5c64
+    external: なし
   version: 1
 - id: CLM-33
   label: ④-33
   kind: 等しい
   statement:
-    text: P(A)＞0 の事象 A とどの事象 B についても、P(A∩B)＝P(A)P(B|A)
+    text: 同じ確率 P のもとの、P(A)＞0 の事象 A とどの事象 B についても、P(A∩B)＝P(A)P(B|A)
   premises:
     subjects:
     - TERM-event
@@ -314,12 +325,19 @@ claims:
   grounds:
   - source:
       title: 条件付き確率の定義 P(B|A)＝P(A∩B)/P(A) の両辺に P(A) を掛ける
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: K
+      date: '2026-11-09'
+      version: 8ba5c64
+    external: なし
   version: 1
 - id: CLM-34
   label: ④-34
   kind: 等しい
   statement:
-    text: 事象 A₁, …, A_k がどれも P(Aᵢ)＞0 で、互いに排反で、合わせると標本空間 Ω 全体になるとき、どの事象 B についても P(B)＝P(A₁)P(B|A₁)＋…＋P(A_k)P(B|A_k)
+    text: 同じ確率 P のもとの事象 A₁, …, A_k がどれも P(Aᵢ)＞0 で、互いに排反で、合わせると標本空間 Ω 全体になるとき、どの事象 B についても P(B)＝P(A₁)P(B|A₁)＋…＋P(A_k)P(B|A_k)
   premises:
     subjects:
     - TERM-event
@@ -340,6 +358,13 @@ claims:
     outside: 重なりがあると重なりを2回数え、覆わないと漏れが出るので、この和が P(B) になるとは保証されない
   grounds:
   - source:
-      title: B＝(B∩A₁)∪…∪(B∩A_k) は排反な和なので、公理の加法性で P(B)＝ΣP(B∩Aᵢ)
+      title: B＝(B∩A₁)∪…∪(B∩A_k) は排反な和なので、公理の加法性（有限の形）で P(B)＝ΣP(B∩Aᵢ)
   - claim: CLM-33
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: K
+      date: '2026-11-09'
+      version: 8ba5c64
+    external: なし
   version: 1
