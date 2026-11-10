@@ -44,6 +44,8 @@ learning:
     reason: U09 は階乗から入り、順列の数を ₙPₖ＝n!/(n−k)! と階乗で書く（順列の基準の定義は並べ方の数で、階乗の式は計算の形）。
     units: [U09]
   # ---- 足す：前提（learning）の関係から移したもの（M6。id は REL- を LRN- に替えた。理由は関係の説明のまま）
+  # #345（⑥ の確かめ方の独立なレビュー）で外した足す：std-outlier（外れ値の定義は z を外にしている）・frame-bias（バイアスの定義は抽出枠を使わない）は必ず要るとは言えない（⑥ の 5 の 2）。
+  #   cond-bayes（条件付き確率 → 全確率の公式 → ベイズの定理でたどれば着く）・rv-bernoulli（確率変数 → 確率分布 → ベルヌーイ分布（LRN-dist-bernoulli）でたどれば着く）は重ね。
   # REL-fact-comb（階乗 → 組合せ）は移さない：階乗 → 順列（足す）→ 組合せ（REL-perm-to-comb の候補）でたどれば着く（直接の1段だけ）
   - id: LRN-indep-binom   # 元：REL-indep-binom
     op: add
@@ -63,10 +65,10 @@ learning:
     units: [U15]
   - id: LRN-exclusive-addition   # 元：REL-exclusive-addition
     op: add
-    from: TERM-exclusive
+    from: TERM-prob
     to: TERM-addition
-    version: 1
-    reason: 排反なら重なりが0なので、加法定理は単に足すだけになる。まず排反の場合で足し算を理解する。
+    version: 2
+    reason: 加法定理は確率の和についての主張（排反でない2つの事象の和の確率）なので、確率（排反な事象の和を定める公理）を先に学ぶ（基準の定義が使う。#345 で 排反 → 加法定理 から替えた：排反は確率の公理を通ってたどれば着く）。
     units: [U10]
   - id: LRN-cond-indep   # 元：REL-cond-indep
     op: add
@@ -79,30 +81,16 @@ learning:
     op: add
     from: TERM-total-prob
     to: TERM-bayes
-    version: 1
-    reason: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
-    units: [U12]
-  - id: LRN-cond-bayes   # 元：REL-cond-bayes
-    op: add
-    from: TERM-cond
-    to: TERM-bayes
-    version: 1
-    reason: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
+    version: 2
+    reason: ベイズの定理の分母 P(D) を求めるのに、全確率の公式を先に使えるようにしておく。
     units: [U12]
   - id: LRN-sample-random   # 元：REL-sample-random
     op: add
     from: TERM-sample
     to: TERM-random-sampling
-    version: 1
-    reason: 無作為抽出は、標本の選び方の1つ。標本とは何かを知ってから、選び方の違いを学ぶ。
+    version: 2
+    reason: 無作為抽出は標本の取り方なので、標本とは何かを先に知っておく。
     units: [U17]
-  - id: LRN-frame-bias   # 元：REL-frame-bias
-    op: add
-    from: TERM-frame
-    to: TERM-bias
-    version: 1
-    reason: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏りうる。偏りが生まれる場所の1つ。
-    units: [U17, U31]
   - id: LRN-lln-clt   # 元：REL-lln-clt
     op: add
     from: TERM-lln
@@ -129,44 +117,37 @@ learning:
     op: add
     from: TERM-lln
     to: TERM-consistency
-    version: 1
-    reason: 標本平均の一致性は大数の法則そのもの。一致性は、大数の法則を推定量一般に広げた考え。
+    version: 2
+    reason: 一致性（推定量が母数に近づく）は、標本平均が母平均に近づく大数の法則を1つの例として先に知っていると読める。
     units: [U19, U21]
   - id: LRN-clt-ci   # 元：REL-clt-ci
     op: add
     from: TERM-clt
     to: TERM-ci
-    version: 1
-    reason: 母集団の分布が正規分布でなくても平均の信頼区間で正規分布を使えるのは、中心極限定理があるから。
+    version: 2
+    reason: 母集団が正規分布でなくても平均の信頼区間で正規分布を使う理由を読むのに、中心極限定理を先に知っておく。
     units: [U19, U22]
   - id: LRN-sampdist-test   # 元：REL-sampdist-test
     op: add
     from: TERM-sampdist
     to: TERM-test
-    version: 1
-    reason: 検定は、統計量の標本分布を使って「このデータは仮説のもとで起こりにくいか」を測る。
+    version: 2
+    reason: 検定で「仮説のもとで起こりにくいか」を測るには、統計量が標本ごとにばらつく分布（標本分布）を先に知っておく。
     units: [U24]
   - id: LRN-h0-pool   # 元：REL-h0-pool
     op: add
     from: TERM-h0
     to: TERM-pool
-    version: 1
-    reason: 2群を合わせてよいのは、帰無仮説（割合が等しい）のもとで計算するから。
+    version: 2
+    reason: プールした比率は、帰無仮説（2群の割合が等しい）のもとで2群を合わせて使う値なので、帰無仮説を先に知っておく。
     units: [U26]
   - id: LRN-freqtable-mode   # 元：REL-freqtable-mode
     op: add
     from: TERM-freqtable
     to: TERM-mode
-    version: 1
-    reason: 度数分布では、度数が最大の階級の値（階級値）を最頻値とする。
+    version: 2
+    reason: この教材では度数分布表から最頻値（度数が最大の階級の階級値）を求めるので、度数分布表を先に学ぶ。
     units: [U04, U06]
-  - id: LRN-std-outlier   # 元：REL-std-outlier
-    op: add
-    from: TERM-std
-    to: TERM-outlier
-    version: 1
-    reason: 標準化した値（z）の大きさで、外れ値かどうかの目安を立てることもある。
-    units: [U08]
   - id: LRN-corr-acf   # 元：REL-corr-acf
     op: add
     from: TERM-corr
@@ -174,13 +155,6 @@ learning:
     version: 1
     reason: 自己相関は、相関係数を学んでから学ぶ（どちらも偏差の積の和を、ばらつきで割って −1〜1 にそろえる形を読む）。
     units: [U05T]
-  - id: LRN-rv-bernoulli   # 元：REL-rv-bernoulli
-    op: add
-    from: TERM-rv
-    to: TERM-bernoulli
-    version: 1
-    reason: ベルヌーイ分布は、0か1をとる確率変数の分布。確率変数として値の出方を見ると読みやすい。
-    units: [U14]
   - id: LRN-scatter-corr   # 元：REL-scatter-corr
     op: add
     from: TERM-scatter
@@ -206,15 +180,15 @@ learning:
     op: add
     from: TERM-mreg
     to: TERM-adjr2
-    version: 1
-    reason: 説明変数の数が違う重回帰の式どうしを比べるときに使う。
+    version: 2
+    reason: 自由度調整済み決定係数は、説明変数の数が違う重回帰の式を比べるために学ぶので、重回帰分析を先に知っておく。
     units: [U30]
   - id: LRN-corr-multicol   # 元：REL-corr-multicol
     op: add
     from: TERM-corr
     to: TERM-multicol
-    version: 1
-    reason: 説明変数どうしの相関係数が大きいと、多重共線性を疑う。
+    version: 2
+    reason: 多重共線性（説明変数どうしの強い1次の関係）の強さは相関係数で読むので、相関係数を先に学ぶ。
     units: [U30]
   - id: LRN-anova-multcomp   # 元：REL-anova-multcomp
     op: add
@@ -234,8 +208,8 @@ learning:
     op: add
     from: TERM-confound
     to: TERM-spurious
-    version: 1
-    reason: 擬相関の多くは、交絡する第3の要因から生まれる。
+    version: 2
+    reason: 擬相関は、両方に関係する第3の変数で生まれる見かけの相関として学ぶので、その第3の変数の考え（交絡）を先に知っておく。
     units: [U28, U32]
   - id: LRN-sigma-mean   # 元：REL-sigma-mean
     op: add
@@ -244,3 +218,127 @@ learning:
     version: 1
     reason: 平均の式は総和記号で（1/n）Σ xᵢ と書く。総和記号は記法なので定義の構成要素にはせず、式を読むための前提知識とする（#310）。
     units: [U02, U06]
+  # ---- 足す：特別な場合の組（⑥ の 3：候補にしない。教材で向きを決めて前提知識に書く。#345）
+  - id: LRN-var-cov
+    op: add
+    from: TERM-var
+    to: TERM-cov
+    version: 1
+    reason: 教材は分散を先に学び、2つの変数へ広げて共分散を読む（共分散の式と条件が分散を使う）。
+  - id: LRN-geom-negbinom
+    op: add
+    from: TERM-geom
+    to: TERM-negbinom
+    version: 1
+    reason: 負の二項分布は、幾何分布（1回目の成功まで）を r 回目の成功まで広げた分布として学ぶ。
+  - id: LRN-median-quantile
+    op: add
+    from: TERM-median
+    to: TERM-quantile
+    version: 1
+    reason: 分位点は、中央値（真ん中で2つに分ける値）を任意の割合へ広げた値として学ぶ。
+  - id: LRN-slr-mreg
+    op: add
+    from: TERM-slr
+    to: TERM-mreg
+    version: 1
+    reason: 重回帰分析は、単回帰の説明変数を増やした形として学ぶ。
+  - id: LRN-datavar-datacov
+    op: add
+    from: TERM-data-var
+    to: TERM-data-cov
+    version: 1
+    reason: データの共分散は、データの分散を2つの変数へ広げたものとして学ぶ。
+  # ---- 足す：説明・式が使うのに前に来ていなかったもの（⑥ の 5 の 4。独立なレビューの指摘。#345）
+  - id: LRN-var-binom
+    op: add
+    from: TERM-sd
+    to: TERM-binom
+    version: 2
+    reason: 二項分布の説明と式が期待値 np・分散 np(1−p)・標準偏差（例題の √0.75）を使うので、期待値・分散・標準偏差を先に学ぶ。
+  - id: LRN-var-geom
+    op: add
+    from: TERM-var
+    to: TERM-geom
+    version: 1
+    reason: 幾何分布の説明と式が期待値・分散を使うので、期待値と分散（確率分布から定める）を先に学ぶ。
+  - id: LRN-binom-hyper
+    op: add
+    from: TERM-binom
+    to: TERM-hyper
+    version: 1
+    reason: 超幾何分布の説明が、二項分布（戻して取り出す・各回が独立）と比べて「戻さない」取り出しを説明するので、二項分布を先に学ぶ（⑥ の 5 の 4）。
+  - id: LRN-var-uniform
+    op: add
+    from: TERM-var
+    to: TERM-uniform
+    version: 1
+    reason: 一様分布の説明が期待値・分散（例：期待値5分・分散 100/12）を使うので、期待値と分散を先に学ぶ。
+  - id: LRN-dist-bernoulli
+    op: add
+    from: TERM-dist
+    to: TERM-bernoulli
+    version: 1
+    reason: ベルヌーイ分布は確率変数の分布の1つとして学ぶので、確率分布を先に学ぶ。
+  - id: LRN-samplemean-lln
+    op: add
+    from: TERM-sample-mean
+    to: TERM-lln
+    version: 1
+    reason: 大数の法則は標本平均が母平均に近づくという主張なので、標本平均を先に学ぶ。
+  - id: LRN-cond-multiplication
+    op: add
+    from: TERM-cond
+    to: TERM-multiplication
+    version: 1
+    reason: 乗法定理 P(A∩B)＝P(A)P(B|A) は条件付き確率を使うので、条件付き確率を先に学ぶ。
+  # ---- 外す：合わせると輪になる候補（⑥ の 5 の 7。足す LRN-binom-hyper と輪になる。#345）
+  - id: LRN-remove-hyper-binom
+    op: remove
+    from: TERM-hyper
+    to: TERM-binom
+    version: 1
+    reason: 二項分布を先に学び、超幾何分布はそれと比べて学ぶ（足す LRN-binom-hyper）。超幾何分布が二項分布に近づくことは、両方を学んだあとに読む。
+  # ---- 2回目の独立なレビュー（#345）で足す・外したもの
+  - id: LRN-indep-lln
+    op: add
+    from: TERM-indep
+    to: TERM-lln
+    version: 1
+    reason: 大数の法則は「独立に同じ分布に従う」標本についての主張なので、独立を先に学ぶ（基準の定義が使う）。
+  - id: LRN-poisson-expo
+    op: add
+    from: TERM-poisson
+    to: TERM-expo
+    version: 1
+    reason: 指数分布の説明が「ポアソン分布で数える出来事の間隔」を使うので、ポアソン分布を先に学ぶ。
+  - id: LRN-binom-normal
+    op: add
+    from: TERM-binom
+    to: TERM-normal
+    version: 1
+    reason: 正規分布の例が「B(100, 0.5) は平均50・標準偏差5 の正規分布で近似できる」を使うので、二項分布を先に学ぶ。
+  - id: LRN-complement-poisson
+    op: add
+    from: TERM-complement
+    to: TERM-poisson
+    version: 1
+    reason: ポアソン分布の例題が「1−(…)」で余事象の確率を使うので、余事象を先に学ぶ。
+  - id: LRN-stdnormal-clt
+    op: add
+    from: TERM-std-normal
+    to: TERM-clt
+    version: 1
+    reason: 中心極限定理は標準化した標本平均の分布が標準正規分布に近づくという主張なので、標準正規分布を先に学ぶ。
+  - id: LRN-remove-samplemean-normal
+    op: remove
+    from: TERM-normal
+    to: TERM-sample-mean
+    version: 1
+    reason: 標本平均は分布なしに標本から定まる統計量で、正規分布を知らなくても読める。正規母集団の標本平均が正規分布に従うことは、正規分布を学んだあとに読む。
+  - id: LRN-remove-clt-normal
+    op: remove
+    from: TERM-std-normal
+    to: TERM-sample-mean
+    version: 1
+    reason: 標本平均は分布なしに標本から定まる統計量で、標準正規分布を知らなくても読める。標準化した標本平均が標準正規分布に近づくこと（中心極限定理）は、両方を学んだあとに読む（足す LRN-stdnormal-clt）。
