@@ -880,7 +880,7 @@ class TestNetwork(unittest.TestCase):
         d = network.export_network(c, {"site_base_url": ""})
         e = d["experiments"][0]
         self.assertEqual(e["id"], "stats2:EXP-binom-p")
-        self.assertIn("stats2:REL-indep-binom", e["links"]["relations"])
+        self.assertIn("stats2:LRN-indep-binom", e["links"]["relations"])
         self.assertEqual(e["reason"]["concept"], "stats2:TERM-binom")
         self.assertFalse(network.schema_errors(v2(d)))
 

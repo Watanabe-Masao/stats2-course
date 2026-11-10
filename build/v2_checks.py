@@ -4,7 +4,7 @@
 ここは型で書けない、行どうし・概念とのつながりで決まるもの（設計書 docs/schema-v2-design.md 3.2 の「機械で止める」）を止める。
 人の確かめに残すもの（3.2 の右の列）は止めない。意味の判断の正本は製本 ⑤（docs/rules/relations.md）。
 
-学ぶ順の止め（前提知識の重ねと輪。⑥ の 2）は、候補を build が求める M6（#266）で足す（候補がないと重ねを判定できない）。
+学ぶ順の止め（前提知識の重ねと輪。⑥ の 2）は build/learning.py（M6・#266）。
 移していない行（legacy_type）は、v2_ready の分類に残っていないかだけを見る（ほかは今の build の止めのまま）。
 """
 from __future__ import annotations
@@ -139,10 +139,8 @@ def v2_errors(data: dict) -> list[str]:
     v2 = [r for r in rels if "type" in r]
 
     # 移した分類に、移していない行を残さない（設計書 8。行き先の概念の分類で見る）
-    # 前提（learning）は学ぶ順のデータへ移す M6（#266）まで v1 のまま残す（⑤ の線ではない。設計書 3.3・6）
+    # 前提（learning）は M6（#266）で学ぶ順（learning.yaml）へ移した。移した分類に残る前提も、ほかの legacy_type と同じく止める
     for r in rels:
-        if r.get("legacy_type") == "前提" and r.get("premise") == "learning":
-            continue
         if "legacy_type" in r and (concepts.get(r["to"]) or {}).get("category") in ready:
             err.append(f"{r['id']}: 移した分類（{concepts[r['to']]['category']}）の行に legacy_type（{r['legacy_type']}）が残っている")
 

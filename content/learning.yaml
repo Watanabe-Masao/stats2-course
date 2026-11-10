@@ -1,0 +1,246 @@
+# 学ぶ順（製本 ⑥）の 足す・外す。M6（#266。2026-11-10）
+# 学ぶ順 ＝ 関係から求める候補 ＋ 足す − 外す（⑥ の 2）。候補は build（build/learning.py）が関係から求め、ここには書かない。
+# 足す（add）：関係にはないが、先に知っておきたいもの。外す（remove）：候補のうち、学ぶ順では先に要らないもの。どちらも理由の1文を書く。
+# 直接の1段だけ（たどれば着く足すは書かない）。合わせた学ぶ順に輪を作らない（build が止める）。書き方は docs/authoring.md「学ぶ順」。
+learning:
+  # ---- 外す：合わせると輪になる候補（渡辺さん 2026-11-10：⑥ の 3 の決まりはそのまま、組ごとに外す）
+  - id: LRN-remove-t-normal   # 候補の元：REL-t-normal（移る・極限）
+    op: remove
+    from: TERM-t
+    to: TERM-std-normal
+    version: 1
+    reason: 標準正規分布は t 分布の定義に使う（カイ二乗分布を経て t 分布を定める）ので先に学ぶ。t 分布が標準正規分布に近づくことは、t 分布を学んだあとに読む。
+  - id: LRN-remove-unbvar-chi2   # 候補の元：REL-unbvar-chi2（従う）
+    op: remove
+    from: TERM-chi2
+    to: TERM-unbvar
+    version: 1
+    reason: 不偏分散は標本平均から定める統計量で、カイ二乗分布を知らなくても読める。(n−1)s²/σ² がカイ二乗分布に従うことは、カイ二乗分布を学んだあとに読む。
+  - id: LRN-remove-hist-pdf   # 候補の元：REL-hist-pdf（推定する。#327）
+    op: remove
+    from: TERM-pdf
+    to: TERM-hist
+    version: 1
+    reason: ヒストグラムはデータの図として先に学び、面積で確率を読む見方を確率密度関数の土台にする（足す LRN-hist-pdf）。ヒストグラムが確率密度関数を推定することは、確率密度関数を学んだあとに読む。
+  - id: LRN-remove-perm-fact   # 候補の元：REL-perm-to-fact（移る・厳密。#327）
+    op: remove
+    from: TERM-perm
+    to: TERM-fact
+    version: 1
+    reason: 階乗は順列の数を書く式に使うので先に学ぶ（足す LRN-fact-perm）。k＝n の順列の数が n! になることは、順列を学んだあとに読む。
+  # ---- 足す：外した組の代わりに先に置くもの（⑥ の 5 の 7）
+  - id: LRN-hist-pdf
+    op: add
+    from: TERM-hist
+    to: TERM-pdf
+    version: 1
+    reason: 面積で確率を読む見方の土台（ヒストグラムの柱の面積が割合になることを、確率密度関数の曲線の下の面積が確率になることへ広げる）。
+    units: [U16]
+  - id: LRN-fact-perm
+    op: add
+    from: TERM-fact
+    to: TERM-perm
+    version: 1
+    reason: U09 は階乗から入り、順列の数を ₙPₖ＝n!/(n−k)! と階乗で書く（順列の基準の定義は並べ方の数で、階乗の式は計算の形）。
+    units: [U09]
+  # ---- 足す：前提（learning）の関係から移したもの（M6。id は REL- を LRN- に替えた。理由は関係の説明のまま）
+  # REL-fact-comb（階乗 → 組合せ）は移さない：階乗 → 順列（足す）→ 組合せ（REL-perm-to-comb の候補）でたどれば着く（直接の1段だけ）
+  - id: LRN-indep-binom   # 元：REL-indep-binom
+    op: add
+    from: TERM-indep
+    to: TERM-binom
+    version: 1
+    reason: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。独立は、二項分布が成り立つ条件。
+    units: [U14]
+    question: なぜ並び1つの確率を掛け算で出せるのか？
+    focus: {formula: F-binom-pmf, parts: [1, 2]}
+  - id: LRN-indep-geom   # 元：REL-indep-geom
+    op: add
+    from: TERM-indep
+    to: TERM-geom
+    version: 1
+    reason: 各回が独立なので、失敗が続いてから成功する確率が掛け算 (1−p)^(k−1)p で求まる。独立は、幾何分布が成り立つ条件。
+    units: [U15]
+  - id: LRN-exclusive-addition   # 元：REL-exclusive-addition
+    op: add
+    from: TERM-exclusive
+    to: TERM-addition
+    version: 1
+    reason: 排反なら重なりが0なので、加法定理は単に足すだけになる。まず排反の場合で足し算を理解する。
+    units: [U10]
+  - id: LRN-cond-indep   # 元：REL-cond-indep
+    op: add
+    from: TERM-cond
+    to: TERM-indep
+    version: 1
+    reason: 独立は「A が起きたと知っても B の確率が変わらない」こと。条件付き確率で読むと意味が分かる。
+    units: [U11]
+  - id: LRN-total-bayes   # 元：REL-total-bayes
+    op: add
+    from: TERM-total-prob
+    to: TERM-bayes
+    version: 1
+    reason: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
+    units: [U12]
+  - id: LRN-cond-bayes   # 元：REL-cond-bayes
+    op: add
+    from: TERM-cond
+    to: TERM-bayes
+    version: 1
+    reason: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
+    units: [U12]
+  - id: LRN-sample-random   # 元：REL-sample-random
+    op: add
+    from: TERM-sample
+    to: TERM-random-sampling
+    version: 1
+    reason: 無作為抽出は、標本の選び方の1つ。標本とは何かを知ってから、選び方の違いを学ぶ。
+    units: [U17]
+  - id: LRN-frame-bias   # 元：REL-frame-bias
+    op: add
+    from: TERM-frame
+    to: TERM-bias
+    version: 1
+    reason: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏りうる。偏りが生まれる場所の1つ。
+    units: [U17, U31]
+  - id: LRN-lln-clt   # 元：REL-lln-clt
+    op: add
+    from: TERM-lln
+    to: TERM-clt
+    version: 1
+    reason: 大数の法則（平均が母平均に近づく）を知ってから、近づくときのばらつきの形（正規分布）を学ぶ。
+    units: [U19]
+  - id: LRN-binom-cc   # 元：REL-binom-cc
+    op: add
+    from: TERM-binom
+    to: TERM-cc
+    version: 1
+    reason: 連続修正は、二項分布を正規分布で近似するときに使う。離散の棒を連続の幅に置き換える考え。
+    units: [U19]
+    question: 整数の棒を曲線で近似するとき、なぜ境目を 0.5 ずらす？
+  - id: LRN-unbvar-df   # 元：REL-unbvar-df
+    op: add
+    from: TERM-unbvar
+    to: TERM-df
+    version: 1
+    reason: 不偏分散で n−1 で割るのは、平均を使った分だけ自由に動ける値が1つ減るから。自由度の考えの入口。
+    units: [U18, U20]
+  - id: LRN-lln-consistency   # 元：REL-lln-consistency
+    op: add
+    from: TERM-lln
+    to: TERM-consistency
+    version: 1
+    reason: 標本平均の一致性は大数の法則そのもの。一致性は、大数の法則を推定量一般に広げた考え。
+    units: [U19, U21]
+  - id: LRN-clt-ci   # 元：REL-clt-ci
+    op: add
+    from: TERM-clt
+    to: TERM-ci
+    version: 1
+    reason: 母集団の分布が正規分布でなくても平均の信頼区間で正規分布を使えるのは、中心極限定理があるから。
+    units: [U19, U22]
+  - id: LRN-sampdist-test   # 元：REL-sampdist-test
+    op: add
+    from: TERM-sampdist
+    to: TERM-test
+    version: 1
+    reason: 検定は、統計量の標本分布を使って「このデータは仮説のもとで起こりにくいか」を測る。
+    units: [U24]
+  - id: LRN-h0-pool   # 元：REL-h0-pool
+    op: add
+    from: TERM-h0
+    to: TERM-pool
+    version: 1
+    reason: 2群を合わせてよいのは、帰無仮説（割合が等しい）のもとで計算するから。
+    units: [U26]
+  - id: LRN-freqtable-mode   # 元：REL-freqtable-mode
+    op: add
+    from: TERM-freqtable
+    to: TERM-mode
+    version: 1
+    reason: 度数分布では、度数が最大の階級の値（階級値）を最頻値とする。
+    units: [U04, U06]
+  - id: LRN-std-outlier   # 元：REL-std-outlier
+    op: add
+    from: TERM-std
+    to: TERM-outlier
+    version: 1
+    reason: 標準化した値（z）の大きさで、外れ値かどうかの目安を立てることもある。
+    units: [U08]
+  - id: LRN-corr-acf   # 元：REL-corr-acf
+    op: add
+    from: TERM-corr
+    to: TERM-acf
+    version: 1
+    reason: 自己相関は、相関係数を学んでから学ぶ（どちらも偏差の積の和を、ばらつきで割って −1〜1 にそろえる形を読む）。
+    units: [U05T]
+  - id: LRN-rv-bernoulli   # 元：REL-rv-bernoulli
+    op: add
+    from: TERM-rv
+    to: TERM-bernoulli
+    version: 1
+    reason: ベルヌーイ分布は、0か1をとる確率変数の分布。確率変数として値の出方を見ると読みやすい。
+    units: [U14]
+  - id: LRN-scatter-corr   # 元：REL-scatter-corr
+    op: add
+    from: TERM-scatter
+    to: TERM-corr
+    version: 1
+    reason: 相関係数は、散布図の点が直線のまわりにどれだけ集まっているかを1つの数にしたもの。まず散布図で見る。
+    units: [U28]
+  - id: LRN-scatter-slr   # 元：REL-scatter-slr
+    op: add
+    from: TERM-scatter
+    to: TERM-slr
+    version: 1
+    reason: 単回帰は、散布図の点にいちばん合う直線を引くこと。
+    units: [U29]
+  - id: LRN-slr-extrap   # 元：REL-slr-extrap
+    op: add
+    from: TERM-slr
+    to: TERM-extrap
+    version: 1
+    reason: 外挿は、回帰式をデータの範囲の外に使うこと。回帰式を知ってから、その使ってよい範囲を学ぶ。
+    units: [U29]
+  - id: LRN-mreg-adjr2   # 元：REL-mreg-adjr2
+    op: add
+    from: TERM-mreg
+    to: TERM-adjr2
+    version: 1
+    reason: 説明変数の数が違う重回帰の式どうしを比べるときに使う。
+    units: [U30]
+  - id: LRN-corr-multicol   # 元：REL-corr-multicol
+    op: add
+    from: TERM-corr
+    to: TERM-multicol
+    version: 1
+    reason: 説明変数どうしの相関係数が大きいと、多重共線性を疑う。
+    units: [U30]
+  - id: LRN-anova-multcomp   # 元：REL-anova-multcomp
+    op: add
+    from: TERM-anova
+    to: TERM-multcomp
+    version: 1
+    reason: 分散分析で「どこかに差がある」と分かったあと、どの群の間かを調べるのが多重比較。
+    units: [U32]
+  - id: LRN-confound-randomize   # 元：REL-confound-randomize
+    op: add
+    from: TERM-confound
+    to: TERM-randomize
+    version: 1
+    reason: 無作為化は、交絡しうる要因が群の間で平均として（期待値で）そろうように行う（1回の割り当てでは偶然に偏りうる）。交絡を知ってから、その断ち方を学ぶ。
+    units: [U32]
+  - id: LRN-confound-spurious   # 元：REL-confound-spurious
+    op: add
+    from: TERM-confound
+    to: TERM-spurious
+    version: 1
+    reason: 擬相関の多くは、交絡する第3の要因から生まれる。
+    units: [U28, U32]
+  - id: LRN-sigma-mean   # 元：REL-sigma-mean
+    op: add
+    from: TERM-sigma
+    to: TERM-mean
+    version: 1
+    reason: 平均の式は総和記号で（1/n）Σ xᵢ と書く。総和記号は記法なので定義の構成要素にはせず、式を読むための前提知識とする（#310）。
+    units: [U02, U06]
