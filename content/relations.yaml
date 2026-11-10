@@ -18,14 +18,6 @@ relations:
     from_form: operation
     description: 分散は「期待値からのずれ」の2乗の期待値。期待値がなければ測る基準がない。
     basis: {units: [U13]}
-  - id: REL-fact-comb
-    from: TERM-fact
-    to: TERM-comb
-    version: 2
-    type: 前提
-    premise: learning
-    description: 組合せの数は、階乗を学んでから学ぶ（ₙCₖ＝n!/(k!(n−k)!) で計算する。組合せの基準の定義は選び方の数で、この式は導く等式）。
-    basis: {units: [U09]}
   - id: REL-comb-binom
     from: TERM-comb
     to: TERM-binom
@@ -34,16 +26,6 @@ relations:
     focus: {formula: F-binom-pmf, parts: [0]}   # このつながりが効く式の部品（#188 07c）
     type: 定める
     description: 成功が k 回ある並びは、n 回のうちどの k 回を成功にするかの選び方の数 ₙCₖ 通りあり、どれも同じ確率なので、1つの並びの確率に ₙCₖ を掛ける。
-    basis: {units: [U14]}
-  - id: REL-indep-binom
-    from: TERM-indep
-    to: TERM-binom
-    version: 2
-    question: なぜ並び1つの確率を掛け算で出せるのか？   # このつながりで考える問い（#188 07c）
-    focus: {formula: F-binom-pmf, parts: [1, 2]}   # このつながりが効く式の部品（#188 07c）
-    type: 前提
-    premise: learning
-    description: 各回が独立なので、1通りの確率が掛け算 pᵏ(1−p)ⁿ⁻ᵏ で求まる。独立は、二項分布が成り立つ条件。
     basis: {units: [U14]}
   - id: REL-binom-poisson
     from: TERM-binom
@@ -223,14 +205,6 @@ relations:
     gist: お互いに影響しない2つの量は、一緒にずれる傾向がないので共分散は0。ただし共分散が0でも、影響し合っていることはある。   # つまり（#95）
     figures: [FIG-LAB-expect-rel-indep-tour-1, FIG-LAB-expect-rel-indep-tour-2, FIG-LAB-expect-rel-indep-tour-3]
     basis: {units: [U13]}
-  - id: REL-indep-geom
-    from: TERM-indep
-    to: TERM-geom
-    version: 2
-    type: 前提
-    premise: learning
-    description: 各回が独立なので、失敗が続いてから成功する確率が掛け算 (1−p)^(k−1)p で求まる。独立は、幾何分布が成り立つ条件。
-    basis: {units: [U15]}
   - id: REL-binom-geom-contrast
     from: TERM-binom
     to: TERM-geom
@@ -375,14 +349,6 @@ relations:
     type: 定める
     description: 排反は2つの事象の関係（共通部分がない）として決める。
     basis: {units: [U10, U11]}
-  - id: REL-exclusive-addition
-    from: TERM-exclusive
-    to: TERM-addition
-    version: 1
-    type: 前提
-    premise: learning
-    description: 排反なら重なりが0なので、加法定理は単に足すだけになる。まず排反の場合で足し算を理解する。
-    basis: {units: [U10]}
   - id: REL-prob-cond
     from: TERM-prob
     to: TERM-cond
@@ -390,14 +356,6 @@ relations:
     type: 定める
     from_form: function
     description: 条件付き確率は、両方が起こる確率を、条件の事象の確率で割って決める。
-    basis: {units: [U11]}
-  - id: REL-cond-indep
-    from: TERM-cond
-    to: TERM-indep
-    version: 1
-    type: 前提
-    premise: learning
-    description: 独立は「A が起きたと知っても B の確率が変わらない」こと。条件付き確率で読むと意味が分かる。
     basis: {units: [U11]}
   - id: REL-exclusive-indep-contrast
     from: TERM-exclusive
@@ -418,22 +376,6 @@ relations:
     claim: CLM-34
     gist: 起こり方を重ならない場合に分け、「その場合になる確率×その場合で起こる確率」を全部足すと、全体の確率になる。各項が乗法定理の形。
     description: 全確率の公式の各項は、乗法定理で「場合の確率×その場合の条件付き確率」と書いたもの。
-    basis: {units: [U12]}
-  - id: REL-total-bayes
-    from: TERM-total-prob
-    to: TERM-bayes
-    version: 2
-    type: 前提
-    premise: learning
-    description: ベイズの定理の分母（結果が起こる全体の確率）は、全確率の公式で求める。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
-    basis: {units: [U12]}
-  - id: REL-cond-bayes
-    from: TERM-cond
-    to: TERM-bayes
-    version: 2
-    type: 前提
-    premise: learning
-    description: ベイズの定理は、条件付き確率 P(結果|原因) から P(原因|結果) を求める式。学ぶ順の前提知識（M6 で ⑥ に照らす。#295）。
     basis: {units: [U12]}
   - id: REL-cond-likelihood
     from: TERM-likelihood
@@ -465,16 +407,6 @@ relations:
       - U03
       - U17
     version: 2
-  - id: REL-sample-random
-    from: TERM-sample
-    to: TERM-random-sampling
-    type: 前提
-    premise: learning
-    description: 無作為抽出は、標本の選び方の1つ。標本とは何かを知ってから、選び方の違いを学ぶ。
-    basis:
-      units:
-      - U17
-    version: 1
   - id: REL-frame-random
     from: TERM-frame
     to: TERM-random-sampling
@@ -485,17 +417,6 @@ relations:
       - U17
       - U31
     version: 2
-  - id: REL-frame-bias
-    from: TERM-frame
-    to: TERM-bias
-    type: 前提
-    premise: learning
-    description: 抽出枠が母集団とずれていると、無作為に選んでも結果が偏りうる。偏りが生まれる場所の1つ。
-    basis:
-      units:
-      - U17
-      - U31
-    version: 1
   - id: REL-sample-statistic
     from: TERM-sample
     to: TERM-statistic
@@ -547,38 +468,6 @@ relations:
       - U18
       - U20
     version: 2
-  - id: REL-lln-clt
-    from: TERM-lln
-    to: TERM-clt
-    type: 前提
-    premise: learning
-    description: 大数の法則（平均が母平均に近づく）を知ってから、近づくときのばらつきの形（正規分布）を学ぶ。
-    basis:
-      units:
-      - U19
-    version: 1
-  - id: REL-binom-cc
-    from: TERM-binom
-    to: TERM-cc
-    type: 前提
-    premise: learning
-    description: 連続修正は、二項分布を正規分布で近似するときに使う。離散の棒を連続の幅に置き換える考え。
-    basis:
-      units:
-      - U19
-    version: 1
-    question: 整数の棒を曲線で近似するとき、なぜ境目を 0.5 ずらす？   # このつながりで考える問い（#188 07c）
-  - id: REL-unbvar-df
-    from: TERM-unbvar
-    to: TERM-df
-    type: 前提
-    premise: learning
-    description: 不偏分散で n−1 で割るのは、平均を使った分だけ自由に動ける値が1つ減るから。自由度の考えの入口。
-    basis:
-      units:
-      - U18
-      - U20
-    version: 1
   - id: REL-normal-chi2
     from: TERM-std-normal
     to: TERM-chi2
@@ -676,17 +565,6 @@ relations:
       units:
       - U21
     version: 2
-  - id: REL-lln-consistency
-    from: TERM-lln
-    to: TERM-consistency
-    type: 前提
-    premise: learning
-    description: 標本平均の一致性は大数の法則そのもの。一致性は、大数の法則を推定量一般に広げた考え。
-    basis:
-      units:
-      - U19
-      - U21
-    version: 1
   - id: REL-point-interval-contrast
     from: TERM-point-est
     to: TERM-interval-est
@@ -710,17 +588,6 @@ relations:
       units:
       - U22
     version: 2
-  - id: REL-clt-ci
-    from: TERM-clt
-    to: TERM-ci
-    type: 前提
-    premise: learning
-    description: 母集団の分布が正規分布でなくても平均の信頼区間で正規分布を使えるのは、中心極限定理があるから。
-    basis:
-      units:
-      - U19
-      - U22
-    version: 1
   - id: REL-pairedt-welch-contrast
     from: TERM-paired-t
     to: TERM-welch
@@ -736,16 +603,6 @@ relations:
       - U25
     version: 2
   # ---- P1 骨格：W4（U24〜U27 検定）。#105
-  - id: REL-sampdist-test
-    from: TERM-sampdist
-    to: TERM-test
-    type: 前提
-    premise: learning
-    description: 検定は、統計量の標本分布を使って「このデータは仮説のもとで起こりにくいか」を測る。
-    basis:
-      units:
-      - U24
-    version: 1
   - id: REL-h0-h1
     from: TERM-h0
     to: TERM-h1
@@ -863,16 +720,6 @@ relations:
       units:
       - U26
     version: 2
-  - id: REL-h0-pool
-    from: TERM-h0
-    to: TERM-pool
-    type: 前提
-    premise: learning
-    description: 2群を合わせてよいのは、帰無仮説（割合が等しい）のもとで計算するから。
-    basis:
-      units:
-      - U26
-    version: 1
   - id: REL-crosstab-indeptest
     from: TERM-crosstab
     to: TERM-indep-test
@@ -984,17 +831,6 @@ relations:
       units:
       - U04
     version: 2
-  - id: REL-freqtable-mode
-    from: TERM-freqtable
-    to: TERM-mode
-    type: 前提
-    premise: learning
-    description: 度数分布では、度数が最大の階級の値（階級値）を最頻値とする。
-    basis:
-      units:
-      - U04
-      - U06
-    version: 1
   - id: REL-median-mean-contrast
     from: TERM-median
     to: TERM-mean
@@ -1113,16 +949,6 @@ relations:
       units:
       - U07
     version: 2
-  - id: REL-std-outlier
-    from: TERM-std
-    to: TERM-outlier
-    type: 前提
-    premise: learning
-    description: 標準化した値（z）の大きさで、外れ値かどうかの目安を立てることもある。
-    basis:
-      units:
-      - U08
-    version: 1
   - id: REL-sd-skew
     from: TERM-data-sd
     to: TERM-skew
@@ -1164,27 +990,7 @@ relations:
       units:
       - U05T
     version: 2
-  - id: REL-corr-acf
-    from: TERM-corr
-    to: TERM-acf
-    type: 前提
-    premise: learning
-    description: 自己相関は、相関係数を学んでから学ぶ（どちらも偏差の積の和を、ばらつきで割って −1〜1 にそろえる形を読む）。
-    basis:
-      units:
-      - U05T
-    version: 2
   # ---- P1 骨格：W5（U28〜U32 相関・回帰・調査・実験）と U14 のベルヌーイ分布。#105
-  - id: REL-rv-bernoulli
-    from: TERM-rv
-    to: TERM-bernoulli
-    type: 前提
-    premise: learning
-    description: ベルヌーイ分布は、0か1をとる確率変数の分布。確率変数として値の出方を見ると読みやすい。
-    basis:
-      units:
-      - U14
-    version: 2
   - id: REL-bernoulli-binom
     from: TERM-bernoulli
     to: TERM-binom
@@ -1199,16 +1005,6 @@ relations:
       - U14
     version: 2
     question: 1回の試行から、分布はどう生まれる？   # このつながりで考える問い（#188 07c）
-  - id: REL-scatter-corr
-    from: TERM-scatter
-    to: TERM-corr
-    type: 前提
-    premise: learning
-    description: 相関係数は、散布図の点が直線のまわりにどれだけ集まっているかを1つの数にしたもの。まず散布図で見る。
-    basis:
-      units:
-      - U28
-    version: 1
   - id: REL-corr-partialcorr
     from: TERM-corr
     to: TERM-partial-corr
@@ -1227,16 +1023,6 @@ relations:
       units:
       - U28
     version: 2
-  - id: REL-scatter-slr
-    from: TERM-scatter
-    to: TERM-slr
-    type: 前提
-    premise: learning
-    description: 単回帰は、散布図の点にいちばん合う直線を引くこと。
-    basis:
-      units:
-      - U29
-    version: 1
   - id: REL-resid-ols
     from: TERM-resid
     to: TERM-ols
@@ -1278,16 +1064,6 @@ relations:
       units:
       - U29
     version: 2
-  - id: REL-slr-extrap
-    from: TERM-slr
-    to: TERM-extrap
-    type: 前提
-    premise: learning
-    description: 外挿は、回帰式をデータの範囲の外に使うこと。回帰式を知ってから、その使ってよい範囲を学ぶ。
-    basis:
-      units:
-      - U29
-    version: 1
   - id: REL-slr-mreg
     from: TERM-slr
     to: TERM-mreg
@@ -1328,16 +1104,6 @@ relations:
       units:
       - U30
     version: 2
-  - id: REL-mreg-adjr2
-    from: TERM-mreg
-    to: TERM-adjr2
-    type: 前提
-    premise: learning
-    description: 説明変数の数が違う重回帰の式どうしを比べるときに使う。
-    basis:
-      units:
-      - U30
-    version: 1
   - id: REL-mreg-multicol
     from: TERM-mreg
     to: TERM-multicol
@@ -1347,16 +1113,6 @@ relations:
       units:
       - U30
     version: 2
-  - id: REL-corr-multicol
-    from: TERM-corr
-    to: TERM-multicol
-    type: 前提
-    premise: learning
-    description: 説明変数どうしの相関係数が大きいと、多重共線性を疑う。
-    basis:
-      units:
-      - U30
-    version: 1
   - id: REL-df-ms
     from: TERM-df
     to: TERM-ms
@@ -1385,16 +1141,6 @@ relations:
       units:
       - U32
     version: 2
-  - id: REL-anova-multcomp
-    from: TERM-anova
-    to: TERM-multcomp
-    type: 前提
-    premise: learning
-    description: 分散分析で「どこかに差がある」と分かったあと、どの群の間かを調べるのが多重比較。
-    basis:
-      units:
-      - U32
-    version: 1
   - id: REL-random-strat
     from: TERM-strat-sampling
     to: TERM-random-sampling
@@ -1480,28 +1226,6 @@ relations:
       - U17
       - U32
     version: 2
-  - id: REL-confound-randomize
-    from: TERM-confound
-    to: TERM-randomize
-    type: 前提
-    premise: learning
-    description: 無作為化は、交絡しうる要因が群の間で平均として（期待値で）そろうように行う（1回の割り当てでは偶然に偏りうる）。交絡を知ってから、その断ち方を学ぶ。
-    basis:
-      units:
-      - U32
-    version: 1
-  - id: REL-confound-spurious
-    from: TERM-confound
-    to: TERM-spurious
-    type: 前提
-    premise: learning
-    description: 擬相関の多くは、交絡する第3の要因から生まれる。
-    basis:
-      units:
-      - U28
-      - U32
-    version: 1
-
   # ---- 関係図の見本：確率分布の材料（定義の構成要素。docs/relation-map-design.md 4・#234）
   - id: REL-prob-dist
     from: TERM-prob
@@ -2042,18 +1766,6 @@ relations:
     description: データの標準偏差は、データの分散の正の平方根。データの分散が定義に直接出る。
     basis:
       units: [U07]
-
-  - id: REL-sigma-mean
-    from: TERM-sigma
-    to: TERM-mean
-    type: 前提
-    premise: learning
-    description: 平均の式は総和記号で（1/n）Σ xᵢ と書く。総和記号は記法なので定義の構成要素にはせず、式を読むための前提知識とする（#310）。
-    basis:
-      units:
-      - U02
-      - U06
-    version: 2
 
   - id: REL-mean-cv
     from: TERM-mean

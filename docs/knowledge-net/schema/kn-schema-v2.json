@@ -2643,11 +2643,76 @@
           "version": {
             "type": "integer",
             "minimum": 1
+          },
+          "units": {
+            "$ref": "#/$defs/gids",
+            "description": "足す（add）の根拠：その前提知識を実際に使う単元（製本 ⑥ の 5 の 4。改訂4。stats2-course #266）"
+          },
+          "question": {
+            "$ref": "#/$defs/text",
+            "description": "足す（add）のつながりで考える問い（関係の question と同じ働き。改訂4）"
+          },
+          "focus": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "formula",
+              "parts"
+            ],
+            "description": "足す（add）のつながりが効く式の部品（関係の focus と同じ形。改訂4）",
+            "properties": {
+              "formula": {
+                "type": "string"
+              },
+              "parts": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "learning_order": {
+      "type": "array",
+      "description": "仕上がりの学ぶ順（製本 ⑥ の 3：関係から求めた候補＋足す−外す）。教材の build が求めて書き出し、画面は読むだけ（⑥ の 3 の表を画面に写さない。stats2-course #266）。1行が「from を先に学ぶ → to を後に学ぶ」の1組。外した候補は書かない",
+      "items": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "source",
+          "via"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "$ref": "#/$defs/gid"
+          },
+          "to": {
+            "$ref": "#/$defs/gid",
+            "description": "後に学ぶもの。概念の id か、定理の点（導出 DER-…。前提の概念 → その点。⑥ の 3）"
+          },
+          "source": {
+            "enum": [
+              "candidate",
+              "add"
+            ],
+            "description": "candidate：関係から求めた候補／add：学ぶ順の足す（learning の op: add）"
+          },
+          "via": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+:(REL|LRN|DER)-[A-Za-z0-9-]+$",
+            "description": "どこから来たか：candidate は関係か導出（定理の点）の id、add は学ぶ順の id"
           }
         }
       }
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 3
+  "x-revision": 4
 }

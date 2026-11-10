@@ -14,6 +14,7 @@ import math
 from model import CONTENT, ROOT, Course, load_yaml, run_check
 import term_icons  # 語の印（#220）
 from effects import effect_errors, question_errors
+from learning import export_learning, learning_order, load_learning   # 学ぶ順（⑥。#266）
 
 SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
 SCHEMA_V2 = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v2.json"   # 書き出す型（M4。#264）
@@ -475,6 +476,9 @@ def skeleton(t: dict) -> bool:
 def linked_terms() -> set:
     rels, ders = load_network()
     linked = {r.get(k) for r in rels for k in ("from", "to")}
+    # 学ぶ順の足す（M6 の前は前提 learning の関係）も、ネットワークの中の置き場として数える（M6 で孤立の数え方を変えない。#266。
+    # 学ぶ順にしかつながらない概念（M6 で6語）に ⑤ の関係が要るかは #343 で振り分ける）
+    linked |= {x.get(k) for x in load_learning() if x.get("op") == "add" for k in ("from", "to")}
     return linked | {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
 
 
@@ -570,7 +574,7 @@ def relation_map_errors(c: Course, rels: list[dict]) -> list[str]:
     for r in rels:
         rid = r.get("id", "?")
         if r.get("type") == "前提" and r.get("premise") == "mathematical" and cat_of.get(r.get("to")) in ready:
-            err.append(f"{rid}: 分類「{cat_of[r['to']]}」は関係図に移したので、前提（mathematical）を材料か学ぶ順（前提 learning）に分ける")
+            err.append(f"{rid}: 分類「{cat_of[r['to']]}」は関係図に移したので、前提（mathematical）を材料か学ぶ順（content/learning.yaml）に分ける")
         if r.get("type") in ("対比", "比べる") and not r.get("axis") and (cat_of.get(r.get("from")) in ready or cat_of.get(r.get("to")) in ready):
             err.append(f"{rid}: 関係図に移した分類の対比には axis（比べる軸）を書く")
     err += group_relation_errors(c, rels, gcat)
@@ -779,37 +783,12 @@ def v2_source_errors(c: Course) -> list[str]:
     return err
 
 
-INCLUSION_V2 = ("一種",)   # ⑤ の一種は from＝子・to＝親で、v1 の種類（親 → 子）と向きが逆。特別な場合は v1 の一般化と同じ向き（特別な場合 → 一般）なので、移行の期間は v1 のままたどる（relation-types.yaml の trace。学ぶ順は M6 で ⑥ から作り直す）
 
 
 def dependency_errors(rels: list[dict]) -> list[str]:
-    """定義の依存と前提知識は直接の1段だけ（#249 ③）。
-    - 定義の依存の輪（材料の輪）は止める：A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない
-    - 重ねた前提知識は止める：A → D の前提知識があるのに、D から「前提をさかのぼる」種類をたどって A に着くなら、A → D は書かない
-      （A → B → C → D なら D は C だけを持ち、A・B は C をたどって出す）"""
-    err = [f"定義の依存の輪：{' → '.join(x)}（どちらかの材料が定義の構成要素でない。#249 ③）" for x in material_cycles(rels)]
-    trace = {k for key in ("types", "types_v2") for k, v in (KIND.get(key) or {}).items() if v.get("trace")}
-    back: dict[str, list[tuple[str, str]]] = {}
-    for r in rels:
-        if r.get("type") in INCLUSION_V2:   # ⑤ の一種は from が子・to が親。学ぶ順では親が先なので、子から親へさかのぼる（#298）
-            back.setdefault(r["from"], []).append((r["to"], r.get("id", "?")))
-        elif r.get("type") in trace:
-            back.setdefault(r["to"], []).append((r["from"], r.get("id", "?")))
-    for r in rels:
-        if not (r.get("type") == "前提" and r.get("premise") == "learning"):
-            continue
-        a, d = r["from"], r["to"]
-        stack = [x for x, rid in back.get(d, []) if rid != r.get("id")]
-        seen = set(stack)
-        while stack:
-            x = stack.pop()
-            for y, _ in back.get(x, []):
-                if y not in seen:
-                    seen.add(y)
-                    stack.append(y)
-        if a in seen:
-            err.append(f"{r.get('id')}: {a} → {d} の前提知識は、{d} の前提をたどると {a} に着くので重ねて書かない（直接の1段だけ。#249 ③）")
-    return err
+    """定義の依存は直接の1段だけ（#249 ③）：定義の依存の輪（材料の輪）は止める（A の定義に B、B の定義に A … は、どちらかが定義の構成要素でない）。
+    前提知識の重ね（たどれば着く足す）と学ぶ順の輪は、学ぶ順（build/learning.py。⑥ の 2）が止める（M6・#266）"""
+    return [f"定義の依存の輪：{' → '.join(x)}（どちらかの材料が定義の構成要素でない。#249 ③）" for x in material_cycles(rels)]
 
 
 def material_cycles(rels: list[dict] | None = None) -> list[list[str]]:
@@ -1162,7 +1141,7 @@ def validate_network(c: Course) -> list[str]:
     for tid, t in c.terms.items():
         if filled(t) and tid not in linked:
             err.append(f"{tid}: 説明のある概念なのに、関係・導出のどれにもつながっていない")
-    err += experiment_errors(c, rel_ids, {d["id"] for d in ders})
+    err += experiment_errors(c, rel_ids | {x["id"] for x in load_learning()}, {d["id"] for d in ders})   # 問いのつながりは学ぶ順の足す（LRN-）も指せる（#266）
     if load_experiments():
         err += walk_texts_errors(load_walk_texts())
         err += apply_texts_errors(load_apply_texts())
@@ -1172,6 +1151,12 @@ def validate_network(c: Course) -> list[str]:
     err += basis_exclude_errors(c, rels)
     err += v2_source_errors(c)
     err += dependency_errors(rels)
+    # 学ぶ順（⑥。M6・#266）：前提（learning）は関係ではなく content/learning.yaml に書く。候補＋足す−外すの重ねと輪を止める
+    for r in rels:
+        if r.get("type") == "前提" and r.get("premise") == "learning":
+            err.append(f"{r.get('id')}: 前提（learning）は関係に書かず、学ぶ順（content/learning.yaml の op: add）に書く（M6・#266）")
+    _, lerr = learning_order(rels, ders, load_learning(), set(c.terms))
+    err += lerr
     return err
 
 
@@ -1342,7 +1327,7 @@ NAME_MAP_V2 = {"材料": "定める", "種類": "一種", "一般化": "特別�
 
 
 CLAIMS = CONTENT / "claims.yaml"   # 主張（製本 ④ の単位。原本へ移したもの。#287）
-LOCAL_ID = re.compile(r"^(TERM|REL|DER|CLM|U[0-9])")
+LOCAL_ID = re.compile(r"^(TERM|REL|DER|CLM|LRN|U[0-9])")   # LRN は学ぶ順の行（#266）
 
 
 def load_claims() -> list[dict]:
@@ -1382,7 +1367,8 @@ def export_claim(cl: dict, g, refs=None) -> dict:
 
 def v2_extras(c: Course, target: dict | None = None) -> dict:
     """原本の v2 だけの項目（v1 の型には置き場がない）を、書き出しの id で。to_v2 が置く。
-    概念：姿（forms）・基準の定義の文（basis の text と terms）・除外（basis_excludes。#86）・主張（claims）。教材：主張（claims.yaml）"""
+    概念：姿（forms）・基準の定義の文（basis の text と terms）・除外（basis_excludes。#86）・主張（claims）。教材：主張（claims.yaml）と
+    学ぶ順（learning.yaml の足す・外すと、仕上がりの learning_order。型 v2 の改訂4。#266）"""
     g = _ns(course_id(c))
     concepts = {}
     for tid, t in c.terms.items():
@@ -1399,7 +1385,9 @@ def v2_extras(c: Course, target: dict | None = None) -> dict:
             concepts[g(tid)] = e
     base = (target or {}).get("site_base_url") or ""
     refs = (lambda x: lab_refs(c, base, x), lambda x: fig_refs(c, base, x))
-    return {"concepts": concepts, "claims": [export_claim(cl, g, refs) for cl in load_claims()]}
+    rels, ders = load_network()
+    edges, _ = learning_order(rels, ders, load_learning(), set(c.terms))   # 止めは validate_network
+    return {"concepts": concepts, "claims": [export_claim(cl, g, refs) for cl in load_claims()], **export_learning(load_learning(), edges, g)}
 
 
 def v2_ids(r: dict, g) -> dict:
@@ -1440,6 +1428,9 @@ def to_v2(data: dict, ready: list[str] | None = None, extras: dict | None = None
         out["concepts"].append(e)
     if extras.get("claims"):
         out["claims"] = extras["claims"]
+    for k in ("learning", "learning_order"):
+        if extras.get(k):
+            out[k] = extras[k]
     if ready:
         out["course"] = {**out["course"], "v2_ready": list(ready)}
     return out
@@ -1451,6 +1442,8 @@ def from_v2(data: dict, v1_revision: int) -> dict:
     out["relations"] = [{("type" if k == "legacy_type" else k): v for k, v in r.items()} for r in data["relations"]]
     out["concepts"] = [{k: v for k, v in c.items() if k not in ("basis", "forms", "claims")} for c in data["concepts"]]   # v2 で足した項目
     out.pop("claims", None)
+    out.pop("learning", None)
+    out.pop("learning_order", None)
     out["course"] = {k: v for k, v in data["course"].items() if k != "v2_ready"}
     return out
 
