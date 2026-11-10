@@ -24,10 +24,8 @@ TARGET = load_yaml(Path(__file__).resolve().parent.parent / "publish" / "notion.
 
 
 def v2(d: dict, c=None) -> dict:
-    """書き出しを、公開する形（型 v2）にしてから型で確かめる（#289 から、⑤ の種類の行は v1 の型に合わない）"""
-    import network
-    c = c or COURSE
-    return network.to_v2(d, c.shared.get("v2_ready"), network.v2_extras(c, {}))
+    """書き出しはそのまま型 v2（M7 から export_network が v2 を直接書き出す。#267）"""
+    return d
 
 
 def course():
@@ -481,8 +479,8 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(self._validate(), [])
 
     @staticmethod
-    def _v1_row(rels, rid, type_, **extra):
-        """写しに v1 の行を1つ作る（原本の中身に頼らない。M5・M6 で原本の v1 の行が減るたびにテストが壊れたため。#336）。
+    def _row(rels, rid, type_, **extra):
+        """写しに関係の行を1つ作る（原本の中身に頼らない。M5・M6 で原本の行が変わるたびにテストが壊れたため。#336）。
         端は、原本で関係のない組（総和記号 → 尤度）にする。"""
         r = {"id": rid, "from": "TERM-sigma", "to": "TERM-likelihood", "type": type_, "version": 1,
              "description": "テストの行", "basis": {"units": ["U09"]}, **extra}
@@ -490,13 +488,13 @@ class TestNetwork(unittest.TestCase):
         return r
 
     def test_gist_required_for_visual_types(self):
-        # M5 で原本の対比の行は0になった（#332）。移していない分類で対比を書いたときにまだ効くので、写しの中で対比の行を作って確かめる
+        # つまり（gist）は移る・比べる・導ける・特別な場合に要る（#95）。定めるには要らない。写しの中で行を作って確かめる
         bad = copy.deepcopy(self.rels)
-        r = self._v1_row(bad, "REL-test-contrast", "対比")
-        p = self._v1_row(bad, "REL-test-premise", "前提", premise="learning", **{"to": "TERM-fact"})
-        self.assertNotIn("gist", p)   # 前提には要らない
+        r = self._row(bad, "REL-test-contrast", "比べる", axis="x", same="x", differ="x")
+        p = self._row(bad, "REL-test-define", "定める", **{"to": "TERM-fact"})
+        self.assertNotIn("gist", p)   # 定めるには要らない
         err = self._validate(rels=bad)
-        self.assertTrue(any(f"{r['id']}: 対比の関係には gist" in e for e in err))
+        self.assertTrue(any(f"{r['id']}: 比べるの関係には gist" in e for e in err))
         self.assertEqual(len([e for e in err if "gist" in e]), 1)
 
     def test_unknown_term_and_type(self):
@@ -1172,14 +1170,14 @@ class TestNetwork(unittest.TestCase):
         n = self.n
         self.assertEqual(n.dependency_errors(self.rels), [])
         rels = copy.deepcopy(self.rels)
-        rels.append({"id": "REL-x-loop", "from": "TERM-dist", "to": "TERM-rv", "type": "材料", "description": "x", "version": 1})   # 確率変数 → 確率分布 の逆
+        rels.append({"id": "REL-x-loop", "from": "TERM-dist", "to": "TERM-rv", "type": "定める", "description": "x", "version": 1})   # 確率変数 → 確率分布 の逆
         err = n.dependency_errors(rels)
         self.assertTrue(any(e.startswith("定義の依存の輪") and "TERM-rv" in e and "TERM-dist" in e for e in err), err)
 
     def test_relation_map_ready(self):
         # 確かめる対象：関係図の決まり（docs/relation-map.md・#233）の build の止め。
         # 想定する故障：移した分類（relation_map_ready）で、まとまりのない語・分け終えていない前提（mathematical）・
-        #   軸のない対比・親が2つの種類を見逃す。移していない分類まで止めて、今の教材の build を落とす。
+        #   軸のない比べる・親が2つの一種を見逃す（前提（mathematical）の止めは M7 で前提ごと外した。#267）。移していない分類まで止めて、今の教材の build を落とす。
         #   まとまりと分類の食い違い・宣言にないまとまりを見逃す。書き出しにまとまり・軸・移した分類が出ない。
         # 見つけ方：確率分布を移した印にして、4つの止めをそれぞれ1つずつ起こし、どれも出ることを見る。
         #   印のない教材（今のまま）では関係図の誤りが0。直した教材を書き出して型に合うことを見る。
@@ -1201,16 +1199,13 @@ class TestNetwork(unittest.TestCase):
         c.terms["TERM-binom"]["group"] = "GRP-dist-count"
         c.terms["TERM-comb"]["group"] = "GRP-dist-count"   # 分類が違う（数学の道具）
         rels = copy.deepcopy(self.rels)
-        rv = next(r for r in rels if r["id"] == "REL-rv-dist")
-        rv.update({"type": "前提", "premise": "mathematical"})   # 分け終えていない前提
         next(r for r in rels if r["id"] == "REL-binom-geom-contrast").pop("axis", None)   # 軸のない対比
         # 二項分布は確率分布の一種（REL-binom-dist。#289）を持つので、種類の親を1つ足すと2つになる
-        rels.append({"id": "REL-x2", "from": "TERM-binom", "to": "TERM-rv", "type": "種類", "description": "x", "version": 1})
+        rels.append({"id": "REL-x2", "from": "TERM-binom", "to": "TERM-rv", "type": "一種", "description": "x", "version": 1})
         err = n.relation_map_errors(c, rels)
         want = ["TERM-dist: 分類「確率分布」は関係図に移したので、group",          # まとまりのない語
-                "REL-rv-dist: 分類「確率分布」は関係図に移したので、前提（mathematical）",   # 分け終えていない前提
-                "REL-binom-geom-contrast: 関係図に移した分類の対比には axis",             # 軸のない対比
-                "TERM-binom: 種類の親が 2 つある",                                       # 親が2つ
+                "REL-binom-geom-contrast: 関係図に移した分類の比べるには axis",             # 軸のない比べる
+                "TERM-binom: 一種の親が 2 つある",                                       # 親が2つ
                 "TERM-comb: group GRP-dist-count の分類（確率分布）"]                    # まとまりと分類の食い違い
         for w in want:
             self.assertTrue(any(w in e for e in err), w)
@@ -1222,12 +1217,9 @@ class TestNetwork(unittest.TestCase):
         c.terms["TERM-binom"]["group"] = "GRP-dist-count"
         c.terms["TERM-comb"].pop("group")
         rels = [r for r in copy.deepcopy(self.rels)]
-        next(r for r in rels if r["id"] == "REL-rv-dist").update({"type": "前提", "premise": "mathematical"})
         for r in rels:
-            if r["type"] == "前提" and r.get("premise") == "mathematical" and c.terms.get(r["to"], {}).get("category") == "確率分布":
-                r["type"] = "材料"; r.pop("premise")
-            if r["type"] == "対比" and "確率分布" in (c.terms.get(r["from"], {}).get("category"), c.terms.get(r["to"], {}).get("category")):
-                r["axis"] = "比べる軸"
+            if r["type"] == "比べる" and "確率分布" in (c.terms.get(r["from"], {}).get("category"), c.terms.get(r["to"], {}).get("category")):
+                r["axis"] = r.get("axis") or "比べる軸"
         self.assertEqual(n.relation_map_errors(c, rels), [])
         orig = n.load_network
         n.load_network = lambda: (rels, self.ders)
@@ -1276,7 +1268,7 @@ class TestNetwork(unittest.TestCase):
         # 確かめる対象：材料の輪の警告。想定する故障：輪を見逃す・輪でない枝分かれを輪と数える。
         # 見つけ方：A→B→C→A の輪と、輪でない合流（D→B）を入れ、輪が1つだけ出ることを見る
         n = self.n
-        rels = [{"id": f"REL-m{i}", "from": a, "to": b, "type": "材料"} for i, (a, b) in
+        rels = [{"id": f"REL-m{i}", "from": a, "to": b, "type": "定める"} for i, (a, b) in
                 enumerate([("TERM-a", "TERM-b"), ("TERM-b", "TERM-c"), ("TERM-c", "TERM-a"), ("TERM-d", "TERM-b")])]
         orig = n.load_network
         n.load_network = lambda: (rels, [])
@@ -1316,28 +1308,26 @@ class TestNetwork(unittest.TestCase):
         self.assertFalse(any(x.get("figures") for x in d["concepts"]))
 
     def test_transform_needs_conditions(self):
-        # 原本の v1 の変換の行は、確率の移行（#295）で全部 ⑤ の移るにした。v1 の決まり（変換には mode と conditions）は、
-        # 移していない分類で変換を書いたときにまだ効くので、v1 の行を1つ写して変換にした行で確かめる
+        # 移るには mode（厳密・近似・極限）を必ず書く（relation-types.yaml の types_v2 の required）
         bad = copy.deepcopy(self.rels)
-        self._v1_row(bad, "REL-test-transform", "変換")
+        self._row(bad, "REL-test-transform", "移る", gist="x")
         err = self._validate(rels=bad)
-        self.assertTrue(any("conditions を必ず書く" in e for e in err))
-        self.assertTrue(any("mode を必ず書く" in e for e in err))
+        self.assertTrue(any("REL-test-transform: 移る には mode を必ず書く" in e for e in err))
 
     def test_premise_kind_and_mode_place(self):
+        # 確かめる対象：M7（#267）で原本に書けなくした v1 の種類と premise を止めること、mode を移るだけに置くこと。
+        # 想定する故障：v1 の種類（前提・特殊化など）の行が通り、画面が描けない種類を公開する・前提知識を関係に書き戻す。
+        # 検出の確かめ（2026-11-10）：種類の止めを「TYPES_V2 か v1 の種類」に戻すと落ちる
         bad = copy.deepcopy(self.rels)
-        self._v1_row(bad, "REL-test-premise", "前提")   # premise を書かない前提の行
-        q = next(x for x in bad if x["type"] == "比べる")   # M5 で対比は0行（#332）。mode を置けないのは比べるも同じ
+        self._row(bad, "REL-test-premise", "前提", premise="learning")
+        self._row(bad, "REL-test-special", "特殊化", **{"to": "TERM-fact"})
+        q = next(x for x in bad if x["type"] == "比べる")
         q["mode"] = "exact"
         err = self._validate(rels=bad)
-        self.assertTrue(any("premise を必ず書く" in e for e in err))
-        self.assertTrue(any("mode は変換・移るだけ" in e for e in err))
-
-    def test_generalization_one_direction(self):
-        rels = copy.deepcopy(self.rels) + [
-            {"id": "REL-x1", "from": "TERM-binom", "to": "TERM-normal", "type": "一般化", "description": "x", "basis": {"units": ["U14"]}},
-            {"id": "REL-x2", "from": "TERM-normal", "to": "TERM-binom", "type": "特殊化", "description": "x", "basis": {"units": ["U14"]}}]
-        self.assertTrue(any("両方向" in e for e in self._validate(rels=rels)))
+        self.assertTrue(any("REL-test-premise: type「前提」は製本 ⑤ の種類" in e for e in err))
+        self.assertTrue(any("REL-test-special: type「特殊化」は製本 ⑤ の種類" in e for e in err))
+        self.assertTrue(any("REL-test-premise: premise は書かない" in e for e in err))
+        self.assertTrue(any("mode は移るだけ" in e for e in err))
 
     def test_conditions_split_and_sources(self):
         c = course()
@@ -1378,23 +1368,6 @@ class TestNetwork(unittest.TestCase):
         bad["concepts"][0]["status"] = "filled"
         self.assertGreaterEqual(len(self.n.schema_errors(v2(bad))), 3)
 
-    def test_v2_export_is_same_as_v1(self):
-        # 確かめる対象：build が型 v2 で書き出し、移していない分類の結果が今（v1）と同じであること（M4 の完了の条件。設計書 docs/schema-v2-design.md 8。#264）。
-        # 想定する故障：v2 に写すときに関係の種類を落とす・v1 の種類の名前を v2 の type に入れる（画面が v2 の種類と取り違える）・項目を足し引きする。
-        # 見つけ方：教材の原本から v1 で組み立てたものを v2 に写し、v2 の厳しい型に合うこと、type が残らないこと、
-        #   legacy_type を type に戻すと v1 で組み立てたものとちょうど同じになること。
-        # 既存との違い：test_export_matches_schema_and_is_namespaced は v1 の形と v1 の型だけを見る。
-        # 検出の確かめ：to_v2 で type を legacy_type に替えないと、v2 の型（知らない種類）で落ちる。to_v2 で関係の項目を1つ落とすと、同じかの比べで落ちる
-        import json as _json
-        v1 = self.n.export_network(course(), TARGET)
-        v2 = self.n.to_v2(v1, course().shared.get("v2_ready"), self.n.v2_extras(course(), TARGET))
-        self.assertEqual(v2["version"], 2)
-        self.assertEqual(self.n.schema_errors(v2), [])
-        # v1 の種類の行は legacy_type だけ、⑤ の種類の行は type だけ（#289 から ⑤ の行がある）
-        self.assertTrue(all(("type" in r) == (r.get("type") in self.n.TYPES_V2) and ("type" in r) != ("legacy_type" in r) for r in v2["relations"]))
-        rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
-        self.assertEqual(self.n.from_v2(v2, rev), v1)
-
     def test_basis_candidates_and_excludes(self):
         # 確かめる対象：基準の定義の式に出る記号の概念（定めるの候補。#86）を、材料・種類の親・basis_excludes で扱ったかの数え方と、basis_excludes の書き方の止め。
         # 想定する故障：記号の表にあるだけで木に出ない記号まで候補にする・種類の親や除外を候補に残す（警告が消えない）・
@@ -1411,7 +1384,7 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(gaps(c), set())
         self.assertEqual(self.n.basis_exclude_errors(c, rels), [])
         c2 = course()
-        self.assertEqual(gaps(c2, rels + [{"id": "REL-x", "type": "種類", "from": "TERM-binom", "to": "TERM-dist"}]), set())
+        self.assertEqual(gaps(c2, rels + [{"id": "REL-x", "type": "一種", "from": "TERM-binom", "to": "TERM-dist"}]), set())
         bad = [
             ({"concept": "TERM-dist", "kind": "一種の親", "text": "x"}, "kind は ⑤"),
             ({"concept": "TERM-dist", "kind": "使われる場"}, "理由の1文"),
@@ -1425,83 +1398,46 @@ class TestNetwork(unittest.TestCase):
                 self.assertTrue(any(msg in e for e in self.n.basis_exclude_errors(cc, rels)), msg)
 
     def test_v2_carries_basis_excludes(self):
-        # 確かめる対象：原本の basis_excludes を、v2 の書き出しの概念の basis.excludes（型 v2 の改訂2）に置き、v1 に戻すと今と同じ。
-        # 想定する故障：除外を書き出さない（公開データで判断が追えない）・v1 の書き出しに混ぜて v1 の型を崩す。
-        # 見つけ方：二項分布に除外を書いた原本で、v2 の型に合い、二項分布の basis に formula と excludes があり、v1 に戻すと v1 の書き出しと同じ。
-        # 既存との違い：test_v2_export_is_same_as_v1 は除外のない今の原本だけを見る。
-        # 検出の確かめ：to_v2 で excludes を置かないと basis の比べで落ちる
-        import json as _json
+        # 確かめる対象：原本の basis_excludes を、書き出しの概念の basis.excludes（型 v2 の改訂2）に置くこと。
+        # 想定する故障：除外を書き出さない（公開データで判断が追えない）。
+        # 見つけ方：二項分布に除外を書いた原本で、型に合い、二項分布の basis に formula と excludes がある。
+        # 検出の確かめ：export_network で excludes を置かないと basis の比べで落ちる
         c = course()
         c.terms["TERM-binom"]["basis_excludes"] = [{"concept": "TERM-dist", "kind": "使われる場", "text": "確率関数の値の割り当て方は使われる場"}]
-        v1 = self.n.export_network(c, TARGET)
-        v2 = self.n.to_v2(v1, c.shared.get("v2_ready"), self.n.v2_extras(c))
+        v2 = self.n.export_network(c, TARGET)
         self.assertEqual(self.n.schema_errors(v2), [])
         b = next(x for x in v2["concepts"] if x["id"] == "stats2:TERM-binom")["basis"]
         self.assertEqual(b["formula"], c.terms["TERM-binom"]["basis_formula"])
         self.assertEqual(b["excludes"][0]["concept"], "stats2:TERM-dist")
-        rev = _json.loads(self.n.SCHEMA.read_text(encoding="utf-8"))["x-revision"]
-        self.assertEqual(self.n.from_v2(v2, rev), v1)
 
     def test_v2_rows_in_source(self):
-        # 確かめる対象：原本の relations.yaml に v1 の行と並べて書いた ⑤ の種類の行・terms.yaml の姿・claims.yaml の主張を、
-        #   build が読み、検査し、型 v2 で書き出すこと（#287。M5 で分類ごとに移す仕組み）。
-        # 想定する故障：v2 の行を v1 の種類として止める（知らない種類・v1 の必須）・legacy_type に入れてしまう・v2 の項目や主張を書き出さない・
-        #   主張の id に教材名を付けない（画面が未接続にする）・移した分類（v2_ready）に残った v1 の行を通す。
-        # 見つけ方：教材の原本の写しで、順列 と 組合せ の比べる（REL-perm-comb-contrast）を外し、v1 の行を2つ作る（その組の対比・総和記号 → 階乗 の前提 mathematical）。対比の行を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
-        #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready に数学の道具を書くと残した v1 の行で止まること。
-        #   （移していない分類の行を例にすると、分類を移すたびに例が移り、全部を移したあとは例がなくなる。#332 で写しの中で作る形に替えた）
-        # 既存との違い：test_v2_checks は手で書いた書き出しの形だけ、test_v2_export_is_same_as_v1 は今の原本だけを見る。
-        # 検出の確かめ：to_v2 で v2 の行も legacy_type にすると型（比べるは v1 の種類にない）で落ちる。前提の行（REL-test-v1-premise）を作らないと、全部を移したあとは v2c の止めが空振りして落ちる。主張に教材名を付けないと型の claimId で落ちる
+        # 確かめる対象：terms.yaml の姿・主張と claims.yaml の主張を、build が読み、検査し、型 v2 で書き出すこと（#287）。
+        # 想定する故障：v2 の項目や主張を書き出さない・主張の id に教材名を付けない（画面が未接続にする）・姿のない概念を通す。
+        # 見つけ方：教材の原本の写しで、順列に主張を1つ足し、原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。
+        #   姿を消すと v2 の止めが、知らない姿・主張を書くと原本の止めが止まること。
+        # 既存との違い：test_v2_checks は手で書いた書き出しの形だけを見る。
+        # 検出の確かめ：主張に教材名を付けないと型の claimId で落ちる（M7 の前に確かめた形のまま）
         from v2_checks import v2_errors
         c = course()
-        rels = [x for x in copy.deepcopy(self.n.load_network()[0]) if x["id"] != "REL-perm-comb-contrast"]   # 同じ組に比べるを2本作らない（⑤ の 7）
-        base = {"version": 1, "basis": {"units": ["U09"]}}
-        rels.append({**base, "id": "REL-test-v1-contrast", "from": "TERM-perm", "to": "TERM-comb", "type": "対比",
-                     "description": "テストの対比", "gist": "テストのつまり"})
-        rels.append({**base, "id": "REL-test-v1-premise", "from": "TERM-sigma", "to": "TERM-fact", "type": "前提",
-                     "premise": "mathematical", "description": "テストの前提"})
-        r = next(x for x in rels if x["id"] == "REL-test-v1-contrast")
-        r.update(type="比べる", axis="順番を区別するか", same="どちらも n 個から k 個を取り出す数", differ="順列は順番を区別する")
         c.terms["TERM-perm"]["claims"] = ["CLM-90"]
         claims = self.n.load_claims() + [{"id": "CLM-90", "label": "④-90", "kind": "等しい", "version": 1,
                                           "statement": {"text": "テストの主張"}, "premises": {"subjects": ["TERM-perm"]}}]
-        orig = (self.n.load_network, self.n.load_claims)
-        self.n.load_network = lambda: (rels, self.ders)
+        orig = self.n.load_claims
         self.n.load_claims = lambda: claims
         try:
             self.assertEqual(self.n.validate_network(c), [])
-            ready = [x for x in c.shared.get("v2_ready") if x != "数学の道具"]   # 写しの v1 の行がある分類は、まだ移していない扱いにする
-            v2 = self.n.to_v2(self.n.export_network(c, TARGET), ready, self.n.v2_extras(c))
+            v2 = self.n.export_network(c, TARGET)
             self.assertEqual(self.n.schema_errors(v2), [])
             self.assertEqual(v2_errors(v2), [])
-            e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-test-v1-contrast")
-            self.assertEqual((e.get("type"), e.get("axis"), "legacy_type" in e), ("比べる", "順番を区別するか", False))
             self.assertIn("stats2:CLM-90", [x["id"] for x in v2["claims"]])
             c.terms["TERM-perm"].pop("forms")
-            v2b = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
-            self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(v2b)))
-            v2c = self.n.to_v2(self.n.export_network(c, TARGET), ["数学の道具"], self.n.v2_extras(c))
-            self.assertTrue(any("legacy_type" in x for x in v2_errors(v2c)))
+            self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(self.n.export_network(c, TARGET))))
             c.terms["TERM-perm"]["forms"] = ["箱"]
             c.terms["TERM-perm"]["claims"] = ["CLM-99"]
             errs = self.n.v2_source_errors(c)
             self.assertTrue(any("箱" in x for x in errs) and any("CLM-99" in x for x in errs))
         finally:
-            self.n.load_network, self.n.load_claims = orig
-
-    def test_migration_counts(self):
-        # 確かめる対象：製本への移行の残り（progress.py の行。#264）の数え方。
-        # 想定する故障：前提を mathematical と learning に分けずに数える（行き先が M5 と M6 で違う）・名前だけ写せる行を移した（v2）と数える・どれかの行を落とす。
-        # 見つけ方：教材の原本の関係で、名前だけ写せる＋未移行が全部の行数と同じ、v2 は 0、前提は区分ごとに分かれ、合計が前提の行数と同じ。
-        # 既存との違い：進み具合の行は今まで単元と概念だけを数えていた。
-        # 検出の確かめ：前提の区分の分け方を外す（区分なしにまとめる）と、区分ごとの行が見つからず落ちる
-        rels = self.n.load_network()[0]
-        m = self.n.migration_counts(rels)
-        self.assertEqual(m["v2"], sum(1 for r in rels if r["type"] in self.n.TYPES_V2))
-        self.assertEqual(m["v2"] + sum(m["named"].values()) + sum(m["left"].values()), len(rels))
-        premise = sum(1 for r in rels if r["type"] == "前提")
-        self.assertEqual(m["left"].get("前提（mathematical）", 0) + m["left"].get("前提（learning）", 0), premise)
-        self.assertNotIn("前提", m["named"])
+            self.n.load_claims = orig
 
     def test_concept_checks_pass(self):
         from model import run_check
