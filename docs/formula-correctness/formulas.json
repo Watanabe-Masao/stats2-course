@@ -132,7 +132,7 @@
   ],
   "contract": {
    "kinds": [
-    "定義"
+    "恒等式"
    ],
    "properties": [
     "非負",

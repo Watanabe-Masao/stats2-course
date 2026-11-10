@@ -1,6 +1,7 @@
 # 概念と概念の関係。id は変えない（ネットワークでは stats2:REL-…）。
 # from・to は用語（概念）の id。別の教材の概念は「教材名:id」で書く（例 math:CON-…）。
-# type：10種類（種類・材料は関係図の決まり：docs/relation-map.md）。定義・矢印の読み方・該当例・該当しない例は docs/knowledge-net/schema/relation-types.yaml（どの教材も共通）。
+# type：製本 ⑤ の種類（定める・一種・特別な場合・移る・従う・導ける・比べる・推定する。意味の判断は ⑤、v1 の種類との対応は docs/rules/migration.md）と、v1 の前提（learning。⑥ の前提知識。M6 で移す）。M5 で v1 のほかの種類の行は0になった（#265）。以下の v1 の決まりは、前提（learning）の行にだけ残る。
+# 旧：10種類（種類・材料は関係図の決まり：docs/relation-map.md）。定義・矢印の読み方・該当例・該当しない例は docs/knowledge-net/schema/relation-types.yaml（どの教材も共通）。
 #   前提には premise（learning：理解に必要な知識／mathematical：数学的な成立条件・定義に使う）を必ず書く。
 #   変換には mode（exact：厳密／approximation：近似／limit：極限）と成立条件を必ず書く。「近い」と「等しい」を混ぜない。
 #   導出には成立条件を必ず書く。前提が2つ以上なら関係ではなく導出（derivations.yaml）の点にする。
@@ -20,10 +21,10 @@ relations:
   - id: REL-fact-comb
     from: TERM-fact
     to: TERM-comb
-    version: 1
+    version: 2
     type: 前提
-    premise: mathematical
-    description: 組合せの数は、全部の並べ方 n! を、選んだ中と残した中の並べ方 k!・(n−k)! で割って求める。
+    premise: learning
+    description: 組合せの数は、階乗を学んでから学ぶ（ₙCₖ＝n!/(k!(n−k)!) で計算する。組合せの基準の定義は選び方の数で、この式は導く等式）。
     basis: {units: [U09]}
   - id: REL-comb-binom
     from: TERM-comb
@@ -342,21 +343,16 @@ relations:
     figures: [FIG-LAB-pois-rel-negbinom-tour-1, FIG-LAB-pois-rel-negbinom-tour-2]
     basis: {units: [U15]}
   # ---- P1 骨格：W1（U09〜U12 数え上げ・確率）。#105
-  - id: REL-fact-perm
-    from: TERM-fact
-    to: TERM-perm
-    version: 1
-    type: 前提
-    premise: mathematical
-    description: n 個から k 個を並べる順列の数は、階乗で n!÷(n−k)! と書ける。
-    basis: {units: [U09]}
   - id: REL-perm-comb-contrast
     from: TERM-perm
     to: TERM-comb
-    version: 1
-    type: 対比
-    description: どちらも n 個から k 個を取り出す数。順列は並べる順番を区別し、組合せは区別しない。組合せの数は、順列の数を k 個の並べ替え k! で割ったもの。
-    gist: 順番が意味を持つ（1位・2位）なら順列、持たない（選ぶだけ）なら組合せ。同じ k 個の選び方が、順列では k! 通りに数えられる。
+    version: 2
+    type: 比べる
+    differ: 順列は、役や順位がある場面（1位・2位、委員長・副委員長）で使い、同じ k 個でも並びが違えば別に数える。組合せは、選ぶだけの場面（委員を3人選ぶ、カードを2枚引く）で使い、同じ k 個の組を1通りと数える。どちらで数えるかは、場面に役・順位があるかで決める
+    same: どちらも、異なる n 個から k 個（0≦k≦n の整数）を取り出すときの場合の数で、同じ「何通りあるか」の問いに答える
+    axis: 場面に役・順位があるか（順番を区別して数えるか）
+    description: どちらも n 個から k 個を取り出す数。役や順位がある場面なら順列、選ぶだけの場面なら組合せで数える（数どうしのつながりは 順列 → 組合せ の移る）。
+    gist: 順番が意味を持つ（1位・2位）なら順列、持たない（選ぶだけ）なら組合せ。場面に役や順位があるかで決める。
     basis: {units: [U09]}
   - id: REL-ss-event
     from: TERM-sample-space
@@ -2291,3 +2287,30 @@ relations:
     description: 自己相関は、ラグ k の自己共分散を、系列のデータの分散で割った値。データの分散が定義に直接出る。
     basis:
       units: [U05T]
+
+  - id: REL-perm-to-comb
+    from: TERM-perm
+    to: TERM-comb
+    version: 1
+    type: 移る
+    mode: exact
+    reversible: true
+    operation: 選んだ k 個の中の並べ替えの数 k! で割る（同じ k 個の組が順列では k! 通りに数えられるので）
+    claim: CLM-38
+    description: 組合せの数は、順列の数を、選んだ k 個の中の並べ替えの数 k! で割ったもの（ₙCₖ＝ₙPₖ/k!）。
+    gist: 順列は並べ方まで数え、組合せは選ぶだけ。同じ k 個の組が順列では k! 通りに数えられるので、k! で割ると組合せになる。
+    basis:
+      units: [U09]
+  - id: REL-perm-to-fact
+    from: TERM-perm
+    to: TERM-fact
+    version: 1
+    type: 移る
+    mode: exact
+    operation: 取り出す個数 k を全体の個数 n と等しくする（k＝n）
+    claim: CLM-39
+    description: 順列で n 個を全部並べる（k＝n）と、並べ方の数は階乗に等しい（ₙPₙ＝n!）。
+    gist: n 個を全部1列に並べる並べ方は、先頭が n 通り、次が n−1 通り……と掛けていくので n!。全部を並べる順列が階乗。
+    basis:
+      units:
+      - U09
