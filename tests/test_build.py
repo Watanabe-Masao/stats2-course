@@ -480,15 +480,20 @@ class TestNetwork(unittest.TestCase):
     def test_clean(self):
         self.assertEqual(self._validate(), [])
 
+    @staticmethod
+    def _v1_row(rels, rid, type_, **extra):
+        """写しに v1 の行を1つ作る（原本の中身に頼らない。M5・M6 で原本の v1 の行が減るたびにテストが壊れたため。#336）。
+        端は、原本で関係のない組（総和記号 → 尤度）にする。"""
+        r = {"id": rid, "from": "TERM-sigma", "to": "TERM-likelihood", "type": type_, "version": 1,
+             "description": "テストの行", "basis": {"units": ["U09"]}, **extra}
+        rels.append(r)
+        return r
+
     def test_gist_required_for_visual_types(self):
         # M5 で原本の対比の行は0になった（#332）。移していない分類で対比を書いたときにまだ効くので、写しの中で対比の行を作って確かめる
         bad = copy.deepcopy(self.rels)
-        r = copy.deepcopy(next(x for x in bad if x["type"] == "前提"))
-        r.update(id="REL-test-contrast", type="対比")
-        for k in ("premise", "gist"):
-            r.pop(k, None)
-        bad.append(r)
-        p = next(x for x in bad if x["type"] == "前提")
+        r = self._v1_row(bad, "REL-test-contrast", "対比")
+        p = self._v1_row(bad, "REL-test-premise", "前提", premise="learning", **{"to": "TERM-fact"})
         self.assertNotIn("gist", p)   # 前提には要らない
         err = self._validate(rels=bad)
         self.assertTrue(any(f"{r['id']}: 対比の関係には gist" in e for e in err))
@@ -1328,19 +1333,14 @@ class TestNetwork(unittest.TestCase):
         # 原本の v1 の変換の行は、確率の移行（#295）で全部 ⑤ の移るにした。v1 の決まり（変換には mode と conditions）は、
         # 移していない分類で変換を書いたときにまだ効くので、v1 の行を1つ写して変換にした行で確かめる
         bad = copy.deepcopy(self.rels)
-        r = copy.deepcopy(next(x for x in bad if x.get("type") == "前提"))
-        r.update(id="REL-test-transform", type="変換")
-        for k in ("premise", "mode", "conditions"):
-            r.pop(k, None)
-        bad.append(r)
+        self._v1_row(bad, "REL-test-transform", "変換")
         err = self._validate(rels=bad)
         self.assertTrue(any("conditions を必ず書く" in e for e in err))
         self.assertTrue(any("mode を必ず書く" in e for e in err))
 
     def test_premise_kind_and_mode_place(self):
         bad = copy.deepcopy(self.rels)
-        p = next(x for x in bad if x["type"] == "前提")
-        p.pop("premise")
+        self._v1_row(bad, "REL-test-premise", "前提")   # premise を書かない前提の行
         q = next(x for x in bad if x["type"] == "比べる")   # M5 で対比は0行（#332）。mode を置けないのは比べるも同じ
         q["mode"] = "exact"
         err = self._validate(rels=bad)
