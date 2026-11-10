@@ -780,6 +780,31 @@ claims:
       version: a3d17e9
     external: なし
   version: 1
+- id: CLM-30
+  label: ④-30
+  kind: 推定量の性質
+  statement:
+    text: X₁, …, Xₙ が独立に同じ分布に従い、階級をデータを見る前に決めたとき、各階級の相対度数は、その階級に入る確率の不偏推定量で、n→∞ でその確率に確率収束する。分布に密度 f があるとき、相対度数÷階級の幅は、その階級での f の平均（区間での f の積分÷幅）の不偏推定量になる
+  premises:
+    subjects:
+    - TERM-hist
+  conclusion:
+    subjects:
+    - TERM-hist
+    predicates:
+    - TERM-unbiased
+    - TERM-consistency
+  grounds:
+  - source:
+      title: 階級に入る数は二項分布に従う。その平均と大数の法則（20b）
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: C
+      date: '2026-11-08'
+      version: dc2b65a
+    external: なし
+  version: 1
 - id: CLM-31
   label: ④-31
   kind: 従う

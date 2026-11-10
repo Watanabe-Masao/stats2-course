@@ -1070,23 +1070,12 @@ relations:
   - id: REL-quartile-boxplot
     from: TERM-quartile
     to: TERM-boxplot
-    type: 前提
-    premise: mathematical
-    description: 箱ひげ図の箱は、第1四分位数から第3四分位数まで。
+    type: 定める
+    description: 箱ひげ図は、最小値・四分位数 Q₁・Q₂・Q₃・最大値の5つの数を箱とひげで表した図。四分位数が定義に直接出る。
     basis:
       units:
       - U05
-    version: 1
-  - id: REL-median-boxplot
-    from: TERM-median
-    to: TERM-boxplot
-    type: 前提
-    premise: mathematical
-    description: 箱ひげ図の箱の中の線は中央値。
-    basis:
-      units:
-      - U05
-    version: 1
+    version: 2
   - id: REL-iqr-outlier
     from: TERM-iqr
     to: TERM-outlier
@@ -1113,13 +1102,12 @@ relations:
   - id: REL-freqtable-hist
     from: TERM-freqtable
     to: TERM-hist
-    type: 前提
-    premise: mathematical
-    description: ヒストグラムは度数分布表を図にしたもの。
+    type: 定める
+    description: ヒストグラムは、度数分布表の各階級の上に、面積が相対度数に等しい柱を並べた図。度数分布表が定義に直接出る。
     basis:
       units:
       - U05
-    version: 1
+    version: 2
   - id: REL-sd-cv
     from: TERM-unbvar
     to: TERM-cv
@@ -1216,16 +1204,6 @@ relations:
       - U14
     version: 2
     question: 1回の試行から、分布はどう生まれる？   # このつながりで考える問い（#188 07c）
-  - id: REL-quant-scatter
-    from: TERM-quant
-    to: TERM-scatter
-    type: 前提
-    premise: mathematical
-    description: 散布図は2つの量的変数の組を点で表す。
-    basis:
-      units:
-      - U28
-    version: 1
   - id: REL-scatter-corr
     from: TERM-scatter
     to: TERM-corr
@@ -2295,3 +2273,14 @@ relations:
     description: 統計量は、標本の関数として作る確率変数の1つ（分からない母数を含まないもの）。
     basis:
       units: [U03, U18]
+
+  - id: REL-hist-pdf
+    from: TERM-hist
+    to: TERM-pdf
+    version: 1
+    type: 推定する
+    properties: [CLM-30]
+    theorem: TERM-lln
+    description: ヒストグラム（相対度数÷階級の幅）で、母集団の分布の確率密度関数を推し量る。決めた階級の上で、各階級での密度の平均を不偏に推定し、n を大きくすると各階級の確率に近づく（④-30）。
+    basis:
+      units: [U05, U13]

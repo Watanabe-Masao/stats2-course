@@ -236,16 +236,27 @@
   name: 度数分布表
   en: frequency table
   category: 図表
+  forms: [rv]
+  basis:
+    text: 量的なデータ x₁, …, xₙ（n≧1。値が数であることは定義の要件）について、互いに重ならず、すべての値を含む区間（階級）c₁, …, c_k を小さい順に決め、各階級 c_j に入る値の個数（度数）f_j を階級の順に並べた表（f₁＋…＋f_k＝n。相対度数 f_j/n・累積度数を添えることが多い）
   short: データを階級に分け、各階級に入るデータの個数（度数）を並べた表
 - id: TERM-hist
   name: ヒストグラム
   en: histogram
   category: 図表
+  forms: [random_set]
+  basis:
+    text: 度数分布表（階級 c_j の幅 w_j＞0、度数 f_j、総数 n）について、各階級の上に、面積がその階級の相対度数 f_j/n に等しい柱（高さ f_j/(n·w_j)）を隙間なく並べた図。x が c_j に入るとき h(x)＝f_j/(n·w_j) とする階段の関数として読め、柱の面積の合計は1になる（階級の幅がそろうとき、縦軸に度数をとって描くのは、縦の目盛りだけが違う同じ図）
+    terms: [TERM-freqtable]
   short: 度数分布表の各階級の度数を、隙間のない柱の面積で表した図
 - id: TERM-boxplot
   name: 箱ひげ図
   en: box plot
   category: 図表
+  forms: [rv]
+  basis:
+    text: 量的なデータ（n≧2）の最小値・第1四分位数 Q₁・第2四分位数 Q₂（中央値）・第3四分位数 Q₃・最大値の5つの数を、1本の数直線の上に、Q₁ から Q₃ までの箱、箱の中の Q₂ の線、箱の両端から最小値と最大値までのひげで表した図（柵 Q₁−1.5(Q₃−Q₁)・Q₃＋1.5(Q₃−Q₁) の外の値を外れ値として点で分け、ひげを柵の内側のいちばん外の値までにした図も、同じ名前で呼ぶ）
+    terms: [TERM-quartile]
   short: 最小値・第1四分位数・中央値・第3四分位数・最大値で、分布の位置と広がりを表した図
 - id: TERM-quartile
   name: 四分位数
@@ -2160,12 +2171,17 @@
   name: クロス集計表
   en: cross tabulation
   category: 図表
-  forms: [random_set]
+  forms: [rv]
+  basis:
+    text: 値が分類（カテゴリ）である2つの変数 A・B（値がカテゴリであることは定義の要件。量的変数は階級に分ければ使える）について、A のカテゴリ a₁, …, a_r と B のカテゴリ b₁, …, b_c の組 (a_i, b_j) ごとに、その組の値をもつ個体の個数（度数）O_ij を数え、r 行 c 列に並べた表（行・列の合計と総数 n を添える。O_ij の総和は n）
   short: 2つの質的変数の組合せごとに度数を数えて並べた表
 - id: TERM-scatter
   name: 散布図
   en: scatter plot
   category: 図表
+  forms: [rv]
+  basis:
+    text: 対になったデータ (x₁, y₁), …, (xₙ, yₙ)（同じ個体の2つの量的変数の値の組。x・y の値が数であることは定義の要件）を、横軸に x、縦軸に y をとった座標平面の n 個の点 (xᵢ, yᵢ) で表した図
   short: 2つの量的変数の値の組を、横軸と縦軸の座標の点で表した図
 - id: TERM-partial-corr
   name: 偏相関係数
