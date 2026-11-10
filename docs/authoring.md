@@ -284,6 +284,24 @@ claims:
 
 図は設定から作る：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`paths`（n 回中ちょうど k 回成功する並びを全部書き出す。解説付き再生の静止図）、`joint`（2つの 0/1 の同時確率の2×2の表。独立なら の値つき）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・geom・hyper・normal・uniform・expo。`overlay` で2つ目の分布を点線の棒か正規分布の曲線で重ね、`lines` で数の行、`maxdiff` で差の最大（丸めて0になるときは「0.001未満」）を出す）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
 
+## 直したら一緒に直すもの（#336）
+
+1つを直すと、別の所も直さないと build・CI・記録が食い違うもの。M5 で取りこぼした（件数の誤り・見本の作り直し忘れなど）ので、一覧にする。数は手で数えず、原本から数える。
+
+| 直したもの | 一緒に直すもの |
+| --- | --- |
+| 式の契約（content/formula-contracts.yaml の kinds など） | `python3 build/formula_fixture.py` で式の見本（docs/formula-correctness/formulas.json）を作り直す。分類の表（docs/formula-correctness/classification.md）の種類 |
+| 式の木・記号・概念の conditions・basis_formula | `python3 build/formulas.py --fingerprint F-…` で指紋を見る。代表の式なら独立なレビューの記録を新しくし、`--publish-check` を通す |
+| 主張（content/claims.yaml）を足す・移す | docs/rules/claims.md の §6 の行と §9 の確かめの記録。verification の version は文字列で書く（`'4660318'`。数だけの短い SHA は数として読まれる） |
+| 関係を足す・外す・種類を変える | 外した id を原本・テストから探す。記録（check-pairs.md）に書く件数は原本から数える |
+| 分類を移す（v2_ready に足す） | docs/rules/migration.md の 2・4。テストが原本の中身（ある種類の行・まだ移していない分類）に頼っていないか（頼るテストは写しの中で例を作る） |
+| 概念（語）を足す | build/term_icons.py の印。knowledge-net の見本を取り込むとき、概念の数のテスト（tests/e2e/viewer.spec.ts） |
+| 製本の未決を足す・決める | 担当する製本の「未決」と履歴（check-pairs.md だけに書かない） |
+
+作業の順の決まり：
+- 確かめ（`check_changed.py`）を走らせている間は、同じ作業フォルダの原本を書き換えない。並べて作業するときは `git worktree add` で別の作業フォルダを使う。
+- 公開は main の別の作業フォルダで build してから行う（#330）。
+
 ## 公開
 
 ### 公開サイト（ラボと図）
