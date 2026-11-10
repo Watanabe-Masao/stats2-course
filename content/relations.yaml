@@ -1162,23 +1162,22 @@ relations:
   - id: REL-mean-ma
     from: TERM-mean
     to: TERM-ma
-    type: 前提
-    premise: mathematical
-    description: 移動平均は、期間をずらしながら求める平均。
+    type: 定める
+    description: 移動平均は、窓に入る連続した値の平均を、窓を1期ずつずらして求めた値の列。平均が定義に直接出る。
     basis:
       units:
       - U05T
-    version: 1
+    version: 2
   - id: REL-corr-acf
     from: TERM-corr
     to: TERM-acf
     type: 前提
-    premise: mathematical
-    description: 自己相関は、同じ時系列の値とずらした値との相関係数。
+    premise: learning
+    description: 自己相関は、相関係数を学んでから学ぶ（どちらも偏差の積の和を、ばらつきで割って −1〜1 にそろえる形を読む）。
     basis:
       units:
       - U05T
-    version: 1
+    version: 2
   # ---- P1 骨格：W5（U28〜U32 相関・回帰・調査・実験）と U14 のベルヌーイ分布。#105
   - id: REL-rv-bernoulli
     from: TERM-rv
@@ -2283,3 +2282,12 @@ relations:
     description: ヒストグラム（相対度数÷階級の幅）で、母集団の分布の確率密度関数を推し量る。言えるのは f そのものではなく、決めた階級ごとの f の平均について：柱の高さはその不偏推定量で、相対度数は n を大きくすると各階級の確率に近づく（④-30）。
     basis:
       units: [U05, U13]
+
+  - id: REL-datavar-acf
+    from: TERM-data-var
+    to: TERM-acf
+    version: 1
+    type: 定める
+    description: 自己相関は、ラグ k の自己共分散を、系列のデータの分散で割った値。データの分散が定義に直接出る。
+    basis:
+      units: [U05T]
