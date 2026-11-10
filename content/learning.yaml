@@ -65,10 +65,10 @@ learning:
     units: [U15]
   - id: LRN-exclusive-addition   # 元：REL-exclusive-addition
     op: add
-    from: TERM-exclusive
+    from: TERM-prob
     to: TERM-addition
-    version: 1
-    reason: 排反なら重なりが0なので、加法定理は単に足すだけになる。まず排反の場合で足し算を理解する。
+    version: 2
+    reason: 加法定理は確率の和についての主張（排反でない2つの事象の和の確率）なので、確率（排反な事象の和を定める公理）を先に学ぶ（基準の定義が使う。#345 で 排反 → 加法定理 から替えた：排反は確率の公理を通ってたどれば着く）。
     units: [U10]
   - id: LRN-cond-indep   # 元：REL-cond-indep
     op: add
@@ -252,10 +252,10 @@ learning:
   # ---- 足す：説明・式が使うのに前に来ていなかったもの（⑥ の 5 の 4。独立なレビューの指摘。#345）
   - id: LRN-var-binom
     op: add
-    from: TERM-var
+    from: TERM-sd
     to: TERM-binom
-    version: 1
-    reason: 二項分布の説明と式が期待値 np・分散 np(1−p) を使うので、期待値と分散を先に学ぶ。
+    version: 2
+    reason: 二項分布の説明と式が期待値 np・分散 np(1−p)・標準偏差（例題の √0.75）を使うので、期待値・分散・標準偏差を先に学ぶ。
   - id: LRN-var-geom
     op: add
     from: TERM-var
@@ -267,31 +267,13 @@ learning:
     from: TERM-binom
     to: TERM-hyper
     version: 1
-    reason: 超幾何分布は、二項分布（戻して取り出す・各回が独立）と比べて「戻さない」取り出しとして学ぶ（説明が「各回は独立ではない」と比べる）。
-  - id: LRN-var-expo
-    op: add
-    from: TERM-var
-    to: TERM-expo
-    version: 1
-    reason: 指数分布の説明と式が期待値・分散を使うので、期待値と分散を先に学ぶ。
-  - id: LRN-indep-expo
-    op: add
-    from: TERM-indep
-    to: TERM-expo
-    version: 1
-    reason: 指数分布の説明が独立に起こる出来事の待ち時間を使うので、独立を先に学ぶ。
+    reason: 超幾何分布の説明が、二項分布（戻して取り出す・各回が独立）と比べて「戻さない」取り出しを説明するので、二項分布を先に学ぶ（⑥ の 5 の 4）。
   - id: LRN-var-uniform
     op: add
     from: TERM-var
     to: TERM-uniform
     version: 1
     reason: 一様分布の説明が期待値・分散（例：期待値5分・分散 100/12）を使うので、期待値と分散を先に学ぶ。
-  - id: LRN-sd-normal
-    op: add
-    from: TERM-sd
-    to: TERM-normal
-    version: 1
-    reason: 正規分布の式の μ・σ は期待値と標準偏差で、説明が「μ±σ に約68%」を使うので、標準偏差（期待値・分散から）を先に学ぶ。
   - id: LRN-dist-bernoulli
     op: add
     from: TERM-dist
@@ -310,16 +292,53 @@ learning:
     to: TERM-multiplication
     version: 1
     reason: 乗法定理 P(A∩B)＝P(A)P(B|A) は条件付き確率を使うので、条件付き確率を先に学ぶ。
-  # ---- 外す：極限の移るで、行き着く形を先に学ぶ組（⑥ の 5 の 7 と同じ形。#345）
-  - id: LRN-remove-binom-normal
-    op: remove
-    from: TERM-binom
-    to: TERM-std-normal
-    version: 1
-    reason: 標準正規分布は正規分布の場合として、二項分布とは別に学ぶ。二項分布が標準正規分布に近づくことは、両方を学んだあとに読む。
+  # ---- 外す：合わせると輪になる候補（⑥ の 5 の 7。足す LRN-binom-hyper と輪になる。#345）
   - id: LRN-remove-hyper-binom
     op: remove
     from: TERM-hyper
     to: TERM-binom
     version: 1
     reason: 二項分布を先に学び、超幾何分布はそれと比べて学ぶ（足す LRN-binom-hyper）。超幾何分布が二項分布に近づくことは、両方を学んだあとに読む。
+  # ---- 2回目の独立なレビュー（#345）で足す・外したもの
+  - id: LRN-indep-lln
+    op: add
+    from: TERM-indep
+    to: TERM-lln
+    version: 1
+    reason: 大数の法則は「独立に同じ分布に従う」標本についての主張なので、独立を先に学ぶ（基準の定義が使う）。
+  - id: LRN-poisson-expo
+    op: add
+    from: TERM-poisson
+    to: TERM-expo
+    version: 1
+    reason: 指数分布の説明が「ポアソン分布で数える出来事の間隔」を使うので、ポアソン分布を先に学ぶ。
+  - id: LRN-binom-normal
+    op: add
+    from: TERM-binom
+    to: TERM-normal
+    version: 1
+    reason: 正規分布の例が「B(100, 0.5) は平均50・標準偏差5 の正規分布で近似できる」を使うので、二項分布を先に学ぶ。
+  - id: LRN-complement-poisson
+    op: add
+    from: TERM-complement
+    to: TERM-poisson
+    version: 1
+    reason: ポアソン分布の例題が「1−(…)」で余事象の確率を使うので、余事象を先に学ぶ。
+  - id: LRN-stdnormal-clt
+    op: add
+    from: TERM-std-normal
+    to: TERM-clt
+    version: 1
+    reason: 中心極限定理は標準化した標本平均の分布が標準正規分布に近づくという主張なので、標準正規分布を先に学ぶ。
+  - id: LRN-remove-samplemean-normal
+    op: remove
+    from: TERM-normal
+    to: TERM-sample-mean
+    version: 1
+    reason: 標本平均は分布なしに標本から定まる統計量で、正規分布を知らなくても読める。正規母集団の標本平均が正規分布に従うことは、正規分布を学んだあとに読む。
+  - id: LRN-remove-clt-normal
+    op: remove
+    from: TERM-std-normal
+    to: TERM-sample-mean
+    version: 1
+    reason: 標本平均は分布なしに標本から定まる統計量で、標準正規分布を知らなくても読める。標準化した標本平均が標準正規分布に近づくこと（中心極限定理）は、両方を学んだあとに読む（足す LRN-stdnormal-clt）。
