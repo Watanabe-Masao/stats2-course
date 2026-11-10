@@ -1457,14 +1457,14 @@ class TestNetwork(unittest.TestCase):
         #   build が読み、検査し、型 v2 で書き出すこと（#287。M5 で分類ごとに移す仕組み）。
         # 想定する故障：v2 の行を v1 の種類として止める（知らない種類・v1 の必須）・legacy_type に入れてしまう・v2 の項目や主張を書き出さない・
         #   主張の id に教材名を付けない（画面が未接続にする）・移した分類（v2_ready）に残った v1 の行を通す。
-        # 見つけ方：教材の原本の写しに、v1 の行を2つ作る（順列 と 組合せ の対比・総和記号 → 階乗 の前提 mathematical。原本にない組にする）。対比の行を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
+        # 見つけ方：教材の原本の写しで、順列 と 組合せ の比べる（REL-perm-comb-contrast）を外し、v1 の行を2つ作る（その組の対比・総和記号 → 階乗 の前提 mathematical）。対比の行を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
         #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready に数学の道具を書くと残した v1 の行で止まること。
         #   （移していない分類の行を例にすると、分類を移すたびに例が移り、全部を移したあとは例がなくなる。#332 で写しの中で作る形に替えた）
         # 既存との違い：test_v2_checks は手で書いた書き出しの形だけ、test_v2_export_is_same_as_v1 は今の原本だけを見る。
         # 検出の確かめ：to_v2 で v2 の行も legacy_type にすると型（比べるは v1 の種類にない）で落ちる。前提の行（REL-test-v1-premise）を作らないと、全部を移したあとは v2c の止めが空振りして落ちる。主張に教材名を付けないと型の claimId で落ちる
         from v2_checks import v2_errors
         c = course()
-        rels = copy.deepcopy(self.n.load_network()[0])
+        rels = [x for x in copy.deepcopy(self.n.load_network()[0]) if x["id"] != "REL-perm-comb-contrast"]   # 同じ組に比べるを2本作らない（⑤ の 7）
         base = {"version": 1, "basis": {"units": ["U09"]}}
         rels.append({**base, "id": "REL-test-v1-contrast", "from": "TERM-perm", "to": "TERM-comb", "type": "対比",
                      "description": "テストの対比", "gist": "テストのつまり"})
@@ -1472,8 +1472,6 @@ class TestNetwork(unittest.TestCase):
                      "premise": "mathematical", "description": "テストの前提"})
         r = next(x for x in rels if x["id"] == "REL-test-v1-contrast")
         r.update(type="比べる", axis="順番を区別するか", same="どちらも n 個から k 個を取り出す数", differ="順列は順番を区別する")
-        for t in ("TERM-perm", "TERM-comb"):
-            c.terms[t]["forms"] = ["number"]
         c.terms["TERM-perm"]["claims"] = ["CLM-90"]
         claims = self.n.load_claims() + [{"id": "CLM-90", "label": "④-90", "kind": "等しい", "version": 1,
                                           "statement": {"text": "テストの主張"}, "premises": {"subjects": ["TERM-perm"]}}]
@@ -1490,7 +1488,7 @@ class TestNetwork(unittest.TestCase):
             e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-test-v1-contrast")
             self.assertEqual((e.get("type"), e.get("axis"), "legacy_type" in e), ("比べる", "順番を区別するか", False))
             self.assertIn("stats2:CLM-90", [x["id"] for x in v2["claims"]])
-            self.assertEqual(self.n.migration_counts(rels)["v2"], base_v2 + 1)
+            self.assertEqual(self.n.migration_counts(rels)["v2"], base_v2)   # 比べるを1本外し、写しの対比を比べるにして1本足した
             c.terms["TERM-perm"].pop("forms")
             v2b = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
             self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(v2b)))

@@ -1052,4 +1052,31 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: V
+      date: '2026-11-10'
+      version: b54797b
+    external: なし
+  version: 1
+- id: CLM-39
+  label: ④-39
+  kind: 等しい
+  statement:
+    text: 0 以上の整数 n について、異なる n 個を全部1列に並べる並べ方の数 ₙPₙ は、n の階乗 n! に等しい
+  premises:
+    subjects:
+    - TERM-perm
+  conclusion:
+    subjects:
+    - TERM-perm
+    predicates:
+    - TERM-fact
+  grounds:
+  - source:
+      title: 先頭に置くものは n 通り、その各々で2番目は残りの n−1 通り……と、最後は1通り。積の法則で並べ方は n(n−1)…1＝n!（n＝0 では何も並べない並べ方が1通りで、空の積 0!＝1 と一致）
+  teaching:
+    conclusion: true
+    proof: 扱う
   version: 1
