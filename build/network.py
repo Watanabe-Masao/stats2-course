@@ -477,7 +477,7 @@ def linked_terms() -> set:
     rels, ders = load_network()
     linked = {r.get(k) for r in rels for k in ("from", "to")}
     # 学ぶ順の足す（M6 の前は前提 learning の関係）も、ネットワークの中の置き場として数える（M6 で孤立の数え方を変えない。#266。
-    # 学ぶ順にしかつながらない概念（M6 で6語）に ⑤ の関係が要るかは、別の issue で振り分ける）
+    # 学ぶ順にしかつながらない概念（M6 で6語）に ⑤ の関係が要るかは #343 で振り分ける）
     linked |= {x.get(k) for x in load_learning() if x.get("op") == "add" for k in ("from", "to")}
     return linked | {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
 
