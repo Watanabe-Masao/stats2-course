@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-schema-v2.json",
   "title": "知識ネットワークの型 v2",
-  "description": "教材ごとの概念・関係・主張・導出・学ぶ順・単元。v2：関係の種類を製本 ⑤ の10種類にし、主張（claims）と学ぶ順（learning）を足した（stats2-course docs/schema-v2-design.md、#262・#263）。移していない関係は legacy_type（v1 の種類）で持つ",
+  "description": "教材ごとの概念・関係・主張・導出・学ぶ順・単元。v2：関係の種類を製本 ⑤ の10種類にし、主張（claims）と学ぶ順（learning）を足した（stats2-course docs/schema-v2-design.md、#262・#263）。M7（stats2-course #267）で v1 の種類（legacy_type）を外した",
   "type": "object",
   "required": [
     "schema",
@@ -1623,7 +1623,8 @@
           "to",
           "description",
           "units",
-          "version"
+          "version",
+          "type"
         ],
         "additionalProperties": false,
         "properties": {
@@ -1858,21 +1859,6 @@
               }
             }
           },
-          "legacy_type": {
-            "enum": [
-              "前提",
-              "導出",
-              "一般化",
-              "特殊化",
-              "変換",
-              "対比",
-              "統合",
-              "応用",
-              "種類",
-              "材料"
-            ],
-            "description": "移していない行の v1 の種類（M7 で外す）"
-          },
           "fix": {
             "enum": [
               "param_value",
@@ -1930,273 +1916,6 @@
           }
         },
         "allOf": [
-          {
-            "oneOf": [
-              {
-                "required": [
-                  "type"
-                ],
-                "not": {
-                  "required": [
-                    "legacy_type"
-                  ]
-                }
-              },
-              {
-                "required": [
-                  "legacy_type"
-                ],
-                "not": {
-                  "required": [
-                    "type"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "const": "変換"
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "required": [
-                "mode",
-                "conditions"
-              ],
-              "properties": {
-                "conditions": {
-                  "minItems": 1
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "const": "導出"
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "required": [
-                "conditions"
-              ],
-              "properties": {
-                "conditions": {
-                  "minItems": 1
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "const": "前提"
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "required": [
-                "premise"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "not": {
-                    "const": "変換"
-                  }
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "not": {
-                "required": [
-                  "mode"
-                ]
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "not": {
-                    "const": "前提"
-                  }
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "not": {
-                "required": [
-                  "premise"
-                ]
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "const": "対比"
-                }
-              },
-              "required": [
-                "legacy_type",
-                "stages"
-              ]
-            },
-            "then": {
-              "properties": {
-                "stages": {
-                  "required": [
-                    "same",
-                    "differ",
-                    "so"
-                  ],
-                  "not": {
-                    "anyOf": [
-                      {
-                        "required": [
-                          "origin"
-                        ],
-                        "legacy_type": "object"
-                      },
-                      {
-                        "required": [
-                          "operation"
-                        ],
-                        "legacy_type": "object"
-                      },
-                      {
-                        "required": [
-                          "result"
-                        ],
-                        "legacy_type": "object"
-                      }
-                    ]
-                  },
-                  "legacy_type": "object"
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "const": "変換"
-                }
-              },
-              "required": [
-                "legacy_type",
-                "stages"
-              ]
-            },
-            "then": {
-              "properties": {
-                "stages": {
-                  "required": [
-                    "origin",
-                    "operation",
-                    "result"
-                  ],
-                  "not": {
-                    "anyOf": [
-                      {
-                        "required": [
-                          "same"
-                        ],
-                        "legacy_type": "object"
-                      },
-                      {
-                        "required": [
-                          "differ"
-                        ],
-                        "legacy_type": "object"
-                      },
-                      {
-                        "required": [
-                          "so"
-                        ],
-                        "legacy_type": "object"
-                      }
-                    ]
-                  },
-                  "legacy_type": "object"
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "not": {
-                    "enum": [
-                      "対比",
-                      "変換"
-                    ]
-                  }
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "not": {
-                "required": [
-                  "stages"
-                ]
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "legacy_type": {
-                  "not": {
-                    "const": "対比"
-                  }
-                }
-              },
-              "required": [
-                "legacy_type"
-              ]
-            },
-            "then": {
-              "not": {
-                "required": [
-                  "axis"
-                ]
-              }
-            }
-          },
           {
             "if": {
               "properties": {
@@ -2324,6 +2043,28 @@
                 ]
               }
             }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "not": {
+                    "const": "比べる"
+                  }
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "axis"
+                ]
+              }
+            },
+            "$comment": "axis（比べる軸）は比べるだけに書く（v1 の決まりにあったものを v2 の種類で書き直した。M7）"
           }
         ]
       }
@@ -2714,5 +2455,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 4
+  "x-revision": 5
 }

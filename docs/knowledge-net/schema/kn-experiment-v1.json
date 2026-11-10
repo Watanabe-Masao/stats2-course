@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 3,
+  "x-revision": 4,
   "if": {
     "type": "object",
     "required": [
@@ -40,17 +40,17 @@
       "description": "実験室（stats2-course #102・計画の 6 の骨格）。実験の定義をデータで書き、画面は読むだけ。予想の答えは書かない（モデルから画面が求める）",
       "properties": {
         "id": {
-          "$ref": "kn-schema-v1.json#/$defs/gid"
+          "$ref": "kn-schema-v2.json#/$defs/gid"
         },
         "version": {
           "type": "integer",
           "minimum": 1
         },
         "title": {
-          "$ref": "kn-schema-v1.json#/$defs/text"
+          "$ref": "kn-schema-v2.json#/$defs/text"
         },
         "question": {
-          "$ref": "kn-schema-v1.json#/$defs/text",
+          "$ref": "kn-schema-v2.json#/$defs/text",
           "description": "今回の問い（毎画面の上に出す）"
         },
         "links": {
@@ -60,10 +60,10 @@
           "minProperties": 1,
           "properties": {
             "concepts": {
-              "$ref": "kn-schema-v1.json#/$defs/gids"
+              "$ref": "kn-schema-v2.json#/$defs/gids"
             },
             "relations": {
-              "$ref": "kn-schema-v1.json#/$defs/gids"
+              "$ref": "kn-schema-v2.json#/$defs/gids"
             }
           }
         },
@@ -171,17 +171,17 @@
           ],
           "properties": {
             "title": {
-              "$ref": "kn-schema-v1.json#/$defs/text"
+              "$ref": "kn-schema-v2.json#/$defs/text"
             },
             "concept": {
-              "$ref": "kn-schema-v1.json#/$defs/gid"
+              "$ref": "kn-schema-v2.json#/$defs/gid"
             },
             "formula": {
               "type": "integer",
               "minimum": 0
             },
             "steps": {
-              "$ref": "kn-schema-v1.json#/$defs/texts"
+              "$ref": "kn-schema-v2.json#/$defs/texts"
             }
           }
         },
@@ -205,19 +205,19 @@
                 "pattern": "^[a-z0-9-]+$"
               },
               "name": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "icon": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "success": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "failure": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "unit": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "p": {
                 "type": "number",
@@ -225,7 +225,7 @@
                 "maximum": 1
               },
               "story": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               }
             }
           }
@@ -242,7 +242,7 @@
             "additionalProperties": false,
             "properties": {
               "question": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "set": {
                 "type": "object",
@@ -264,7 +264,7 @@
           }
         },
         "points": {
-          "$ref": "kn-schema-v1.json#/$defs/texts",
+          "$ref": "kn-schema-v2.json#/$defs/texts",
           "description": "ⓘ のシートのポイント"
         },
         "counterexamples": {
@@ -286,7 +286,7 @@
                 "pattern": "^[a-z0-9-]+$"
               },
               "name": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "mechanism": {
                 "type": "object",
@@ -331,13 +331,13 @@
                 }
               },
               "text": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "concept": {
-                "$ref": "kn-schema-v1.json#/$defs/gid"
+                "$ref": "kn-schema-v2.json#/$defs/gid"
               },
               "breaks": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "崩した成り立つ条件（概念の conditions の言葉で）"
               }
             }
@@ -375,11 +375,11 @@
                 "description": "問いの形：prob（確率の値：事象の確率を桁の目盛りで予想）・spread（広がり：n を変えたとき、回数と割合の散らばりの向きを予想）・conv（理論と実測：セットを増やしたとき、理論とのずれの目安が何分の1になるかを予想）・paths（並び：2つの回数のどちらが起きやすいかを予想し、並びの数 ₙCₖ と1つの並びの確率を見る。ks）・repeat（くり返し：同じ条件の実験を何回もして、実測の割合が理論のまわりでゆれるのを見る。events・sets）・mean（平均：多くのセットの成功回数の平均を予想し、移り変わりを見る）・var（ばらつき：理論の分散が最大になる成功確率を予想し、p ごとの理論と実測の分散を見る。ps）"
               },
               "title": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "入口の一覧に出す短い名前"
               },
               "question": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "今回の問い（毎画面の上に出す）"
               },
               "set": {
@@ -581,7 +581,7 @@
                 "pattern": "^[A-Z]$"
               },
               "title": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "items": {
                 "type": "array",
@@ -596,27 +596,27 @@
                   ],
                   "properties": {
                     "id": {
-                      "$ref": "kn-schema-v1.json#/$defs/gid",
+                      "$ref": "kn-schema-v2.json#/$defs/gid",
                       "description": "問いの id：教材名:概念-まとまり-番号（stats2:binom-A-01）。教材をまたいでつなぐため、頭に教材名を置く。変えない・消さない"
                     },
                     "title": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "一覧に出す問いの名前"
                     },
                     "finds": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
                     },
                     "predict": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "何を予想するか（開ける問いは必ず書く）"
                     },
                     "operate": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "何を操作するか"
                     },
                     "judge": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
                     },
                     "open": {
@@ -625,11 +625,11 @@
                       "description": "開く入口。ないものは作成中"
                     },
                     "concept": {
-                      "$ref": "kn-schema-v1.json#/$defs/gid",
+                      "$ref": "kn-schema-v2.json#/$defs/gid",
                       "description": "主（この問いで理解させるもの。1つ）：概念か、2つの概念のつながりが主の問いなら関係（REL-…）。関係なら両端の概念から問いが引ける"
                     },
                     "related": {
-                      "$ref": "kn-schema-v1.json#/$defs/gids",
+                      "$ref": "kn-schema-v2.json#/$defs/gids",
                       "description": "関連概念（この問いを理解するのに実際に使う概念）"
                     },
                     "retired": {
@@ -660,7 +660,7 @@
                           "description": "求める考え方"
                         },
                         "task": {
-                          "$ref": "kn-schema-v1.json#/$defs/text",
+                          "$ref": "kn-schema-v2.json#/$defs/text",
                           "description": "課題の文"
                         },
                         "solve": {
@@ -730,7 +730,7 @@
                               "type": "array",
                               "minItems": 2,
                               "items": {
-                                "$ref": "kn-schema-v1.json#/$defs/text"
+                                "$ref": "kn-schema-v2.json#/$defs/text"
                               },
                               "description": "選ぶ答え（solve の answer が番号）"
                             }
@@ -767,7 +767,7 @@
                           ]
                         },
                         "why": {
-                          "$ref": "kn-schema-v1.json#/$defs/text",
+                          "$ref": "kn-schema-v2.json#/$defs/text",
                           "description": "答えのあとの一言（なぜそうなるか）"
                         },
                         "walk": {
@@ -978,17 +978,17 @@
       "description": "値の表の実験室（stats2-course #119）：値と重みの表から1回ずつ引き、平均（期待値）を確かめる。予想の答えは書かない（表から画面が求める）。values と重みの数が同じことは教材の build が確かめる",
       "properties": {
         "id": {
-          "$ref": "kn-schema-v1.json#/$defs/gid"
+          "$ref": "kn-schema-v2.json#/$defs/gid"
         },
         "version": {
           "type": "integer",
           "minimum": 1
         },
         "title": {
-          "$ref": "kn-schema-v1.json#/$defs/text"
+          "$ref": "kn-schema-v2.json#/$defs/text"
         },
         "question": {
-          "$ref": "kn-schema-v1.json#/$defs/text",
+          "$ref": "kn-schema-v2.json#/$defs/text",
           "description": "今回の問い（毎画面の上に出す）"
         },
         "links": {
@@ -998,10 +998,10 @@
           "minProperties": 1,
           "properties": {
             "concepts": {
-              "$ref": "kn-schema-v1.json#/$defs/gids"
+              "$ref": "kn-schema-v2.json#/$defs/gids"
             },
             "relations": {
-              "$ref": "kn-schema-v1.json#/$defs/gids"
+              "$ref": "kn-schema-v2.json#/$defs/gids"
             }
           }
         },
@@ -1031,16 +1031,16 @@
                 "pattern": "^[a-z0-9-]+$"
               },
               "name": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "icon": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "unit": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "story": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "values": {
                 "type": "array",
@@ -1054,7 +1054,7 @@
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                  "$ref": "kn-schema-v1.json#/$defs/text"
+                  "$ref": "kn-schema-v2.json#/$defs/text"
                 },
                 "description": "値の呼び名（なければ値と単位）。values と同じ数"
               },
@@ -1077,7 +1077,7 @@
                 "description": "問いで変えた重み"
               },
               "change": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "何を変えたかの文（「6 の面を3倍出やすくする」）"
               }
             }
@@ -1092,17 +1092,17 @@
           ],
           "properties": {
             "title": {
-              "$ref": "kn-schema-v1.json#/$defs/text"
+              "$ref": "kn-schema-v2.json#/$defs/text"
             },
             "concept": {
-              "$ref": "kn-schema-v1.json#/$defs/gid"
+              "$ref": "kn-schema-v2.json#/$defs/gid"
             },
             "formula": {
               "type": "integer",
               "minimum": 0
             },
             "steps": {
-              "$ref": "kn-schema-v1.json#/$defs/texts"
+              "$ref": "kn-schema-v2.json#/$defs/texts"
             }
           }
         },
@@ -1126,10 +1126,10 @@
                 "pattern": "^[a-z0-9-]+$"
               },
               "name": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "breaks": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "崩した成り立つ条件（概念の conditions の言葉で）"
               },
               "values": {
@@ -1151,21 +1151,21 @@
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                  "$ref": "kn-schema-v1.json#/$defs/text"
+                  "$ref": "kn-schema-v2.json#/$defs/text"
                 },
                 "description": "値の呼び名（なければ値と単位）。values と同じ数"
               },
               "text": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "concept": {
-                "$ref": "kn-schema-v1.json#/$defs/gid"
+                "$ref": "kn-schema-v2.json#/$defs/gid"
               }
             }
           }
         },
         "points": {
-          "$ref": "kn-schema-v1.json#/$defs/texts",
+          "$ref": "kn-schema-v2.json#/$defs/texts",
           "description": "ⓘ のシートのポイント"
         },
         "contrasts": {
@@ -1195,10 +1195,10 @@
                 "description": "misconception：誤解を正す例、limit：指標の限界を示す比較"
               },
               "name": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "claim": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "確かめる主張（例：平均は同じでも散らばりが違う）"
               },
               "tables": {
@@ -1206,15 +1206,15 @@
                 "minItems": 1,
                 "maxItems": 2,
                 "items": {
-                  "$ref": "kn-schema-v1.json#/$defs/valueTable"
+                  "$ref": "kn-schema-v2.json#/$defs/valueTable"
                 },
                 "description": "見る表（比べるときは2つ。比べる条件をそろえる）"
               },
               "text": {
-                "$ref": "kn-schema-v1.json#/$defs/text"
+                "$ref": "kn-schema-v2.json#/$defs/text"
               },
               "concept": {
-                "$ref": "kn-schema-v1.json#/$defs/gid",
+                "$ref": "kn-schema-v2.json#/$defs/gid",
                 "description": "観察のあとに考える概念（例：分散）"
               }
             }
@@ -1275,7 +1275,7 @@
           "type": "object",
           "description": "記号の意味（まちがえて入れたときに返す）",
           "additionalProperties": {
-            "$ref": "kn-schema-v1.json#/$defs/text"
+            "$ref": "kn-schema-v2.json#/$defs/text"
           }
         },
         "formulas": {
@@ -1290,18 +1290,18 @@
             ],
             "properties": {
               "word": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "出てくる値の呼び名"
               },
               "pick": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "公式の選択の段で選び肢に出す形"
               },
               "mean": {
                 "type": "object",
                 "description": "この公式だけの記号の意味（symbols より先に使う）",
                 "additionalProperties": {
-                  "$ref": "kn-schema-v1.json#/$defs/text"
+                  "$ref": "kn-schema-v2.json#/$defs/text"
                 }
               },
               "rows": {
@@ -1316,11 +1316,11 @@
                   ],
                   "properties": {
                     "title": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "行の題。{名前} は engine が返す穴の値"
                     },
                     "why": {
-                      "$ref": "kn-schema-v1.json#/$defs/text",
+                      "$ref": "kn-schema-v2.json#/$defs/text",
                       "description": "行の意味の文。{名前} は穴の値"
                     },
                     "variants": {
@@ -1332,10 +1332,10 @@
                         "minProperties": 1,
                         "properties": {
                           "title": {
-                            "$ref": "kn-schema-v1.json#/$defs/text"
+                            "$ref": "kn-schema-v2.json#/$defs/text"
                           },
                           "why": {
-                            "$ref": "kn-schema-v1.json#/$defs/text"
+                            "$ref": "kn-schema-v2.json#/$defs/text"
                           }
                         }
                       }
@@ -1363,7 +1363,7 @@
           "additionalProperties": {
             "type": "object",
             "additionalProperties": {
-              "$ref": "kn-schema-v1.json#/$defs/text"
+              "$ref": "kn-schema-v2.json#/$defs/text"
             }
           }
         },
@@ -1378,11 +1378,11 @@
             ],
             "properties": {
               "title": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "段の題。{名前} は穴の値"
               },
               "text": {
-                "$ref": "kn-schema-v1.json#/$defs/text",
+                "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "段の文（ない段もある）"
               },
               "variants": {
@@ -1394,10 +1394,10 @@
                   "minProperties": 1,
                   "properties": {
                     "title": {
-                      "$ref": "kn-schema-v1.json#/$defs/text"
+                      "$ref": "kn-schema-v2.json#/$defs/text"
                     },
                     "text": {
-                      "$ref": "kn-schema-v1.json#/$defs/text"
+                      "$ref": "kn-schema-v2.json#/$defs/text"
                     }
                   }
                 }
