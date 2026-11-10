@@ -186,7 +186,7 @@ def v2_errors(data: dict) -> list[str]:
         if len(ps) > 1:
             err.append(f"{k}: 一種の親が2つ以上（{ps}）。親は多くて1つ（⑤ の 包含）")
 
-    # 1つの組に関係は1つ。重ねてよいのは 包含＋移る と 比べる＋ほか（⑤ の 7。向きを問わない。移していない行も数える）
+    # 1つの組に関係は1つ。重ねてよいのは 包含＋移る と 比べる＋ほか（比べるも1本まで）（⑤ の 7。向きを問わない。移していない行も数える）
     pairs: dict[frozenset, list[dict]] = {}
     for r in rels:
         pairs.setdefault(frozenset((r["from"], r["to"])), []).append(r)
@@ -195,7 +195,7 @@ def v2_errors(data: dict) -> list[str]:
             continue
         kinds = [r.get("type") or r.get("legacy_type") for r in rs]
         rest = [k for k in kinds if k != "比べる"]
-        ok = len(rest) <= 1 or (len(rest) == 2 and "移る" in rest and set(rest) - {"移る"} <= INCLUSION)
+        ok = kinds.count("比べる") <= 1 and (len(rest) <= 1 or (len(rest) == 2 and "移る" in rest and set(rest) - {"移る"} <= INCLUSION))   # 比べるも1組に1本（#333）
         if not ok:
             err.append(f"{'・'.join(r['id'] for r in rs)}: 同じ組に重ねられない関係（{kinds}。⑤ の 7）")
 
