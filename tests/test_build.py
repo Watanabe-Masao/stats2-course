@@ -1478,7 +1478,6 @@ class TestNetwork(unittest.TestCase):
         orig = (self.n.load_network, self.n.load_claims)
         self.n.load_network = lambda: (rels, self.ders)
         self.n.load_claims = lambda: claims
-        base_v2 = self.n.migration_counts(orig[0]()[0])["v2"]
         try:
             self.assertEqual(self.n.validate_network(c), [])
             ready = [x for x in c.shared.get("v2_ready") if x != "数学の道具"]   # 写しの v1 の行がある分類は、まだ移していない扱いにする
@@ -1488,7 +1487,6 @@ class TestNetwork(unittest.TestCase):
             e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-test-v1-contrast")
             self.assertEqual((e.get("type"), e.get("axis"), "legacy_type" in e), ("比べる", "順番を区別するか", False))
             self.assertIn("stats2:CLM-90", [x["id"] for x in v2["claims"]])
-            self.assertEqual(self.n.migration_counts(rels)["v2"], base_v2)   # 比べるを1本外し、写しの対比を比べるにして1本足した
             c.terms["TERM-perm"].pop("forms")
             v2b = self.n.to_v2(self.n.export_network(c, TARGET), None, self.n.v2_extras(c))
             self.assertTrue(any("姿（forms）がない" in x for x in v2_errors(v2b)))

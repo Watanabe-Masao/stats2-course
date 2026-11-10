@@ -1079,4 +1079,11 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: V
+      date: '2026-11-10'
+      version: '4660318'
+    external: なし
   version: 1
