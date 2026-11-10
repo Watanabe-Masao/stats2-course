@@ -16,7 +16,6 @@ import term_icons  # 語の印（#220）
 from effects import effect_errors, question_errors
 from learning import export_learning, learning_order, load_learning   # 学ぶ順（⑥。#266）
 
-SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v1.json"
 SCHEMA_V2 = ROOT / "docs" / "knowledge-net" / "schema" / "kn-schema-v2.json"   # 書き出す型（M4。#264）
 EXPERIMENT_SCHEMA = ROOT / "docs" / "knowledge-net" / "schema" / "kn-experiment-v1.json"   # 実験室の拡張（芯の experiments が指す。#211）
 RELATION_TYPES = ROOT / "docs" / "knowledge-net" / "schema" / "relation-types.yaml"   # 種類の定義（どの教材も共通）
@@ -1419,11 +1418,10 @@ def migration_counts(rels: list[dict]) -> dict:
 def schema_errors(data: dict) -> list[str]:
     import jsonschema  # requirements.txt
     from referencing import Registry, Resource
-    v1 = json.loads(SCHEMA.read_text(encoding="utf-8"))   # v2・実験室の拡張が部品を指す（v1 の型を外すのは M7-3）
     ext = json.loads(EXPERIMENT_SCHEMA.read_text(encoding="utf-8"))
     schema = json.loads(SCHEMA_V2.read_text(encoding="utf-8"))
-    # 芯と実験室の拡張は互いを $id（URL）で指す（v2 は v1 の部品も指す）。ネットには取りに行かず、写しを登録して解く
-    reg = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in (v1, schema, ext)])
+    # 芯と実験室の拡張は互いを $id（URL）で指す（拡張は芯の共通の部品を指す）。ネットには取りに行かず、写しを登録して解く
+    reg = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in (schema, ext)])
     v = jsonschema.Draft202012Validator(schema, registry=reg)
     return [f"{'/'.join(map(str, e.absolute_path)) or '(全体)'}: {e.message}" for e in v.iter_errors(data)]
 

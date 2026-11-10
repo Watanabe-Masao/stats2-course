@@ -26,8 +26,8 @@ def gh(path: str):
 
 
 # 型は芯と実験室の拡張の2つ（#211）。データの項目の名前 → 型のファイル。芯の改訂は芯の版ごとに数える（v2 は改訂1から。#264）
-SCHEMAS = {"schema_revision": ("芯", "schema/kn-schema-v1.json"), "experiment_revision": ("実験室の拡張", "schema/kn-experiment-v1.json")}
-CORE = {1: "schema/kn-schema-v1.json", 2: "schema/kn-schema-v2.json"}
+SCHEMAS = {"schema_revision": ("芯", "schema/kn-schema-v2.json"), "experiment_revision": ("実験室の拡張", "schema/kn-experiment-v1.json")}
+CORE = {2: "schema/kn-schema-v2.json"}   # v1 は M7 で外した（#267）
 
 
 def schemas_for(version: int) -> dict:
