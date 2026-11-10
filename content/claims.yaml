@@ -791,6 +791,7 @@ claims:
   conclusion:
     subjects:
     - TERM-hist
+    - TERM-freqtable
     predicates:
     - TERM-unbiased
     - TERM-consistency
