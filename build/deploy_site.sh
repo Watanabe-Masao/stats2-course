@@ -7,6 +7,8 @@ cd "$(dirname "$0")/.."
 dest="${1:?公開用リポジトリの手元のパスを指定する}"
 [ -d "$dest/.git" ] || { echo "❌ $dest は git の作業フォルダではない"; exit 1; }
 [ -f out/site/index.html ] || { echo "❌ out/site がない（python3 build/build.py を先に）"; exit 1; }
+# out/site が、origin/main と同じ HEAD の、書きかけの変更がない作業フォルダで作られたか（#330）。作業中のブランチの build を公開しない
+python3 build/site_stamp.py --check
 # 公開の前の検査（#118 M9）：公開する代表の式は、今の版でレビュー済みでなければ止める
 python3 build/formulas.py --publish-check
 # 公開中の画面（knowledge-net）の型の改訂が、データの改訂以上か（#207）。画面の公開が遅れた日に教材だけを進めない

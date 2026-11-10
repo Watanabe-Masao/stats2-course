@@ -1543,3 +1543,26 @@ class TestVersions(unittest.TestCase):
         c = course()
         c.terms["TERM-binom"].pop("version")
         self.assertTrue(any("TERM-binom: 説明のある概念には version" in e for e in network.validate_network(c)))
+
+
+class TestSiteStamp(unittest.TestCase):
+    # 確かめる対象：公開の止め（build/site_stamp.py の stamp_errors。deploy_site.sh が呼ぶ。#330）。
+    # 想定する故障：作業中のブランチで build した out/site を公開する（2026-11-10 に起きた）・main と違う HEAD から公開する・
+    #   書きかけの変更がある作業フォルダで build したものを公開する・build し直さずに古い out/site を公開する。
+    # 見つけ方：正しい組（印も HEAD も main と同じで、どちらもきれい）は止めず、1つずつずらした組はどれも止める。
+    # 既存との違い：今までの公開の検査（式のレビュー・画面の種類）は、out/site がどのコミットから作られたかを見ていなかった。
+    # 検出の確かめ：stamp_errors の印のコミットと HEAD の照らし合わせを外すと、「古い out/site」の組が止まらずに落ちる
+    def test_stops_unless_built_from_main(self):
+        from site_stamp import stamp_errors
+        good = {"commit": "a" * 40, "clean": True}
+        self.assertEqual(stamp_errors(good, "a" * 40, "a" * 40, True), [])
+        cases = {
+            "ブランチの HEAD": (good, "a" * 40, "b" * 40, True),
+            "書きかけの作業フォルダ": (good, "a" * 40, "a" * 40, False),
+            "印がない": (None, "a" * 40, "a" * 40, True),
+            "古い out/site": ({"commit": "c" * 40, "clean": True}, "a" * 40, "a" * 40, True),
+            "書きかけで build した": ({"commit": "a" * 40, "clean": False}, "a" * 40, "a" * 40, True),
+        }
+        for name, args in cases.items():
+            with self.subTest(name):
+                self.assertTrue(stamp_errors(*args), name)

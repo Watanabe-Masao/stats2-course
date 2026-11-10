@@ -95,6 +95,8 @@ def main(argv: list[str]) -> int:
     for name, md in pages.items():
         (outdir / f"{name}.md").write_text(md, encoding="utf-8")
     print(f"生成：out/notion/ に {len(pages)} ページ、out/labs/ に {len(labs)} 版、out/site/ にラボ {sum(1 for e in site if not e['query'])} 本・図 {len(course.figures)}（問題・例題の図 {len(figs)}）（生成物の検査 OK）")
+    from site_stamp import write_stamp
+    write_stamp()   # out/site がどのコミットから作られたかの印（公開の前に deploy_site.sh が照らす。#330）
     filled = sum(1 for x in net["concepts"] if x["status"] == "filled")
     print(f"知識ネットワーク：{write_network(net)}（概念 {filled}・まだ説明のない概念 {len(net['concepts']) - filled}・関係 {len(net['relations'])}・導出 {len(net['derivations'])}）")
     if legacy_lines:
