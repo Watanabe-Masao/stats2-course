@@ -176,12 +176,12 @@ class TestV2Checks(unittest.TestCase):
         con(d, "clt")["basis"]["terms"].append("t:mu")   # 主張に出ず、たどっても着かない
         self.assertTrue([e for e in v2_errors(d) if "t:mu を、定める" in e])
 
-    def test_learning_rows_wait_for_m6(self):
-        # 前提（learning）は学ぶ順へ移す M6（#266）まで v1 のまま残してよい（移した分類でも止めない）。
-        # 検出の確かめ：この例外の行を消すと落ちる。mathematical は上の BREAKS で止まる
+    def test_learning_rows_after_m6(self):
+        # 前提（learning）は M6（#266）で学ぶ順（learning.yaml）へ移した。移した分類に残る前提（learning）も、ほかの legacy_type と同じく止める。
+        # 検出の確かめ：M6 の前の例外（前提 learning を飛ばす行）を戻すと落ちる
         d = base()
         d["relations"].append({"id": "t:REL-x", "legacy_type": "前提", "premise": "learning", "from": "t:prob", "to": "t:poisson"})
-        self.assertEqual(v2_errors(d), [])
+        self.assertTrue([e for e in v2_errors(d) if e.startswith("t:REL-x:") and "legacy_type（前提）" in e])
 
     def test_current_export_passes(self):
         # 教材の今の書き出し（移した分類を含む。#289 から確率分布）は止まらない

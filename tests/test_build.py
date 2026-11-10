@@ -1164,31 +1164,17 @@ class TestNetwork(unittest.TestCase):
         self.assertFalse(n.schema_errors(v2(d)))
 
     def test_dependency_one_step(self):
-        # 確かめる対象：定義の依存と前提知識は直接の1段だけ（#249 ③）の build の止め。
-        # 想定する故障：定義の依存の輪（A の定義に B、B の定義に A）を見逃す。前提知識を重ねて書いても通る
-        #   （A → B → C と A → C の両方。画面の「前提をさかのぼる」で A が2回出て、学ぶ順が崩れる）。直接の1段だけの今の教材まで止める。
-        # 見つけ方：今の教材では0。材料を1本逆向きに足して輪を、たどれる所に前提知識を1本足して重ねを起こし、止めの文を見る。
-        # 既存との違い：材料の輪は今まで警告だけで、テストがなかった。前提知識の重ねは今回の止め。
-        # 検出の確かめ（2026-11-08）：dependency_errors の重ねの判定で「a in seen」を外すと落ち、輪の止めを外すと落ちることを見た
+        # 確かめる対象：定義の依存は直接の1段だけ（#249 ③）の build の止め：定義の依存の輪（A の定義に B、B の定義に A）。
+        # 想定する故障：材料の輪を見逃す。今の教材まで止める。
+        # 見つけ方：今の教材では0。材料を1本逆向きに足して輪を起こし、止めの文を見る。
+        # 既存との違い：前提知識の重ねと学ぶ順の輪は M6（#266）で学ぶ順（build/learning.py）へ移し、tests/test_learning.py で見る。
+        # 検出の確かめ（2026-11-08）：輪の止めを外すと落ちることを見た
         n = self.n
         self.assertEqual(n.dependency_errors(self.rels), [])
         rels = copy.deepcopy(self.rels)
         rels.append({"id": "REL-x-loop", "from": "TERM-dist", "to": "TERM-rv", "type": "材料", "description": "x", "version": 1})   # 確率変数 → 確率分布 の逆
-        # 共分散 ← 確率変数 ← 確率（どちらも材料）とたどれるのに、確率 → 共分散 を前提知識でも書く（直接の関係はなく、2段の重ね）
-        rels.append({"id": "REL-x-twice", "from": "TERM-prob", "to": "TERM-cov", "type": "前提", "premise": "learning", "description": "x", "version": 1})
         err = n.dependency_errors(rels)
         self.assertTrue(any(e.startswith("定義の依存の輪") and "TERM-rv" in e and "TERM-dist" in e for e in err), err)
-        self.assertTrue(any(e.startswith("REL-x-twice:") for e in err), err)
-        # ⑤ の一種は from が子で to が親（v1 の種類は親 → 子で逆向き）。学ぶ順では親が先なので、子から親へさかのぼる（#298）。
-        # 想定する故障：v1 の種類と同じ向きでたどり、子が親の前提に入る。標本分布・極限の移行で、二項分布 → 連続修正 の前提知識が
-        #   「連続修正 ← 確率密度関数 ← 確率分布 ← 二項分布（一種を逆にたどる）」で重ねと誤って止まった。
-        # 検出の確かめ（2026-11-09）：一種の向きの分け方を外すと、今の原本（二項分布 → 連続修正）と1つ目で誤って止まり、2つ目（親から子の前提知識の重ね）を見逃して落ちる
-        rels = copy.deepcopy(self.rels)
-        rels.append({"id": "REL-x-kind", "from": "TERM-binom", "to": "TERM-pdf", "type": "前提", "premise": "learning", "description": "x", "version": 1})
-        self.assertFalse([e for e in n.dependency_errors(rels) if e.startswith("REL-x-kind:")])
-        rels = copy.deepcopy(self.rels)
-        rels.append({"id": "REL-x-parent", "from": "TERM-dist", "to": "TERM-binom", "type": "前提", "premise": "learning", "description": "x", "version": 1})
-        self.assertTrue([e for e in n.dependency_errors(rels) if e.startswith("REL-x-parent:")])
 
     def test_relation_map_ready(self):
         # 確かめる対象：関係図の決まり（docs/relation-map.md・#233）の build の止め。

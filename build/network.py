@@ -1153,7 +1153,7 @@ def validate_network(c: Course) -> list[str]:
     err += dependency_errors(rels)
     # 学ぶ順（⑥。M6・#266）：前提（learning）は関係ではなく content/learning.yaml に書く。候補＋足す−外すの重ねと輪を止める
     for r in rels:
-        if r.get("type") == "前提":
+        if r.get("type") == "前提" and r.get("premise") == "learning":
             err.append(f"{r.get('id')}: 前提（learning）は関係に書かず、学ぶ順（content/learning.yaml の op: add）に書く（M6・#266）")
     _, lerr = learning_order(rels, ders, load_learning(), set(c.terms))
     err += lerr
