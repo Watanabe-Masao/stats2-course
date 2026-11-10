@@ -481,9 +481,13 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(self._validate(), [])
 
     def test_gist_required_for_visual_types(self):
+        # M5 で原本の対比の行は0になった（#332）。移していない分類で対比を書いたときにまだ効くので、写しの中で対比の行を作って確かめる
         bad = copy.deepcopy(self.rels)
-        r = next(x for x in bad if x["type"] == "対比")
-        r.pop("gist")
+        r = copy.deepcopy(next(x for x in bad if x["type"] == "前提"))
+        r.update(id="REL-test-contrast", type="対比")
+        for k in ("premise", "gist"):
+            r.pop(k, None)
+        bad.append(r)
         p = next(x for x in bad if x["type"] == "前提")
         self.assertNotIn("gist", p)   # 前提には要らない
         err = self._validate(rels=bad)
@@ -1337,7 +1341,7 @@ class TestNetwork(unittest.TestCase):
         bad = copy.deepcopy(self.rels)
         p = next(x for x in bad if x["type"] == "前提")
         p.pop("premise")
-        q = next(x for x in bad if x["type"] == "対比")
+        q = next(x for x in bad if x["type"] == "比べる")   # M5 で対比は0行（#332）。mode を置けないのは比べるも同じ
         q["mode"] = "exact"
         err = self._validate(rels=bad)
         self.assertTrue(any("premise を必ず書く" in e for e in err))
