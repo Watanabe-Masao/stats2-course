@@ -290,7 +290,9 @@ claims:
 
 `publish/notion.yaml` に `site_base_url` があると、ラボと図はアップロードせず URL で埋め込む（`<slug>/?p=場面`、`fig/<図ID>.svg`）。
 `python3 build/build.py` で `out/site/` ができる。`build/check_all.sh` を通してから `build/deploy_site.sh <公開用リポジトリの手元のパス>` で公開する。公開されるのは out/site/ だけ（原本・予測の答え・個人データは出ない）。
-deploy_site.sh は push の前に2つを確かめて、合わなければ止める：公開する代表の式が今の版でレビュー済みか（`build/formulas.py --publish-check`）、公開中の画面（knowledge-net の GitHub Pages）の型の改訂がデータの改訂以上か（`build/screen_check.py`。#207）。画面が古いときは、knowledge-net を先に公開してからやり直す。
+公開は main の別の作業フォルダ（`git worktree add <場所> origin/main`）で `python3 build/build.py` してから行い、作業中のフォルダでは公開しない。build は out/site がどのコミットから作られたかの印（out/site.stamp。公開しない）を書き、deploy_site.sh はまず `build/site_stamp.py --check` で、今の HEAD が origin/main と同じか・作業フォルダに書きかけの変更がないか・out/site が今の HEAD から作られたかを確かめ、違えば止める（#330。2026-11-10 にブランチの build を公開した）。
+
+deploy_site.sh はそのあと push の前に2つを確かめて、合わなければ止める：公開する代表の式が今の版でレビュー済みか（`build/formulas.py --publish-check`）、公開中の画面（knowledge-net の GitHub Pages）の型の改訂がデータの改訂以上か（`build/screen_check.py`。#207）。画面が古いときは、knowledge-net を先に公開してからやり直す。
 ラボの `slug` と図の ID は URL の一部なので変えない。
 
 ### Notion への公開手順
