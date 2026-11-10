@@ -104,6 +104,9 @@ BREAKS = [
     ("通す定理の姿が命題でない", lambda d: rel(d, "REL-9").update(theorem="t:mu"), "姿が命題でない"),
     ("一種の親が2つ", lambda d: d["relations"].append({"id": "t:REL-x", "type": "一種", "from": "t:estimator", "to": "t:xbar"}), "一種の親が2つ以上"),
     ("同じ組に重ねられない関係", lambda d: d["relations"].append({"id": "t:REL-x", "type": "定める", "from": "t:binom", "to": "t:poisson"}), "重ねられない"),
+    # 比べるを同じ組に2本（#333。比べるを数えずに通していた。#332 の確かめ V が見つけた）
+    ("同じ組に比べる2本", lambda d: d["relations"].append({"id": "t:REL-x", "type": "比べる", "from": "t:poisson", "to": "t:binom",
+                                                       "axis": "別の軸", "same": "同じ", "differ": "違う"}), "重ねられない"),
     ("移していない行と重なる", lambda d: d["relations"].append({"id": "t:REL-x", "legacy_type": "材料", "from": "t:comb", "to": "t:binom"}), "重ねられない"),
     ("定理で結べる組に theorem を添えない", lambda d: rel(d, "REL-9").pop("theorem"), "theorem として添える"),
     ("定めるの輪", lambda d: (con(d, "comb")["basis"].update(terms=["t:binom"]),
