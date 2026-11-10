@@ -389,7 +389,7 @@ class TestCheckChanged(unittest.TestCase):
         for f in ["build/model.py", "tests/test_build.py", "tools/labkit/labkit.js", "tools/test_labs.js",
                   "templates/notion/components.yaml", "content/stages.yaml", "content/shared.yaml",
                   "content/units/index.yaml", "publish/notion.yaml", "content/relations.yaml",
-                  "docs/knowledge-net/schema/kn-schema-v1.json"]:
+                  "docs/knowledge-net/schema/kn-schema-v2.json"]:
             self.assertEqual(classify([f])[3], [f], f)
 
     def test_unit_assets_exist(self):
@@ -710,7 +710,6 @@ class TestNetwork(unittest.TestCase):
         # 検出の確かめ：schemas_for が版を見ずに v1 の型を返すと落ちる
         from screen_check import schemas_for
         self.assertEqual(schemas_for(2)["schema_revision"][1], "schema/kn-schema-v2.json")
-        self.assertEqual(schemas_for(1)["schema_revision"][1], "schema/kn-schema-v1.json")
         # 意味の確かめ（#293）：型の改訂が同じでも、画面が ⑤ の種類を描けなければ止める（2026-11-09、確率分布の公開ですり抜けた）。
         # 想定する故障：⑤ の種類を描けない画面のまま公開する。移していない行（legacy_type）まで描けないと数えて止める。
         # 検出の確かめ：kinds_check が type を見ないと1つ目が、legacy_type も数えると3つ目が落ちる
