@@ -13,7 +13,7 @@ vocab:
   properties: [非負, 正規化, 線形, 対称, 不変, 単調, 有界, 同値, 再現, 収束, 単位の整合, 条件しだい]
 contracts:
 - formula: F-comb-def
-  kinds: [定義]
+  kinds: [恒等式]
   properties: [非負, 対称, 条件しだい]
 - formula: F-fact-def
   kinds: [定義]

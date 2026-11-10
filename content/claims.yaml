@@ -1032,3 +1032,24 @@ claims:
       version: c69a6d9
     external: なし
   version: 1
+- id: CLM-38
+  label: ④-38
+  kind: 等しい
+  statement:
+    text: 0≦k≦n の整数 n・k について、異なる n 個から k 個を選ぶ組合せの数 ₙCₖ は、順列の数 ₙPₖ を k! で割ったものに等しい（ₙPₖ＝k!·ₙCₖ）
+  premises:
+    subjects:
+    - TERM-perm
+  conclusion:
+    subjects:
+    - TERM-comb
+    predicates:
+    - TERM-perm
+    - TERM-fact
+  grounds:
+  - source:
+      title: k 個を並べた1つの並びからは、並べた k 個の組がちょうど1つ決まる。逆に1つの組からは、その k 個の並べ替えの k! 通りの並びが出る。並びは組ごとに重なりなく分かれるので ₙPₖ＝k!·ₙCₖ（k＝0 では 0!＝1 で両辺が1）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  version: 1

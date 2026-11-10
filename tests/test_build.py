@@ -1457,7 +1457,7 @@ class TestNetwork(unittest.TestCase):
         #   build が読み、検査し、型 v2 で書き出すこと（#287。M5 で分類ごとに移す仕組み）。
         # 想定する故障：v2 の行を v1 の種類として止める（知らない種類・v1 の必須）・legacy_type に入れてしまう・v2 の項目や主張を書き出さない・
         #   主張の id に教材名を付けない（画面が未接続にする）・移した分類（v2_ready）に残った v1 の行を通す。
-        # 見つけ方：教材の原本の写しに、v1 の行を2つ作る（順列 と 組合せ の対比・階乗 → 順列 の前提 mathematical）。対比の行を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
+        # 見つけ方：教材の原本の写しに、v1 の行を2つ作る（順列 と 組合せ の対比・総和記号 → 階乗 の前提 mathematical。原本にない組にする）。対比の行を比べる（軸・同じ所・違う所）に書き替え、姿と主張を足して、
         #   原本の検査が通り、書き出しが型 v2 に合い、v2 の止めが通ること。姿を消すと v2 の止めが、v2_ready に数学の道具を書くと残した v1 の行で止まること。
         #   （移していない分類の行を例にすると、分類を移すたびに例が移り、全部を移したあとは例がなくなる。#332 で写しの中で作る形に替えた）
         # 既存との違い：test_v2_checks は手で書いた書き出しの形だけ、test_v2_export_is_same_as_v1 は今の原本だけを見る。
@@ -1468,7 +1468,7 @@ class TestNetwork(unittest.TestCase):
         base = {"version": 1, "basis": {"units": ["U09"]}}
         rels.append({**base, "id": "REL-test-v1-contrast", "from": "TERM-perm", "to": "TERM-comb", "type": "対比",
                      "description": "テストの対比", "gist": "テストのつまり"})
-        rels.append({**base, "id": "REL-test-v1-premise", "from": "TERM-fact", "to": "TERM-perm", "type": "前提",
+        rels.append({**base, "id": "REL-test-v1-premise", "from": "TERM-sigma", "to": "TERM-fact", "type": "前提",
                      "premise": "mathematical", "description": "テストの前提"})
         r = next(x for x in rels if x["id"] == "REL-test-v1-contrast")
         r.update(type="比べる", axis="順番を区別するか", same="どちらも n 個から k 個を取り出す数", differ="順列は順番を区別する")
@@ -1483,7 +1483,8 @@ class TestNetwork(unittest.TestCase):
         base_v2 = self.n.migration_counts(orig[0]()[0])["v2"]
         try:
             self.assertEqual(self.n.validate_network(c), [])
-            v2 = self.n.to_v2(self.n.export_network(c, TARGET), c.shared.get("v2_ready"), self.n.v2_extras(c))
+            ready = [x for x in c.shared.get("v2_ready") if x != "数学の道具"]   # 写しの v1 の行がある分類は、まだ移していない扱いにする
+            v2 = self.n.to_v2(self.n.export_network(c, TARGET), ready, self.n.v2_extras(c))
             self.assertEqual(self.n.schema_errors(v2), [])
             self.assertEqual(v2_errors(v2), [])
             e = next(x for x in v2["relations"] if x["id"] == "stats2:REL-test-v1-contrast")

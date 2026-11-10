@@ -3,12 +3,17 @@
   name: 順列
   en: permutation
   category: 数学の道具
+  forms: [number]
+  basis:
+    text: 異なる n 個のものから k 個（n・k は 0≦k≦n の整数。定義の要件）を取り出し、順番を区別して1列に並べる並べ方の数 ₙPₖ（何も取り出さない k＝0 は1通り）
   short: 異なるものから順番を区別して並べる並べ方と、その数
 - id: TERM-comb
   name: 組合せ
   en: combination
   category: 数学の道具
   forms: [number]
+  basis:
+    text: 異なる n 個のものから、順番を区別せずに k 個（n・k は 0≦k≦n の整数。定義の要件）を選ぶ選び方の数 ₙCₖ（何も選ばない k＝0 は1通り）
   definition: n 個の中から、順番を区別せずに k 個を選ぶ選び方の数。ₙCₖ と書く。
   version: 1
   principle: n 個を1列に並べる n! 通りのうち、選んだ k 個の中の並び（k! 通り）と、残した n−k 個の中の並び（(n−k)! 通り）は区別しないので、その分で割る。
@@ -66,12 +71,16 @@
   name: 総和記号（Σ）
   en: summation
   category: 数学の道具
+  forms: [operation]
+  basis:
+    text: 添え字（i など）を下端から上端まで1つずつ変えながら、各項をすべて足し合わせること。Σ はその書き方で、Σ_{i=1}^{n} aᵢ＝a₁＋a₂＋…＋aₙ
   short: 添え字を1つずつ変えながら、項をすべて足し合わせることを表す記号
 - id: TERM-fact
   name: 階乗
   en: factorial
   category: 数学の道具
   forms: [number]
+  basis_formula: F-fact-def
   definition: 1 から n までの整数をすべて掛けた数。n! と書く。0! は 1 と決める。
   version: 1
   principle: n 個のものを1列に並べる並べ方の数。先頭は n 通り、次は n−1 通り……と1つずつ減るので、それを全部掛け合わせる。
