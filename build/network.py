@@ -471,18 +471,41 @@ def skeleton(t: dict) -> bool:
     return bool(t.get("short")) and not filled(t)
 
 
-def linked_terms() -> set:
+def network_ties(c: "Course | None" = None) -> tuple[set, set]:
+    """概念のつながりを2つに分けて返す（#343）。
+    1 ⑤ の上のつながり：関係の端・関係に通す定理（theorem）・導出の前提と結論・主張の前提と結論（⑤ の 6 の定理の点のつなぎ）。
+      主張を持つ命題の概念（ベイズの定理など。terms.yaml の claims）は、その主張がほかの概念とつながるとき、つながっていると数える。
+    2 ⑥ の置き場：学ぶ順の足す（前提知識）。⑤ で線にしないと判定した語（総和記号・散布図・外挿。check-pairs その18）の置き場"""
     rels, ders = load_network()
-    linked = {r.get(k) for r in rels for k in ("from", "to")}
-    # 学ぶ順の足す（M6 の前は前提 learning の関係）も、ネットワークの中の置き場として数える（M6 で孤立の数え方を変えない。#266。
-    # 学ぶ順にしかつながらない概念（M6 で6語）に ⑤ の関係が要るかは #343 で振り分ける）
-    linked |= {x.get(k) for x in load_learning() if x.get("op") == "add" for k in ("from", "to")}
-    return linked | {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
+    five = {r.get(k) for r in rels for k in ("from", "to", "theorem")}
+    five |= {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
+    tied = set()   # ほかの概念とつながる主張
+    for cl in load_claims():
+        who = {x for part in ("premises", "conclusion") for xs in (cl.get(part) or {}).values() for x in xs}
+        five |= who
+        if who:
+            tied.add(cl.get("id"))
+    terms = c.terms if c is not None else {t["id"]: t for t in load_yaml(CONTENT / "terms.yaml") or []}
+    five |= {tid for tid, t in terms.items() if tied & set(t.get("claims") or [])}
+    six = {x.get(k) for x in load_learning() if x.get("op") == "add" for k in ("from", "to")}
+    return five - {None}, six - {None}
+
+
+def linked_terms(c: "Course | None" = None) -> set:
+    """孤立の数え方（骨格の完了の条件・説明のある概念の止め）：⑤ の上のつながりか、⑥ の置き場（学ぶ順の足す）"""
+    five, six = network_ties(c)
+    return five | six
+
+
+def learning_only_terms(c: "Course | None" = None) -> set:
+    """⑤ の上のつながりがなく、学ぶ順の足すだけでつながる語（build が名前で知らせる。#343）"""
+    five, six = network_ties(c)
+    return six - five
 
 
 def skeleton_gaps(c: Course) -> dict:
     """骨格の完了の条件（#105）で数えるもの：定義1文がない語・分類がない語・どの関係にもつながっていない語"""
-    linked = linked_terms()
+    linked = linked_terms(c)
     return {
         "no_short": [tid for tid, t in c.terms.items() if not (t.get("short") or filled(t))],
         "no_category": [tid for tid, t in c.terms.items() if not t.get("category")],
@@ -1122,12 +1145,11 @@ def validate_network(c: Course) -> list[str]:
                     err.append(f"{qid}: concepts の {ref} はまだ説明のない用語（概念にしてから指す）")
             if u.get("concepts_linked") and not q.get("retired") and not refs:
                 err.append(f"{qid}: {uid} は concepts_linked なので、確かめる概念（concepts:）を書く")
-    # 説明のある概念は、どこかの関係か導出につながっている（孤立させない）
-    linked = {r.get(k) for r in rels for k in ("from", "to")}
-    linked |= {p for d in ders for p in d.get("premises", [])} | {d.get("conclusion") for d in ders}
+    # 説明のある概念は、関係・定理の点・導出・学ぶ順の足すのどれかにつながっている（孤立させない。数え方は network_ties。#343）
+    linked = linked_terms(c)
     for tid, t in c.terms.items():
         if filled(t) and tid not in linked:
-            err.append(f"{tid}: 説明のある概念なのに、関係・導出のどれにもつながっていない")
+            err.append(f"{tid}: 説明のある概念なのに、関係・主張・導出・学ぶ順の足すのどれにもつながっていない")
     err += experiment_errors(c, rel_ids | {x["id"] for x in load_learning()}, {d["id"] for d in ders})   # 問いのつながりは学ぶ順の足す（LRN-）も指せる（#266）
     if load_experiments():
         err += walk_texts_errors(load_walk_texts())
