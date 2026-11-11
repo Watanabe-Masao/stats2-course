@@ -319,7 +319,7 @@ claims:
 | 直したもの | 一緒に直すもの |
 | --- | --- |
 | 式の契約（content/formula-contracts.yaml の kinds など） | `python3 build/formula_fixture.py` で式の見本（docs/formula-correctness/formulas.json）を作り直す。分類の表（docs/formula-correctness/classification.md）の種類 |
-| 式の木・記号・概念の conditions・basis_formula | `python3 build/formulas.py --fingerprint F-…` で指紋を見る。代表の式なら独立なレビューの記録を新しくし、`--publish-check` を通す |
+| 式の木・記号・概念の conditions・basis_formula、契約の review_refs が指すもの（導出・実験室の反例と問い） | `python3 build/formulas.py --fingerprint F-…` で指紋を見る。代表の式なら独立なレビューの記録を同じ PR で新しくし、`--publish-check` を通す（`check_changed.py` が掛かると知らせる。2026-11-11：#357 で実験室の反例を直して main を公開できなくなった） |
 | 主張（content/claims.yaml）を足す・移す | docs/rules/claims.md の §6 の行と §9 の確かめの記録。verification の version は文字列で書く（`'4660318'`。数だけの短い SHA は数として読まれる） |
 | 関係を足す・外す・種類を変える | 外した id を原本・テストから探す。記録（check-pairs.md）に書く件数は原本から数える |
 | 分類を移す（v2_ready に足す） | docs/rules/migration.md の 2・4。テストが原本の中身（ある種類の行・まだ移していない分類）に頼っていないか（頼るテストは写しの中で例を作る） |

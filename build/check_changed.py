@@ -106,6 +106,13 @@ def main() -> None:
     run("生成（検証・検算・生成物の検査）", [sys.executable, "build/build.py"])
     run("式の見本（#118 C5）", [sys.executable, "build/formula_fixture.py", "--check"])
     run("独立な見本（#118）", [sys.executable, "build/oracle.py", "--check"])
+    # 公開の前の止め（代表の式のレビューの版）を、マージの前に知らせる（2026-11-11：#357 で実験室の反例の文を直し、
+    # F-binom-pmf のレビューの版が変わったのに気づかずマージし、main を公開できなかった）。止めはしない（ふだんの build と同じ）。
+    # 落ちたら、独立なレビューの記録を同じ PR に足してからマージする（CLAUDE.md「式の個別のレビュー」）
+    pub = subprocess.run([sys.executable, "build/formulas.py", "--publish-check"], cwd=ROOT, capture_output=True, text=True)
+    if pub.returncode != 0:
+        print("⚠️ 公開の前の止め（formulas.py --publish-check）に掛かる。このまま main に入ると公開できない。独立なレビューの記録を同じ PR に足す")
+        print("\n".join("   " + x for x in pub.stdout.strip().splitlines()[-5:]))
     for u in sorted(units):
         if os.path.exists(os.path.join(ROOT, "migration", "old", f"{u}.md")):
             run(f"旧版との突き合わせ {u}", [sys.executable, "build/audit.py", u])
