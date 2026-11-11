@@ -922,6 +922,7 @@ experiments:
             related: [TERM-var, TERM-dist, TERM-binom]
             predict: 期待値が同じ2つの分布の形の違い
             operate: n と p（n×p を同じに保つ）
+            retired: true   # 同じ発見は期待値の実験室の expect-D-01（期待値が同じくじは、同じくじ？）で扱う（#119・#273。渡辺さん 2026-11-11）
           - id: binom-D-04
             title: 成功回数と成功割合では何が違う？
             finds: 個数と割合の分散の違い
@@ -1286,6 +1287,63 @@ experiments:
       - 確率の重い値ほど期待値を自分の方へ引き寄せる（てんびんの支点）
       - 期待値は表の中の値として出るとは限らない（さいころの 3.5）
       - まれでも大きい値は期待値を大きく動かす。平均がなかなか落ち着かないこともある
+    # テーマ体系（#119。渡辺さん 2026-11-11 に案で進めると決めた）：二項分布（binom-A〜F）と同じ形。主は発見させたい性質で決める（製本 ⑦ の 1）。
+    # 問いの id は expect-まとまり-番号（変えない・消さない）。開けるのは A-01（今の流れ）だけで、ほかは問いの形と反例を足すときに open を書く
+    catalog:
+      - id: A
+        title: 期待値の位置
+        items:
+          - id: expect-A-01
+            title: 確率の重い値を増やすと、平均はどこへ動く？
+            finds: 確率の重さと期待値の位置
+            concept: TERM-expect
+            predict: 表を変えたとき、何度も引いた平均がどこへ行くか（向きと値）
+            operate: 値ごとの確率（テーマの表を変える）
+            judge: 確率の重い値ほど期待値（重心）を自分の方へ引き寄せることを、値×確率の和で、別の表でも説明できる
+            open: shift
+          - id: expect-A-02
+            title: 期待値は、実際に出る値？
+            finds: 期待値と実際に出る値の違い
+            concept: TERM-expect
+          - id: expect-A-03
+            title: まれでも大きい当たりが1本あると？
+            finds: まれで大きい値と期待値・中央値
+            concept: TERM-expect
+            related: [TERM-median]
+      - id: B
+        title: 理論と実験
+        items:
+          - id: expect-B-01
+            title: 何度も引くと、平均は期待値に近づく？
+            finds: 引く回数と平均のずれ
+            concept: TERM-lln
+            related: [TERM-expect]
+          - id: expect-B-02
+            title: 期待値がいくらでも大きくなるくじ
+            finds: 和が有限でないときの平均
+            concept: TERM-expect
+      - id: C
+        title: 変換と線形性
+        items:
+          - id: expect-C-01
+            title: 全部の値を a 倍して b 足すと、期待値は？
+            finds: E(aX＋b)＝aE(X)＋b
+            concept: TERM-expect
+      - id: D
+        title: 期待値と散らばり
+        items:
+          - id: expect-D-01
+            title: 期待値が同じくじは、同じくじ？
+            finds: 期待値だけでは決まらない散らばり
+            concept: TERM-var
+            related: [TERM-expect]
+      - id: E
+        title: 応用
+        items:
+          - id: expect-E-01
+            title: くじの値段は、いくらまでなら得？
+            finds: 期待値で決める（と、決められないこと）
+            concept: TERM-expect
     counterexamples:   # 反例を実験する：成り立つ条件を崩す。数は概念しだい
       - id: doubling
         name: 賞金が倍々のくじ

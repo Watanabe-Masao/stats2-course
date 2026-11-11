@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 4,
+  "x-revision": 5,
   "if": {
     "type": "object",
     "required": [
@@ -564,402 +564,7 @@
           }
         },
         "catalog": {
-          "type": "array",
-          "minItems": 1,
-          "description": "テーマ体系（stats2-course #163）：まとまり（A〜F）の下に問い（B01〜）を並べる。問いは主概念（concept）と関連概念（related）を持ち、サイトの実験室のタブで概念から問いを絞る。open は開く入口（shift＝最初の問い・questions の id・break:反例の id）。open のない問いは「作成中」として並べるだけ",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "id",
-              "title",
-              "items"
-            ],
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^[A-Z]$"
-              },
-              "title": {
-                "$ref": "kn-schema-v2.json#/$defs/text"
-              },
-              "items": {
-                "type": "array",
-                "minItems": 1,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "id",
-                    "title",
-                    "concept"
-                  ],
-                  "properties": {
-                    "id": {
-                      "$ref": "kn-schema-v2.json#/$defs/gid",
-                      "description": "問いの id：教材名:概念-まとまり-番号（stats2:binom-A-01）。教材をまたいでつなぐため、頭に教材名を置く。変えない・消さない"
-                    },
-                    "title": {
-                      "$ref": "kn-schema-v2.json#/$defs/text",
-                      "description": "一覧に出す問いの名前"
-                    },
-                    "finds": {
-                      "$ref": "kn-schema-v2.json#/$defs/text",
-                      "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
-                    },
-                    "predict": {
-                      "$ref": "kn-schema-v2.json#/$defs/text",
-                      "description": "何を予想するか（開ける問いは必ず書く）"
-                    },
-                    "operate": {
-                      "$ref": "kn-schema-v2.json#/$defs/text",
-                      "description": "何を操作するか"
-                    },
-                    "judge": {
-                      "$ref": "kn-schema-v2.json#/$defs/text",
-                      "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
-                    },
-                    "open": {
-                      "type": "string",
-                      "pattern": "^(shift|break:[a-z][a-z0-9-]*|[a-z][a-z0-9-]*)$",
-                      "description": "開く入口。ないものは作成中"
-                    },
-                    "concept": {
-                      "$ref": "kn-schema-v2.json#/$defs/gid",
-                      "description": "主（この問いで理解させるもの。1つ）：概念か、2つの概念のつながりが主の問いなら関係（REL-…）。関係なら両端の概念から問いが引ける"
-                    },
-                    "related": {
-                      "$ref": "kn-schema-v2.json#/$defs/gids",
-                      "description": "関連概念（この問いを理解するのに実際に使う概念）"
-                    },
-                    "retired": {
-                      "type": "boolean",
-                      "description": "使わない印（重複などで外した問い。id は消さず、入口・一覧に並べない。open を持たない）"
-                    },
-                    "apply": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": [
-                        "kind",
-                        "task",
-                        "solve",
-                        "answer",
-                        "why"
-                      ],
-                      "description": "応用の課題（stats2-course #171）：予測〜理由で練習したのとは別の考え方を求める。答えは書かず、画面が engine の solveApply で solve から求めて照らす。open のある問いにだけ書く",
-                      "properties": {
-                        "kind": {
-                          "enum": [
-                            "逆算",
-                            "設計",
-                            "反証",
-                            "評価",
-                            "変換",
-                            "モデル選択"
-                          ],
-                          "description": "求める考え方"
-                        },
-                        "task": {
-                          "$ref": "kn-schema-v2.json#/$defs/text",
-                          "description": "課題の文"
-                        },
-                        "solve": {
-                          "type": "object",
-                          "required": [
-                            "method"
-                          ],
-                          "description": "答えの求め方（math-lab engine の ApplySolve。method ごとの条件は engine が確かめ、理由を言って止まる）",
-                          "properties": {
-                            "method": {
-                              "enum": [
-                                "mean-to-p",
-                                "min-n-share-sd",
-                                "compare-eq",
-                                "boundary",
-                                "expected-observers",
-                                "sets-for-error",
-                                "binom-judge",
-                                "max-strength",
-                                "min-total",
-                                "solve-spread",
-                                "mode",
-                                "within-band",
-                                "linear-sum",
-                                "compare-var"
-                              ]
-                            }
-                          }
-                        },
-                        "answer": {
-                          "type": "object",
-                          "additionalProperties": false,
-                          "required": [
-                            "type"
-                          ],
-                          "properties": {
-                            "type": {
-                              "enum": [
-                                "number",
-                                "choice"
-                              ]
-                            },
-                            "unit": {
-                              "type": "string",
-                              "description": "答えの単位（回・人・セット・個・%）"
-                            },
-                            "percent": {
-                              "type": "boolean",
-                              "description": "0〜1 の答えを % で入力・表示する"
-                            },
-                            "tol": {
-                              "type": "object",
-                              "additionalProperties": false,
-                              "description": "合っているとする幅（abs：差・rel：比。どちらか）",
-                              "properties": {
-                                "abs": {
-                                  "type": "number",
-                                  "minimum": 0
-                                },
-                                "rel": {
-                                  "type": "number",
-                                  "minimum": 0
-                                }
-                              }
-                            },
-                            "options": {
-                              "type": "array",
-                              "minItems": 2,
-                              "items": {
-                                "$ref": "kn-schema-v2.json#/$defs/text"
-                              },
-                              "description": "選ぶ答え（solve の answer が番号）"
-                            }
-                          },
-                          "allOf": [
-                            {
-                              "if": {
-                                "properties": {
-                                  "type": {
-                                    "const": "choice"
-                                  }
-                                }
-                              },
-                              "then": {
-                                "required": [
-                                  "options"
-                                ]
-                              }
-                            },
-                            {
-                              "if": {
-                                "properties": {
-                                  "type": {
-                                    "const": "number"
-                                  }
-                                }
-                              },
-                              "then": {
-                                "required": [
-                                  "tol"
-                                ]
-                              }
-                            }
-                          ]
-                        },
-                        "why": {
-                          "$ref": "kn-schema-v2.json#/$defs/text",
-                          "description": "答えのあとの一言（なぜそうなるか）"
-                        },
-                        "walk": {
-                          "type": "object",
-                          "additionalProperties": false,
-                          "required": [
-                            "segments",
-                            "info",
-                            "formulas",
-                            "steps"
-                          ],
-                          "description": "解き方を自分で組み立てる（stats2-course #181、渡辺さんの「解法の段 骨格設計」）。思考の段（ask 問いの理解・unit 対象の分解・event 事象の定義・info 情報の抽出・relate 関係の発見・formula 公式の選択・build 式の構築と計算・probe 道具で確かめる）を、この順で使う段だけ書く。式・記号の意味・計算の行と意味・値・答えは engine が作る（原本に数を書かない）",
-                          "properties": {
-                            "segments": {
-                              "type": "array",
-                              "minItems": 2,
-                              "description": "課題の文の区切り（つなぐと task と同じ）。role：ask 聞かれている所・info 数・event 起きてほしいこと・condition 条件・noise 使わない数・text そのほか。info・event・condition は key で info を指す",
-                              "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "required": [
-                                  "text",
-                                  "role"
-                                ],
-                                "properties": {
-                                  "text": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  },
-                                  "role": {
-                                    "enum": [
-                                      "ask",
-                                      "info",
-                                      "event",
-                                      "condition",
-                                      "noise",
-                                      "text"
-                                    ]
-                                  },
-                                  "key": {
-                                    "type": "string",
-                                    "pattern": "^[a-z][a-zA-Z0-9]*$"
-                                  }
-                                }
-                              }
-                            },
-                            "info": {
-                              "type": "object",
-                              "minProperties": 1,
-                              "description": "学習者が見つける情報。word：ふだんの言葉、sym：当てはめる記号、of：応用の課題の solve のどの値か（a.n のように . でたどる。値は書かない）。条件（condition）は word だけ",
-                              "additionalProperties": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "required": [
-                                  "word"
-                                ],
-                                "properties": {
-                                  "word": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  },
-                                  "sym": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  },
-                                  "of": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  }
-                                }
-                              }
-                            },
-                            "formulas": {
-                              "type": "array",
-                              "minItems": 1,
-                              "description": "当てはめる公式（engine の WALK_FORMULAS の ref）。bind：公式の記号 → info の key か、前の公式の id（導いた値を運ぶ）",
-                              "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "required": [
-                                  "id",
-                                  "ref",
-                                  "bind"
-                                ],
-                                "properties": {
-                                  "id": {
-                                    "type": "string",
-                                    "pattern": "^[a-z][a-zA-Z0-9]*$"
-                                  },
-                                  "ref": {
-                                    "type": "string"
-                                  },
-                                  "bind": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "word": {
-                                    "type": "string",
-                                    "description": "導いた値の呼び名（1人の確率 など）"
-                                  }
-                                }
-                              }
-                            },
-                            "steps": {
-                              "type": "array",
-                              "minItems": 3,
-                              "items": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "required": [
-                                  "kind"
-                                ],
-                                "properties": {
-                                  "kind": {
-                                    "enum": [
-                                      "ask",
-                                      "unit",
-                                      "event",
-                                      "info",
-                                      "relate",
-                                      "formula",
-                                      "build",
-                                      "probe"
-                                    ]
-                                  },
-                                  "short": {
-                                    "type": "string",
-                                    "description": "これまでの段に残す短い結論（formula・build・probe は engine）"
-                                  },
-                                  "sum": {
-                                    "type": "string",
-                                    "description": "この段のまとめ（1〜2文。formula・build・probe は engine が作る）"
-                                  },
-                                  "mark": {
-                                    "type": "string",
-                                    "description": "押させる文の区切りの key（ask は q を使わず role: ask の区切り）"
-                                  },
-                                  "collect": {
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "required": [
-                                      "need"
-                                    ],
-                                    "properties": {
-                                      "need": {
-                                        "type": "array",
-                                        "minItems": 1,
-                                        "items": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "later": {
-                                        "type": "array",
-                                        "items": {
-                                          "type": "string"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "choose": {
-                                    "type": "array",
-                                    "items": {
-                                      "$ref": "#/$defs/walkQuiz"
-                                    }
-                                  },
-                                  "rowQuiz": {
-                                    "type": "object",
-                                    "description": "計算の行に付ける問い（キーは 公式の id.行の key。例 one.fail）",
-                                    "additionalProperties": {
-                                      "$ref": "#/$defs/walkQuiz"
-                                    }
-                                  },
-                                  "todo": {
-                                    "type": "string"
-                                  },
-                                  "hit": {
-                                    "type": "string"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "$ref": "#/$defs/catalog"
         }
       }
     },
@@ -1219,6 +824,9 @@
               }
             }
           }
+        },
+        "catalog": {
+          "$ref": "#/$defs/catalog"
         }
       }
     },
@@ -1398,6 +1006,404 @@
                     },
                     "text": {
                       "$ref": "kn-schema-v2.json#/$defs/text"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "catalog": {
+      "type": "array",
+      "minItems": 1,
+      "description": "テーマ体系（stats2-course #163）：まとまり（A〜F）の下に問い（B01〜）を並べる。問いは主概念（concept）と関連概念（related）を持ち、サイトの実験室のタブで概念から問いを絞る。open は開く入口（shift＝最初の問い・questions の id・break:反例の id）。open のない問いは「作成中」として並べるだけ。値の表の実験室（model: table）でも同じ形（改訂5。stats2-course #119：期待値の問いのテーマ体系）",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "items"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z]$"
+          },
+          "title": {
+            "$ref": "kn-schema-v2.json#/$defs/text"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "title",
+                "concept"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "kn-schema-v2.json#/$defs/gid",
+                  "description": "問いの id：教材名:概念-まとまり-番号（stats2:binom-A-01）。教材をまたいでつなぐため、頭に教材名を置く。変えない・消さない"
+                },
+                "title": {
+                  "$ref": "kn-schema-v2.json#/$defs/text",
+                  "description": "一覧に出す問いの名前"
+                },
+                "finds": {
+                  "$ref": "kn-schema-v2.json#/$defs/text",
+                  "description": "主な発見（テーマカードの「何を発見できるか」。予想の前には出さない）"
+                },
+                "predict": {
+                  "$ref": "kn-schema-v2.json#/$defs/text",
+                  "description": "何を予想するか（開ける問いは必ず書く）"
+                },
+                "operate": {
+                  "$ref": "kn-schema-v2.json#/$defs/text",
+                  "description": "何を操作するか"
+                },
+                "judge": {
+                  "$ref": "kn-schema-v2.json#/$defs/text",
+                  "description": "理解判定：何ができれば理解したとするか。開く先（実験の仕組み）は共有してよいが、open は問いごとに1つ"
+                },
+                "open": {
+                  "type": "string",
+                  "pattern": "^(shift|break:[a-z][a-z0-9-]*|[a-z][a-z0-9-]*)$",
+                  "description": "開く入口。ないものは作成中"
+                },
+                "concept": {
+                  "$ref": "kn-schema-v2.json#/$defs/gid",
+                  "description": "主（この問いで理解させるもの。1つ）：概念か、2つの概念のつながりが主の問いなら関係（REL-…）。関係なら両端の概念から問いが引ける"
+                },
+                "related": {
+                  "$ref": "kn-schema-v2.json#/$defs/gids",
+                  "description": "関連概念（この問いを理解するのに実際に使う概念）"
+                },
+                "retired": {
+                  "type": "boolean",
+                  "description": "使わない印（重複などで外した問い。id は消さず、入口・一覧に並べない。open を持たない）"
+                },
+                "apply": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "task",
+                    "solve",
+                    "answer",
+                    "why"
+                  ],
+                  "description": "応用の課題（stats2-course #171）：予測〜理由で練習したのとは別の考え方を求める。答えは書かず、画面が engine の solveApply で solve から求めて照らす。open のある問いにだけ書く",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "逆算",
+                        "設計",
+                        "反証",
+                        "評価",
+                        "変換",
+                        "モデル選択"
+                      ],
+                      "description": "求める考え方"
+                    },
+                    "task": {
+                      "$ref": "kn-schema-v2.json#/$defs/text",
+                      "description": "課題の文"
+                    },
+                    "solve": {
+                      "type": "object",
+                      "required": [
+                        "method"
+                      ],
+                      "description": "答えの求め方（math-lab engine の ApplySolve。method ごとの条件は engine が確かめ、理由を言って止まる）",
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "mean-to-p",
+                            "min-n-share-sd",
+                            "compare-eq",
+                            "boundary",
+                            "expected-observers",
+                            "sets-for-error",
+                            "binom-judge",
+                            "max-strength",
+                            "min-total",
+                            "solve-spread",
+                            "mode",
+                            "within-band",
+                            "linear-sum",
+                            "compare-var"
+                          ]
+                        }
+                      }
+                    },
+                    "answer": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "number",
+                            "choice"
+                          ]
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "答えの単位（回・人・セット・個・%）"
+                        },
+                        "percent": {
+                          "type": "boolean",
+                          "description": "0〜1 の答えを % で入力・表示する"
+                        },
+                        "tol": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "description": "合っているとする幅（abs：差・rel：比。どちらか）",
+                          "properties": {
+                            "abs": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "rel": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        "options": {
+                          "type": "array",
+                          "minItems": 2,
+                          "items": {
+                            "$ref": "kn-schema-v2.json#/$defs/text"
+                          },
+                          "description": "選ぶ答え（solve の answer が番号）"
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "choice"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "options"
+                            ]
+                          }
+                        },
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "number"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "tol"
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "why": {
+                      "$ref": "kn-schema-v2.json#/$defs/text",
+                      "description": "答えのあとの一言（なぜそうなるか）"
+                    },
+                    "walk": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "segments",
+                        "info",
+                        "formulas",
+                        "steps"
+                      ],
+                      "description": "解き方を自分で組み立てる（stats2-course #181、渡辺さんの「解法の段 骨格設計」）。思考の段（ask 問いの理解・unit 対象の分解・event 事象の定義・info 情報の抽出・relate 関係の発見・formula 公式の選択・build 式の構築と計算・probe 道具で確かめる）を、この順で使う段だけ書く。式・記号の意味・計算の行と意味・値・答えは engine が作る（原本に数を書かない）",
+                      "properties": {
+                        "segments": {
+                          "type": "array",
+                          "minItems": 2,
+                          "description": "課題の文の区切り（つなぐと task と同じ）。role：ask 聞かれている所・info 数・event 起きてほしいこと・condition 条件・noise 使わない数・text そのほか。info・event・condition は key で info を指す",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "text",
+                              "role"
+                            ],
+                            "properties": {
+                              "text": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "role": {
+                                "enum": [
+                                  "ask",
+                                  "info",
+                                  "event",
+                                  "condition",
+                                  "noise",
+                                  "text"
+                                ]
+                              },
+                              "key": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-zA-Z0-9]*$"
+                              }
+                            }
+                          }
+                        },
+                        "info": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "description": "学習者が見つける情報。word：ふだんの言葉、sym：当てはめる記号、of：応用の課題の solve のどの値か（a.n のように . でたどる。値は書かない）。条件（condition）は word だけ",
+                          "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "word"
+                            ],
+                            "properties": {
+                              "word": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "sym": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "of": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            }
+                          }
+                        },
+                        "formulas": {
+                          "type": "array",
+                          "minItems": 1,
+                          "description": "当てはめる公式（engine の WALK_FORMULAS の ref）。bind：公式の記号 → info の key か、前の公式の id（導いた値を運ぶ）",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "id",
+                              "ref",
+                              "bind"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-zA-Z0-9]*$"
+                              },
+                              "ref": {
+                                "type": "string"
+                              },
+                              "bind": {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "type": "string"
+                                }
+                              },
+                              "word": {
+                                "type": "string",
+                                "description": "導いた値の呼び名（1人の確率 など）"
+                              }
+                            }
+                          }
+                        },
+                        "steps": {
+                          "type": "array",
+                          "minItems": 3,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "kind"
+                            ],
+                            "properties": {
+                              "kind": {
+                                "enum": [
+                                  "ask",
+                                  "unit",
+                                  "event",
+                                  "info",
+                                  "relate",
+                                  "formula",
+                                  "build",
+                                  "probe"
+                                ]
+                              },
+                              "short": {
+                                "type": "string",
+                                "description": "これまでの段に残す短い結論（formula・build・probe は engine）"
+                              },
+                              "sum": {
+                                "type": "string",
+                                "description": "この段のまとめ（1〜2文。formula・build・probe は engine が作る）"
+                              },
+                              "mark": {
+                                "type": "string",
+                                "description": "押させる文の区切りの key（ask は q を使わず role: ask の区切り）"
+                              },
+                              "collect": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "need"
+                                ],
+                                "properties": {
+                                  "need": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "later": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "choose": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/$defs/walkQuiz"
+                                }
+                              },
+                              "rowQuiz": {
+                                "type": "object",
+                                "description": "計算の行に付ける問い（キーは 公式の id.行の key。例 one.fail）",
+                                "additionalProperties": {
+                                  "$ref": "#/$defs/walkQuiz"
+                                }
+                              },
+                              "todo": {
+                                "type": "string"
+                              },
+                              "hit": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
