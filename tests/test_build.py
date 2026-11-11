@@ -1094,6 +1094,44 @@ class TestNetwork(unittest.TestCase):
         g = network.skeleton_gaps(course())
         self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short"))))
 
+    def test_network_ties(self):
+        # 確かめる対象：孤立の数え方（#343）が、⑤ の上のつながり（関係の端・通す定理・主張の前提と結論）と ⑥ の置き場（学ぶ順の足す）を分けて数えること。
+        # 想定する故障：通す定理（theorem）や主張の点だけでつながる命題の概念（ベイズの定理・加法定理）を孤立に数え、要らない線を足させる。
+        #   逆に、学ぶ順の足すだけの語を ⑤ でつながったと数え、build の知らせから消す。説明のある概念の止めと骨格の数えで数え方がずれる。
+        # 見つけ方：今の原本で、ベイズの定理（通す定理）と加法定理（主張 ④-32）が ⑤ の側に、総和記号が ⑥ の側だけにあること。
+        #   写しで通す定理・主張を1つずつ外し、どの道でもベイズの定理が数えられ、両方を外すと消えること。写しの主張の前提に出る語が ⑤ の側に入ること。
+        # 既存との違い：test_skeleton は short・category の書き方と数の数え方。ここはつながりの数え方。
+        # 検出の確かめ（2026-11-11）：network_ties で theorem を数えない・主張の前提と結論を数えない・主張を持つ概念を数えない、のそれぞれで落ちることを見た
+        n = self.n
+        c = course()
+        five, six = n.network_ties(c)
+        self.assertIn("TERM-bayes", five)
+        self.assertIn("TERM-addition", five)
+        self.assertIn("TERM-sigma", six - five)
+        self.assertIn("TERM-sigma", n.learning_only_terms(c))
+        self.assertNotIn("TERM-bayes", n.learning_only_terms(c))
+        rels, ders = n.load_network()
+        bare = copy.deepcopy(rels)
+        for r in bare:
+            r.pop("theorem", None)
+        orig, orig_cl = n.load_network, n.load_claims
+        n.load_network = lambda: (bare, ders)
+        try:
+            # 通す定理を外しても、ベイズの定理は自分の主張 ④-23（前提・結論がほかの概念）でつながる
+            self.assertIn("TERM-bayes", n.network_ties(c)[0])
+            # 主張も持たせないと、⑤ の側から消える（主張を持つ命題の概念の数え方）
+            c2 = course()
+            c2.terms["TERM-bayes"].pop("claims", None)
+            self.assertNotIn("TERM-bayes", n.network_ties(c2)[0])
+            n.load_network = orig
+            # 通す定理だけでつながる形（主張なし）
+            self.assertIn("TERM-bayes", n.network_ties(c2)[0])
+            # 主張の前提に出る語は ⑤ の側（写しの主張で、総和記号を前提にする）
+            n.load_claims = lambda: orig_cl() + [{"id": "CLM-99", "premises": {"subjects": ["TERM-sigma"]}, "conclusion": {"subjects": ["TERM-mean"]}}]
+            self.assertIn("TERM-sigma", n.network_ties(c)[0])
+        finally:
+            n.load_network, n.load_claims = orig, orig_cl
+
     def test_condition_kinds(self):
         # 確かめる対象：成立条件の区分（#249 ①）と基準にする定義の式（③）の build の止め、公開の JSON への書き出し。
         # 想定する故障：移した分類で区分のない数学の行・関係の行を見逃す（区分の付け忘れが公開に出る）。

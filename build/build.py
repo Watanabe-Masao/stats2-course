@@ -53,7 +53,7 @@ def main(argv: list[str]) -> int:
     from network import relations_without_figures
     nofig = relations_without_figures()
     if nofig:
-        print(f"⚠ 図のない関係（変換・対比・導出・一般化）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
+        print(f"⚠ 図のない関係（移る・比べる・導ける・特別な場合）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
     from network import basis_gaps, load_network
     gaps = basis_gaps(course, load_network()[0])
     if gaps:
@@ -61,6 +61,11 @@ def main(argv: list[str]) -> int:
               f"{', '.join(f'{a} → {b}' for a, b in gaps)}（#86。材料にするか、⑤ の理由で basis_excludes に書く。移した分類（v2_ready）では止める）")
     from network import skeleton_gaps
     sk = skeleton_gaps(course)
+    from network import learning_only_terms
+    lo = sorted(learning_only_terms(course))
+    if lo:
+        print(f"ℹ ⑤ のつながりがなく、学ぶ順の足すだけでつながる語 {len(lo)}：{', '.join(lo)}"
+              f"（⑤ で線にしないと判定した語は check-pairs に記録がある。ない語は ⑤ の判定の順を当てる。#343）")
     if any(sk.values()):
         print(f"⚠ 骨格（#105）：定義1文がない語 {len(sk['no_short'])}・分類がない語 {len(sk['no_category'])}・孤立した語 {len(sk['isolated'])}"
               f"（P1 を閉じるとき shared.yaml の skeleton_required を true にして 0 にする）")
