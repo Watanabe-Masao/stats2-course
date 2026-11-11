@@ -54,6 +54,8 @@ figures:
 checks:
   # 発展：対数正規（σ＝1）を同じ平均・標準偏差にそろえたときの割合・平均＋2σ の外
   - 'abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+2*math.sqrt((math.e-1)*math.e))) - 0.963) < 0.0005 and math.exp(0.5)-2*math.sqrt((math.e-1)*math.e) < 0 and abs(1-statistics.NormalDist().cdf(2) - 0.023) < 0.0005 and abs(statistics.NormalDist().cdf(math.log(math.exp(0.5)+math.sqrt((math.e-1)*math.e))) - 0.91) < 0.005 and 80+2*12 == 104 and abs(1-statistics.NormalDist().cdf(1.96) - 0.025) < 0.0005'
+  # 対数をとった値の標準偏差が0.5の対数正規：±σ の中は約76%（S5「1つの数で何が消えるか」。#354）
+  - 'abs(statistics.NormalDist().cdf(math.log(math.exp(0.125)*(1+math.sqrt(math.exp(0.25)-1)))/0.5) - statistics.NormalDist().cdf(math.log(math.exp(0.125)*(1-math.sqrt(math.exp(0.25)-1)))/0.5) - 0.76) < 0.005'
   - 'Fraction(400+20) == 420 and math.isclose(math.sqrt(8**2+6**2), 10) and Fraction(1,12) == Fraction(1,12)'
   # 創造：平日と週末が混ざった日販（平日5日 N(60, 8²)・週末2日 N(100, 10²)）
   - 'abs((5*60+2*100)/7 - 71.4) < 0.05 and abs(math.sqrt((5*64+2*100)/7 + 5/7*(60-500/7)**2 + 2/7*(100-500/7)**2) - 20.0) < 0.05 and abs(500/7 + 1.645*math.sqrt((5*64+2*100)/7 + 5/7*(60-500/7)**2 + 2/7*(100-500/7)**2) - 104) < 0.5 and abs(1-statistics.NormalDist(100,10).cdf(104) - 0.34) < 0.005 and abs(100+1.645*10 - 116) < 0.5 and abs(60+1.645*8 - 73) < 0.5'
