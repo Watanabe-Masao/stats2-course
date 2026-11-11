@@ -120,3 +120,10 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-10'
   fingerprint: 3f6b2362920815d5
+- formula: F-binom-pmf
+  points:
+  - モデルの仮定（独立・同じ p）と反例の実験の言い分
+  judgement: "実験室 EXP-binom-p の反例 mix の breaks・text・concept を変えたことによるやり直し（#353。M8 の ⑦ の確かめ）。前回の記録（2026-11-08、96127a0d0ace0228）からの差分だけを確かめた。git diff 5a79d3e 284c7ab で content/terms.yaml・formula-contracts.yaml に差はない。版に入る実験室の反例と比べる（counterexamples・contrasts）で変わったのは mix の breaks・text・concept だけで、5a79d3e では 96127a0d0ace0228、284c7ab では d005fe6564ec06d8（問いの文は版に入らない）。mix の起き方（lab.ts の drawSet：セットの最初に確率 Q を p−d か p＋d から半々で1回選び、セットの中の全部の回に使う。d＝min(spread, p, 1−p)）では、P(Xᵢ＝1)＝½(p−d)＋½(p＋d)＝p で各回の確率は同じ p のまま、P(Xᵢ＝Xⱼ＝1)＝p²＋d² で回どうしの共分散が d² になり、崩れるのは独立だけ。breaks を「各回が独立」だけにし、concept を TERM-indep にしたのは正しい。n＝2・p＝1/2・d＝1/5 では周辺確率 1/2、2回とも成功が 29/100≠1/4、成功回数の分布は 29/100・21/50・29/100、分散 29/50＝1/2＋2/25。n＝1〜10、p は 0.05 刻みとテーマの p、spread 0.2・0.05・0.4 の 660 通りで、並び 2ⁿ 通りの確率を分数で求め、周辺確率 p、共分散 d²、独立なのは d＝0 のときだけ、平均 np、分散 np(1−p)＋n(n−1)d²、成功回数が同じ並びどうしは同じ確率（why の3段目は保たれ2段目だけが崩れ、note と合う）、山が広がるのは n≧2 かつ 0＜p＜1 のときだけで p が 0・1 なら二項分布と同じ、を確かめた（食い違い0）。text と effect {mean: same, spread: larger}、lab.ts の mechanismMoments と一致する。外した「客の型が決まった割合で独立なら狭くなる」は正しい主張（分散 np(1−p)−nd²）で、同じ構造は fatigue が受け持ち、fatigue の text の向きの比べ（共通のずれなら広がる・回ごとに違って独立なら狭い）とも食い違わない。4つの反例の breaks（urn・streak・mix は各回が独立、fatigue は各回の成功確率 p が同じ）は、どれも TERM-binom の conditions.math の仮定の行の文と一致し、崩す行は1つで、母数は要件の範囲の中にある"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-11'
+  fingerprint: d005fe6564ec06d8
