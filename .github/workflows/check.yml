@@ -34,10 +34,12 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      # ブラウザの依存（フォントなど）は Ubuntu のパッケージの置き場から取る。置き場の名前が引けない時間があった
+      # （2026-11-11 の夜、1時間半ほど全部の段がここで落ちた）ので、失敗したら 60 秒おいて 3 回までやり直す
       - if: steps.pw.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: for i in 1 2 3; do npx playwright install --with-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
       - if: steps.pw.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: for i in 1 2 3; do npx playwright install-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
       - run: build/check_all.sh
         env: {PART: base}
   labs:
@@ -60,9 +62,11 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      # ブラウザの依存（フォントなど）は Ubuntu のパッケージの置き場から取る。置き場の名前が引けない時間があった
+      # （2026-11-11 の夜、1時間半ほど全部の段がここで落ちた）ので、失敗したら 60 秒おいて 3 回までやり直す
       - if: steps.pw.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: for i in 1 2 3; do npx playwright install --with-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
       - if: steps.pw.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: for i in 1 2 3; do npx playwright install-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
       - run: build/check_all.sh
         env: {PART: labs, SHARD: "${{ matrix.shard }}/6"}
