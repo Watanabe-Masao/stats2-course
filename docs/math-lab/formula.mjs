@@ -549,6 +549,8 @@ function substituteFree(node, map) {
 		return r ? clone(r) : void 0;
 	});
 }
+/** 端のない Σ・∫（とりうる値すべての和・積分）を含むか */
+const hasSupportSum = (n) => isOp(n) && ((n.op === "sum" || n.op === "int") && n.lower === void 0 && n.upper === void 0 || n.args.some(hasSupportSum) || n.lower !== void 0 && hasSupportSum(n.lower) || n.upper !== void 0 && hasSupportSum(n.upper));
 const sub = (s) => s.replace(/_\{?([^}]*)\}?$/, "").trim();
 /**
 * 記号 key を定義で開く。開いた所（置き換えた木）を marks に key で記録する。count は開いた数（0 なら開けなかった。reason に理由）。
@@ -564,6 +566,10 @@ function openSymbol(tree, symbols, key, def, marks = /* @__PURE__ */ new Map(), 
 	let reason;
 	/** 1か所を開いた木を作る（params：定義の引数 → 実際の引数） */
 	const build = (params) => {
+		if ([...params].some(([p, arg]) => !(isSym(arg) && arg.sym === p)) && hasSupportSum(rhs)) {
+			reason = "とりうる値すべての和の形は、その確率変数の値と確率で書いた式なので、引数を替えて開けない";
+			return null;
+		}
 		let body = clone(rhs);
 		const rename = /* @__PURE__ */ new Map();
 		for (const [p, arg] of params) for (const s of defSyms.filter((x) => x.of === p && freeSymbols(body).has(x.key))) {
