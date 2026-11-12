@@ -503,6 +503,7 @@ const ARITY = {
 };
 function validateFormula(f) {
 	const keys = new Set(f.symbols.map((s) => s.key));
+	const kinds = new Map(f.symbols.map((s) => [s.key, s.kind]));
 	const bad = [];
 	const walk = (n, bound) => {
 		if (isNum(n)) {
@@ -518,6 +519,8 @@ function validateFormula(f) {
 		if ((n.op === "eq" || n.op === "sub") && n.args.length < 2) bad.push(`${n.op} の引数は2個以上`);
 		if (n.op === "fn" && !(n.name && (keys.has(n.name) || COMMON_FNS.includes(n.name)))) bad.push(`関数 ${n.name ?? "（名前なし）"} が symbols にも共通の関数にもない`);
 		if (n.var && !keys.has(n.var)) bad.push(`動かす記号 ${n.var} が symbols にない`);
+		const vk = n.var ? kinds.get(n.var) : void 0;
+		if (n.var && vk && vk !== "index") bad.push(`動かす記号 ${n.var} は kind が ${vk}（動かせるのは index の記号だけ）`);
 		const b = n.var ? /* @__PURE__ */ new Set([...bound, n.var]) : bound;
 		n.args.forEach((a) => walk(a, b));
 		if (n.lower) walk(n.lower, bound);
