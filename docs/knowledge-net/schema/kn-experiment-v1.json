@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 5,
+  "x-revision": 6,
   "if": {
     "type": "object",
     "required": [
@@ -684,6 +684,30 @@
               "change": {
                 "$ref": "kn-schema-v2.json#/$defs/text",
                 "description": "何を変えたかの文（「6 の面を3倍出やすくする」）"
+              },
+              "same_mean": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "weights",
+                  "change"
+                ],
+                "description": "期待値が start と同じ別の表（期待値の実験室 D-01。stats2-course #119）。重みは全部正（0 の値があると棒の目盛りがずれる）。期待値が等しいことは教材の build が止める",
+                "properties": {
+                  "weights": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "description": "重み（values と同じ数）"
+                  },
+                  "change": {
+                    "$ref": "kn-schema-v2.json#/$defs/text",
+                    "description": "A の表から何を変えたかの文（期待値が同じことは書かない。予測の答えになるから）"
+                  }
+                }
               }
             }
           }
@@ -827,6 +851,30 @@
         },
         "catalog": {
           "$ref": "#/$defs/catalog"
+        },
+        "spread_reason": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "steps"
+          ],
+          "properties": {
+            "title": {
+              "$ref": "kn-schema-v2.json#/$defs/text"
+            },
+            "concept": {
+              "$ref": "kn-schema-v2.json#/$defs/gid"
+            },
+            "formula": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "steps": {
+              "$ref": "kn-schema-v2.json#/$defs/texts"
+            }
+          },
+          "description": "散らばりの考察：分散を値ごとの項に開く式（concept の formula 番目）と、なぜの段（D-01）"
         }
       }
     },

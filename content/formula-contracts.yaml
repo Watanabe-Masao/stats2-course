@@ -23,6 +23,12 @@ contracts:
   properties: [非負, 同値, 不変, 単位の整合]
   representative: true
   review: [単位（元の単位の2乗）, 前提（2乗の期待値が有限）]
+- formula: F-var-sum
+  kinds: [恒等式]
+  properties: [非負, 同値, 単位の整合]
+  representative: true
+  review: [台が離散（値の表）のときの形で、連続なら積分になること, F-var-def と同じ量であること]
+  note: 値の表の実験室の考察で、今の表の値と μ を入れて項に開く（#119 の D-01）
 - formula: F-var-linear
   kinds: [恒等式, 変換]
   properties: [同値, 不変, 対称]

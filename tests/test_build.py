@@ -1484,6 +1484,27 @@ class TestNetwork(unittest.TestCase):
             self.assertTrue(run_check(e), f"{tid}: {e}")
 
 
+class TestSameMean(unittest.TestCase):
+    # 確かめる対象：期待値が同じ別の表（テーマの same_mean。期待値の実験室 D-01。#119）の build の止め。
+    # 想定する故障：期待値が少しずれた表（予測「同じ」が理論と合わない）・重み 0 の値（画面の棒の目盛りがずれる）・分散の差が小さすぎる表（実験で差が見えない）を公開する。
+    # 見つけ方：原本の3テーマは通り、1つずつ崩した表がそれぞれの理由で止まること。期待値は分数でちょうど比べる（38 と 38.000001 を分ける）。
+    # 既存との違い：table_errors の既存の止め（値の並び・重みの数）は same_mean を見ない。ここは same_mean だけ。
+    # 検出の確かめ（2026-11-12）：same_mean_errors の期待値の比べを外す・重みの正の止めを外す・比の下限を 1 にすると、それぞれの assert で落ちることを見た
+    def test_same_mean_errors(self):
+        from network import load_experiments, same_mean_errors
+        x = next(e for e in load_experiments() if e["id"] == "EXP-expect-table")
+        self.assertEqual(same_mean_errors("X", x), [])
+        self.assertTrue(all(t.get("same_mean") for t in x["themes"]))
+
+        def bad(theme_id, weights):
+            y = copy.deepcopy(x)
+            next(t for t in y["themes"] if t["id"] == theme_id)["same_mean"]["weights"] = weights
+            return " ".join(same_mean_errors("X", y))
+        self.assertIn("期待値", bad("lottery", [71, 27, 1]))          # 期待値 37 円（ずれ）
+        self.assertIn("0 より大きい", bad("basket", [10, 70, 20, 0, 0]))   # 期待値は同じだが重み 0
+        self.assertIn("分散の比", bad("dice", [2, 1, 1, 1, 1, 2]))     # 期待値は同じ 3.5、分散の比は約1.29
+
+
 class TestProgress(unittest.TestCase):
     def test_counts_from_source(self):
         from progress import notion_page, unit_row

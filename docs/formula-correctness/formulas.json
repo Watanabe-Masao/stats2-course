@@ -437,6 +437,112 @@
   }
  },
  {
+  "concept": "TERM-var",
+  "index": 2,
+  "id": "F-var-sum",
+  "label": "値ごとの和（離散）",
+  "tex": "V(X)=\\sum_{x}(x-\\mu)^{2}p(x)",
+  "symbols": [
+   {
+    "symbol": "V( )",
+    "meaning": "分散（ずれの2乗の期待値）",
+    "key": "V",
+    "concept": "TERM-var"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "x",
+    "meaning": "X がとりうる値",
+    "key": "x",
+    "kind": "index"
+   },
+   {
+    "symbol": "μ",
+    "meaning": "X の期待値 E(X)",
+    "key": "mu",
+    "concept": "TERM-expect",
+    "kind": "param",
+    "of": "X"
+   },
+   {
+    "symbol": "p(x)",
+    "meaning": "X が x になる確率（重み。値が飛び飛びのとき。連続なら密度 f(x) に替え、和は積分 ∫(x−μ)²f(x)dx になる）",
+    "range": "0以上1以下・合計1",
+    "key": "p",
+    "concept": "TERM-dist"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "args": [
+      {
+       "sym": "X"
+      }
+     ],
+     "name": "V"
+    },
+    {
+     "op": "sum",
+     "args": [
+      {
+       "op": "mul",
+       "args": [
+        {
+         "op": "pow",
+         "args": [
+          {
+           "op": "sub",
+           "args": [
+            {
+             "sym": "x"
+            },
+            {
+             "sym": "mu"
+            }
+           ]
+          },
+          {
+           "num": 2
+          }
+         ]
+        },
+        {
+         "op": "fn",
+         "args": [
+          {
+           "sym": "x"
+          }
+         ],
+         "name": "p"
+        }
+       ]
+      }
+     ],
+     "var": "x"
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "同値",
+    "単位の整合"
+   ],
+   "representative": true
+  }
+ },
+ {
   "concept": "TERM-sd",
   "index": 0,
   "id": "F-sd-def",
