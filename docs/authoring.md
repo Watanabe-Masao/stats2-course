@@ -309,6 +309,7 @@ claims:
 - `counterexamples`：反例を実験する。成り立つ条件（`breaks`。概念の `conditions.math` の言葉で）を1つ崩した起き方（urn・streak・mix）で理論とのずれを見る。数は概念しだい
 - 反例の `effect`（平均・散らばりの向き。mean: same・spread: larger／smaller）：build（build/effects.py）が起き方の定義から分布を分数で求め、vary の全部の n・p とテーマの p で確かめる。端（n＝1・割合 0・1）は「同じ」になることも確かめる。公開の JSON には出さない（画面は engine の mechanismMoments から答えを求める）
 - `model`：`binom`（二項分布。vary・start・compare）か `table`（値の表。#119：テーマごとに values・labels・start と compare の重み・change、反例は values と weights の表）。値の表は、値が小さい順・重みと呼び名が値と同じ数・前と変えた重みが違うことを build が確かめる
+- 値の表のテーマの `same_mean`（型の改訂6。#119 の D-01）：`{weights, change}`。期待値が `start` と同じ別の表と、何を変えたかの文（「期待値が同じ」とは書かない。予測の答えになる）。開く先は問いの `open: same-mean`。build が、重みが全部正（`start` も）・期待値が分数でちょうど等しい・分散の比が 1.4 以上（実験で差が見える）を止める。考察の式は `spread_reason`（形は `reason` と同じ。分散の値ごとの和 F-var-sum を指す）
 
 ## 図の型（build/figures.py）
 

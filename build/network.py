@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+from fractions import Fraction
 import re
 import math
 
@@ -111,6 +112,41 @@ def table_errors(eid: str, x: dict) -> list[str]:
             err.append(f"{eid}: テーマ {t.get('id')} の start と compare が同じ（問いで何も変わらない）")
     for b in x.get("counterexamples") or []:
         one(f"反例 {b.get('id')}", b.get("values") or [], {"weights": b.get("weights") or []}, b.get("labels"))
+    err += same_mean_errors(eid, x)
+    return err
+
+
+SAME_MEAN_VAR_RATIO = Fraction(7, 5)   # 2つの表の分散の比の下限（1.4）。これより近いと、100回ずつ引いても平均の線のゆれの差が見えない（独立なレビュー 2026-11-12）
+
+
+def same_mean_errors(eid: str, x: dict) -> list[str]:
+    """期待値が同じ別の表（テーマの same_mean。期待値の実験室 D-01。#119）：重みは values と同じ数で全部正（0 の値があると画面の棒の目盛りがずれる）、
+    期待値は start と分数でちょうど等しい、分散の比は SAME_MEAN_VAR_RATIO 以上（差が見える）。予測の答え（どちらが散らばるか）は書かず、画面が表から求める"""
+    err: list[str] = []
+    def mom(vals, ws):
+        tot = sum(Fraction(w) for w in ws)
+        ps = [Fraction(w) / tot for w in ws]
+        m = sum(Fraction(v) * p for v, p in zip(vals, ps))
+        return m, sum((Fraction(v) - m) ** 2 * p for v, p in zip(vals, ps))
+    for t in x.get("themes") or []:
+        sm = t.get("same_mean")
+        if not sm:
+            continue
+        where = f"{eid}: テーマ {t.get('id')} の same_mean"
+        vals, ws = t.get("values") or [], sm.get("weights") or []
+        if len(ws) != len(vals) or any(not w > 0 for w in ws):
+            err.append(f"{where} の weights は values と同じ数で、全部 0 より大きい")
+            continue
+        if not (sm.get("change") or "").strip():
+            err.append(f"{where} に change（何を変えたかの文）がない")
+        if any(not w > 0 for w in t.get("start") or []):
+            err.append(f"{where}：start の重みも全部 0 より大きい（2つの表の棒の目盛りをそろえるため）")
+            continue
+        (ma, va), (mb, vb) = mom(vals, t["start"]), mom(vals, ws)
+        if ma != mb:
+            err.append(f"{where} の期待値 {float(mb):g} が start の {float(ma):g} と違う")
+        elif min(va, vb) == 0 or max(va, vb) / min(va, vb) < SAME_MEAN_VAR_RATIO:
+            err.append(f"{where}：分散の比が {float(SAME_MEAN_VAR_RATIO):g} より小さい（差が見えない）")
     return err
 
 
@@ -408,7 +444,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
                     # support：値の表の実験室の「表を変えない問い」（期待値は実際に出る値？。knowledge-net の TableSupportQ。#119）
-                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
                     if not ok:
                         err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}
@@ -450,13 +486,14 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
             err += table_errors(eid, x)
         err += effect_errors(eid, x)   # 反例の言い分（effect）を厳密な計算で確かめる（#118 層3）
         err += question_errors(eid, x)   # 入口の問い：確率の値の答えが目盛りの境目から離れているか（#161）
-        rs = x.get("reason") or {}
-        if rs.get("concept"):
-            t = c.terms.get(rs["concept"])
-            if not t or not filled(t):
-                err.append(f"{eid}: reason.concept {rs['concept']} が説明のある概念にない")
-            elif "formula" in rs and not (0 <= rs["formula"] < len(t.get("formulas") or [])):
-                err.append(f"{eid}: reason.formula {rs['formula']} が {rs['concept']} の式にない")
+        for rk in ("reason", "spread_reason"):   # spread_reason：散らばりの考察の式（D-01。型の改訂6）
+            rs = x.get(rk) or {}
+            if rs.get("concept"):
+                t = c.terms.get(rs["concept"])
+                if not t or not filled(t):
+                    err.append(f"{eid}: {rk}.concept {rs['concept']} が説明のある概念にない")
+                elif "formula" in rs and not (0 <= rs["formula"] < len(t.get("formulas") or [])):
+                    err.append(f"{eid}: {rk}.formula {rs['formula']} が {rs['concept']} の式にない")
         for bad in ("answer", "expect"):
             if bad in x or bad in (x.get("predict") or {}):
                 err.append(f"{eid}: 予想の答え（{bad}）は書かない（公開の JSON に出てしまう。画面がモデルから求める）")
@@ -1300,11 +1337,12 @@ def _assemble(c: Course, target: dict) -> dict:
                     "units": [g(u) for u in (d.get("basis") or {}).get("units", [])]} for d in ders]
     experiments = []
     for x in load_experiments():
-        e = {k: v for k, v in x.items() if k not in ("links", "reason", "counterexamples")}
+        e = {k: v for k, v in x.items() if k not in ("links", "reason", "spread_reason", "counterexamples")}
         e["id"] = g(x["id"])
         e["links"] = {k: [g(r) for r in v] for k, v in (x.get("links") or {}).items() if v}
-        if x.get("reason"):
-            e["reason"] = {**x["reason"], **({"concept": g(x["reason"]["concept"])} if x["reason"].get("concept") else {})}
+        for rk in ("reason", "spread_reason"):
+            if x.get(rk):
+                e[rk] = {**x[rk], **({"concept": g(x[rk]["concept"])} if x[rk].get("concept") else {})}
         if x.get("catalog"):
             e["catalog"] = [{**grp, "items": [{**it, "id": g(it["id"]), "concept": g(it["concept"]), **({"related": [g(r) for r in it["related"]]} if it.get("related") else {})} for it in grp["items"]]} for grp in x["catalog"]]
         if x.get("counterexamples"):
