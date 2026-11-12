@@ -353,6 +353,26 @@
       kind: param
       of: X
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "fn", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "X"}, {"sym": "mu"}]}, {"num": 2}]}], "name": "E"}, {"op": "sub", "args": [{"op": "fn", "args": [{"op": "pow", "args": [{"sym": "X"}, {"num": 2}]}], "name": "E"}, {"op": "pow", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "E"}, {"num": 2}]}]}]}
+  - id: F-var-linear
+    label: 1次式の分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（ずれの2乗の期待値）
+      key: V
+      concept: TERM-var
+    - symbol: X
+      meaning: 確率変数
+      key: X
+      kind: rv
+    - symbol: a
+      meaning: 掛ける定数（2乗で効く）
+      key: a
+      kind: const
+    - symbol: b
+      meaning: 足す定数（ばらつきは変えない）
+      key: b
+      kind: const
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "V"}, {"op": "mul", "args": [{"op": "pow", "args": [{"sym": "a"}, {"num": 2}]}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   - id: F-var-sum
     label: 値ごとの和（離散）
     symbols:
@@ -380,26 +400,6 @@
       key: p
       concept: TERM-dist
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "X"}], "name": "V"}, {"op": "sum", "args": [{"op": "mul", "args": [{"op": "pow", "args": [{"op": "sub", "args": [{"sym": "x"}, {"sym": "mu"}]}, {"num": 2}]}, {"op": "fn", "args": [{"sym": "x"}], "name": "p"}]}], "var": "x"}]}
-  - id: F-var-linear
-    label: 1次式の分散
-    symbols:
-    - symbol: V( )
-      meaning: 分散（ずれの2乗の期待値）
-      key: V
-      concept: TERM-var
-    - symbol: X
-      meaning: 確率変数
-      key: X
-      kind: rv
-    - symbol: a
-      meaning: 掛ける定数（2乗で効く）
-      key: a
-      kind: const
-    - symbol: b
-      meaning: 足す定数（ばらつきは変えない）
-      key: b
-      kind: const
-    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "add", "args": [{"op": "mul", "args": [{"sym": "a"}, {"sym": "X"}]}, {"sym": "b"}]}], "name": "V"}, {"op": "mul", "args": [{"op": "pow", "args": [{"sym": "a"}, {"num": 2}]}, {"op": "fn", "args": [{"sym": "X"}], "name": "V"}]}]}
   conditions:
     math:
     - text: 2乗の期待値 E(X²) が有限（このとき E(X) も有限になり、E((X−μ)²) が有限の値に定まる）

@@ -339,6 +339,106 @@
  {
   "concept": "TERM-var",
   "index": 1,
+  "id": "F-var-linear",
+  "label": "1次式の分散",
+  "tex": "V(aX+b)=a^{2}V(X)",
+  "symbols": [
+   {
+    "symbol": "V( )",
+    "meaning": "分散（ずれの2乗の期待値）",
+    "key": "V",
+    "concept": "TERM-var"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "a",
+    "meaning": "掛ける定数（2乗で効く）",
+    "key": "a",
+    "kind": "const"
+   },
+   {
+    "symbol": "b",
+    "meaning": "足す定数（ばらつきは変えない）",
+    "key": "b",
+    "kind": "const"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "args": [
+      {
+       "op": "add",
+       "args": [
+        {
+         "op": "mul",
+         "args": [
+          {
+           "sym": "a"
+          },
+          {
+           "sym": "X"
+          }
+         ]
+        },
+        {
+         "sym": "b"
+        }
+       ]
+      }
+     ],
+     "name": "V"
+    },
+    {
+     "op": "mul",
+     "args": [
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "a"
+        },
+        {
+         "num": 2
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "args": [
+        {
+         "sym": "X"
+        }
+       ],
+       "name": "V"
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式",
+    "変換"
+   ],
+   "properties": [
+    "同値",
+    "不変",
+    "対称"
+   ],
+   "representative": true
+  }
+ },
+ {
+  "concept": "TERM-var",
+  "index": 2,
   "id": "F-var-sum",
   "label": "値ごとの和（離散）",
   "tex": "V(X)=\\sum_{x}(x-\\mu)^{2}p(x)",
@@ -438,106 +538,6 @@
     "非負",
     "同値",
     "単位の整合"
-   ],
-   "representative": true
-  }
- },
- {
-  "concept": "TERM-var",
-  "index": 2,
-  "id": "F-var-linear",
-  "label": "1次式の分散",
-  "tex": "V(aX+b)=a^{2}V(X)",
-  "symbols": [
-   {
-    "symbol": "V( )",
-    "meaning": "分散（ずれの2乗の期待値）",
-    "key": "V",
-    "concept": "TERM-var"
-   },
-   {
-    "symbol": "X",
-    "meaning": "確率変数",
-    "key": "X",
-    "kind": "rv"
-   },
-   {
-    "symbol": "a",
-    "meaning": "掛ける定数（2乗で効く）",
-    "key": "a",
-    "kind": "const"
-   },
-   {
-    "symbol": "b",
-    "meaning": "足す定数（ばらつきは変えない）",
-    "key": "b",
-    "kind": "const"
-   }
-  ],
-  "tree": {
-   "op": "eq",
-   "args": [
-    {
-     "op": "fn",
-     "args": [
-      {
-       "op": "add",
-       "args": [
-        {
-         "op": "mul",
-         "args": [
-          {
-           "sym": "a"
-          },
-          {
-           "sym": "X"
-          }
-         ]
-        },
-        {
-         "sym": "b"
-        }
-       ]
-      }
-     ],
-     "name": "V"
-    },
-    {
-     "op": "mul",
-     "args": [
-      {
-       "op": "pow",
-       "args": [
-        {
-         "sym": "a"
-        },
-        {
-         "num": 2
-        }
-       ]
-      },
-      {
-       "op": "fn",
-       "args": [
-        {
-         "sym": "X"
-        }
-       ],
-       "name": "V"
-      }
-     ]
-    }
-   ]
-  },
-  "contract": {
-   "kinds": [
-    "恒等式",
-    "変換"
-   ],
-   "properties": [
-    "同値",
-    "不変",
-    "対称"
    ],
    "representative": true
   }
