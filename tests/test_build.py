@@ -981,6 +981,8 @@ class TestNetwork(unittest.TestCase):
         ok = dict(predict="p", operate="o", judge="j")
         self.assertTrue(any("open break:nothing が問い・反例にない" in e for e in errs(one(open="break:nothing", **ok))))
         self.assertTrue(any("open nothing が問い・反例にない" in e for e in errs(one(open="nothing", **ok))))
+        # support（表を変えない問い）は値の表の実験室だけ（#119）。二項分布の実験室では開く画面がない。値の表の側で通ることは、本物の EXP-expect-table の A-02 が build を通ることで見る
+        self.assertTrue(any("open support が問い・反例にない" in e for e in errs(one(open="support", **ok))))
         self.assertTrue(any("主 TERM-binon が用語にも関係にもない" in e for e in errs(one(concept="TERM-binon"))))
         self.assertFalse(any("binom-A-01" in e for e in errs(one(concept="REL-binom-hyper-contrast"))))   # 関係を主にできる（#169）
         self.assertTrue(any("関連 REL-binom-hyper-contrast が用語にない" in e for e in errs(one(related=["REL-binom-hyper-contrast"]))))

@@ -407,7 +407,8 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                             err.append(f"{eid}: {iid} は開ける問いなので {need}（予測・操作・理解判定）を書く")
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
-                    ok = op == "shift" or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    # support：値の表の実験室の「表を変えない問い」（期待値は実際に出る値？。knowledge-net の TableSupportQ。#119）
+                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or op in qids or (op.startswith("break:") and op[6:] in cxids)
                     if not ok:
                         err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}
