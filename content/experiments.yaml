@@ -320,7 +320,7 @@ experiments:
         title: 事象と確率計算
         items:
           - id: binom-B-01
-            title: ちょうど k 回成功する確率を調べる
+            title: ちょうど k 回成功する確率は、どのくらい？   # 題が画面の「今回の問い」になる（問いの形。#379）
             finds: ちょうど k 回の確率の決まり方   # 名前でなく性質（M8 の ⑦ の確かめ。#353・#352 の暫定 2）
             concept: TERM-binom
             related: [TERM-comb]
@@ -403,7 +403,7 @@ experiments:
                     fb: ['', 比が 1 から離れているかを見る。, 比 A ÷ B が 1 より大きいとき、どちらの確率が大きい？]
                 - {kind: probe}
           - id: binom-B-02
-            title: ちょうど k 回と k 回以上を比べる   # 画面の問いと合わせる（#372）
+            title: 「ちょうど k 回」と「k 回以上」、確率はどう違う？   # 題が画面の「今回の問い」になる（問いの形。#379）
             finds: 累積確率と事象の範囲
             concept: TERM-dist
             related: [TERM-binom]
@@ -1246,7 +1246,7 @@ experiments:
             concept: TERM-binom
             related: [TERM-dist]
           - id: binom-F-03
-            title: 観測した成功回数から成功確率を推定する
+            title: 観測した成功回数から、成功確率はどこまで言える？
             finds: 母比率の推定
             concept: TERM-sample-prop
             related: [TERM-binom]
@@ -1335,7 +1335,7 @@ experiments:
             concept: TERM-lln
             related: [TERM-expect]
           - id: expect-B-02
-            title: 期待値がいくらでも大きくなるくじ
+            title: 期待値がいくらでも大きくなるくじで、何度も引いた平均は？
             finds: 和が有限でないときの平均
             concept: TERM-expect
       - id: C
