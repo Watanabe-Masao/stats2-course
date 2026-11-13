@@ -148,3 +148,10 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-13'
   fingerprint: b3626a890c841e34
+- formula: F-binom-pmf
+  points:
+  - モデルの仮定（独立・同じ p）と反例の実験の言い分
+  judgement: "実験室 EXP-binom-p の反例 streak・mix・fatigue の text を、画面の言葉と ⑦ の「その問いで見つけることだけを言う」に合わせて直したことによるやり直し（#379）。前回の記録（2026-11-13、b3626a890c841e34）からの差分だけを確かめた。git diff HEAD~1（bbf46a9）で変わったのは content/experiments.yaml の3つの text だけで、experiments.yaml だけを HEAD~1 の版に戻して版を計算し直すと b3626a890c841e34 にちょうど戻る（terms.yaml・formula-contracts.yaml・derivations.yaml・build/formulas.py は同じ）。breaks・mechanism・effect・concept・name は前回と同じ。streak の新しい文「成功すると次も成功しやすく、失敗すると次も失敗しやすい（前の結果が次の回を引きずる）」は起き方（lab.ts の drawSet：次の確率は p＋carry(x−p)。成功のあと p＋c(1−p)＞p、失敗のあと p−cp＜p）と同じことを言う。直接効くのは1つ前の結果だけだが、相関は carry^|i−j| で残り、文と食い違わない。各回の確率は p のままで、分散 p(1−p){n＋2Σ(n−h)carry^h} は 2 回以上・0＜p＜1・carry＞0 で np(1−p) より大きく、文の言い分と合う。前の文の店の場面の言葉と、mix の名前とぶつかる「調子」はなくなった。mix の「成功しやすいセットと成功しにくいセットが混ざる（その日の調子）」は、セットの最初に p−d か p＋d を半々で1回選んでセットの全部の回に使う起き方と同じで、名前「その日の調子が1セット全部に効く」とかみ合う。続きの文（ずれが共通なので各回は独立でない・平均 np・分散 np(1−p)＋n(n−1)d²）は前回と同じ。fatigue から外した向きの比べ（共通のずれなら広がる）は E-04 で見つける内容で、mix の text と E-04 の judge が受け持つ。fatigue の text には、各回は独立のまま確率だけが回ごとに違う・分散 Σpᵢ(1−pᵢ)＝np(1−p)−Σ(pᵢ−p)² で二項分布より狭い・その条件と見えにくさの注意が残っていて、言い分はこれだけで足りる。新しい最後の文が指す題「その日の調子が1セット全部に効くと、山の広がりは？」は binom-E-04 の title と一致する。4つの反例の breaks は TERM-binom の conditions.math の仮定の行と一致し、崩す行は1つで、母数は要件の範囲の中にある"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-13'
+  fingerprint: d894ece0486472fa
