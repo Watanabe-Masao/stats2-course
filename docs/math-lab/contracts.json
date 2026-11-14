@@ -484,6 +484,17 @@
     "unit"
    ],
    "choices": 3
+  },
+  "table-transform-mean": {
+   "required": [
+    "values",
+    "weights",
+    "a",
+    "b"
+   ],
+   "optional": [
+    "only"
+   ]
   }
  },
  "apply_steps": {
@@ -630,6 +641,32 @@
   "table-mean-on-table.means": {
    "vars": [],
    "variants": []
+  },
+  "table-transform-mean.goal": {
+   "vars": [
+    "a",
+    "b"
+   ],
+   "variants": [
+    "all"
+   ]
+  },
+  "table-transform-mean.table": {
+   "vars": [],
+   "variants": []
+  },
+  "table-transform-mean.mean": {
+   "vars": [],
+   "variants": []
+  },
+  "table-transform-mean.formula": {
+   "vars": [
+    "mu",
+    "share"
+   ],
+   "variants": [
+    "all"
+   ]
   },
   "table-mean-median-gap.goal": {
    "vars": [],

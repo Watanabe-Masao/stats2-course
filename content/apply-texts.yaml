@@ -172,6 +172,18 @@ steps:
     text: "{mu} の確率は {pmu} で、いちばん出やすいのは {mode}（{pmode}）。期待値は重心で、いちばん出やすい値とは別のもの。"
     variants:
       same: {text: "いちばん出やすいのも {mu}（{pmu}）。この表では一致するが、期待値が表の値でも、いちばん出やすい値と一致するとは限らない。"}
+  table-transform-mean.goal:
+    title: 何を求めるか
+    text: "一部の行だけを {a} 倍して {b} 足す。全部の値を同じように変えるのではない（aX＋b の形でない）ので、変えたあとの表を作って期待値を求める。"
+    variants:
+      all: {text: "全部の値を {a} 倍して {b} 足した表の期待値を求める。"}
+  table-transform-mean.table: {title: 変えたあとの表, text: 値ごとに、変える前 → 変えたあと。重み w（本数）は変わらない。}
+  table-transform-mean.mean: {title: 変えたあとの期待値, text: 値×重みの和を、重みの和で割る。}
+  table-transform-mean.formula:
+    title: 公式と比べる
+    text: "E(aX＋b)＝aE(X)＋b をそのまま使うと、元の期待値 {mu} から求めた値になり、答えと違う。b が付くのは、変える行の分（全体の {share}）だけだから。"
+    variants:
+      all: {text: "E(aX＋b)＝aE(X)＋b（E(X) は元の期待値 {mu}）でも同じ値になる。全部の値を同じように変えたから。"}
   table-mean-median-gap.goal: {title: 何を比べるか, text: 3つの表それぞれで、平均（期待値）と中央値を求め、2つの差がいちばん大きい表を探す。}
   table-mean-median-gap.formula: {title: 大元の公式, text: x は値、w はその値の人数。平均は「値×人数」の和を人数の和で割った数。中央値は、全員を小さい順に並べた真ん中の人の値。}
   table-mean-median-gap.means: {title: 3つの表の平均}

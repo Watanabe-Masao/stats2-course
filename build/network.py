@@ -114,6 +114,7 @@ def table_errors(eid: str, x: dict) -> list[str]:
         one(f"反例 {b.get('id')}", b.get("values") or [], {"weights": b.get("weights") or []}, b.get("labels"))
     err += same_mean_errors(eid, x)
     err += rare_errors(eid, x)
+    err += linear_errors(eid, x)
     return err
 
 
@@ -150,6 +151,36 @@ def rare_errors(eid: str, x: dict) -> list[str]:
             continue
         if any(abs(m1 / m0 - c) < RARE_MARGIN for c in RARE_CUTS):
             err.append(f"{where}：替えた表の期待値は元の {float(m1 / m0):.3g} 倍で、予測の境目（1.2・1.6 倍）に近すぎる")
+    return err
+
+
+def linear_errors(eid: str, x: dict) -> list[str]:
+    """全部の値を a 倍して b 足す変換（テーマの linear。期待値の実験室 C-01。#119）：a は 0 でない、change がある、
+    予測の3つの選び肢（a×m＋b・a×(m＋b)・a×m。画面の TableLinearQ と同じ）が互いに違う、
+    linear を書いたテーマが2つ以上あるとき、正しい答えの並びの位置（小さい順）が全部のテーマで同じでない
+    （a＞1 ならいつも真ん中になり、位置で当たる。⑦ の監査役 2026-11-15）。予測の答えは書かず、画面が表から求める"""
+    err: list[str] = []
+    pos: list[int] = []
+    for t in x.get("themes") or []:
+        lin = t.get("linear")
+        if not lin:
+            continue
+        where = f"{eid}: テーマ {t.get('id')} の linear"
+        a, b = Fraction(str(lin.get("a", 0))), Fraction(str(lin.get("b", 0)))
+        if a == 0:
+            err.append(f"{where}：a は 0 でない")
+            continue
+        if not (lin.get("change") or "").strip():
+            err.append(f"{where} に change（どう変えるかの文）がない")
+        vals, st = t.get("values") or [], t.get("start") or []
+        m = sum(Fraction(v) * w for v, w in zip(vals, st)) / sum(Fraction(w) for w in st)
+        cands = [a * m + b, a * (m + b), a * m]
+        if len(set(cands)) < 3:
+            err.append(f"{where}：予測の3つの選び肢 {[float(c) for c in cands]} に同じ数がある")
+            continue
+        pos.append(sorted(cands).index(cands[0]))
+    if len(pos) >= 2 and len(set(pos)) == 1:
+        err.append(f"{eid}: linear の正しい答えの位置が、全部のテーマで同じ（{pos[0] + 1} 番目）。位置で当たらないように a・b を替える")
     return err
 
 
@@ -481,7 +512,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
                     # support：値の表の実験室の「表を変えない問い」（期待値は実際に出る値？。knowledge-net の TableSupportQ。#119）
-                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or (op == "linear" and any(t.get("linear") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
                     if not ok:
                         err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}
