@@ -154,17 +154,17 @@ steps:
       b: {text: "B の方が大きい（{r} 倍）。平均だけではばらつきは決まらない。p が 0.5 に近いほど1回の p(1−p) は大きいが、回数 n が多いほど足す数も増える。"}
 
   # 値の表（期待値の実験室。#364）
-  table-weight-for-mean.goal: {title: 何を求めるか, text: "{x} の重みだけを w に替えて（ほかの重みはそのまま）、期待値をちょうど {mean} にする w を求める。"}
-  table-weight-for-mean.formula: {title: 大元の公式, text: 重みの比が確率なので、期待値は「値×重み」の和を重みの和で割った数（値×確率の和と同じ）。}
-  table-weight-for-mean.put: {title: 値を入れる, text: "替える値の行のほかは、値×重み の和が {S}、重みの和が {W}。替える行の 値×重み と重みを足して、期待値を目標と等しくおく。"}
-  table-weight-for-mean.calc: {title: 計算の過程, text: 両辺に分母を掛け、w の項を片側に集めて w を求める。}
-  table-weight-for-mean.check: {title: 確かめる, text: 求めた w を重みに入れ直すと、期待値が目標になる。}
+  table-weight-for-mean.goal: {title: 何を求めるか, text: "{x} の重みだけを t とおき（ほかの重みはそのまま）、期待値をちょうど {mean} にする t を求める。"}
+  table-weight-for-mean.formula: {title: 大元の公式, text: x は値、w はその値の重み。重みの比が確率なので、期待値は「値×重み」の和を重みの和で割った数（値×確率の和と同じ）。}
+  table-weight-for-mean.put: {title: 値を入れる, text: "替える値の行のほかは、値×重み の和が {S}、重みの和が {W}。替える行の 値×t と t を足して、期待値を目標と等しくおく。"}
+  table-weight-for-mean.calc: {title: 計算の過程, text: 両辺に分母を掛け、t の項を片側に集めて t を求める。}
+  table-weight-for-mean.check: {title: 確かめる, text: 求めた t を重みに入れ直すと、期待値が目標になる。}
   table-mean-on-table.goal: {title: 何を確かめるか, text: 3つの表それぞれの期待値を求め、表の値の1つと同じになる表を探す。}
-  table-mean-on-table.formula: {title: 大元の公式, text: 期待値は「値×重み」の和を重みの和で割った数（値×確率の和）。}
+  table-mean-on-table.formula: {title: 大元の公式, text: x は値、w はその値の重み。期待値は「値×重み」の和を重みの和で割った数（値×確率の和）。}
   table-mean-on-table.means: {title: 3つの表の期待値}
   table-mean-on-table.judge: {title: 判断, text: "{name} だけ、期待値 {mu} が表の値の1つと同じ。ほかの2つは値と値の間に来る（1回では出ない値）。"}
   table-min-var.goal: {title: 何を比べるか, text: "3つの表はどれも期待値 {mu}。毎回の結果がそろうかは、散らばり（分散）で比べる。"}
-  table-min-var.formula: {title: 大元の公式, text: 分散は「(値−期待値)²×重み」の和を重みの和で割った数（期待値からのずれの2乗の期待値）。}
+  table-min-var.formula: {title: 大元の公式, text: μ は期待値、x は値、w はその値の重み。分散は「(値−μ)²×重み」の和を重みの和で割った数（期待値からのずれの2乗の期待値）。}
   table-min-var.var: {title: 3つの表の分散}
   table-min-var.compare: {title: 選ぶ, text: "{name} の分散がいちばん小さい（次に小さい表の {r} 分の1）。毎回の結果をそろえたいなら {name}。"}
 
