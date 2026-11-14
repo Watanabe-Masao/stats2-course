@@ -19,14 +19,14 @@ steps:
 
   # 逆算：平均から p
   mean-to-p.goal: {title: 何を求めるか, text: "{n} 回の成功の回数 X の平均（期待値）を {mean} 回にする、1回の成功確率 p。"}
-  mean-to-p.formula: {title: 大元の公式, text: 二項分布の平均は、回数 n×1回の成功確率 p。}
+  mean-to-p.formula: {title: 大元の公式, text: E(X) は成功の回数 X の平均（期待値）。二項分布の平均は、回数 n×1回の成功確率 p。}
   mean-to-p.put: {title: 値を入れる}
   mean-to-p.calc: {title: 計算する, text: 両辺を n で割る。}
   mean-to-p.check: {title: 検証, text: 下の道具で n と p をこの値にすると、中心 n×p がこの値になる。}
 
   # 設計：割合の標準偏差を上限以下にする最小の n
   min-n-share-sd.goal: {title: 何を求めるか, text: "成功の割合 p̂（成功の回数 X を n で割った値）は、調べるたびにばらつく。そのばらつき（標準偏差）を {sd} 以下にする、いちばん少ない回数 n。"}
-  min-n-share-sd.formula: {title: 大元の公式, text: 回数 X の分散は np(1−p)。割合は X を n で割るので、分散は n² で割る。標準偏差はその平方根。}
+  min-n-share-sd.formula: {title: 大元の公式, text: X は成功の回数、n は回数、p は1回の成功確率、p̂ は成功の割合 X÷n、V は分散、σ は標準偏差。成功の回数 X の分散は np(1−p)。割合は X を n で割るので、分散は n² で割る。標準偏差はその平方根。}
   min-n-share-sd.put: {title: 値を入れる}
   min-n-share-sd.calc: {title: 計算する, text: 両辺を2乗して √ を外し、n について解く。}
   min-n-share-sd.answer:
@@ -36,7 +36,7 @@ steps:
 
   # 反証：割合が同じ2つの「ちょうど k 回」
   compare-eq.goal: {title: 何を比べるか, text: "{an} 回中ちょうど {ak} 回と、{bn} 回中ちょうど {bk} 回。割合は同じでも、「ちょうどその回数」になる確率は同じとは限らない。"}
-  compare-eq.formula: {title: 大元の公式}
+  compare-eq.formula: {title: 大元の公式, text: X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率、ₙCₖ は n 回から k 回を選ぶ並びの数。}
   compare-eq.case: {title: "{n} 回中 {k} 回（n＝{n}・k＝{k}・p＝{p}）"}
   compare-eq.compare:
     title: 比較
@@ -48,7 +48,7 @@ steps:
   # 評価：以上と、より多い の差
   boundary.goal: {title: 何を求めるか, text: "「{k} 回以上」と「{k} 回より多い」の確率の差（n＝{n}・p＝{p}）。"}
   boundary.diff: {title: 2つの違い, text: "「以上」は境目の {k} 回を含み、「より多い」は含まない。差は境目の棒1本。"}
-  boundary.formula: {title: 大元の公式}
+  boundary.formula: {title: 大元の公式, text: X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率、ₙCₖ は n 回から k 回を選ぶ並びの数。}
   boundary.calc: {title: "値を入れて計算する（n＝{n}・k＝{k}・p＝{p}）"}
   boundary.check: {title: グラフで検証, text: "下の道具で n＝{n}・p＝{p}・k＝{k} にすると、「{k} 回以上」{ge} と「{k1} 回以上」{gt} が出る。その差が境目の棒（ちょうど {k} 回）。"}
 
@@ -57,20 +57,20 @@ steps:
     title: 何を求めるか
     text: "{people} 人がそれぞれ {n} 回挑戦したとき、「{k} 回{op}」になる人数の平均。"
     variants: {all: {text: "{people} 人がそれぞれ {n} 回挑戦したとき、「{n} 回とも成功」になる人数の平均。"}}
-  expected-observers.one: {title: 1人の確率（大元の公式）, text: まず1人について、その結果になる確率を求める。}
-  expected-observers.mean: {title: 人数の平均（大元の公式）, text: "起きる人数 Y は、{people} 人それぞれの「起きる・起きない」を数えたもの。人数 N と1人の確率 P の二項分布なので、平均は N×P。"}
+  expected-observers.one: {title: 1人の確率（大元の公式）, text: まず1人について、その結果になる確率を求める。X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率、ₙCₖ は n 回から k 回を選ぶ並びの数。}
+  expected-observers.mean: {title: 人数の平均（大元の公式）, text: "起きる人数 Y は、{people} 人それぞれの「起きる・起きない」を数えたもの。人数 N と1人の確率 q（上で求めた値）の二項分布なので、平均 E(Y) は N×q。"}
   expected-observers.calc:
     title: 値を入れて計算する
     variants: {rare: {text: "1人では約 {inv} 人に1人の珍しさでも、{people} 人いれば平均で約 {mean} 人。"}}
-  expected-observers.any: {title: 少なくとも1人いる確率}
+  expected-observers.any: {title: 少なくとも1人いる確率, text: 1−(1−q)ᴺ は、N 人のだれにも起きない確率 (1−q)ᴺ を1から引いたもの。}
 
   # 設計：割合のずれの目安を許す幅以内にするセット数
   sets-for-error.goal:
     title: 何を求めるか
     text: "何セットも実験して「{k} 回{op}」（n＝{n}・p＝{p}）になったセットの割合を数える。その割合と理論の確率とのずれの目安（±2 標準誤差）を {err} ポイント 以内にする、いちばん少ないセット数 N。"
     variants: {unit: {text: "何セットも実験して「{k} 回{op}」（n＝{n}・p＝{p}）になったセットの割合を数える。その割合と理論の確率とのずれの目安（±2 標準誤差）を {err} ポイント 以内にする、いちばん少ないセット数 N（{u} セット単位）。"}}
-  sets-for-error.prob: {title: 理論の確率 P（大元の公式）}
-  sets-for-error.se: {title: ずれの目安（大元の公式）, text: 1セットごとに「当てはまる・当てはまらない」の 0 か 1。割合はその平均なので、標準誤差は √(P(1−P)÷N)。}
+  sets-for-error.prob: {title: 1セットで当てはまる理論の確率 q（大元の公式）, text: X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率、ₙCₖ は n 回から k 回を選ぶ並びの数。}
+  sets-for-error.se: {title: ずれの目安（大元の公式）, text: 1セットごとに「当てはまる・当てはまらない」の 0 か 1。割合はその平均なので、標準誤差 SE は √(q(1−q)÷N)。N はセット数（1セットの回数 n とは別）。}
   sets-for-error.put: {title: 値を入れる}
   sets-for-error.calc: {title: 計算する, text: 両辺を2で割り、2乗して √ を外し、N について解く。}
   sets-for-error.answer:
@@ -81,7 +81,7 @@ steps:
 
   # 反証：平均が np でも二項分布と言えるか
   binom-judge.goal: {title: 何を確かめるか, text: 二項分布かどうかは平均だけでは決まらない。平均とばらつき（分散）の両方を、二項分布の式と比べる。}
-  binom-judge.formula: {title: 大元の公式（二項分布）}
+  binom-judge.formula: {title: 大元の公式（二項分布）, text: E(X) は平均、V(X) は分散。X は成功の回数、n は回数、p は1回の成功確率。}
   binom-judge.put: {title: 値を入れる}
   binom-judge.judge:
     title: 比べて判断する
@@ -98,7 +98,7 @@ steps:
     title: 何を求めるか
     text: "箱から戻さずに {n} 個取ると、分散は戻して取るとき（二項分布）より小さくなる。小さくなっても {ratio} 倍以上にとどまる、いちばん少ない箱の中の玉の数 N。"
     variants: {unit: {text: "箱から戻さずに {n} 個取ると、分散は戻して取るとき（二項分布）より小さくなる。小さくなっても {ratio} 倍以上にとどまる、いちばん少ない箱の中の玉の数 N（{st} 個単位）。"}}
-  min-total.formula: {title: 大元の公式（有限母集団修正）, text: 戻さないと取るたびに箱の中身が変わり、その分だけ分散が縮む。}
+  min-total.formula: {title: 大元の公式（有限母集団修正）, text: n は取る数、N は箱の中の玉の数、p は当たりの割合、V は分散（戻さない・戻す）。戻さないと取るたびに箱の中身が変わり、その分だけ分散が縮む。}
   min-total.put: {title: 値を入れる}
   min-total.calc: {title: 計算する, text: 両辺に N−1 を掛け、N を左にまとめて解く。}
   min-total.answer:
@@ -108,14 +108,14 @@ steps:
 
   # 逆算：分散からずれ幅 d
   solve-spread.goal: {title: 何を求めるか, text: 日によって成功確率が p−d か p＋d に変わると、成功の回数の分散は二項分布より大きくなる。増えた分から、ずれ幅 d を逆に求める。}
-  solve-spread.formula: {title: 大元の公式, text: 1日の中のばらつき（二項分布の分）に、日ごとの確率の違いの分が足される。}
+  solve-spread.formula: {title: 大元の公式, text: X は成功の回数、n は回数、p は平均の成功確率、d は日ごとの確率のずれ幅。1日の中のばらつき（二項分布の分）に、日ごとの確率の違いの分が足される。}
   solve-spread.put: {title: 値を入れる}
   solve-spread.calc: {title: 計算する}
   solve-spread.check: {title: 検証, text: "確率は p−d＝{lo} と p＋d＝{hi} の日が半々。下の道具でずれ幅をこの値にすると、分散がこの値になる。"}
 
   # 評価：いちばん起こりやすい成功回数
   mode.goal: {title: 何を求めるか, text: "成功確率 {p} で {n} 回。いちばん起こりやすい成功の回数（確率がいちばん大きい棒）。"}
-  mode.formula: {title: 大元の公式, text: P＝並びの数×1つの並びの確率。並びの数 ₙCₖ は真ん中（k＝n÷2）でいちばん多い。1つの並びの確率 pᵏ(1−p)ⁿ⁻ᵏ は、p が大きいと k が大きいほど大きい。その掛け算で決まる。}
+  mode.formula: {title: 大元の公式, text: X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率。P(X＝k)＝並びの数×1つの並びの確率。並びの数 ₙCₖ は真ん中（k＝n÷2）でいちばん多い。1つの並びの確率 pᵏ(1−p)ⁿ⁻ᵏ は、p が大きいと k が大きいほど大きい。その掛け算で決まる。}
   mode.calc: {title: "値を入れて計算する（n＝{n}・p＝{pv}）", text: "並びの数は {half} 回がいちばん多い（{c} 通り）が、1つの並びの確率は {k} 回の方がずっと大きい。"}
   mode.answer:
     title: 答え
@@ -126,7 +126,7 @@ steps:
 
   # 反証：±2SE の帯の中か
   within-band.goal: {title: 何を確かめるか, text: "理論の確率 {P} で {m} 回中 {x} 回（{obs}）。このずれが、実験のばらつき（標本変動）の範囲かどうか。"}
-  within-band.formula: {title: 大元の公式, text: 同じ条件の実験をくり返すと、割合は理論のまわりを SE ほどばらつく。±2SE の帯の中なら、ばらつきとして説明できる。}
+  within-band.formula: {title: 大元の公式, text: P は理論の確率、m は試した回数、SE は標準誤差（割合のばらつきの大きさ）。同じ条件の実験をくり返すと、割合は理論のまわりを SE ほどばらつく。ずれの目安（±2SE）の帯の中なら、ばらつきとして説明できる。}
   within-band.put: {title: 値を入れる}
   within-band.band: {title: 帯を計算する}
   within-band.judge:
@@ -136,14 +136,14 @@ steps:
 
   # 変換：期待値の線形性
   linear-sum.goal: {title: 何を求めるか, text: "成功で {a} 円、失敗で {b} 円。成功確率 {p} で {n} 回くり返したときの、合計金額の期待値。"}
-  linear-sum.formula: {title: 大元の公式（期待値の線形性）, text: 1回の値 W は、成功なら a、失敗なら b。合計の期待値は、1回の期待値を足したもの（独立でなくても成り立つ）。}
+  linear-sum.formula: {title: 大元の公式（期待値の線形性）, text: Wᵢ は i 回目の値（成功なら a、失敗なら b）、n は回数、p は1回の成功確率。合計の期待値は、1回の期待値を足したもの（独立でなくても成り立つ）。}
   linear-sum.put: {title: 値を入れる}
   linear-sum.calc: {title: 計算する}
   linear-sum.alt: {title: 別の見方で検証, text: E(X) は成功の回数の平均。成功の回数の平均 np を使っても同じ。期待値は線形なので、値を付け替えても平均から計算できる。}
 
   # 評価：2つの二項分布の分散
   compare-var.goal: {title: 何を比べるか, text: "A：n＝{an}・p＝{ap}、B：n＝{bn}・p＝{bp}。平均が同じでも、ばらつき（分散）は同じとは限らない。"}
-  compare-var.formula: {title: 大元の公式, text: 1回の分散 p(1−p) を n 回分足す（各回は独立）。}
+  compare-var.formula: {title: 大元の公式, text: E(X) は平均、V(X) は分散。X は成功の回数、n は回数、p は1回の成功確率。1回の分散 p(1−p) を n 回分足す（各回は独立）。}
   compare-var.mean: {title: 平均}
   compare-var.var: {title: 分散}
   compare-var.compare:
@@ -185,7 +185,7 @@ steps:
   mech.streak: {title: 崩した起き方の分散（大元の公式）}
 
   # 強さを変えたときの分散の比
-  ratio.streak.formula: {title: 大元の公式（前の結果に引きずられる）, text: c は引きずる強さ。隣どうしの相関が c、2つ離れると c²…と積み重なる。}
+  ratio.streak.formula: {title: 大元の公式（前の結果に引きずられる）, text: c は引きずる強さ、h は何回離れているか。隣どうしの相関が c、2つ離れると c²…と積み重なる。}
   ratio.streak.calc: {title: "値を入れて計算する（c＝{c}・n＝{n}）"}
   ratio.mix: {title: 大元の公式（日によって確率が違う）}
   ratio.other: {title: 比を求める, text: "{key}＝{x} のとき。"}
