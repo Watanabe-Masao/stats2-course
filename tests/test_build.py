@@ -1555,6 +1555,28 @@ class TestLinear(unittest.TestCase):
         self.assertIn("位置", bad(dice={"a": 2, "b": 1}, lottery={"a": 2, "b": 50}))
 
 
+class TestPrice(unittest.TestCase):
+    # 確かめる対象：1回あたりの値段（テーマの price。期待値の実験室 E-01。#119）の build の止め。
+    # 想定する故障：期待値と値段が同じ（答えが「損得なし」になる）・全部のテーマで得か損かが同じ（テーマを替えても答えが読める）・呼び名がない。
+    # 見つけ方：原本の2テーマ（くじ +8・さいころ −0.5）は通り、1つずつ崩した price がそれぞれの理由で止まること。数は分数で比べる。
+    # 既存との違い：linear_errors は値の変換。ここは値段。
+    # 検出の確かめ（2026-11-15）：同じの止め・向きの止め・呼び名の止めを1つずつ外すと、それぞれの assert で落ちることを見た
+    def test_price_errors(self):
+        from network import load_experiments, price_errors
+        x = next(e for e in load_experiments() if e["id"] == "EXP-expect-table")
+        self.assertEqual(price_errors("X", x), [])
+
+        def bad(**by_theme):
+            y = copy.deepcopy(x)
+            for t in y["themes"]:
+                if t["id"] in by_theme:
+                    t["price"].update(by_theme[t["id"]])
+            return " ".join(price_errors("X", y))
+        self.assertIn("同じ（ちょうど", bad(lottery={"c": 38}))
+        self.assertIn("全部のテーマで同じ", bad(dice={"c": 3}))   # さいころも 3.5−3＝+0.5 で得になる
+        self.assertIn("word", bad(dice={"word": ""}))
+
+
 class TestProgress(unittest.TestCase):
     def test_counts_from_source(self):
         from progress import notion_page, unit_row
