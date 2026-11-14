@@ -438,6 +438,29 @@
    ],
    "optional": [],
    "choices": 3
+  },
+  "table-weight-for-mean": {
+   "required": [
+    "values",
+    "weights",
+    "index",
+    "mean"
+   ],
+   "optional": []
+  },
+  "table-mean-on-table": {
+   "required": [
+    "tables"
+   ],
+   "optional": [],
+   "choices": 3
+  },
+  "table-min-var": {
+   "required": [
+    "tables"
+   ],
+   "optional": [],
+   "choices": 3
   }
  },
  "apply_steps": {
@@ -564,6 +587,72 @@
   },
   "event.each": {
    "vars": [],
+   "variants": []
+  },
+  "table-mean-on-table.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-on-table.goal": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-on-table.judge": {
+   "vars": [
+    "mu",
+    "name"
+   ],
+   "variants": []
+  },
+  "table-mean-on-table.means": {
+   "vars": [],
+   "variants": []
+  },
+  "table-min-var.compare": {
+   "vars": [
+    "name",
+    "r"
+   ],
+   "variants": []
+  },
+  "table-min-var.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "table-min-var.goal": {
+   "vars": [
+    "mu"
+   ],
+   "variants": []
+  },
+  "table-min-var.var": {
+   "vars": [],
+   "variants": []
+  },
+  "table-weight-for-mean.calc": {
+   "vars": [],
+   "variants": []
+  },
+  "table-weight-for-mean.check": {
+   "vars": [],
+   "variants": []
+  },
+  "table-weight-for-mean.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "table-weight-for-mean.goal": {
+   "vars": [
+    "mean",
+    "x"
+   ],
+   "variants": []
+  },
+  "table-weight-for-mean.put": {
+   "vars": [
+    "S",
+    "W"
+   ],
    "variants": []
   },
   "event.one": {
