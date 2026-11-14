@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 11,
+  "x-revision": 12,
   "if": {
     "type": "object",
     "required": [
@@ -726,6 +726,30 @@
                   }
                 }
               },
+              "price": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "c",
+                  "word",
+                  "change"
+                ],
+                "description": "1回あたりの値段（期待値の実験室 E-01。stats2-course #119。改訂12）。1回引くたびに c を払い、出た値を受け取る",
+                "properties": {
+                  "c": {
+                    "type": "number",
+                    "description": "1回あたりの値段"
+                  },
+                  "word": {
+                    "type": "string",
+                    "description": "値段の呼び名（くじは「値段」、さいころは「参加費」）"
+                  },
+                  "change": {
+                    "$ref": "kn-schema-v2.json#/$defs/text",
+                    "description": "場面の文（得か損かは書かない。予測の答えになるから）"
+                  }
+                }
+              },
               "linear": {
                 "type": "object",
                 "additionalProperties": false,
@@ -1259,6 +1283,7 @@
                             "table-weight-for-mean",
                             "table-mean-median-gap",
                             "table-transform-mean",
+                            "table-best-net",
                             "table-mean-on-table",
                             "table-min-var",
                             "table-mean-mode"

@@ -115,6 +115,7 @@ def table_errors(eid: str, x: dict) -> list[str]:
     err += same_mean_errors(eid, x)
     err += rare_errors(eid, x)
     err += linear_errors(eid, x)
+    err += price_errors(eid, x)
     return err
 
 
@@ -181,6 +182,31 @@ def linear_errors(eid: str, x: dict) -> list[str]:
         pos.append(sorted(cands).index(cands[0]))
     if len(pos) >= 2 and len(set(pos)) == 1:
         err.append(f"{eid}: linear の正しい答えの位置が、全部のテーマで同じ（{pos[0] + 1} 番目）。位置で当たらないように a・b を替える")
+    return err
+
+
+def price_errors(eid: str, x: dict) -> list[str]:
+    """1回あたりの値段（テーマの price。期待値の実験室 E-01。#119）：word・change がある、期待値と値段が同じでない
+    （「ちょうど損得なし」は選び肢に置くが答えにしない）、price を書いたテーマが2つ以上あるとき、得・損の答えが全部のテーマで同じでない
+    （テーマを替えても答えが読めないように。⑦ の監査役 2026-11-15）。予測の答えは書かず、画面が表から求める"""
+    err: list[str] = []
+    signs: list[int] = []
+    for t in x.get("themes") or []:
+        pr = t.get("price")
+        if not pr:
+            continue
+        where = f"{eid}: テーマ {t.get('id')} の price"
+        if not (pr.get("word") or "").strip() or not (pr.get("change") or "").strip():
+            err.append(f"{where} に word（値段の呼び名）と change（場面の文）を書く")
+        vals, st = t.get("values") or [], t.get("start") or []
+        m = sum(Fraction(v) * w for v, w in zip(vals, st)) / sum(Fraction(w) for w in st)
+        d = m - Fraction(str(pr.get("c", 0)))
+        if d == 0:
+            err.append(f"{where}：期待値と値段が同じ（ちょうど損得なしは答えにしない）")
+            continue
+        signs.append(1 if d > 0 else -1)
+    if len(signs) >= 2 and len(set(signs)) == 1:
+        err.append(f"{eid}: price の得・損の答えが、全部のテーマで同じ。テーマを替えても答えが読めないように値段を替える")
     return err
 
 
@@ -512,7 +538,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
                     # support：値の表の実験室の「表を変えない問い」（期待値は実際に出る値？。knowledge-net の TableSupportQ。#119）
-                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or (op == "linear" and any(t.get("linear") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or (op == "linear" and any(t.get("linear") for t in x.get("themes") or [])) or (op == "price" and any(t.get("price") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
                     if not ok:
                         err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}
