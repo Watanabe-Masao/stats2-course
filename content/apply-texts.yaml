@@ -40,10 +40,10 @@ steps:
   compare-eq.case: {title: "{n} 回中 {k} 回（n＝{n}・k＝{k}・p＝{p}）"}
   compare-eq.compare:
     title: 比較
-    text: ほぼ同じ（0.9〜1.1 倍）。並びの数 ₙCₖ は増えるが、1つの並びの確率がそれ以上に小さくなる。
+    text: ほぼ同じ（0.9〜1.1 倍）。並びの数 ₙCₖ の増え方と、1つの並びの確率の減り方がほぼ釣り合う。
     variants:
       a: {text: "{an} 回中 {ak} 回の方が約 {r} 倍起きやすい。並びの数 ₙCₖ は増えるが、1つの並びの確率がそれ以上に小さくなる。"}
-      b: {text: "{bn} 回中 {bk} 回の方が約 {r} 倍起きやすい。並びの数 ₙCₖ は増えるが、1つの並びの確率がそれ以上に小さくなる。"}
+      b: {text: "{bn} 回中 {bk} 回の方が約 {r} 倍起きやすい。並びの数 ₙCₖ の増え方が、1つの並びの確率の減り方より大きい。"}
 
   # 評価：以上と、より多い の差
   boundary.goal: {title: 何を求めるか, text: "「{k} 回以上」と「{k} 回より多い」の確率の差（n＝{n}・p＝{p}）。"}
@@ -116,7 +116,7 @@ steps:
   # 評価：いちばん起こりやすい成功回数
   mode.goal: {title: 何を求めるか, text: "成功確率 {p} で {n} 回。いちばん起こりやすい成功の回数（確率がいちばん大きい棒）。"}
   mode.formula: {title: 大元の公式, text: X は成功の回数、n は回数、k は数える成功の回数、p は1回の成功確率。P(X＝k)＝並びの数×1つの並びの確率。並びの数 ₙCₖ は真ん中（k＝n÷2）でいちばん多い。1つの並びの確率 pᵏ(1−p)ⁿ⁻ᵏ は、p が大きいと k が大きいほど大きい。その掛け算で決まる。}
-  mode.calc: {title: "値を入れて計算する（n＝{n}・p＝{pv}）", text: "並びの数は {half} 回がいちばん多い（{c} 通り）が、1つの並びの確率は {k} 回の方がずっと大きい。"}
+  mode.calc: {title: "値を入れて計算する（n＝{n}・p＝{pv}）", text: "並びの数がいちばん多いのは真ん中の {half} 回（{c} 通り。n が奇数なら次の回も同じ数）だが、1つの並びの確率は {k} 回の方がずっと大きい。"}
   mode.answer:
     title: 答え
     text: "{k} 回。確かめ：となりの棒より大きい（{km} 回 {pkm}・{kp} 回 {pkp}、{k} 回 {pk}）。目安は (n＋1)p＝{t} の整数の部分。"
@@ -142,7 +142,7 @@ steps:
   linear-sum.alt: {title: 別の見方で検証, text: E(X) は成功の回数の平均。成功の回数の平均 np を使っても同じ。期待値は線形なので、値を付け替えても平均から計算できる。}
 
   # 評価：2つの二項分布の分散
-  compare-var.goal: {title: 何を比べるか, text: "A：n＝{an}・p＝{ap}、B：n＝{bn}・p＝{bp}。平均が同じでも、ばらつき（分散）は同じとは限らない。"}
+  compare-var.goal: {title: 何を比べるか, text: "A：n＝{an}・p＝{ap}、B：n＝{bn}・p＝{bp}。平均（np）の大小と、ばらつき（分散）の大小は同じとは限らない。"}
   compare-var.formula: {title: 大元の公式, text: E(X) は平均、V(X) は分散。X は成功の回数、n は回数、p は1回の成功確率。1回の分散 p(1−p) を n 回分足す（各回は独立）。}
   compare-var.mean: {title: 平均}
   compare-var.var: {title: 分散}
@@ -181,7 +181,7 @@ steps:
     variants:
       odd: {text: "どの表も {n} 人なので、小さい順に並べた {a} 番目の値。人数を小さい値から足していき、その順位に届く値を読む。"}
   table-mean-median-gap.gaps: {title: 平均と中央値の差}
-  table-mean-median-gap.judge: {title: 選ぶ, text: "{name} の差 {gap} がいちばん大きい（次に大きい表の {r} 倍）。平均を「ふつうの値」として伝えると、{name} がいちばん誤解を招く。"}
+  table-mean-median-gap.judge: {title: 選ぶ, text: "{name} の差 {gap} がいちばん大きい（次に大きい表の {r} 倍）。平均と中央値は別の量で、{name} ではその2つがいちばん離れる。"}
   table-min-var.goal: {title: 何を比べるか, text: "3つの表はどれも期待値 {mu}。毎回の結果がそろうかは、散らばり（分散）で比べる。"}
   table-min-var.formula: {title: 大元の公式, text: μ は期待値、x は値、w はその値の重み。分散は「(値−μ)²×重み」の和を重みの和で割った数（期待値からのずれの2乗の期待値）。}
   table-min-var.var: {title: 3つの表の分散}
