@@ -452,14 +452,18 @@
    "required": [
     "tables"
    ],
-   "optional": [],
+   "optional": [
+    "unit"
+   ],
    "choices": 3
   },
   "table-min-var": {
    "required": [
     "tables"
    ],
-   "optional": [],
+   "optional": [
+    "unit"
+   ],
    "choices": 3
   }
  },
