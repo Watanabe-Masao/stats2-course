@@ -172,6 +172,16 @@ steps:
     text: "{mu} の確率は {pmu} で、いちばん出やすいのは {mode}（{pmode}）。期待値は重心で、いちばん出やすい値とは別のもの。"
     variants:
       same: {text: "いちばん出やすいのも {mu}（{pmu}）。この表では一致するが、期待値が表の値でも、いちばん出やすい値と一致するとは限らない。"}
+  table-mean-median-gap.goal: {title: 何を比べるか, text: 3つの表それぞれで、平均（期待値）と中央値を求め、2つの差がいちばん大きい表を探す。}
+  table-mean-median-gap.formula: {title: 大元の公式, text: x は値、w はその値の人数。平均は「値×人数」の和を人数の和で割った数。中央値は、全員を小さい順に並べた真ん中の人の値。}
+  table-mean-median-gap.means: {title: 3つの表の平均}
+  table-mean-median-gap.medians:
+    title: 3つの表の中央値
+    text: "どの表も {n} 人なので、小さい順に並べた {a} 番目と {b} 番目の値の平均。人数を小さい値から足していき、その順位に届く値を読む。"
+    variants:
+      odd: {text: "どの表も {n} 人なので、小さい順に並べた {a} 番目の値。人数を小さい値から足していき、その順位に届く値を読む。"}
+  table-mean-median-gap.gaps: {title: 平均と中央値の差}
+  table-mean-median-gap.judge: {title: 選ぶ, text: "{name} の差 {gap} がいちばん大きい（次に大きい表の {r} 倍）。平均を「ふつうの値」として伝えると、{name} がいちばん誤解を招く。"}
   table-min-var.goal: {title: 何を比べるか, text: "3つの表はどれも期待値 {mu}。毎回の結果がそろうかは、散らばり（分散）で比べる。"}
   table-min-var.formula: {title: 大元の公式, text: μ は期待値、x は値、w はその値の重み。分散は「(値−μ)²×重み」の和を重みの和で割った数（期待値からのずれの2乗の期待値）。}
   table-min-var.var: {title: 3つの表の分散}

@@ -475,6 +475,15 @@
     "unit"
    ],
    "choices": 2
+  },
+  "table-mean-median-gap": {
+   "required": [
+    "tables"
+   ],
+   "optional": [
+    "unit"
+   ],
+   "choices": 3
   }
  },
  "apply_steps": {
@@ -620,6 +629,40 @@
   },
   "table-mean-on-table.means": {
    "vars": [],
+   "variants": []
+  },
+  "table-mean-median-gap.goal": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-median-gap.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-median-gap.means": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-median-gap.medians": {
+   "vars": [
+    "a",
+    "b",
+    "n"
+   ],
+   "variants": [
+    "odd"
+   ]
+  },
+  "table-mean-median-gap.gaps": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-median-gap.judge": {
+   "vars": [
+    "gap",
+    "name",
+    "r"
+   ],
    "variants": []
   },
   "table-mean-mode.goal": {
