@@ -163,6 +163,15 @@ steps:
   table-mean-on-table.formula: {title: 大元の公式, text: x は値、w はその値の重み。期待値は「値×重み」の和を重みの和で割った数（値×確率の和）。}
   table-mean-on-table.means: {title: 3つの表の期待値}
   table-mean-on-table.judge: {title: 判断, text: "{name} だけ、期待値 {mu} が表の値の1つと同じ。ほかの2つは値と値の間に来る（1回では出ない値）。"}
+  table-mean-mode.goal: {title: 何を確かめるか, text: "期待値 {mu} は表の値の1つ。1回引いたとき {mu} がいちばん出やすいかを、値ごとの確率で確かめる。"}
+  table-mean-mode.formula: {title: 大元の公式, text: x は値、w はその値の重み。期待値は「値×重み」の和を重みの和で割った数。値ごとの確率は、その値の重み÷重みの和。}
+  table-mean-mode.mean: {title: 期待値}
+  table-mean-mode.probs: {title: 値ごとの確率}
+  table-mean-mode.judge:
+    title: 判断
+    text: "{mu} の確率は {pmu} で、いちばん出やすいのは {mode}（{pmode}）。期待値は重心で、いちばん出やすい値とは別のもの。"
+    variants:
+      same: {text: "いちばん出やすいのも {mu}（{pmu}）。この表では一致するが、期待値が表の値でも、いちばん出やすい値と一致するとは限らない。"}
   table-min-var.goal: {title: 何を比べるか, text: "3つの表はどれも期待値 {mu}。毎回の結果がそろうかは、散らばり（分散）で比べる。"}
   table-min-var.formula: {title: 大元の公式, text: μ は期待値、x は値、w はその値の重み。分散は「(値−μ)²×重み」の和を重みの和で割った数（期待値からのずれの2乗の期待値）。}
   table-min-var.var: {title: 3つの表の分散}

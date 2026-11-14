@@ -465,6 +465,16 @@
     "unit"
    ],
    "choices": 3
+  },
+  "table-mean-mode": {
+   "required": [
+    "values",
+    "weights"
+   ],
+   "optional": [
+    "unit"
+   ],
+   "choices": 2
   }
  },
  "apply_steps": {
@@ -611,6 +621,35 @@
   "table-mean-on-table.means": {
    "vars": [],
    "variants": []
+  },
+  "table-mean-mode.goal": {
+   "vars": [
+    "mu"
+   ],
+   "variants": []
+  },
+  "table-mean-mode.formula": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-mode.mean": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-mode.probs": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-mode.judge": {
+   "vars": [
+    "mode",
+    "mu",
+    "pmode",
+    "pmu"
+   ],
+   "variants": [
+    "same"
+   ]
   },
   "table-min-var.compare": {
    "vars": [
