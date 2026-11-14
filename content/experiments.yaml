@@ -66,58 +66,40 @@ experiments:
     questions:
       - id: spread
         form: spread
-        title: 試行回数を増やすと分布はどう変わる？
-        question: 回数を 10 回から 40 回にすると、セットをくり返したときの成功の回数と割合のばらつきはどうなる？   # 何のばらつきかを書く（#372）
         set: {n: 10, p: 0.5}
         to: {n: 40}
       - id: rare
         form: prob
         free: true
-        title: 珍しい結果を調べる
-        question: 結果を自分で選び、その確率を桁で予測する
         set: {n: 10, p: 0.7}
         events: [{op: eq, k: 10}]
       - id: pmf
         form: prob
-        title: ちょうど k 回成功する確率を調べる
-        question: 成功確率 30% で 10 回。「ちょうど 3 回」になる確率は？
         set: {n: 10, p: 0.3}
         events: [{op: eq, k: 3}]
       - id: exact
         form: prob
-        title: ちょうど k 回と k 回以上を比べる
-        question: 成功確率 50% で 10 回。「ちょうど 5 回」と「5 回以上」の確率は？
         set: {n: 10, p: 0.5}
         events: [{op: eq, k: 5}, {op: ge, k: 5}]
       - id: conv
         form: conv
-        title: 回数を増やすと割合は理論に近づく？
-        question: 10 回中 5 回以上になるセットの割合。10000 セット重ねると、割合のずれはどのくらいまで？   # 予測は見えている具体の数で（⑦ の 2。#372）。「ずれの目安」は観察で付ける名前
         set: {n: 10, p: 0.5}
         events: [{op: ge, k: 5}]
       # paths（並び）・repeat（くり返し）・mean（平均）・var（ばらつき）：#171 で作成中だった4問の入口
       - id: paths
         form: paths
-        title: 表が 6 回と 3 回、どちらが起こりやすい？   # 題で予測の答えを言わない（⑦ の 2。#372）
-        question: コインを 6 回投げる。表が 6 回と表が 3 回、どちらが起こりやすい？
         set: {n: 6, p: 0.5}
         ks: [6, 3]
       - id: repeat
         form: repeat
-        title: 理論分布と実験結果は一致する？
-        question: 10 回中ちょうど 5 回成功するセットの割合。100 セットの実験をくり返すと、理論と一致する？
         set: {n: 10, p: 0.5}
         events: [{op: eq, k: 5}]
         sets: 100
       - id: mean
         form: mean
-        title: 成功回数の期待値はどこにある？
-        question: 成功確率 35% で 10 回。セットをくり返すと、成功回数の平均はいくつに近づく？
         set: {n: 10, p: 0.35}
       - id: var
         form: var
-        title: 成功回数のばらつきは何で決まる？
-        question: 回数 10 回のまま p を変える。成功回数の分散がいちばん大きい p は？
         set: {n: 10, p: 0.5}
         ps: [0.1, 0.3, 0.5, 0.7, 0.9]
     # テーマ体系（#163。渡辺さんの企画書「二項分布実験室」の 4. 実験テーマ体系）：まとまり（A〜F）の下に問い。
