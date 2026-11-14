@@ -504,6 +504,17 @@
     "unit"
    ],
    "choices": 3
+  },
+  "table-mean-which": {
+   "required": [
+    "tables",
+    "n",
+    "observed"
+   ],
+   "optional": [
+    "unit"
+   ],
+   "choices": 2
   }
  },
  "apply_steps": {
@@ -649,6 +660,29 @@
   },
   "table-mean-on-table.means": {
    "vars": [],
+   "variants": []
+  },
+  "table-mean-which.goal": {
+   "vars": [
+    "n",
+    "obs"
+   ],
+   "variants": []
+  },
+  "table-mean-which.moments": {
+   "vars": [],
+   "variants": []
+  },
+  "table-mean-which.margin": {
+   "vars": [
+    "n"
+   ],
+   "variants": []
+  },
+  "table-mean-which.judge": {
+   "vars": [
+    "name"
+   ],
    "variants": []
   },
   "table-best-net.goal": {

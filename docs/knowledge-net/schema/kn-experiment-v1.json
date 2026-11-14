@@ -3,7 +3,7 @@
   "$id": "https://watanabe-masao.github.io/knowledge-net/schema/kn-experiment-v1.json",
   "title": "knowledge-net：実験室の拡張（教材が書き出す実験室の定義）",
   "description": "芯（kn-schema-v1.json：概念・関係・導出・単元）とは別に改訂する。共通の部品（gid・text・valueTable など）は芯の $defs を指す。教材は experiment_revision にこの x-revision を書く（stats2-course #211）。変更履歴は CHANGELOG.md の「実験室の拡張」。 実験室（stats2-course #102）。model で形が分かれる：binom（二項分布）・table（値の表。#119）",
-  "x-revision": 12,
+  "x-revision": 13,
   "if": {
     "type": "object",
     "required": [
@@ -878,6 +878,15 @@
                 },
                 "description": "値の呼び名（なければ値と単位）。values と同じ数"
               },
+              "cutoffs": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "integer",
+                  "minimum": 2
+                },
+                "description": "打ち切りの回数（期待値の実験室 B-01。stats2-course #119。改訂13）。倍々のくじを最初の K 行で切り直す：k＜K の重みは 2^(K−k)、k＝K は 2。K は values の数以下"
+              },
               "text": {
                 "$ref": "kn-schema-v2.json#/$defs/text"
               },
@@ -1284,6 +1293,7 @@
                             "table-mean-median-gap",
                             "table-transform-mean",
                             "table-best-net",
+                            "table-mean-which",
                             "table-mean-on-table",
                             "table-min-var",
                             "table-mean-mode"

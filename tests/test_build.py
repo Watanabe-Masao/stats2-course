@@ -1577,6 +1577,29 @@ class TestPrice(unittest.TestCase):
         self.assertIn("word", bad(dice={"word": ""}))
 
 
+class TestCutoffs(unittest.TestCase):
+    # 確かめる対象：打ち切り（反例の cutoffs。期待値の実験室 B-01。#119）の build の止め。
+    # 想定する故障：倍々のくじでない表に打ち切りを書く（画面の切り直しの重みが表と合わず、期待値が K＋1 にならない）・
+    #   打ち切りの数や順が画面の前提（3つ・小さい順・表の行数まで）と違う。
+    # 見つけ方：原本は通り、重みを1つ崩した表・打ち切り2つ・行数を超える打ち切りがそれぞれ止まること。
+    # 既存との違い：linear・price はテーマ。これは反例の表。
+    # 検出の確かめ（2026-11-15）：形の止めと数・順の止めを1つずつ外すと、それぞれの assert で落ちることを見た
+    def test_cutoff_errors(self):
+        from network import load_experiments, cutoff_errors
+        x = next(e for e in load_experiments() if e["id"] == "EXP-expect-table")
+        self.assertEqual(cutoff_errors("X", x), [])
+
+        def bad(**kw):
+            y = copy.deepcopy(x)
+            c = next(c for c in y["counterexamples"] if c["id"] == "doubling")
+            c.update(kw)
+            return " ".join(cutoff_errors("X", y))
+        dbl = next(c for c in x["counterexamples"] if c["id"] == "doubling")
+        self.assertIn("形", bad(weights=dbl["weights"][:-1] + [1]))
+        self.assertIn("ちょうど3つ", bad(cutoffs=[10, 20]))
+        self.assertIn("ちょうど3つ", bad(cutoffs=[10, 20, 41]))
+
+
 class TestProgress(unittest.TestCase):
     def test_counts_from_source(self):
         from progress import notion_page, unit_row
