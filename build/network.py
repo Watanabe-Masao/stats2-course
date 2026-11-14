@@ -116,6 +116,7 @@ def table_errors(eid: str, x: dict) -> list[str]:
     err += rare_errors(eid, x)
     err += linear_errors(eid, x)
     err += price_errors(eid, x)
+    err += cutoff_errors(eid, x)
     return err
 
 
@@ -207,6 +208,25 @@ def price_errors(eid: str, x: dict) -> list[str]:
         signs.append(1 if d > 0 else -1)
     if len(signs) >= 2 and len(set(signs)) == 1:
         err.append(f"{eid}: price の得・損の答えが、全部のテーマで同じ。テーマを替えても答えが読めないように値段を替える")
+    return err
+
+
+def cutoff_errors(eid: str, x: dict) -> list[str]:
+    """打ち切り（反例の cutoffs。期待値の実験室 B-01。#119）：画面は倍々のくじを最初の K 行で切り直す（k＜K の重みは 2^(K−k)、k＝K は 2）ので、
+    反例の表がその形（値 2ᵏ・重みが打ち切り len(values) 回の式どおり）であること、cutoffs がちょうど3つ・小さい順・2 以上 len(values) 以下であること"""
+    err: list[str] = []
+    for c in x.get("counterexamples") or []:
+        ks = c.get("cutoffs")
+        if not ks:
+            continue
+        where = f"{eid}: 反例 {c.get('id')} の cutoffs"
+        vals, ws = c.get("values") or [], c.get("weights") or []
+        K = len(vals)
+        if vals != [2 ** k for k in range(1, K + 1)] or ws != [2 ** (K - k) for k in range(1, K)] + [2]:
+            err.append(f"{where}：倍々のくじの形（値 2ᵏ、重み 2^(K−k)・最後は 2）でない表には打ち切りを書かない")
+            continue
+        if len(ks) != 3 or ks != sorted(set(ks)) or ks[0] < 2 or ks[-1] > K:
+            err.append(f"{where}：打ち切りはちょうど3つ、小さい順で 2 以上 {K} 以下")
     return err
 
 
@@ -538,7 +558,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                     if it.get("concept") in c.terms and not filled(c.terms[it["concept"]]):
                         err.append(f"{eid}: {iid} は開ける問いなので、主概念 {it['concept']} を先に説明のある概念にする")
                     # support：値の表の実験室の「表を変えない問い」（期待値は実際に出る値？。knowledge-net の TableSupportQ。#119）
-                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or (op == "linear" and any(t.get("linear") for t in x.get("themes") or [])) or (op == "price" and any(t.get("price") for t in x.get("themes") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
+                    ok = op == "shift" or (op == "support" and x.get("model") == "table") or (op == "same-mean" and any(t.get("same_mean") for t in x.get("themes") or [])) or (op == "rare" and any(t.get("rare") for t in x.get("themes") or [])) or (op == "linear" and any(t.get("linear") for t in x.get("themes") or [])) or (op == "price" and any(t.get("price") for t in x.get("themes") or [])) or (op == "lln" and any(c.get("cutoffs") for c in x.get("counterexamples") or [])) or op in qids or (op.startswith("break:") and op[6:] in cxids)
                     if not ok:
                         err.append(f"{eid}: {iid} の open {op} が問い・反例にない")
         vary = x.get("vary") or {}

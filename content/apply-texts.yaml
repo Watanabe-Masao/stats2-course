@@ -172,6 +172,10 @@ steps:
     text: "{mu} の確率は {pmu} で、いちばん出やすいのは {mode}（{pmode}）。期待値は重心で、いちばん出やすい値とは別のもの。"
     variants:
       same: {text: "いちばん出やすいのも {mu}（{pmu}）。この表では一致するが、期待値が表の値でも、いちばん出やすい値と一致するとは限らない。"}
+  table-mean-which.goal: {title: 何を確かめるか, text: "{n} 回引いた平均 {obs} が、2つの表のそれぞれで、期待値からずれの目安（±2×標準誤差）の内か外かを見る。標準誤差は σ/√n（σ は1回の額の標準偏差、n は引く回数）。"}
+  table-mean-which.moments: {title: 2つの表の期待値と分散}
+  table-mean-which.margin: {title: "ずれの目安 2√(V(X)/n)"}
+  table-mean-which.judge: {title: 照らす, text: "{name} だけ、ずれが目安の外。目安で判定してよいのは、ずれの分布が正規分布に近い表（裾の軽い表）。"}
   table-best-net.goal: {title: 何を比べるか, text: 何度も買うときの1枚あたりの損得の平均を、3つのくじで比べる。}
   table-best-net.formula: {title: 大元の公式, text: X はもらえる額、c は1枚の値段。何度も買うと、1枚あたりの損得の平均は 期待値−値段 に近づく。}
   table-best-net.nets: {title: 3つのくじの 期待値−値段}
