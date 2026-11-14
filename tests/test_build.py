@@ -1531,6 +1531,30 @@ class TestRare(unittest.TestCase):
         self.assertIn("境目", bad("lottery", to=2400))
 
 
+class TestLinear(unittest.TestCase):
+    # 確かめる対象：全部の値を a 倍して b 足す変換（テーマの linear。期待値の実験室 C-01。#119）の build の止め。
+    # 想定する故障：a＝0（変換にならない）・予測の選び肢に同じ数（b＝0 なら a×m＋b と a×m が同じ）・
+    #   全部のテーマで正しい答えの位置が同じ（a＞1 ならいつも真ん中で、位置で当たる）のまま公開する。
+    # 見つけ方：原本の3テーマは通り（位置は 1・3・2 番目）、1つずつ崩した linear がそれぞれの理由で止まること。数は分数で比べる。
+    # 既存との違い：rare_errors は1つを替えた表。ここは全部の値の変換。
+    # 検出の確かめ（2026-11-15）：a の止め・同じ数の止め・位置の止めを1つずつ外すと、それぞれの assert で落ちることを見た
+    def test_linear_errors(self):
+        from network import load_experiments, linear_errors
+        x = next(e for e in load_experiments() if e["id"] == "EXP-expect-table")
+        self.assertEqual(linear_errors("X", x), [])
+
+        def bad(**by_theme):
+            y = copy.deepcopy(x)
+            for t in y["themes"]:
+                if t["id"] in by_theme:
+                    t["linear"].update(by_theme[t["id"]])
+            return " ".join(linear_errors("X", y))
+        self.assertIn("0 でない", bad(dice={"a": 0}))
+        self.assertIn("同じ数", bad(dice={"b": 0}))
+        # 3テーマとも a＞1・b＞0 にすると、正しい答えはどれも真ん中
+        self.assertIn("位置", bad(dice={"a": 2, "b": 1}, lottery={"a": 2, "b": 50}))
+
+
 class TestProgress(unittest.TestCase):
     def test_counts_from_source(self):
         from progress import notion_page, unit_row
