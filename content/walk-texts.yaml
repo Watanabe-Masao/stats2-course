@@ -71,7 +71,7 @@ formulas:
         variants: {exact: {why: "n は {n} ちょうどで条件を満たす。"}}
   binom.mode:
     word: いちばん起こりやすい回数
-    pick: 最頻値 = ⌊(n + 1)p⌋
+    pick: 最頻値 = ⌊(n + 1)p⌋（⌊ ⌋ は小数を切り捨て）
     rows:
       t: {title: 境目, why: 隣の棒との高さの比 P(k)/P(k−1)＝(n−k+1)p／(k(1−p)) は、k が (n+1)p より小さい間は 1 より大きい（棒が高くなっていく）。}
       floor:
