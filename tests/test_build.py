@@ -1505,6 +1505,32 @@ class TestSameMean(unittest.TestCase):
         self.assertIn("分散の比", bad("dice", [2, 1, 1, 1, 1, 2]))     # 期待値は同じ 3.5、分散の比は約1.29
 
 
+class TestRare(unittest.TestCase):
+    # 確かめる対象：1本だけ大きな値に替えた表（テーマの rare。期待値の実験室 A-03。#119）の build の止め。
+    # 想定する故障：替える前の値の重みが 1（替えると元の値が表から消え、画面の棒の目盛りがずれる）・替えた値が表のいちばん大きい値より小さい
+    #   （中央値が動かない、と言えなくなる）・替えた表の期待値の倍率が予測の境目のすぐそば（照らしが読み違えやすい）のまま公開する。
+    # 見つけ方：原本の2テーマは通り、1つずつ崩した rare がそれぞれの理由で止まること。倍率は分数で比べる。
+    # 既存との違い：same_mean_errors は期待値が同じ別の表。ここは1本を替えた表。
+    # 検出の確かめ（2026-11-14）：重み 2 以上の止め・to の止め・境目の近さの止めを1つずつ外すと、それぞれの assert で落ちることを見た
+    def test_rare_errors(self):
+        from network import load_experiments, rare_errors
+        x = next(e for e in load_experiments() if e["id"] == "EXP-expect-table")
+        self.assertEqual(rare_errors("X", x), [])
+        self.assertEqual(sorted(t["id"] for t in x["themes"] if t.get("rare")), ["basket", "lottery"])
+
+        def bad(theme_id, start=None, **kw):
+            y = copy.deepcopy(x)
+            t = next(t for t in y["themes"] if t["id"] == theme_id)
+            t["rare"].update(kw)
+            if start:
+                t["start"] = start
+            return " ".join(rare_errors("X", y))
+        self.assertIn("2 以上", bad("lottery", start=[80, 19, 1], **{"from": 2}))   # 1000 円が 1 本だけ：替えると表から消える
+        self.assertIn("大きい", bad("lottery", to=500))
+        # くじ：元 38 円、100 円の1本を y 円にすると (3800−100＋y)÷100。y＝2400 なら 61 円で 1.605 倍（境目 1.6 倍のすぐそば）
+        self.assertIn("境目", bad("lottery", to=2400))
+
+
 class TestProgress(unittest.TestCase):
     def test_counts_from_source(self):
         from progress import notion_page, unit_row
