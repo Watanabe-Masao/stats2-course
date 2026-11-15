@@ -1,7 +1,7 @@
 # 単元U22の問題。id は変えない（個人の解答記録がこの id を指す）。
 # t の点は問題文に数表の値として書く。答えにだけ出る点は、密度の数値積分（中点則4000分割）で左側累積を出して照合する
 - id: Q-U22-001
-  concepts: [TERM-interval-est, TERM-ci, TERM-se, TERM-conf-level]
+  concepts: [TERM-interval-est, TERM-ci, TERM-se, TERM-conf-level, TERM-normal, TERM-sample-mean]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -24,7 +24,7 @@
     why: SE＝2、誤差幅3.92。100−3.92＝96.08。n を144にすると SE は1、誤差幅は1.96 で半分。
 
 - id: Q-U22-002
-  concepts: [TERM-interval-est, TERM-ci, TERM-sample-prop, TERM-se, CLM-19]
+  concepts: [TERM-interval-est, TERM-ci, TERM-sample-prop, TERM-se, TERM-normal, CLM-19]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -43,7 +43,7 @@
     why: 1.96×√(0.21÷200)≒0.0635。区間は約0.237〜0.364。n を800にすると誤差幅は約0.032で半分。
 
 - id: Q-U22-003
-  concepts: [TERM-ci, TERM-conf-level, TERM-se]
+  concepts: [TERM-ci, TERM-conf-level, TERM-se, TERM-normal]
   stage: S1
   difficulty: 1
   format: written
@@ -81,7 +81,7 @@
     why: t(15) の点約2.131×SE 2＝約4.26。灰色の z で作った区間（±3.92）より長い。
 
 - id: Q-U22-005
-  concepts: [TERM-interval-est, TERM-se, TERM-conf-level]
+  concepts: [TERM-interval-est, TERM-se, TERM-conf-level, TERM-normal]
   stage: S1
   difficulty: 3
   format: written
@@ -100,7 +100,7 @@
     why: (1.96×10÷1)²＝384.16 を切り上げて385。目標の誤差幅を0.5にすると1537。
 
 - id: Q-U22-010
-  concepts: [TERM-ci, TERM-sample-prop, TERM-se, CLM-19]
+  concepts: [TERM-ci, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -153,7 +153,7 @@
     why: 23−2.306×1＝20.694。灰色の z で作った区間は1.96しか引かないので狭い。
 
 - id: Q-U22-020
-  concepts: [TERM-interval-est, TERM-sample-prop, TERM-se]
+  concepts: [TERM-interval-est, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -171,7 +171,7 @@
     why: 1.96²×0.25÷0.0009≒1067.1 → 1068人。誤差幅を0.02にすると2401人。
 
 - id: Q-U22-021
-  concepts: [TERM-conf-level, TERM-se, TERM-interval-est]
+  concepts: [TERM-conf-level, TERM-se, TERM-interval-est, TERM-normal]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -238,7 +238,7 @@
     why: t の点を使えば、σ が分からなくても約95%が含む。1本ずつの区間は長さも位置も違う。
 
 - id: Q-U22-030
-  concepts: [TERM-ci, TERM-sample-prop, TERM-se, CLM-19]
+  concepts: [TERM-ci, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -274,7 +274,7 @@
     why: t(24) の点約2.064×30≒61.9円。z なら 1.96×30＝58.8円で、少し狭すぎる。
 
 - id: Q-U22-032
-  concepts: [TERM-interval-est, TERM-sample-prop, TERM-se]
+  concepts: [TERM-interval-est, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -292,8 +292,8 @@
     why: 1.96²×0.16÷0.0004≒1536.6 → 1537人。p＝0.5 とすると2401人。
 
 - id: Q-U22-040
-  concepts: [TERM-ci, TERM-sample-prop, TERM-conf-level, CLM-19]
-  stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
+  concepts: [TERM-ci, TERM-sample-prop, TERM-conf-level, TERM-se, TERM-binom, TERM-normal, CLM-19]
+  stage: S5   # 2級の範囲外の発展。予測を外し、近似の式が崩れるときを説明する（#373 の F。渡辺さん 2026-11-12。2026-11-16 に説明する形に）
   format: written
   powers: [P1, P3]
   prompt: 20人中2人が返品した（p̂＝0.1）。p̂±1.96√(p̂(1−p̂)÷n) で「95%信頼区間」を作ると −0.031〜0.231 になり、下の端が0未満にはみ出す。なぜこうなるのか、この作り方が n＝20・p＝0.1 前後で95%の区間と言えるのかを説明する。
@@ -301,16 +301,17 @@
   answer: |-
     この式は、p̂ の分布が正規分布に近いことに頼った近似。n＝20・p̂＝0.1 では返品の数はたいてい0〜4個で、分布は0で切れて右に長く、正規分布の左右対称な形とは違う。左右に同じ幅を取る式は、0の下まで幅を伸ばしてしまう。
 
-    もう1つは、幅を決める標準誤差を p̂ から出していること。たまたま返品が少ない標本ほど標準誤差が小さく出て、区間が狭くなる（返品0個なら幅は0）。p＝0.1 で n＝20 のとき、この作り方の区間が p を含む割合は約88%で、95%に届かない。近似の式は、成功と失敗の数がどちらも十分大きいときに使う。
+    もう1つは、幅を決める標準誤差を p̂ から出していること。たまたま返品が少ない標本ほど標準誤差が小さく出て、区間が狭くなる（返品0個なら幅は0）。p がちょうど0.1 で n＝20 のとき、この作り方の区間が p を含む割合は約88%で、95%に届かない。成功と失敗の数がどちらも大きくなれば、決まった p での割合は95%に近づく。けれども、どの n でも p を0に近づければ割合はいくらでも下がるので、この作り方の「95%」は名目の値でしかない。
 
-    0〜1 に収まる作り方の1つがウィルソンの区間（約 0.028〜0.301。中心は約0.164 と0.5の側に寄る）。標準誤差を p̂ でなく候補の p から出すので、少ない数でも含む割合が名目に近い。
+    0〜1 に収まる作り方の1つがウィルソンの区間（約 0.028〜0.301。中心は p̂＝0.1 より0.5の側の約0.164）。標準誤差を p̂ でなく、確かめたい p の値から出す。p＝0.1 では含む割合は約96%で名目に近いが、p が0にごく近いと、この区間も95%を下回る。
   checks:
     - 'abs(math.sqrt(0.09/20) - 0.067) < 0.0005 and abs(1.96*math.sqrt(0.09/20) - 0.131) < 0.0005 and abs(0.1-1.96*math.sqrt(0.09/20) + 0.031) < 0.0005 and abs(0.1+1.96*math.sqrt(0.09/20) - 0.231) < 0.0005'
     - 'abs(sum(math.comb(20,x)*0.1**x*0.9**(20-x) for x in range(21) if x/20-1.96*math.sqrt(x/20*(1-x/20)/20) <= 0.1 <= x/20+1.96*math.sqrt(x/20*(1-x/20)/20)) - 0.88) < 0.005'
+    - 'abs(sum(math.comb(20,x)*0.1**x*0.9**(20-x) for x in range(21) if abs(x/20-0.1) <= 1.96*math.sqrt(0.1*0.9/20)) - 0.96) < 0.005'
     - 'abs((0.1+1.96**2/40)/(1+1.96**2/20) - 0.164) < 0.0005 and abs((0.1+1.96**2/40)/(1+1.96**2/20) - 1.96*math.sqrt(0.09/20+1.96**2/1600)/(1+1.96**2/20) - 0.028) < 0.0005 and abs((0.1+1.96**2/40)/(1+1.96**2/20) + 1.96*math.sqrt(0.09/20+1.96**2/1600)/(1+1.96**2/20) - 0.301) < 0.0005 and 20*0.1 == 2'
   lab:
     id: LAB-ci
     mode: prop
     set: {level: 0.95, x: 2, n: 20, d: 0.03}
     task: x と n を動かして、p̂±1.96SE の区間とウィルソンの区間を比べる。どんなとき2つが離れ、近似の区間が0〜1をはみ出すか。
-    why: 約0.028で0より上に収まる。p̂±1.96SE の区間は −0.031 と0未満にはみ出す。n を200、x を20にすると2つの区間はほぼ同じになる。
+    why: ウィルソンの区間の下の端は約0.028で、0より上に収まる。p̂±1.96SE の区間は −0.031 と0未満にはみ出す。n を200、x を20にすると2つの区間はほぼ同じになる。

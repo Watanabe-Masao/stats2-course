@@ -359,17 +359,15 @@ def _cimean(state: dict, tour: dict) -> dict:
 
 
 def _cimean_fig(x: dict, state: dict, tour: dict) -> dict:
-    se, xb = x["se"], x["xbar"]
-    w = 4 * max(se, x["margin"] / 2)
-    step = 5 if w > 12 else 2
-    lo = math.floor((xb - w) / step) * step
-    hi = math.ceil((xb + w) / step) * step
+    """区間の横の棒と点推定 x̄ の点（ラボの平均の区間と同じ見せ方。x̄ を中心にした曲線は「μ の分布」と読まれるので描かない）"""
+    xb, span = x["xbar"], max(x["margin"] * 1.6, x["se"])
+    step = 5 if 2 * span > 12 else 2
+    lo = math.floor((xb - span) / step) * step
+    hi = math.ceil((xb + span) / step) * step
     pct = round(x["level"] * 100)
-    return {"type": "dist", "family": "normal", "mu": xb, "sigma": se, "ticks": [lo, hi, step], "mark_mean": False,
-            "shade": [{"from": x["lo"], "to": x["hi"], "label": f"{pct}%"}],
-            "marks": [{"x": x["lo"], "label": _n(round(x["lo"], 3))}, {"x": x["hi"], "label": _n(round(x["hi"], 3))}],
-            "label": f"x̄＝{_n(xb)}・n＝{x['n']}",
-            "lines": [f"{pct}%信頼区間 {_n(round(x['lo'], 3))}〜{_n(round(x['hi'], 3))}（誤差幅 {_n(round(x['margin'], 3))}）"]}
+    return {"type": "ci_bar", "lo": x["lo"], "hi": x["hi"], "center": xb, "ticks": [lo, hi, step],
+            "center_label": f"x̄ {_n(xb)}", "label": f"{pct}%信頼区間・n＝{x['n']}",
+            "lines": [f"{_n(round(x['lo'], 3))}〜{_n(round(x['hi'], 3))}（誤差幅 {_n(round(x['margin'], 3))}）"]}
 
 
 MODES = {

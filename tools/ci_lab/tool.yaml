@@ -25,18 +25,19 @@ data: スライダーと選択欄で決める（データの読み込みなし�
 presets:
   s1-mean:
     mode: mean
-    set: {kind: z, level: 0.95, xbar: 50, s: 10, n: 100, d: 1}
-    task: σ＝10 が分かっている。100人の客単価の平均は50百円。母平均の95%信頼区間の下の端は？
+    set: {kind: z, level: 0.95, xbar: 80, s: 15, n: 36, d: 1}
+    task: σ＝15 が分かっている。36日の来店客数の平均は80人。母平均の95%信頼区間の下の端は？
     predict: {type: number, key: lo, label: "区間の下の端"}
-    expect: 48.04
-    why: SE＝10÷√100＝1、誤差幅 1.96×1＝1.96。50−1.96＝48.04、上の端は51.96。n を400にすると誤差幅は0.98で半分。
+    expect: 75.1
+    why: SE＝15÷√36＝2.5、誤差幅 1.96×2.5＝4.9。80−4.9＝75.1、上の端は84.9。n を144にすると誤差幅は2.45で半分。
   s1-cover:
     mode: cover
-    set: {kind: z, level: 0.95, n: 25, sigma: 10}
-    task: 同じ作り方で95%信頼区間を1000回作る。μ を含む区間はどれくらいか。
-    predict: {type: choice, key: coverLabel, label: "μ を含む区間は", options: [約95%が含む, 95%より少ない]}
-    expect: 約95%が含む
-    why: 1000回のうち約950回が μ を含み、残りは外れる。μ は動かず、動くのは区間。1本の区間が μ を含むかどうかは、確率ではなく「含む」か「含まない」か。
+    set: {kind: z, level: 0.9, n: 25, sigma: 10}
+    unlock: [kind, level]
+    task: 同じ作り方で90%信頼区間を1000回作る。μ を含む区間はどれくらいか。
+    predict: {type: choice, key: coverLabel, label: "μ を含む区間は", options: [約90%が含む, 90%より少ない]}
+    expect: 約90%が含む
+    why: 1000回のうち約900回が μ を含み、残りは外れる。μ は動かず、動くのは区間。信頼係数を下げると区間が短くなり、外す区間が増える。
   s3-free:
     mode: mean
     modes: [mean, prop, cover]
@@ -68,7 +69,7 @@ presets:
   rel-point-interval-free:   # 確かめる（自由に動かす。関係「点推定 と 区間推定 を比べる」）
     mode: mean
     set: {kind: z, level: 0.95, xbar: 120, s: 20, n: 25}
-    task: 信頼係数と n を変えて、点推定（x̄）は同じまま区間の幅だけが変わることを確かめる。幅を半分にするには n を何倍にすればよいか。
+    task: 信頼係数と n を変えて、点推定（x̄）は同じまま区間の幅だけが変わることを確かめる。σ を2倍にすると、幅は何倍になるか。
 used_by: [U22]
 tests:
   - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み

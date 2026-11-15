@@ -95,7 +95,8 @@ LK.register("mean",{name:"平均の区間",
 function pVals(){const level=$("plevel").value,x=Math.min(+$("px").value,+$("pn").value),n=+$("pn").value,d=+$("pd").value,z=ZQ[level],ph=x/n,se=Math.sqrt(ph*(1-ph)/n),m=z*se;
  const z2=z*z,den=1+z2/n,wc=(ph+z2/(2*n))/den,wh=z*Math.sqrt(ph*(1-ph)/n+z2/(4*n*n))/den;
  return {level:+level,x,n,d,z,phat:ph,se,margin:m,lo:ph-m,hi:ph+m,width:2*m,nFor:Math.ceil(z2*ph*(1-ph)/(d*d)-1e-9),nWorst:Math.ceil(z2*0.25/(d*d)-1e-9),wLo:wc-wh,wHi:wc+wh,np:n*ph,nq:n*(1-ph)};}
-function pRender(){const P=pVals();
+function pRender(){const pn=+$("pn").value;$("px").max=pn;if(+$("px").value>pn)LK.setRange("px",pn);   // x は n を超えない（つまみの表示と計算をそろえる。#47 の U22 のレビュー）
+ const P=pVals();
  $("pplot").innerHTML=bar(P.lo,P.hi,P.phat,`p̂＝${f(P.phat,4)}`,"割合の信頼区間",[P.wLo,P.wHi,"ウィルソン"])+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>${P.level*100}%信頼区間（p̂±z×SE）</span><span><i class="sw" style="background:var(--mut);opacity:.6"></i>ウィルソンの区間（発展）</span></div>`;
  $("psum").innerHTML=`<div>p̂＝${P.x}÷${P.n}＝<b>${f(P.phat)}</b>　SE＝√(p̂(1−p̂)÷n)＝<b>${f(P.se)}</b></div><div>誤差幅＝${f(P.z,3)}×${f(P.se)}＝<b>${f(P.margin)}</b>　区間：<b>${f(P.lo)}〜${f(P.hi)}</b></div><div>誤差幅を ${f(P.d,3)} 以下にする人数：p̂ を使うと <b>${P.nFor}</b> 人、p が分からず p＝0.5 とすると <b>${P.nWorst}</b> 人</div><div class="mut">np̂＝${f(P.np,1)}、n(1−p̂)＝${f(P.nq,1)}。どちらかが小さいと近似が悪く、区間が0未満や1超えになることもある。${P.lo<0||P.hi>1?"<b>いまの区間は0〜1の外にはみ出している。</b>":""}</div>`;
  $("ptab").innerHTML=`<table><tr><th>区間</th><th>下</th><th>上</th></tr><tr><td>p̂±z×SE</td><td>${f(P.lo)}</td><td>${f(P.hi)}</td></tr><tr><td>ウィルソン</td><td>${f(P.wLo)}</td><td>${f(P.wHi)}</td></tr></table>`;}

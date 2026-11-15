@@ -1043,7 +1043,35 @@ def intervals(sp: dict) -> str:
     return c.done(y + 8)
 
 
-TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+def ci_bar(sp: dict) -> str:
+    """1本の信頼区間を横の棒で（#47 の U22 の解説の静止図。ラボの平均の区間と同じ見せ方。曲線は描かない）。
+    sp：{lo, hi, center, ticks: [始め, 終わり, 刻み], center_label, label, lines}"""
+    c = Canvas()
+    a, b, step = sp["ticks"]
+    L, R = 16, 344
+    X = lambda x: L + (min(b, max(a, x)) - a) / (b - a) * (R - L)
+    y = 64
+    c.line(L, y + 26, R, y + 26, INK2, 1)
+    t = a
+    while t <= b + 1e-9:
+        c.line(X(t), y + 22, X(t), y + 30, INK2, 1)
+        c.text(X(t), y + 46, _num(t), 11.5, INK2, "middle")
+        t += step
+    c.line(X(sp["lo"]), y, X(sp["hi"]), y, BLUE, 7)
+    c.circle(X(sp["center"]), y, 6, fill=ORANGE, stroke=BG, width=2)
+    c.text(X(sp["center"]), y - 16, sp.get("center_label", ""), 12.5, ORANGE, "middle", "bold")
+    c.text(X(sp["lo"]), y + 4 - 26, _num(round(sp["lo"], 3)), 12, INK, "start")
+    c.text(X(sp["hi"]), y + 4 - 26, _num(round(sp["hi"], 3)), 12, INK, "end")
+    yy = y + 70
+    if sp.get("label"):
+        c.text(8, yy, sp["label"], 12.5, BLUE, "start", "bold")
+        yy += 18
+    for ln in sp.get("lines") or []:
+        yy = c.para(8, yy, ln, 344, 12.5, INK2)
+    return c.done(yy + 6)
+
+
+TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
