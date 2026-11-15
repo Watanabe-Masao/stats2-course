@@ -1303,72 +1303,6 @@
   }
  },
  {
-  "concept": "TERM-complement",
-  "index": 0,
-  "id": "F-complement",
-  "label": "余事象の確率",
-  "tex": "P(Aᶜ)=1-P(A)",
-  "symbols": [
-   {
-    "symbol": "P( )",
-    "meaning": "確率",
-    "key": "P",
-    "concept": "TERM-prob"
-   },
-   {
-    "symbol": "Aᶜ",
-    "meaning": "A が起こらない事象（余事象）",
-    "key": "Ac",
-    "kind": "value"
-   },
-   {
-    "symbol": "A",
-    "meaning": "事象",
-    "key": "A",
-    "kind": "value"
-   }
-  ],
-  "tree": {
-   "op": "eq",
-   "args": [
-    {
-     "op": "fn",
-     "name": "P",
-     "args": [
-      {
-       "sym": "Ac"
-      }
-     ]
-    },
-    {
-     "op": "sub",
-     "args": [
-      {
-       "num": 1
-      },
-      {
-       "op": "fn",
-       "name": "P",
-       "args": [
-        {
-         "sym": "A"
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  "contract": {
-   "kinds": [
-    "恒等式"
-   ],
-   "properties": [
-    "条件しだい"
-   ]
-  }
- },
- {
   "concept": "TERM-indep",
   "index": 0,
   "id": "F-indep-def",
@@ -4039,6 +3973,73 @@
     "非負",
     "不変",
     "同値"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-prob",
+  "index": 0,
+  "id": "F-complement",
+  "label": "余事象の確率",
+  "tex": "P(Aᶜ)=1-P(A)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "Aᶜ",
+    "meaning": "A が起こらない事象（余事象。高校では Ā と書く）",
+    "key": "Ac",
+    "kind": "value",
+    "concept": "TERM-complement"
+   },
+   {
+    "symbol": "A",
+    "meaning": "事象",
+    "key": "A",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "Ac"
+      }
+     ]
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "num": 1
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "A"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
    ]
   }
  },
