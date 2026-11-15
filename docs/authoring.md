@@ -326,6 +326,7 @@ claims:
 | 主張（content/claims.yaml）を足す・移す | docs/rules/claims.md の §6 の行と §9 の確かめの記録。verification の version は文字列で書く（`'4660318'`。数だけの短い SHA は数として読まれる） |
 | 関係を足す・外す・種類を変える | 外した id を原本・テストから探す。記録（check-pairs.md）に書く件数は原本から数える |
 | 分類を移す（v2_ready に足す） | docs/rules/migration.md の 2・4。テストが原本の中身（ある種類の行・まだ移していない分類）に頼っていないか（頼るテストは写しの中で例を作る） |
+| 骨格の語に説明（definition）を書く | テストがその語を「骨格の例」に使っていないか（tests/test_build.py の `as_skeleton` でテストの中だけ骨格に戻す。2026-11-15：W1 で TERM-perm に説明を書いて3つのテストが落ちた）。式を足したら `python3 build/formula_fixture.py` |
 | 概念（語）を足す | build/term_icons.py の印。knowledge-net の見本を取り込むとき、概念の数のテスト（tests/e2e/viewer.spec.ts） |
 | 製本の未決を足す・決める | 担当する製本の「未決」と履歴（check-pairs.md だけに書かない） |
 | 応用の数の組（solve・choices）を替える | その method の apply-texts・walk-texts の文を全部読み直す（前の組の言い方が残る。#401：binom-D-02 の「平均が同じでも」） |

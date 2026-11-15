@@ -171,6 +171,11 @@ function toTex(node, opt = {}) {
 				p: ATOM,
 				fn: true
 			};
+			case "perm": return {
+				t: `{}_{${a[0].t}}\\mathrm{P}_{${a[1].t}}`,
+				p: ATOM,
+				fn: true
+			};
 			case "fact": return {
 				t: `${paren(a[0], a[0].p < ATOM || !!a[0].neg)}!`,
 				p: ATOM
@@ -321,8 +326,17 @@ function comb(n, k) {
 	for (let i = 1; i <= Math.min(k, n - k); i++) r = r * (n - i + 1) / i;
 	return Math.round(r);
 }
+/** 順列の数 ₙPₖ＝n!/(n−k)!（k＞n は 0。並べられない。stats2-course #45 の U09） */
+function perm(n, k) {
+	if (!Number.isInteger(n) || !Number.isInteger(k) || n < 0) return NaN;
+	if (k < 0 || k > n) return 0;
+	let r = 1;
+	for (let i = 0; i < k; i++) r *= n - i;
+	return r;
+}
 const BUILTIN = {
 	comb,
+	perm,
 	fact: factorial,
 	exp: Math.exp,
 	log: Math.log,
@@ -751,7 +765,7 @@ function stopReason(node, env = {}) {
 		case "div": return x[1] === 0 ? "0 で割ることになる" : void 0;
 		case "sqrt": return "負の数の平方根になる";
 		case "pow": return x[0] === 0 && (x[1] ?? 0) < 0 ? "0 の負の累乗（0 で割る）になる" : "累乗が実数にならない";
-		case "fn": return node.name === "log" ? "0以下の数の対数になる" : node.name === "comb" || node.name === "fact" ? "組合せ・階乗は0以上の整数だけ" : `${node.name} が計算できない`;
+		case "fn": return node.name === "log" ? "0以下の数の対数になる" : node.name === "comb" || node.name === "fact" || node.name === "perm" ? "順列・組合せ・階乗は0以上の整数だけ" : `${node.name} が計算できない`;
 		default: return "値が有限にならない";
 	}
 }
@@ -784,4 +798,4 @@ function distribution(tree, over, lo, hi, env = {}) {
 	}
 	return out;
 }
-export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, renameBound, replaceFree, rhsOf, sliderRange, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula };
+export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula };
