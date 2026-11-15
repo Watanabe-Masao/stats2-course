@@ -577,6 +577,11 @@ def _pdf(sp: dict):
     if f == "expo":
         lam = sp["lam"]
         return (lambda x: lam * math.exp(-lam * x) if x >= 0 else 0.0), 1 / lam, 1 / lam
+    if f == "xbar_expo":   # 平均 mu の指数分布から n 個の平均（形 n・率 n/mu のガンマ分布。#47 の U19。場面 clt と同じ）
+        mu, n = sp["mu"], sp["n"]
+        lg = math.lgamma(n)
+        return ((lambda x: math.exp(n * math.log(n / mu) + (n - 1) * math.log(x) - n * x / mu - lg) if x > 0 else (n / mu if n == 1 and x == 0 else 0.0)),
+                mu, mu / math.sqrt(n))
     raise ValueError(f"family {f}")
 
 
@@ -617,6 +622,8 @@ def dist(sp: dict) -> str:
         bw = min(40, slot * (0.36 if ov else 0.62))
         dec = sp.get("decimals", 2)
         hl = set(sp.get("highlight") or [])
+        if sp.get("upto") is not None:   # k 以下の棒を全部塗る（「k 以下」の確率。#47 の U19 の概念図）
+            hl |= {x for x, _ in pmf if x <= sp["upto"]}
     else:
         f, mean, sd = _pdf(sp)
         lo, hi, step = sp["ticks"]
