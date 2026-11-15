@@ -722,6 +722,16 @@ relations:
     from_form: number
     description: どちらも確率で、比べて帰無仮説を棄却するか決める。有意水準はデータを見る前に決める基準、p値はデータから計算する値。p値が有意水準以下なら棄却する。
     gist: 有意水準は前もって引いておく線、p値はデータが出した数。線より小さければ「偶然とは考えにくい」と判断する。
+    stages:
+      same: どちらも帰無仮説が正しいとしたときの確率。σ＝12・36人で平均104.2 なら z＝2.1・両側の p 値は0.036 で、有意水準5%より小さいので棄却する。
+      differ: 有意水準はデータを見る前に決める判断の線で、1%にすると同じ p 値0.036 でも棄却しない。p 値はデータから出る数で、平均102.6 の標本なら0.194 に変わる。
+      so: 有意水準はデータの前に決め、p 値はデータのあとに出す。p 値を見てから有意水準を選ぶと、判断の線の意味がなくなる。
+    labs:
+      - {id: LAB-test, preset: rel-pvalue-alpha-tour, purpose: 同じ p 値でも有意水準で判断が変わり、別の標本では p 値が変わるのを段ごとに見る}
+      - {id: LAB-test, preset: rel-pvalue-alpha-free, purpose: 平均・人数・有意水準を自分で動かし、p 値と判断の変わり方を確かめる}
+    figures: [FIG-LAB-test-rel-pvalue-alpha-tour-2, FIG-LAB-test-rel-pvalue-alpha-tour-3]
+    checks:
+      - abs(4.2/(12/6) - 2.1) < 1e-9 and abs(2*(1-0.5*(1+math.erf(2.1/math.sqrt(2)))) - 0.036) < 0.0005 and abs(2*(1-0.5*(1+math.erf(1.3/math.sqrt(2)))) - 0.194) < 0.0005 and abs(2.6/2 - 1.3) < 1e-9
     basis:
       units:
       - U24
@@ -747,6 +757,16 @@ relations:
     from_form: event
     description: 第1種の過誤は正しい帰無仮説を棄却する誤り、第2種の過誤は誤った帰無仮説を棄却しない誤り。同じ検定統計量・同じデータの数で、棄却域を狭めて第1種を減らすと、第2種は減らない（ふつうは増える）。
     gist: 「無実の人を有罪にする」のが第1種、「犯人を見逃す」のが第2種。片方を厳しくすると、もう片方が起こりやすくなる。
+    stages:
+      same: どちらも棄却域で決まる判定の誤り。σ＝12・36人・両側5%で、母平均が103.6 なら、第1種の過誤の確率は0.05、第2種の過誤の確率 β は0.56。
+      differ: 有意水準を1%にすると第1種は0.01 に減るが、境目が外へ動いて β は0.78 に増える。片方を厳しくすると、もう片方が起きやすくなる。
+      so: 同じ人数のままでは、2つの誤りを同時には減らせない。両方を減らすには人数を増やす（144人なら、有意水準1%でも β は0.15）。どちらの誤りの損が大きいかで有意水準を決める。
+    labs:
+      - {id: LAB-test, preset: rel-type1-type2-tour, purpose: 有意水準を下げると β が増え、人数を増やすと両方が減るのを段ごとに見る}
+      - {id: LAB-test, preset: rel-type1-type2-free, purpose: 有意水準と人数を自分で動かし、β の変わり方を確かめる}
+    figures: [FIG-LAB-test-rel-type1-type2-tour-2, FIG-LAB-test-rel-type1-type2-tour-3]
+    checks:
+      - 'abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,1.96) - 0.44) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,2.576) - 0.22) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),3.6,2.576) - 0.85) < 0.005 and abs(3.6/(12/6) - 1.8) < 1e-9'
     basis:
       units:
       - U24
