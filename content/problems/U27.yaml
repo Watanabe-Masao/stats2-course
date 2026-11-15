@@ -2,6 +2,7 @@
 # χ² の上側の点は数値積分の χ² CDF で照合する：
 # (lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)
 - id: Q-U27-001
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -24,6 +25,7 @@
     why: 期待度数20、ずれの2乗の和80÷20＝4。自由度3の点7.815 に届かない。同じ χ²＝4 でも、自由度1なら棄却、自由度3なら棄却しない。
 
 - id: Q-U27-002
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -42,6 +44,7 @@
     why: χ²≒4.76 が3.841 を超える。帯グラフで、新の「購入」の帯が全体の区切りより長い。
 
 - id: Q-U27-003
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S1
   difficulty: 1
   format: written
@@ -60,6 +63,7 @@
     why: 期待度数は60・30・30。比率の欄に 2・1・1 と入れれば、合計が1でなくても割合として扱われる。
 
 - id: Q-U27-004
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S1
   difficulty: 2
   format: written
@@ -78,6 +82,7 @@
     why: 期待度数は 25・40・35。カードの列はずれがなく、現金とスマホのずれだけが χ² に効く。自由度は2。
 
 - id: Q-U27-005
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, CLM-28b]
   stage: S1
   difficulty: 3
   format: written
@@ -96,6 +101,7 @@
     why: 4.5 は目安の5より小さい。ラボの χ²≒5.05・p≒0.025 は近似の値で、件数が少ないと当てにならない。
 
 - id: Q-U27-010
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -113,6 +119,7 @@
     why: 期待度数40、ずれの2乗の和218÷40＝5.45。木曜の少なさがいちばん効く（100÷40＝2.5）。
 
 - id: Q-U27-011
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-pool, REL-normal-chi2, CLM-45]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -130,6 +137,7 @@
     why: z≒−1.633 の2乗と同じ2.667。p≒0.10 も z 検定と一致する。
 
 - id: Q-U27-012
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-sample-prop, TERM-reject, REL-normal-chi2, CLM-5a]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -147,6 +155,7 @@
     why: χ²＝4（自由度1）の上側の確率は、z＝2 の両側の確率と同じ約0.046。
 
 - id: Q-U27-020
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-df, TERM-poisson, TERM-reject, CLM-28b]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -164,6 +173,7 @@
     why: 自由度＝4−1−1＝2 なので5.991。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
 
 - id: Q-U27-021
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -181,6 +191,7 @@
     why: χ²≒16.41 が9.488 を大きく超える。帯の区切りが年代ごとに大きくずれている。
 
 - id: Q-U27-022
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -198,6 +209,7 @@
     why: 例題Aの10倍の件数で χ² も10倍。帯グラフの形は例題Aとまったく同じ。
 
 - id: Q-U27-023
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-indep, TERM-df, TERM-chi2, TERM-reject, CLM-28b]
   stage: S3
   tag: 本番形式
   format: choice
@@ -228,6 +240,7 @@
     why: 50×50÷100＝25。帯グラフの点線（全体の区切り）が50%の位置にある。
 
 - id: Q-U27-030
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -245,6 +258,7 @@
     why: χ²≒5.86、p≒0.053。わずかに5%を超える。いちばん効いているのは「不満」の列。
 
 - id: Q-U27-031
+  concepts: [TERM-gof, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -262,6 +276,7 @@
     why: χ²＝4.96 は5.991 に届かない（p≒0.084）。同じ割合で300人なら χ²＝9.92 で棄却する。
 
 - id: Q-U27-032
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -279,6 +294,7 @@
     why: χ²≒13.73 で強い関連。ただし関連は原因を示さない。帯の区切りのずれは、どちらが原因でも同じように出る。
 
 - id: Q-U27-040
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-df]
   stage: S3
   format: written
   powers: [P1, P3]
