@@ -1005,6 +1005,15 @@ def relations_without_figures() -> list[str]:
     return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES and not r.get("figures")]
 
 
+# ラボの mode の名前が、画面（knowledge-net の場面）の別の意味の名前と重なるときの言い換え（#48 の U24。
+# 検定ラボの z は、場面の z（z得点の比べ）と意味が違う）。play の mode・modes・段の状態の mode をこの名前にする
+SCENE_NAMES = {("LAB-test", "z"): "ztest"}
+
+
+def _scene(lid: str, mode):
+    return SCENE_NAMES.get((lid, mode), mode)
+
+
 def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
     """ラボの版を、ネットワークの画面が JS の部品で描く形にする（#188 04b・#192）。
     段の状態は tour.states（静止図と同じ重ね方）で作り、関係から開く解説には最後に「つまり」の段を足す。
@@ -1013,10 +1022,10 @@ def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
     if not pre.get("mode"):
         return None
     pre = with_gist(lid, name or "", pre)
-    out: dict = {"mode": pre["mode"]}
+    out: dict = {"mode": _scene(lid, pre["mode"])}
     for k in ("modes", "set", "task"):
         if pre.get(k):
-            out[k] = pre[k]
+            out[k] = [_scene(lid, m) for m in pre[k]] if k == "modes" else pre[k]
     if pre.get("predict"):
         # 予想させる版の課題の文は問い（「…の確率は？」）。触るは答えの数をすぐ出すので、問いと答えが同時に出ないよう文を出さない（#188 07d）
         out.pop("task", None)
@@ -1027,7 +1036,9 @@ def play_of(lid: str, name: str | None, pre: dict) -> dict | None:
                 out[k] = t[k]
         out["steps"] = []
         for st, sx in zip(t["steps"], states(t)):
-            step = {"title": st["title"], "text": st["text"], "states": [] if st.get("gist") else [sx["start"], *sx["frames"]]}
+            sts = [] if st.get("gist") else [sx["start"], *sx["frames"]]
+            sts = [{**x, "mode": _scene(lid, x["mode"])} if isinstance(x, dict) and "mode" in x else x for x in sts]
+            step = {"title": st["title"], "text": st["text"], "states": sts}
             for k in ("focus", "gist", "ms"):
                 if st.get(k):
                     step[k] = st[k]

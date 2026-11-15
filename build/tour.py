@@ -403,6 +403,53 @@ def _twoci_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": [f"{x['lo']:.2f}〜{x['hi']:.2f}（誤差幅 {x['margin']:.2f}）".replace("-", "−")]}
 
 
+_ZQ = {"two": {0.1: 1.645, 0.05: 1.96, 0.01: 2.576}, "one": {0.1: 1.282, 0.05: 1.645, 0.01: 2.326}}   # 2級の数表の値（検定ラボの ZQ と同じ）
+
+
+def _phi(x: float) -> float:
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def _ztest(state: dict, tour: dict) -> dict:
+    """z 検定と p 値（検定ラボの z。#48 の U24）：ラボの zVals と同じ式"""
+    side, a = state.get("side", "two"), float(state.get("alpha", 0.05))
+    se = state["sigma"] / math.sqrt(state["n"])
+    z = (state["xbar"] - state["mu0"]) / se
+    p = 2 * (1 - _phi(abs(z))) if side == "two" else (1 - _phi(z) if side == "upper" else _phi(z))
+    crit = _ZQ["two" if side == "two" else "one"][a]
+    return {"side": side, "alpha": a, "se": se, "z": z, "p": p, "crit": crit}
+
+
+def _ztest_fig(x: dict, state: dict, tour: dict) -> dict:
+    c = x["crit"]
+    shade = [{"outside": [-c, c]}] if x["side"] == "two" else ([{"outside": [-99, c]}] if x["side"] == "upper" else [{"outside": [-c, 99]}])
+    return {"type": "dist", "family": "normal", "mu": 0, "sigma": 1, "ticks": [-4, 4, 1], "mark_mean": False, "shade": shade,
+            "marks": [{"x": round(x["z"], 2), "label": f"z {_n(round(x['z'], 2))}"}], "label": "H₀ のもとの z の分布",
+            "lines": [f"有意水準 {_n(x['alpha'])}（境目 {_n(c)}）　p 値 {x['p']:.3f}"]}
+
+
+def _power(state: dict, tour: dict) -> dict:
+    """検出力と過誤（検定ラボの power）：ラボの wVals と同じ式"""
+    side, a = state.get("side", "two"), float(state.get("alpha", 0.05))
+    se = state["sigma"] / math.sqrt(state["n"])
+    d = (state["mu1"] - state["mu0"]) / se
+    c = _ZQ["two" if side == "two" else "one"][a]
+    pw = (1 - _phi(c - d)) + _phi(-c - d) if side == "two" else 1 - _phi(c - d)
+    return {"side": side, "alpha": a, "mu0": state["mu0"], "mu1": state["mu1"], "n": state["n"], "se": se, "shift": d, "crit": c,
+            "power": pw, "beta": 1 - pw, "xcrit": state["mu0"] + c * se}
+
+
+def _power_fig(x: dict, state: dict, tour: dict) -> dict:
+    se, m0, m1, c = x["se"], x["mu0"], x["mu1"], x["crit"]
+    lo, hi = math.floor(m0 - 4 * se), math.ceil(m1 + 4 * se)
+    step = 1 if hi - lo <= 12 else 2
+    band = [m0 - c * se, m0 + c * se] if x["side"] == "two" else [-1e9, m0 + c * se]
+    return {"type": "dist", "family": "normal", "mu": m1, "sigma": se, "ticks": [lo, hi, step], "mark_mean": False,
+            "shade": [{"outside": band}], "overlay": {"family": "normal", "mu": m0, "sigma": se, "label": "H₀ の分布"},
+            "marks": [{"x": round(m0 + c * se, 2), "label": _n(round(m0 + c * se, 2))}], "label": f"μ₁＝{_n(m1)} の分布・n＝{_n(x['n'])}",
+            "lines": [f"検出力 {x['power']:.2f}　β {x['beta']:.2f}　有意水準 {_n(x['alpha'])}"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -420,6 +467,8 @@ MODES = {
     ("LAB-est", "var"): {"calc": _vest, "check": ("biasV", "mseS2", "mseV"), "figure": _vest_fig},
     ("LAB-two", "diff"): {"calc": _twodiff, "check": ("diff", "se", "df", "tcrit", "margin", "lo", "hi"), "figure": _twoci_fig},
     ("LAB-two", "paired"): {"calc": _twopaired, "check": ("se", "df", "tcrit", "margin", "lo", "hi"), "figure": _twoci_fig},
+    ("LAB-test", "z"): {"calc": _ztest, "check": ("se", "z", "p", "crit"), "figure": _ztest_fig},
+    ("LAB-test", "power"): {"calc": _power, "check": ("se", "shift", "power", "beta", "xcrit"), "figure": _power_fig},
     ("LAB-ci", "mean"): {"calc": _cimean, "check": ("se", "crit", "margin", "lo", "hi"), "figure": _cimean_fig},
 }
 

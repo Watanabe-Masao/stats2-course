@@ -1,6 +1,7 @@
 # 単元U24の問題。id は変えない（個人の解答記録がこの id を指す）。
 # Φ(z)＝0.5*(1+math.erf(z/math.sqrt(2)))
 - id: Q-U24-001
+  concepts: [TERM-h0, TERM-h1, TERM-sides, TERM-test-stat, TERM-pvalue, TERM-alpha, TERM-test, TERM-se, TERM-normal, CLM-6a]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -23,6 +24,7 @@
     why: z＝2、右側の面積は約0.023。両側にすると2倍の約0.046 で、どちらでも5%以下。
 
 - id: Q-U24-002
+  concepts: [TERM-type2, TERM-power, TERM-alpha, TERM-type1]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: 本当の z の中心は 5.6÷2＝2.8。境目1.96を超える確率（検出力）が約0.80、見逃す確率 β が約0.20。
 
 - id: Q-U24-003
+  concepts: [TERM-h0, TERM-h1, TERM-test-stat, TERM-pvalue, TERM-alpha, TERM-sides, TERM-se, TERM-normal, CLM-6a]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: z＝1.5、p≒0.13。偶然でもこれくらいのずれは13%ほど起こる。
 
 - id: Q-U24-004
+  concepts: [TERM-sides, TERM-pvalue, TERM-test-stat, TERM-alpha, CLM-6a]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +81,7 @@
     why: 右側だけの面積で約0.036。両側に切り替えると約0.072 で5%を超える。
 
 - id: Q-U24-005
+  concepts: [TERM-type1, TERM-alpha]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +100,7 @@
     why: 1−0.95²⁰≒0.64。「α÷k で判断」に切り替えると約0.049 に下がる。
 
 - id: Q-U24-010
+  concepts: [TERM-alpha, TERM-reject, TERM-pvalue, TERM-test-stat, CLM-22]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -112,6 +118,7 @@
     why: 境目が2.576 に広がり、z＝2.2 は内側。α を5%に戻すと棄却する。
 
 - id: Q-U24-011
+  concepts: [TERM-power, TERM-type2, TERM-se, TERM-normal, TERM-reject]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -129,6 +136,7 @@
     why: 中心4が境目1.96を大きく超え、ほとんど見逃さない。n＝25 では約0.52。
 
 - id: Q-U24-012
+  concepts: [TERM-test, TERM-ci, TERM-reject, TERM-test-stat, TERM-se]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -146,6 +154,7 @@
     why: z＝−2、p≒0.046。μ₀ を51 にすると z＝−1、区間の中なので棄却しない。
 
 - id: Q-U24-020
+  concepts: [TERM-power, TERM-type2, TERM-se, TERM-alpha]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -163,6 +172,7 @@
     why: n＝49 で約0.7995、50 で約0.807。表の0.84 を使った見積もり49 は、ちょうど境目。
 
 - id: Q-U24-021
+  concepts: [TERM-power, TERM-alpha, TERM-type1, TERM-type2, TERM-reject, TERM-normal]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -180,6 +190,7 @@
     why: 境目が2.576 に広がり、本当の中心2 の山の大半が内側に入る。α と β は片方を減らすともう片方が増える。
 
 - id: Q-U24-022
+  concepts: [TERM-type1, TERM-alpha]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -197,6 +208,7 @@
     why: 1−0.995¹⁰≒0.049。調整を外すと約0.40。
 
 - id: Q-U24-023
+  concepts: [TERM-test, TERM-alpha, TERM-type1, TERM-type2, TERM-power, TERM-reject]
   stage: S3
   tag: 本番形式
   format: choice
@@ -227,6 +239,7 @@
     why: 約0.52。α を1%にすると約0.28 に下がり、β が増える。
 
 - id: Q-U24-030
+  concepts: [TERM-test, TERM-test-stat, TERM-pvalue, TERM-se, TERM-normal, TERM-ci, CLM-6a]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -244,6 +257,7 @@
     why: z＝2 で境目1.96をわずかに超える（p≒0.046）。50人なら z≒1.41 で棄却しない。
 
 - id: Q-U24-031
+  concepts: [TERM-pvalue, TERM-test-stat, TERM-se, TERM-test, CLM-6a]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -261,6 +275,7 @@
     why: SE が3円しかないので、6円の差でも z＝2。有意かどうかと、差が大きいかどうかは別。
 
 - id: Q-U24-032
+  concepts: [TERM-power, TERM-type2, TERM-se, TERM-normal]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -278,6 +293,7 @@
     why: 約0.27。検出力0.8 にするには71店が要る（「必要な n」を見る）。
 
 - id: Q-U24-040
+  concepts: [TERM-power, TERM-type1, TERM-alpha]
   stage: S3
   format: written
   powers: [P1, P3]

@@ -52,7 +52,11 @@
 const $=LK.$,esc=LK.esc;
 const W=340;
 const f=(v,d=4)=>{if(!isFinite(v))return "—";const r=+v.toFixed(d);return String(Object.is(r,-0)?0:r);};
-function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.5*x);const y=t*Math.exp(-x*x-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return s*(1-y);}
+function erf(x){   // erf(x)＝P(1/2, x²)（不完全ガンマ関数の級数と連分数。近似式 1.2e-7 の誤差では、解説の静止図と 1e-9 で合わない。stats2-course #48 の U24）
+ const sg=x<0?-1:1,q=x*x,a=0.5,lg=0.5*Math.log(Math.PI);if(q===0)return 0;let P;
+ if(q<a+1){let ap=a,sum=1/a,d=sum;for(let n=0;n<500;n++){ap++;d*=q/ap;sum+=d;if(Math.abs(d)<Math.abs(sum)*3e-16)break;}P=sum*Math.exp(-q+a*Math.log(q)-lg);}
+ else{let b=q+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-16)break;}P=1-Math.exp(-q+a*Math.log(q)-lg)*h;}
+ return sg*P;}
 const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
 const dn=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
 const ZQ={two:{"0.1":1.645,"0.05":1.96,"0.01":2.576},one:{"0.1":1.282,"0.05":1.645,"0.01":2.326}};   // 2級の数表の値
