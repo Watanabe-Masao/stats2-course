@@ -416,7 +416,7 @@
   "index": 0,
   "id": "F-bias-def",
   "label": "偏りの定義",
-  "tex": "b=E(\\thetâ)-\\theta",
+  "tex": "b=E(\\hat{\\theta})-\\theta",
   "symbols": [
    {
     "symbol": "b",
@@ -4462,6 +4462,107 @@
    "properties": [
     "非負",
     "単調",
+    "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-mse",
+  "index": 0,
+  "id": "F-mse-decomp",
+  "label": "平均二乗誤差の分け方",
+  "tex": "\\mathrm{MSE}(\\hat{\\theta})=V(\\hat{\\theta})+b^{2}",
+  "symbols": [
+   {
+    "symbol": "MSE( )",
+    "meaning": "平均二乗誤差（ずれの2乗の期待値）",
+    "key": "MSE",
+    "concept": "TERM-mse"
+   },
+   {
+    "symbol": "θ̂",
+    "meaning": "推定量",
+    "key": "thetahat",
+    "concept": "TERM-estimator",
+    "kind": "rv"
+   },
+   {
+    "symbol": "V( )",
+    "meaning": "分散（推定量のばらつき）",
+    "key": "V",
+    "concept": "TERM-var"
+   },
+   {
+    "symbol": "b",
+    "meaning": "推定量の偏り E(θ̂)−θ",
+    "key": "b",
+    "concept": "TERM-bias",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "MSE",
+     "args": [
+      {
+       "sym": "thetahat"
+      }
+     ]
+    },
+    {
+     "op": "add",
+     "args": [
+      {
+       "op": "fn",
+       "name": "V",
+       "args": [
+        {
+         "sym": "thetahat"
+        }
+       ]
+      },
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "b"
+        },
+        {
+         "num": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "ばらつき",
+    "meaning": "推定量が自分の平均のまわりでどれだけ散らばるか"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "偏りの2乗",
+    "meaning": "推定量の平均が母数からどれだけずれているか"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
     "条件しだい"
    ]
   }

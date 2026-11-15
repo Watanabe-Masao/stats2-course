@@ -320,6 +320,31 @@ def _fdist_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": [f"上側5%の点 {_n(round(x['fcrit'], 3))}　F＝{_n(round(x['F'], 3))}"]}
 
 
+def _comp(state: dict, tour: dict) -> dict:
+    """推定量を比べる（推定ラボの comp。#47 の U21）：理論の値（ラボの kVals の seMean・seFirst・biasShift と同じ式）"""
+    sig, n, b = state["sigma"], int(state["n"]), state.get("b", 0)
+    se = sig / math.sqrt(n)
+    return {"n": n, "seMean": se, "seFirst": sig, "biasShift": b, "mseShift": se * se + b * b}
+
+
+def _comp_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "bars", "title": f"n＝{x['n']}：標準誤差（ばらつき）", "decimals": 2,
+            "bars": [["標本平均", round(x["seMean"], 2)], ["最初の1個", round(x["seFirst"], 2)]]}
+
+
+def _vest(state: dict, tour: dict) -> dict:
+    """分散の推定量（推定ラボの var）：v の偏り −σ²/n、s² と v の MSE（ラボの vVals と同じ式）"""
+    s2, n = state["sigma2"], int(state["n"])
+    bias = -s2 / n
+    var_s2, var_v = 2 * s2 * s2 / (n - 1), 2 * (n - 1) * s2 * s2 / (n * n)
+    return {"n": n, "biasV": bias, "mseS2": var_s2, "mseV": var_v + bias * bias}
+
+
+def _vest_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "bars", "title": f"n＝{x['n']}：偏りの大きさ", "decimals": 2,
+            "bars": [["s²（n−1 で割る）", 0], ["v（n で割る）", round(-x["biasV"], 2)]]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -333,6 +358,8 @@ MODES = {
     ("LAB-clt", "clt"): {"calc": _clt, "check": ("mu", "se", "skew"), "figure": _clt_fig},
     ("LAB-tcf", "t"): {"calc": _tdist, "check": ("tcrit", "zcrit", "diff"), "figure": _tdist_fig},
     ("LAB-tcf", "f"): {"calc": _fdist, "check": ("F", "fcrit", "pUp"), "figure": _fdist_fig},
+    ("LAB-est", "comp"): {"calc": _comp, "check": ("seMean", "seFirst", "biasShift"), "figure": _comp_fig},
+    ("LAB-est", "var"): {"calc": _vest, "check": ("biasV", "mseS2", "mseV"), "figure": _vest_fig},
 }
 
 

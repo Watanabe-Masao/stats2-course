@@ -1,5 +1,6 @@
 # 単元U21の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U21-001
+  concepts: [TERM-point-est, TERM-unbvar, TERM-sample-mean, TERM-unbiased]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -22,6 +23,7 @@
     why: 偏差の2乗和20を3で割って約6.67。n で割る v は5で、平均して σ² の3/4倍に小さく偏る。
 
 - id: Q-U21-002
+  concepts: [TERM-unbvar, TERM-bias, TERM-unbiased]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -40,6 +42,7 @@
     why: (n−1)/n×σ²＝3/4×12＝9。2000回取り直した v の平均も9に近い。s² の平均は12。
 
 - id: Q-U21-003
+  concepts: [TERM-unbiased, TERM-consistency, TERM-mse, TERM-bias, TERM-se, CLM-43]
   stage: S1
   difficulty: 1
   format: written
@@ -58,6 +61,7 @@
     why: SE は2で分散4、偏り1の2乗を足して5。n を100にすると 1＋1＝2 で、偏りの1だけはいつまでも残る。
 
 - id: Q-U21-004
+  concepts: [TERM-unbiased, TERM-consistency, TERM-se]
   stage: S1
   difficulty: 2
   format: written
@@ -76,12 +80,13 @@
     why: 10÷10＝1。最初の1個の広がりは10のまま。どちらも中心は μ（不偏）だが、ばらつきが10倍違う。
 
 - id: Q-U21-005
+  concepts: [TERM-bias, TERM-consistency, TERM-unbiased]
   stage: S1
   difficulty: 3
   format: written
   powers: [P1, P3]
   prompt: 母分散 σ²＝10 の正規母集団から n＝5 の標本を取る。n で割る v の期待値と偏りを求めよ。n を大きくすると偏りはどうなるか。
-  answer: E[v]＝4÷5×10＝**8**、偏り＝8−10＝**−2**（＝−σ²÷n）。n を大きくすると −σ²÷n は0に近づくので、v は不偏ではないが**一致**する。
+  answer: E[v]＝4÷5×10＝**8**、偏り＝8−10＝**−2**（＝−σ²÷n）。n を大きくすると −σ²÷n は0に近づき、v のばらつきも縮む（正規母集団で、分散 2(n−1)σ⁴÷n²→0）ので、v は不偏ではないが**一致**する。
   checks:
     - '4/5*10 == 8 and 8-10 == -2 and -10/5 == -2'
   lab:
@@ -91,9 +96,10 @@
     task: σ²＝10、n＝5。n で割る v の偏り（期待値−σ²）は？
     predict: {type: number, key: biasV, label: "v の偏り"}
     expect: -2
-    why: −σ²÷n＝−2。n を50にすると −0.2 で、偏りは n とともに小さくなる（一致）。
+    why: −σ²÷n＝−2。n を50にすると −0.2 で、偏りは n とともに小さくなる。ばらつきも縮むので一致する（偏りが縮むだけでは一致とは言えない）。
 
 - id: Q-U21-010
+  concepts: [TERM-point-est, TERM-unbvar, TERM-unbiased]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -111,6 +117,7 @@
     why: 偏差の2乗和40を5で割って8。n−1 で割ると10。
 
 - id: Q-U21-011
+  concepts: [TERM-efficiency, TERM-se]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -128,6 +135,7 @@
     why: 10÷5＝2。2000回取り直した中央値の SE は約2.5。正規分布なら、平均の方が中央値よりばらつきが小さい。
 
 - id: Q-U21-012
+  concepts: [TERM-unbiased, TERM-sample-prop, TERM-se, TERM-consistency, TERM-binom]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -145,6 +153,7 @@
     why: √(0.16÷100)＝0.04。n を400にすると0.02で半分。p̂ は不偏で、n とともに p に近づく。
 
 - id: Q-U21-020
+  concepts: [TERM-mse, TERM-bias, TERM-unbvar, TERM-unbiased, CLM-43]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -162,10 +171,11 @@
     why: 分散32＋偏り²4＝36。s² の MSE は50。v の分布は少し左にずれるが、広がりが小さい。
 
 - id: Q-U21-021
+  concepts: [TERM-bias, TERM-consistency, TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
-  prompt: 本当の満足率は0.5。満足の人は60%、不満の人は20%がアンケートに答える。回答者の満足率は何に近づくか。回答を1000人から5000人に増やすと偏りは減るか。
+  prompt: 客全体の満足率は0.5。満足の人は60%、不満の人は20%がアンケートに答える。回答者の満足率は何に近づくか。回答を1000人から5000人に増やすと偏りは減るか。
   answer: 回答者の満足率 → 0.5×0.6÷(0.5×0.6＋0.5×0.2)＝0.3÷0.4＝**0.75**。偏り＝**0.25**。回答を増やすと SE は小さくなるが、偏り0.25は**減らない**。
   checks:
     - 'abs(0.5*0.6/(0.5*0.6+0.5*0.2) - 0.75) < 1e-12 and abs(0.5*0.6+0.5*0.2 - 0.4) < 1e-12'
@@ -173,12 +183,13 @@
     id: LAB-est
     mode: self
     set: {p: 0.5, r1: 0.6, r0: 0.2, n: 1000}
-    task: 本当の満足率0.5、回答率は満足60%・不満20%。回答者の満足率が落ち着く先は？
+    task: 客全体の満足率0.5、回答率は満足60%・不満20%。回答者の満足率が落ち着く先は？
     predict: {type: number, key: target, label: "落ち着く先"}
     expect: 0.75
     why: 満足の人が3倍答えやすいので0.75。n を5000にしても0.75に落ち着く。回答率をそろえると0.5に戻る。
 
 - id: Q-U21-022
+  concepts: [TERM-efficiency, TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -196,6 +207,7 @@
     why: 10÷√50≒1.414。中央値の分布はそれより一回り広い。n を変えても、比はおよそ1.25倍（分散で1.57倍）のまま。
 
 - id: Q-U21-023
+  concepts: [TERM-unbiased, TERM-consistency, TERM-mse, TERM-bias]
   stage: S3
   tag: 本番形式
   format: choice
@@ -226,6 +238,7 @@
     why: 4/5＝0.8。n を50にすると0.98で、1に近づく（一致）。
 
 - id: Q-U21-030
+  concepts: [TERM-point-est, TERM-unbvar, TERM-se]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -243,10 +256,11 @@
     why: 偏差の2乗和56を5で割って11.2。平均の SE は√(11.2÷6)≒1.37。
 
 - id: Q-U21-031
+  concepts: [TERM-bias, TERM-se, TERM-sample-prop]
   stage: S4
   format: written
   powers: [P1, P3]
-  prompt: 店頭アンケートで、本当の満足率が0.4、満足の人の回答率60%・不満の人20% とする。2000人分の回答で満足率を推定するとき、偏りと標準誤差はそれぞれどれくらいか。どちらが推定を大きくずらしているか。
+  prompt: 店頭アンケートで、客全体の満足率が0.4、満足の人の回答率60%・不満の人20% とする。2000人分の回答で満足率を推定するとき、偏りと標準誤差はそれぞれどれくらいか。どちらが推定を大きくずらしているか。
   answer: 落ち着く先＝0.4×0.6÷(0.4×0.6＋0.6×0.2)＝0.24÷0.36≒0.667、偏り≒**0.267**。SE＝√(0.667×0.333÷2000)≒**0.011**。ずれのほとんどは**偏り**で、回答数をいくら増やしても直らない。回答率をそろえる工夫が先。
   checks:
     - 'abs(0.24/0.36 - 0.667) < 0.0005 and abs(0.24/0.36-0.4 - 0.267) < 0.0005 and abs(math.sqrt((2/3)*(1/3)/2000) - 0.011) < 0.0005 and abs(0.4*0.6+0.6*0.2 - 0.36) < 1e-12'
@@ -254,12 +268,13 @@
     id: LAB-est
     mode: self
     set: {p: 0.4, r1: 0.6, r0: 0.2, n: 2000}
-    task: 本当の満足率0.4、回答率は満足60%・不満20%、回答2000人。偏り（落ち着く先−0.4）は（小数で）？
+    task: 客全体の満足率0.4、回答率は満足60%・不満20%、回答2000人。偏り（落ち着く先−0.4）は（小数で）？
     predict: {type: number, key: bias, label: "偏り"}
     expect: 0.2667
     why: 落ち着く先は約0.667で、偏りは約0.267。SE は約0.011 で、偏りの25分の1ほど。
 
 - id: Q-U21-032
+  concepts: [TERM-efficiency, TERM-se]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -277,16 +292,22 @@
     why: 14÷√7≒5.29。最初の1個（昨日だけ）の広がりは14のまま。
 
 - id: Q-U21-040
+  concepts: [TERM-unbiased, TERM-unbvar, TERM-consistency]
   stage: S5   # 2級の範囲外の発展（c₄。範囲表の「不偏性」は s² まで）。予測を外し、自由に動かして「なぜ」を見る（#373 の F。渡辺さん 2026-11-12）
   format: written
   powers: [P1, P3]
-  prompt: 正規母集団（σ²＝100、σ＝10）から n＝5 を取る。s² の期待値は100。s の期待値は c₄σ で、n＝5 なら c₄≒0.940。s の期待値を求め、s が σ に不偏かを答えよ。
-  answer: E[s]≒0.940×10＝**9.40**。σ＝10 より小さいので、s は σ に**不偏ではない**。s² が不偏でも、平方根を取ると平均が小さめにずれる。
+  prompt: 正規母集団（σ²＝100、σ＝10）から n＝5 を取る。不偏分散 s² の期待値は σ²＝100 にちょうど一致する。ところが s＝√s² の期待値は約 9.40 で、σ＝10 より小さい。s² が σ² に不偏なのに、なぜ s は σ に不偏にならないのかを説明する。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: |-
+    平方根は曲がった関数で、大きい値ほど伸び方が小さい。s² は標本ごとに σ²＝100 の上下にばらつく。たとえば s² が 50 と 150 に半分ずつ出たとすると、s² の平均は100だが、s は √50≒7.07 と √150≒12.25 で、平均は約 9.66。s² が上に50外れても s は 10 から 2.25 しか増えないのに、下に50外れると 2.93 減る。増える分より減る分が大きいので、s の平均は √100＝10 より小さくなる。
+
+    つまり「平均してから平方根」と「平方根してから平均」は一致しない。不偏性は推定量ごとの性質で、s² が不偏でも、それを変換した s が不偏とは限らない。n を大きくすると s² のばらつきが小さくなり、曲がりの効き方も小さくなるので、ずれは0に近づく（s は不偏ではないが一致性はある）。
   checks:
     - 'abs(math.sqrt(2/4)*math.exp(math.lgamma(2.5)-math.lgamma(2)) - 0.940) < 0.0005 and abs(0.940*10 - 9.40) < 1e-9'
+    - '(50+150)/2 == 100 and abs(math.sqrt(50) - 7.07) < 0.005 and abs(math.sqrt(150) - 12.25) < 0.005 and abs((math.sqrt(50)+math.sqrt(150))/2 - 9.66) < 0.005 and abs(math.sqrt(150)-10 - 2.25) < 0.005 and abs(10-math.sqrt(50) - 2.93) < 0.005'
   lab:
     id: LAB-est
     mode: var
     set: {sigma2: 100, n: 5}
     task: n を動かして、E[s] と σ の差の動き方を見る。s² は σ² に不偏なのに、なぜ s は σ より小さくなるのか。
-    why: c₄σ≒0.940×10＝9.40。n を50にすると c₄≒0.995 で、ずれは小さくなる。
+    why: n＝5 で E[s]≒9.40。n を50にすると c₄≒0.995 で、ずれは小さくなる。

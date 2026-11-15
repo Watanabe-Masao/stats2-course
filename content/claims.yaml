@@ -1240,3 +1240,33 @@ claims:
       version: 5ee32a8
     external: なし
   version: 1
+- id: CLM-43
+  label: ④-43
+  kind: 等しい
+  statement:
+    text: 母数 θ の推定量 θ̂ の分散 V(θ̂) が有限のとき、E[(θ̂−θ)²]＝V(θ̂)＋{E(θ̂)−θ}²（平均二乗誤差は分散と偏りの2乗の和）
+  premises:
+    subjects:
+    - TERM-estimator
+    predicates:
+    - TERM-var
+    - TERM-bias
+  conclusion:
+    subjects:
+    - TERM-estimator
+    predicates:
+    - TERM-mse
+  grounds:
+  - source:
+      title: θ̂−θ＝{θ̂−E(θ̂)}＋{E(θ̂)−θ} の2乗の期待値を開く。交わりの項 2{E(θ̂)−θ}·E{θ̂−E(θ̂)} は E{θ̂−E(θ̂)}＝0 なので消える
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: Z
+      date: '2026-11-16'
+      version: 087f354
+    external: なし
+  version: 1
