@@ -3,6 +3,7 @@
 # powers: P1 式を読む / P2 計算する / P3 言葉にする
 # checks: 答えの数値の検算式（build で自動実行）
 - id: Q-U09-001
+  concepts: [TERM-perm, TERM-comb, REL-perm-to-comb]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -26,6 +27,7 @@
     why: 会長・副会長・書記なら 6×5×4＝120。同じ3人の組を 3!＝6 回ずつ数えているので 120÷6＝20。
 
 - id: Q-U09-002
+  concepts: [TERM-perm, TERM-comb, REL-perm-to-comb]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -46,6 +48,7 @@
     why: 7×6＝42。役割を「区別しない」に切り替えると研修参加者2人の選び方 42÷2＝21。
 
 - id: Q-U09-003
+  concepts: [TERM-perm]
   stage: S1
   difficulty: 1
   format: written
@@ -64,6 +67,7 @@
     why: 4×3＝12。帯1本（同じ2人の組）に「B→C」「C→B」の2通りが並ぶ。
 
 - id: Q-U09-004
+  concepts: [TERM-comb, REL-perm-to-comb]
   stage: S1
   difficulty: 2
   format: written
@@ -82,6 +86,7 @@
     why: 役割ありの12通りを、同じ組の並べ方 2!＝2 で割って6。
 
 - id: Q-U09-005
+  concepts: [TERM-perm]
   stage: S1
   difficulty: 3
   format: written
@@ -100,6 +105,7 @@
     why: 1個目3通り×2個目3通り＝3²＝9。順番を区別しないなら ₄C₂＝6（くわしくの書き出し）。
 
 - id: Q-U09-010
+  concepts: [TERM-comb, TERM-perm, REL-perm-comb-contrast]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -119,6 +125,7 @@
     why: 5×4×3＝60。段（役割）を区別しない詰め合わせなら 60÷3!＝10。
 
 - id: Q-U09-011
+  concepts: [TERM-comb]
   stage: S2
   label: 計算練習
   format: written
@@ -147,6 +154,7 @@
     why: 選ぶ8人を決めることは、選ばない2人を決めることと同じ。₁₀C₈＝₁₀C₂＝10×9÷2＝45。続けて n・r を 7・3、12・10 に動かし、2・3 の答え（35、66）も確かめる。
 
 - id: Q-U09-012
+  concepts: [TERM-perm, TERM-comb]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -167,6 +175,7 @@
     why: 8×7×6＝336。順位は役割なので順列。区別しない委員なら 336÷6＝56。
 
 - id: Q-U09-020
+  concepts: [TERM-comb]
   stage: S3
   format: written
   powers: [P2]
@@ -184,6 +193,7 @@
     why: A を先に入れて、残り5人から2人：₅C₂＝10。くわしくの書き出しで、太枠（A を含む組）が10個あることを確かめる。含まないのも ₅C₃＝10 で、合わせて ₆C₃＝20。
 
 - id: Q-U09-021
+  concepts: [TERM-comb]
   stage: S3
   format: written
   powers: [P1]
@@ -202,6 +212,7 @@
     why: 全部 ₇C₃＝35 から、男性3人だけの ₃C₃＝1 を引いて34。くわしくの書き出しで、太枠でない組が1つだけあることを確かめる。
 
 - id: Q-U09-022
+  concepts: [TERM-fact]
   stage: S3
   format: written
   powers: [P2]
@@ -219,6 +230,7 @@
     why: A と B をかたまりとみて4つを並べる 4!＝24、かたまりの中の AB・BA の2通りで48。全部の120通りのうち、くわしくの太枠が48個。
 
 - id: Q-U09-023
+  concepts: [TERM-comb]
   stage: S3
   tag: 本番形式
   format: choice
@@ -248,6 +260,7 @@
     why: ₉C₂＝36。委員長の10通りを掛けて 360。
 
 - id: Q-U09-024
+  concepts: [TERM-comb, TERM-perm, REL-perm-to-comb]
   stage: S3
   tag: 確率へ
   format: written
@@ -266,6 +279,7 @@
     why: ₅C₂＝10。そのうち {A, B} は1通りなので確率 1/10。役割ありで数えると分母20、分子2（A→B・B→A）で同じ 1/10。
 
 - id: Q-U09-025
+  concepts: [TERM-comb]
   stage: S3
   tag: 分布へ
   format: written
@@ -284,6 +298,7 @@
     why: 不良1個の選び方 ₂C₁＝2、良品2個 ₈C₂＝28 で 2×28＝56 通り。全部 ₁₀C₃＝120 通りなので 56÷120＝7/15≒0.4667。
 
 - id: Q-U09-030
+  concepts: [TERM-comb]
   stage: S4
   format: written
   powers: [P1]
@@ -301,6 +316,7 @@
     why: 握手1回＝2人の組（区別なし）。₁₀C₂＝10×9÷2＝45。
 
 - id: Q-U09-031
+  concepts: [TERM-comb]
   stage: S4
   format: written
   powers: [P1]
@@ -318,6 +334,7 @@
     why: 7歩のうち右の4歩を選ぶ：₇C₄＝35。上の3歩を選ぶ ₇C₃ と同じ。
 
 - id: Q-U09-032
+  concepts: [TERM-comb]
   stage: S4
   tag: 仕事へ
   format: written
@@ -336,11 +353,12 @@
     why: ₁₀C₅＝252。パスカルの10段目のまん中（一番大きい数）。どの選び方も同じ確率で選ぶのが無作為化。
 
 - id: Q-U09-040
+  concepts: [TERM-binom, TERM-comb]
   stage: S3
   label: 確かめ問題
   format: written
   powers: [P2]
-  prompt: B(4, 0.25) の確率 0.3164, 0.4219, 0.2109, 0.0469, 0.0039 を足すと？
+  prompt: 二項分布 B(4, 0.25)（{{unit:U14}}。成功確率 0.25 の試行を独立に4回したときの成功回数の分布）の確率 0.3164, 0.4219, 0.2109, 0.0469, 0.0039 を足すと？
   answer_title: 答え
   answer: 1（端数の丸めで0.9999〜1.0001になることがある）。
   checks:
