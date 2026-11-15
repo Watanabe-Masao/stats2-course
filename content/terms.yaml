@@ -5,33 +5,33 @@
   category: 数学の道具
   forms: [number]
   basis:
-    text: 異なる n 個のものから k 個（n・k は 0≦k≦n の整数。定義の要件）を取り出し、順番を区別して1列に並べる並べ方の数 ₙPₖ（何も取り出さない k＝0 は1通り）
+    text: 異なる n 個のものから r 個（n・r は 0≦r≦n の整数。定義の要件）を取り出し、順番を区別して1列に並べる並べ方の数 ₙPᵣ（何も取り出さない r＝0 は1通り）
   short: 異なるものから順番を区別して並べる並べ方と、その数
-  definition: 異なる n 個の中から k 個を取り出し、順番を区別して1列に並べる並べ方の数。ₙPₖ と書く。
+  definition: 異なる n 個の中から r 個を取り出し、順番を区別して1列に並べる並べ方の数。ₙPᵣ と書く。
   version: 1
-  principle: 1番目は n 通り、2番目は残りの n−1 通り……と、1つ置くたびに選べるものが1つ減る。k 番目まで掛けた n(n−1)…(n−k+1) が並べ方の数。n 個を全部並べて前の k 個だけを見ると、後ろの n−k 個の並べ替え (n−k)! 通りは同じ並べ方になるので、n! を (n−k)! で割っても同じ数になる。
+  principle: 1番目は n 通り、2番目は残りの n−1 通り……と、1つ置くたびに選べるものが1つ減る。r 番目まで掛けた n(n−1)…(n−r+1) が並べ方の数。n 個を全部並べて前の r 個だけを見ると、後ろの n−r 個の並べ替え (n−r)! 通りは同じ並べ方になるので、n! を (n−r)! で割っても同じ数になる。
   formulas:
     - id: F-perm-def
       label: 階乗で表す
       symbols:
-        - {symbol: ₙPₖ, meaning: n 個から k 個を取り出して並べる並べ方の数, key: perm, concept: TERM-perm}
+        - {symbol: ₙPᵣ, meaning: n 個から r 個を取り出して並べる並べ方の数, key: perm, concept: TERM-perm}
         - {symbol: n, meaning: 全体の個数, key: n, kind: value, domain: {min: 0, integer: true}}
-        - {symbol: k, meaning: 取り出して並べる個数, key: k, kind: value, domain: {min: 0, max: n, integer: true}}
+        - {symbol: r, meaning: 取り出して並べる個数, key: r, kind: value, domain: {min: 0, max: n, integer: true}}
         - {symbol: n!, meaning: 階乗（1からその数までを掛けた数）, key: fact, concept: TERM-fact}
       tree:
         op: eq
         args:
-          - {op: fn, name: perm, args: [{sym: n}, {sym: k}]}
+          - {op: fn, name: perm, args: [{sym: n}, {sym: r}]}
           - op: div
             args:
               - {op: fn, name: fact, args: [{sym: n}]}
-              - {op: fn, name: fact, args: [{op: sub, args: [{sym: n}, {sym: k}]}]}
+              - {op: fn, name: fact, args: [{op: sub, args: [{sym: n}, {sym: r}]}]}
       parts:
         - {path: [1, 0], name: 全部の並べ方, meaning: n 個を全部1列に並べる並べ方の数}
-        - {path: [1, 1], name: 残した中の並べ方, meaning: 取り出さずに残した n−k 個の並びは数えないので、その並べ方の数で割る}
+        - {path: [1, 1], name: 残した中の並べ方, meaning: 取り出さずに残した n−r 個の並びは数えないので、その並べ方の数で割る}
   conditions:
     math:
-      - n と k は整数で、0 ≦ k ≦ n
+      - n と r は整数で、0 ≦ r ≦ n
       - n 個はどれも区別できる
       - 同じものを2回使わない（取り出したものは戻さない）
     data:
@@ -55,16 +55,16 @@
   category: 数学の道具
   forms: [number]
   basis:
-    text: 異なる n 個のものから、順番を区別せずに k 個（n・k は 0≦k≦n の整数。定義の要件）を選ぶ選び方の数 ₙCₖ（何も選ばない k＝0 は1通り）
-  definition: n 個の中から、順番を区別せずに k 個を選ぶ選び方の数。ₙCₖ と書く。
+    text: 異なる n 個のものから、順番を区別せずに r 個（n・r は 0≦r≦n の整数。定義の要件）を選ぶ選び方の数 ₙCᵣ（何も選ばない r＝0 は1通り）
+  definition: n 個の中から、順番を区別せずに r 個を選ぶ選び方の数。ₙCᵣ と書く。
   version: 1
-  principle: n 個を1列に並べる n! 通りのうち、選んだ k 個の中の並び（k! 通り）と、残した n−k 個の中の並び（(n−k)! 通り）は区別しないので、その分で割る。
+  principle: n 個を1列に並べる n! 通りのうち、選んだ r 個の中の並び（r! 通り）と、残した n−r 個の中の並び（(n−r)! 通り）は区別しないので、その分で割る。
   formulas:
   - id: F-comb-def
     label: 階乗で表す
     symbols:
-    - symbol: ₙCₖ
-      meaning: n 個から k 個を選ぶ選び方の数
+    - symbol: ₙCᵣ
+      meaning: n 個から r 個を選ぶ選び方の数
       key: comb
       concept: TERM-comb
     - symbol: n
@@ -72,29 +72,29 @@
       key: n
       kind: value
       domain: {min: 0, integer: true}
-    - symbol: k
+    - symbol: r
       meaning: 選ぶ個数
-      key: k
+      key: r
       kind: value
       domain: {min: 0, max: n, integer: true}
     - symbol: n!
       meaning: 階乗（1からその数までを掛けた数）
       key: fact
       concept: TERM-fact
-    tree: {"op": "eq", "args": [{"op": "fn", "name": "comb", "args": [{"sym": "n"}, {"sym": "k"}]}, {"op": "div", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "n"}]}, {"op": "mul", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "k"}]}, {"op": "fn", "name": "fact", "args": [{"op": "sub", "args": [{"sym": "n"}, {"sym": "k"}]}]}]}]}]}
+    tree: {"op": "eq", "args": [{"op": "fn", "name": "comb", "args": [{"sym": "n"}, {"sym": "r"}]}, {"op": "div", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "n"}]}, {"op": "mul", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "r"}]}, {"op": "fn", "name": "fact", "args": [{"op": "sub", "args": [{"sym": "n"}, {"sym": "r"}]}]}]}]}]}
     parts:
     - path: [1, 0]
       name: 全部の並べ方
       meaning: n 個を1列に並べる並べ方の数
     - path: [1, 1, 0]
       name: 選んだ中の並べ方
-      meaning: 選んだ k 個は順番を区別しないので、その並べ方の数で割る
+      meaning: 選んだ r 個は順番を区別しないので、その並べ方の数で割る
     - path: [1, 1, 1]
       name: 残した中の並べ方
-      meaning: 残した n−k 個も順番を区別しないので、その並べ方の数で割る
+      meaning: 残した n−r 個も順番を区別しないので、その並べ方の数で割る
   conditions:
     math:
-    - n と k は整数で、0 ≦ k ≦ n
+    - n と r は整数で、0 ≦ r ≦ n
     - n 個はどれも区別できる
     - 同じものを2回選ばない（選んだものは戻さない）
     data:
@@ -103,7 +103,7 @@
   counterexample: 5人から委員長と副委員長を1人ずつ選ぶときは役が違うので順番を区別する。10 通りではなく 5×4＝20 通り（順列）。
   misconceptions:
   - misconception: ₁₀C₃ と ₁₀C₇ は別の数
-    correction: 選ぶ3人を決めることは、残す7人を決めることと同じ。ₙCₖ＝ₙCₙ₋ₖ で、どちらも120
+    correction: 選ぶ3人を決めることは、残す7人を決めることと同じ。ₙCᵣ＝ₙCₙ₋ᵣ で、どちらも120
   sources:
   - source: 公式2級範囲表
     locator: 確率モデルの導入（確率変数・確率分布）

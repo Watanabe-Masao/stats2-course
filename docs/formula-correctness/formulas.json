@@ -4,11 +4,11 @@
   "index": 0,
   "id": "F-perm-def",
   "label": "階乗で表す",
-  "tex": "{}_{n}\\mathrm{P}_{k}=\\dfrac{n!}{(n-k)!}",
+  "tex": "{}_{n}\\mathrm{P}_{r}=\\dfrac{n!}{(n-r)!}",
   "symbols": [
    {
-    "symbol": "ₙPₖ",
-    "meaning": "n 個から k 個を取り出して並べる並べ方の数",
+    "symbol": "ₙPᵣ",
+    "meaning": "n 個から r 個を取り出して並べる並べ方の数",
     "key": "perm",
     "concept": "TERM-perm"
    },
@@ -23,9 +23,9 @@
     }
    },
    {
-    "symbol": "k",
+    "symbol": "r",
     "meaning": "取り出して並べる個数",
-    "key": "k",
+    "key": "r",
     "kind": "value",
     "domain": {
      "min": 0,
@@ -51,7 +51,7 @@
        "sym": "n"
       },
       {
-       "sym": "k"
+       "sym": "r"
       }
      ]
     },
@@ -78,7 +78,7 @@
            "sym": "n"
           },
           {
-           "sym": "k"
+           "sym": "r"
           }
          ]
         }
@@ -103,7 +103,7 @@
      1
     ],
     "name": "残した中の並べ方",
-    "meaning": "取り出さずに残した n−k 個の並びは数えないので、その並べ方の数で割る"
+    "meaning": "取り出さずに残した n−r 個の並びは数えないので、その並べ方の数で割る"
    }
   ],
   "contract": {
@@ -121,11 +121,11 @@
   "index": 0,
   "id": "F-comb-def",
   "label": "階乗で表す",
-  "tex": "{}_{n}\\mathrm{C}_{k}=\\dfrac{n!}{k!(n-k)!}",
+  "tex": "{}_{n}\\mathrm{C}_{r}=\\dfrac{n!}{r!(n-r)!}",
   "symbols": [
    {
-    "symbol": "ₙCₖ",
-    "meaning": "n 個から k 個を選ぶ選び方の数",
+    "symbol": "ₙCᵣ",
+    "meaning": "n 個から r 個を選ぶ選び方の数",
     "key": "comb",
     "concept": "TERM-comb"
    },
@@ -140,9 +140,9 @@
     }
    },
    {
-    "symbol": "k",
+    "symbol": "r",
     "meaning": "選ぶ個数",
-    "key": "k",
+    "key": "r",
     "kind": "value",
     "domain": {
      "min": 0,
@@ -168,7 +168,7 @@
        "sym": "n"
       },
       {
-       "sym": "k"
+       "sym": "r"
       }
      ]
     },
@@ -192,7 +192,7 @@
          "name": "fact",
          "args": [
           {
-           "sym": "k"
+           "sym": "r"
           }
          ]
         },
@@ -207,7 +207,7 @@
              "sym": "n"
             },
             {
-             "sym": "k"
+             "sym": "r"
             }
            ]
           }
@@ -235,7 +235,7 @@
      0
     ],
     "name": "選んだ中の並べ方",
-    "meaning": "選んだ k 個は順番を区別しないので、その並べ方の数で割る"
+    "meaning": "選んだ r 個は順番を区別しないので、その並べ方の数で割る"
    },
    {
     "path": [
@@ -244,7 +244,7 @@
      1
     ],
     "name": "残した中の並べ方",
-    "meaning": "残した n−k 個も順番を区別しないので、その並べ方の数で割る"
+    "meaning": "残した n−r 個も順番を区別しないので、その並べ方の数で割る"
    }
   ],
   "contract": {
