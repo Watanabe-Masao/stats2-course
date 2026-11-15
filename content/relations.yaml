@@ -664,6 +664,7 @@ relations:
     figures: [FIG-LAB-two-rel-paired-welch-tour-2, FIG-LAB-two-rel-paired-welch-tour-3]
     checks:
       - 53-50 == 3 and abs(math.sqrt(10**2/10+10**2/10) - 4.47) < 0.005 and abs(math.sqrt(10**2+10**2) - 14.1) < 0.05 and 10-1 == 9 and 10+10-2 == 18
+      - abs(3-2.262157*2/math.sqrt(10) - 1.57) < 0.005 and abs(3+2.262157*2/math.sqrt(10) - 4.43) < 0.005 and abs(3-2.100922*math.sqrt(20) + 6.40) < 0.005 and abs(3+2.100922*math.sqrt(20) - 12.40) < 0.005
     basis:
       units:
       - U23

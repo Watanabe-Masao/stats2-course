@@ -400,7 +400,7 @@ def _twoci_fig(x: dict, state: dict, tour: dict) -> dict:
     """差の区間の横の棒（0 の位置に印を付けて、区間が 0 を含むかを読む）"""
     return {"type": "ci_bar", "lo": x["lo"], "hi": x["hi"], "center": x["diff"], "ticks": [-10, 15, 5], "zero": True, "decimals": 2,
             "center_label": f"差 {_n(x['diff'])}", "label": f"{x['label']}の95%信頼区間（自由度 {_n(round(x['df'], 1))}）",
-            "lines": [f"{_n(round(x['lo'], 2))}〜{_n(round(x['hi'], 2))}（誤差幅 {_n(round(x['margin'], 2))}）"]}
+            "lines": [f"{x['lo']:.2f}〜{x['hi']:.2f}（誤差幅 {x['margin']:.2f}）".replace("-", "−")]}
 
 
 MODES = {
