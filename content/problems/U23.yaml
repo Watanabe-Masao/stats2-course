@@ -210,7 +210,7 @@
     why: 区間は約 −0.23〜2.63。n を20にすると約0.26〜2.14 で、0を含まなくなる。
 
 - id: Q-U23-023
-  concepts: [TERM-ci, TERM-paired-t, TERM-chi2, TERM-t, TERM-df]
+  concepts: [TERM-ci, TERM-paired-t, TERM-chi2, TERM-t, TERM-df, TERM-sample-prop]
   stage: S3
   tag: 本番形式
   format: choice

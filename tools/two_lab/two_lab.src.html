@@ -137,7 +137,7 @@ function pVals(){const d=+$("pd").value,s=+$("ps").value,n=+$("pn").value,se=s/M
  return {dbar:d,sd:s,n,se,df:n-1,tcrit:tc,margin:m,lo:d-m,hi:d+m,contains0:inc(d-m,d+m,0)?"0を含む":"0を含まない"};}
 function pRender(){const P=pVals();
  $("pplot").innerHTML=bar(P.lo,P.hi,P.dbar,`D̄＝${f(P.dbar,2)}`,"差の平均の信頼区間",0)+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>差の平均の95%信頼区間</span><span><i class="sw" style="background:var(--acc2)"></i>差0</span></div>`;
- $("psum").innerHTML=`<div>SE＝差の標準偏差÷√n＝${f(P.sd,2)}÷√${P.n}＝<b>${f(P.se)}</b>　自由度 ${P.df}</div><div>t(${P.df}) の0.975点＝${f(P.tcrit,3)}　誤差幅＝<b>${f(P.margin)}</b></div><div>区間：<b>${f(P.lo)}〜${f(P.hi)}</b>（${P.contains0}）</div><div class="mut">同じ店の前後を別々の2群として扱うと、店ごとの差（店の大きさなど）がばらつきに入り、区間が広くなりすぎる。</div>`;}
+ $("psum").innerHTML=`<div>SE＝差の標準偏差÷√n＝${f(P.sd,2)}÷√${P.n}＝<b>${f(P.se)}</b>　自由度 ${P.df}</div><div>t(${P.df}) の0.975点＝${f(P.tcrit,3)}　誤差幅＝<b>${f(P.margin)}</b></div><div>区間：<b>${f(P.lo)}〜${f(P.hi)}</b>（${P.contains0}）</div><div class="mut">同じ店の前後を別々の2群として扱うと、前と後が店ごとに連動しているとき（店の大きさの違いが大きいとき）、その違いがばらつきに入り、区間が広くなりすぎる。</div>`;}
 LK.register("paired",{name:"対応あり",
  init(){["pd","ps","pn"].forEach(id=>LK.stepper($(id),pRender));pRender();},
  apply(s){if(s.dbar!==undefined)LK.setRange("pd",s.dbar);if(s.sd!==undefined)LK.setRange("ps",s.sd);if(s.n!==undefined)LK.setRange("pn",s.n);pRender();},
