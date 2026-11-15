@@ -947,7 +947,9 @@ def frame(sp: dict) -> str:
         c.text(304, 160, f"{out}{u}", 14, RED, "middle", "bold")
         c.text(304, 180, "選ばれる確率 0", 11.5, RED, "middle")
     y = 284
-    y = c.para(8, y, f"結論を言えるのは抽出枠の{fr['n']}{u}まで。" + (f"枠の外の{out}{u}は、標本を大きくしても入らない" if out else ""), 344, 12.5, INK2)
+    y = c.para(8, y, f"結論を言えるのは抽出枠の{fr['n']}{u}まで。", 344, 12.5, INK2)
+    if out:
+        y = c.para(8, y, f"枠の外の{out}{u}は、標本を大きくしても入らない", 344, 12.5, INK2)
     return c.done(y + 4)
 
 

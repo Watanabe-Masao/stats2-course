@@ -337,8 +337,8 @@
   "symbols": [
    {
     "symbol": "π",
-    "meaning": "枠の1つの要素が標本に入る確率（包含確率）",
-    "key": "pi",
+    "meaning": "枠の1つの要素が標本に入る確率（包含確率。円周率の π とは別）",
+    "key": "incl",
     "concept": "TERM-prob",
     "kind": "value"
    },
@@ -368,7 +368,7 @@
    "op": "eq",
    "args": [
     {
-     "sym": "pi"
+     "sym": "incl"
     },
     {
      "op": "div",
@@ -422,6 +422,7 @@
     "symbol": "b",
     "meaning": "推定量の偏り（バイアス）",
     "key": "b",
+    "concept": "TERM-bias",
     "kind": "value"
    },
    {

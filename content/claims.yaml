@@ -1091,7 +1091,7 @@ claims:
   label: ④-40
   kind: 等しい
   statement:
-    text: 要素の数 N（N≧1）の抽出枠から、大きさ n（0≦n≦N）の標本を単純無作為抽出する（大きさ n のどの組み合わせも同じ確率で選ぶ）とき、枠のどの要素についても、その要素が標本に入る確率は n/N
+    text: 要素が重複なく1回ずつ載った、要素の数 N（N≧1）の抽出枠から、大きさ n（0≦n≦N）の標本を戻さずに単純無作為抽出する（大きさ n のどの組み合わせも同じ確率で選ぶ）とき、枠のどの要素についても、その要素が標本に入る確率は n/N
   premises:
     subjects:
     - TERM-frame
@@ -1102,10 +1102,26 @@ claims:
     - TERM-random-sampling
     predicates:
     - TERM-prob
+  conditions:
+  - text: 枠に同じ要素が重複して載っていない
+    kind: 仮定
+    terms:
+    - TERM-frame
+    outside: 2回載っている要素の入る確率は n/N より大きい（1−(N−2)Cn/NCn）
+  - text: 戻さずに選ぶ（大きさ n の組み合わせから1つを選ぶ）
+    kind: 仮定
+    outside: 戻して n 回選ぶと、ある要素が1回以上入る確率は 1−(1−1/N)ⁿ で、n≧2 では n/N より小さい
   grounds:
   - source:
       title: 組み合わせは全部で NCn 通りで、どれも確率 1/NCn。ある要素を含む組み合わせは、残りの N−1 個から n−1 個を選ぶ (N−1)C(n−1) 通り。その比は (N−1)C(n−1)/NCn＝n/N（n＝0 では含む組み合わせが0通りで 0＝0/N）
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: W
+      date: '2026-11-16'
+      version: 15469f3
+    external: なし
   version: 1
