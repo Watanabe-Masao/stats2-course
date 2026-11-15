@@ -1011,7 +1011,39 @@ def targets(sp: dict) -> str:
     return c.done(y)
 
 
-TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+def intervals(sp: dict) -> str:
+    """取り直した信頼区間を横に並べ、動かない母数の線と比べる（#47 の U22 の概念図）。
+    sp：{count: 本数, miss: 外す本数, param: 母数の名前}。外す行と区間の位置・幅は決まった並び（乱数を使わない）"""
+    c = Canvas()
+    n = sp["count"]
+    miss = {(n * (2 * j + 1) * 2 // (3 * (2 * sp.get("miss", 0) or 1))) % n for j in range(sp.get("miss", 0))}
+    offs = [0.35, -0.5, 0.1, 0.62, -0.2, -0.7, 0.45, -0.05, 0.28, -0.4, 0.7, -0.15, 0.05, -0.62, 0.5, -0.3, 0.2, 0.55, -0.45, 0.15]
+    cx, half, top, row = 180, 70, 30, 14
+    for i in range(n):
+        y = top + i * row
+        if i in miss:
+            m = cx + (1.25 if i % 2 == 0 else -1.25) * half
+            col = ORANGE
+        else:
+            m = cx + offs[i % len(offs)] * half
+            col = BLUE
+        w = half * (0.9 + 0.2 * ((i * 7) % 5) / 4)
+        c.line(m - w, y, m + w, y, col, 3)
+        c.circle(m, y, 3.2, fill=col)
+    bottom = top + (n - 1) * row
+    c.line(cx, top - 14, cx, bottom + 12, INK, 2, dash="5 3")
+    c.text(cx, top - 18, f"{sp.get('param', 'μ')}（動かない）", 12.5, INK, "middle", "bold")
+    k = n - len(miss)
+    y = bottom + 34
+    c.text(8, y, f"青：{sp.get('param', 'μ')} を含む区間 {k}本", 12.5, BLUE, "start", "bold")
+    c.text(8, y + 18, f"橙：{sp.get('param', 'μ')} を外す区間 {len(miss)}本", 12.5, ORANGE, "start", "bold")
+    y += 18
+    if sp.get("caption_line"):
+        y = c.para(8, y + 10, sp["caption_line"], 344, 12.5, INK2)
+    return c.done(y + 8)
+
+
+TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
