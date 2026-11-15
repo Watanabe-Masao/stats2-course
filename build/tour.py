@@ -220,6 +220,24 @@ def _list_fig(x: dict, state: dict, tour: dict) -> dict:
     return {"type": "arrange", "n": x["n"], "r": x["r"], "role": x["role"]}
 
 
+def _bayes(state: dict, tour: dict) -> dict:
+    """ベイズ（確率ラボの bayes。#45 の U12）：1000 個で数える。旧版のラボの bVals と同じ（total は1回の検査の全確率）"""
+    p, se, fp = state["prior"] / 100, state["sens"] / 100, state["fpr"] / 100
+    t = 2 if state.get("times") == 2 else 1
+    tp, fpn = 1000 * p * se ** t, 1000 * (1 - p) * fp ** t
+    return {"prior": p, "sens": se, "fpr": fp, "times": t, "tpn": tp, "fpn": fpn,
+            "total": (p * se + (1 - p) * fp) * 100, "post": tp / (tp + fpn) * 100 if tp + fpn else float("nan")}
+
+
+def _bayes_fig(x: dict, state: dict, tour: dict) -> dict:
+    t = x["times"]
+    ev = state.get("event") or "検出"
+    return {"type": "count_tree", "n": 1000, "prior": x["prior"], "sens": x["sens"] ** t, "fpr": x["fpr"] ** t,
+            "name": state.get("name") or "不良", "other": state.get("other") or "良品", "event": ev,
+            "hit": f"2回とも{ev}あり" if t == 2 else f"{ev}あり", "miss": "それ以外" if t == 2 else f"{ev}なし",
+            "lines": False}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -229,6 +247,7 @@ MODES = {
     ("LAB-pois", "pois"): {"calc": _pois, "check": ("pk", "p0", "lambda"), "figure": _pois_fig},
     ("LAB-expect", "joint"): {"calc": _joint, "check": ("px", "py", "exy", "cov", "vx"), "figure": _joint_fig},
     ("LAB-count", "list"): {"calc": _list, "check": ("perm", "comb", "count"), "figure": _list_fig},
+    ("LAB-prob", "bayes"): {"calc": _bayes, "check": ("tpn", "fpn", "total", "post"), "figure": _bayes_fig},
 }
 
 
@@ -323,7 +342,7 @@ def validate(where: str, p: dict, mode: dict | None, lid: str, modes: dict | Non
         need = {("LAB-pois", "approx"): {"n", "lam"}, ("LAB-binom", "path"): {"n", "p", "k"}, ("LAB-binom", "pmf"): {"n", "p", "k"},
                 ("LAB-pois", "geom"): {"p", "k"}, ("LAB-pois", "hyper"): {"N", "K", "n", "k"},
                 ("LAB-pois", "pois"): {"rate", "t", "k"}, ("LAB-expect", "joint"): {"p11", "p10", "p01"},
-                ("LAB-count", "list"): {"n", "r", "role"}}.get((lid, p.get("mode")), set())
+                ("LAB-count", "list"): {"n", "r", "role"}, ("LAB-prob", "bayes"): {"prior", "sens", "fpr"}}.get((lid, p.get("mode")), set())
         if not need <= set(first):
             err.append(f"{where}: 段1の set に {sorted(need)} を書く（静止図と照合の計算に要る）")
     return err

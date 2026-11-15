@@ -857,6 +857,38 @@ def tree(sp: dict) -> str:
     return c.done(y + 14)
 
 
+def count_tree(sp: dict) -> str:
+    """1000 個で数える樹形図（#45 の U12 の概念図）。1段目に原因（該当・非該当）の個数、2段目に結果の個数。
+    結果ありの2本を太くし、下に全確率と事後確率の行。sp：{n: 1000, prior: 0.02, sens: 0.9, fpr: 0.05, name, other, event}"""
+    n, p, se, fp = sp.get("n", 1000), sp["prior"], sp["sens"], sp["fpr"]
+    nm, ot, ev = sp.get("name", "不良"), sp.get("other", "良品"), sp.get("event", "検出")
+    hit, miss = sp.get("hit", f"{ev}あり"), sp.get("miss", f"{ev}なし")   # 2回の検査なら「2回とも検出あり」と「それ以外」
+    num = lambda v: f"{round(v, 2):g}"  # noqa: E731
+    a, b = n * p, n * (1 - p)
+    rows = [(nm, a, [(hit, a * se, True), (miss, a * (1 - se), False)]),
+            (ot, b, [(hit, b * fp, True), (miss, b * (1 - fp), False)])]
+    c = Canvas()
+    c.text(12, 18, f"{num(n)} 個で数える", 12.5, INK2)
+    x0, y0, x1, x2 = 12, 130, 92, 176
+    ys1 = [74, 190]
+    for (lab, cnt, kids), y1 in zip(rows, ys1):
+        c.add(f'<line x1="{x0}" y1="{y0}" x2="{x1}" y2="{y1}" stroke="{GRID}" stroke-width="1.5"/>')
+        c.text(x1 + 4, y1 - 4, lab, 12.5, INK, weight="bold")
+        c.text(x1 + 4, y1 + 12, f"{num(cnt)}個", 12, INK)
+        for (klab, kc, on), dy in zip(kids, (-26, 26)):
+            y2 = y1 + dy
+            c.add(f'<line x1="{x1 + 46}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{BLUE if on else GRID}" stroke-width="{3 if on else 1.5}"/>')
+            c.text(x2 + 6, y2 + 4, f"{klab} {num(kc)}個", 12, INK, weight="bold" if on else "normal")
+    tp, fpn = a * se, b * fp
+    y = 232
+    if sp.get("lines", True):   # 解説の段の図は道すじの個数だけ（全確率・事後確率は段の文で言う。文より先に数を見せない）
+        y += 18
+        c.text(12, y, f"{hit}＝{num(tp)}＋{num(fpn)}＝{num(tp + fpn)}個（{num((tp + fpn) / n * 100)}%）", 12.5, INK)
+        y += 20
+        c.text(12, y, f"{hit}のうち{nm}＝{num(tp)}÷{num(tp + fpn)}≒{num(tp / (tp + fpn) * 100)}%（事後確率）", 13, INK, weight="bold")
+    return c.done(y + 14)
+
+
 def joint(sp: dict) -> str:
     """2つの「する（1）・しない（0）」の同時確率の表（2×2）。各ますに確率と「独立なら」の値。下に数の行（解説付き再生の静止図）。"""
     q11, q10, q01 = sp["p11"], sp["p10"], sp["p01"]
@@ -887,7 +919,7 @@ def joint(sp: dict) -> str:
 
 
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
 def specs(course: Course) -> dict[str, dict]:
