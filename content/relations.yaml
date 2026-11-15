@@ -760,13 +760,13 @@ relations:
     stages:
       same: どちらも棄却域で決まる判定の誤り。σ＝12・36人・両側5%で、母平均が103.6 なら、第1種の過誤の確率は0.05、第2種の過誤の確率 β は0.56。
       differ: 有意水準を1%にすると第1種は0.01 に減るが、境目が外へ動いて β は0.78 に増える。片方を厳しくすると、もう片方が起きやすくなる。
-      so: 同じ人数のままでは、2つの誤りを同時には減らせない。両方を減らすには人数を増やす（144人で β は0.05）。どちらの誤りの損が大きいかで有意水準を決める。
+      so: 同じ人数のままでは、2つの誤りを同時には減らせない。両方を減らすには人数を増やす（144人なら、有意水準1%でも β は0.15）。どちらの誤りの損が大きいかで有意水準を決める。
     labs:
       - {id: LAB-test, preset: rel-type1-type2-tour, purpose: 有意水準を下げると β が増え、人数を増やすと両方が減るのを段ごとに見る}
       - {id: LAB-test, preset: rel-type1-type2-free, purpose: 有意水準と人数を自分で動かし、β の変わり方を確かめる}
     figures: [FIG-LAB-test-rel-type1-type2-tour-2, FIG-LAB-test-rel-type1-type2-tour-3]
     checks:
-      - 'abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,1.96) - 0.44) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,2.576) - 0.22) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),3.6,1.96) - 0.95) < 0.005 and abs(3.6/(12/6) - 1.8) < 1e-9'
+      - 'abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,1.96) - 0.44) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),1.8,2.576) - 0.22) < 0.005 and abs((lambda P,d,c: 1-P(c-d)+P(-c-d))(lambda x: 0.5*(1+math.erf(x/math.sqrt(2))),3.6,2.576) - 0.85) < 0.005 and abs(3.6/(12/6) - 1.8) < 1e-9'
     basis:
       units:
       - U24
