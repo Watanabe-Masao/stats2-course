@@ -1262,4 +1262,11 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: Z
+      date: '2026-11-16'
+      version: 087f354
+    external: なし
   version: 1
