@@ -1011,7 +1011,67 @@ def targets(sp: dict) -> str:
     return c.done(y)
 
 
-TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+def intervals(sp: dict) -> str:
+    """取り直した信頼区間を横に並べ、動かない母数の線と比べる（#47 の U22 の概念図）。
+    sp：{count: 本数, miss: 外す本数, param: 母数の名前}。外す行と区間の位置・幅は決まった並び（乱数を使わない）"""
+    c = Canvas()
+    n = sp["count"]
+    miss = {(n * (2 * j + 1) * 2 // (3 * (2 * sp.get("miss", 0) or 1))) % n for j in range(sp.get("miss", 0))}
+    offs = [0.35, -0.5, 0.1, 0.62, -0.2, -0.7, 0.45, -0.05, 0.28, -0.4, 0.7, -0.15, 0.05, -0.62, 0.5, -0.3, 0.2, 0.55, -0.45, 0.15]
+    cx, half, top, row = 180, 70, 30, 14
+    for i in range(n):
+        y = top + i * row
+        if i in miss:
+            m = cx + (1.25 if i % 2 == 0 else -1.25) * half
+            col = ORANGE
+        else:
+            m = cx + offs[i % len(offs)] * half
+            col = BLUE
+        w = half * (0.9 + 0.2 * ((i * 7) % 5) / 4)
+        c.line(m - w, y, m + w, y, col, 3)
+        c.circle(m, y, 3.2, fill=col)
+    bottom = top + (n - 1) * row
+    c.line(cx, top - 14, cx, bottom + 12, INK, 2, dash="5 3")
+    c.text(cx, top - 18, f"{sp.get('param', 'μ')}（動かない）", 12.5, INK, "middle", "bold")
+    k = n - len(miss)
+    y = bottom + 34
+    c.text(8, y, f"青：{sp.get('param', 'μ')} を含む区間 {k}本", 12.5, BLUE, "start", "bold")
+    c.text(8, y + 18, f"橙：{sp.get('param', 'μ')} を外す区間 {len(miss)}本", 12.5, ORANGE, "start", "bold")
+    y += 18
+    if sp.get("caption_line"):
+        y = c.para(8, y + 10, sp["caption_line"], 344, 12.5, INK2)
+    return c.done(y + 8)
+
+
+def ci_bar(sp: dict) -> str:
+    """1本の信頼区間を横の棒で（#47 の U22 の解説の静止図。ラボの平均の区間と同じ見せ方。曲線は描かない）。
+    sp：{lo, hi, center, ticks: [始め, 終わり, 刻み], center_label, label, lines}"""
+    c = Canvas()
+    a, b, step = sp["ticks"]
+    L, R = 16, 344
+    X = lambda x: L + (min(b, max(a, x)) - a) / (b - a) * (R - L)
+    y = 64
+    c.line(L, y + 26, R, y + 26, INK2, 1)
+    t = a
+    while t <= b + 1e-9:
+        c.line(X(t), y + 22, X(t), y + 30, INK2, 1)
+        c.text(X(t), y + 46, _num(t), 11.5, INK2, "middle")
+        t += step
+    c.line(X(sp["lo"]), y, X(sp["hi"]), y, BLUE, 7)
+    c.circle(X(sp["center"]), y, 6, fill=ORANGE, stroke=BG, width=2)
+    c.text(X(sp["center"]), y - 16, sp.get("center_label", ""), 12.5, ORANGE, "middle", "bold")
+    c.text(X(sp["lo"]), y + 4 - 26, _num(round(sp["lo"], 3)), 12, INK, "start")
+    c.text(X(sp["hi"]), y + 4 - 26, _num(round(sp["hi"], 3)), 12, INK, "end")
+    yy = y + 70
+    if sp.get("label"):
+        c.text(8, yy, sp["label"], 12.5, BLUE, "start", "bold")
+        yy += 18
+    for ln in sp.get("lines") or []:
+        yy = c.para(8, yy, ln, 344, 12.5, INK2)
+    return c.done(yy + 6)
+
+
+TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 

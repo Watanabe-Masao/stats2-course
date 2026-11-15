@@ -345,6 +345,31 @@ def _vest_fig(x: dict, state: dict, tour: dict) -> dict:
             "bars": [["s²（n−1 で割る）", 0], ["v（n で割る）", round(-x["biasV"], 2)]]}
 
 
+_ZTABLE = {0.9: 1.645, 0.95: 1.96, 0.99: 2.576}   # 2級の数表の値（信頼区間ラボの ZQ と同じ）
+
+
+def _cimean(state: dict, tour: dict) -> dict:
+    """平均の区間（信頼区間ラボの mean。#47 の U22）：x̄ ± 確率点 × s÷√n（ラボの mVals の se・crit・margin・lo・hi と同じ式。t は数値積分の点で、ラボの不完全ベータ関数とは別の道）"""
+    lv, n = float(state.get("level", 0.95)), int(state["n"])
+    xb, s = state["xbar"], state["s"]
+    se = s / math.sqrt(n)
+    crit = _ZTABLE[lv] if state.get("kind", "z") == "z" else _bisect(lambda t: _t_cdf(t, n - 1), 1 - (1 - lv) / 2, 0, 50)
+    m = crit * se
+    return {"n": n, "level": lv, "xbar": xb, "se": se, "crit": crit, "margin": m, "lo": xb - m, "hi": xb + m}
+
+
+def _cimean_fig(x: dict, state: dict, tour: dict) -> dict:
+    """区間の横の棒と点推定 x̄ の点（ラボの平均の区間と同じ見せ方。x̄ を中心にした曲線は「μ の分布」と読まれるので描かない）"""
+    xb, span = x["xbar"], max(x["margin"] * 1.6, x["se"])
+    step = 5 if 2 * span > 12 else 2
+    lo = math.floor((xb - span) / step) * step
+    hi = math.ceil((xb + span) / step) * step
+    pct = round(x["level"] * 100)
+    return {"type": "ci_bar", "lo": x["lo"], "hi": x["hi"], "center": xb, "ticks": [lo, hi, step],
+            "center_label": f"x̄ {_n(xb)}", "label": f"{pct}%信頼区間・n＝{x['n']}",
+            "lines": [f"{_n(round(x['lo'], 3))}〜{_n(round(x['hi'], 3))}（誤差幅 {_n(round(x['margin'], 3))}）"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -360,6 +385,7 @@ MODES = {
     ("LAB-tcf", "f"): {"calc": _fdist, "check": ("F", "fcrit", "pUp"), "figure": _fdist_fig},
     ("LAB-est", "comp"): {"calc": _comp, "check": ("seMean", "seFirst", "biasShift"), "figure": _comp_fig},
     ("LAB-est", "var"): {"calc": _vest, "check": ("biasV", "mseS2", "mseV"), "figure": _vest_fig},
+    ("LAB-ci", "mean"): {"calc": _cimean, "check": ("se", "crit", "margin", "lo", "hi"), "figure": _cimean_fig},
 }
 
 
