@@ -43,8 +43,18 @@ const NAMES = Object.fromEntries(Object.entries(GREEK).filter(([k]) => /\p{L}/u.
 function symbolTex(key, symbols = []) {
 	const s = symbols.find((x) => x.key === key && !/[()]/.test(x.symbol))?.symbol;
 	if (s) {
+		const ACCENT = {
+			"̂": "\\hat",
+			"̄": "\\bar"
+		};
 		let out = "";
 		for (const c of s) {
+			const acc = ACCENT[c];
+			const cmd = /\\[A-Za-z]+$/.exec(out);
+			if (acc && cmd) {
+				out = out.slice(0, cmd.index) + `${acc}{${cmd[0]}}`;
+				continue;
+			}
 			const t = GREEK[c] ?? c;
 			out += /\\[A-Za-z]+$/.test(out) && /^[A-Za-z]/.test(t) ? ` ${t}` : t;
 		}
