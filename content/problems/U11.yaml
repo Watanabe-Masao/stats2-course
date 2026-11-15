@@ -62,7 +62,7 @@
     why: 分母は雨の日の客40人。12÷40＝30%。全客100人で割った12%は、雨の日で傘を買った人の全体での割合（同時確率）。
 
 - id: Q-U11-004
-  concepts: [TERM-multiplication, TERM-cond, TERM-exclusive]
+  concepts: [TERM-multiplication, TERM-cond, TERM-total-prob]
   stage: S1
   difficulty: 2
   format: written
@@ -283,7 +283,7 @@
     why: 分母は休日の客200人で 70÷200＝35%。平日20%、全体26%。
 
 - id: Q-U11-032
-  concepts: [TERM-multiplication, TERM-cond, TERM-exclusive]
+  concepts: [TERM-multiplication, TERM-cond, TERM-total-prob]
   stage: S4
   tag: 抽選の順番
   format: written

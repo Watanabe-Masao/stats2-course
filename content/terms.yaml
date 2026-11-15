@@ -1056,6 +1056,50 @@
     text: P(H)＞0・P(D)＞0 の事象 H・D について、P(H|D)＝P(D|H)P(H)/P(D)（④-23）
     terms: [TERM-cond, TERM-prob, TERM-event]
   short: 結果が分かったときに、その原因の確率を、条件付き確率を逆向きにして求める式
+  definition: 結果 D が分かったときの原因 H の確率 P(H|D) を、逆向きの条件付き確率 P(D|H) と、H のもともとの確率 P(H) から求める式。P(H|D)＝P(D|H)P(H)÷P(D)。
+  version: 1
+  principle: 乗法定理で両方の確率を2通りに書くと、P(H)P(D|H)＝P(D)P(H|D)。これを P(H|D) について解いた形。分母の P(D) は全確率の公式で、原因ごとに足して求める。「原因 → 結果」の確率から「結果 → 原因」の確率へ向きを替える。
+  formulas:
+    - id: F-bayes
+      label: 向きを替える
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: H|D, meaning: D を条件にした H（事後確率）, key: HgD, kind: value, concept: TERM-posterior}
+        - {symbol: D|H, meaning: H を条件にした D（尤度）, key: DgH, kind: value, concept: TERM-likelihood}
+        - {symbol: H, meaning: 原因・仮説（事前確率の事象）, key: H, kind: value, concept: TERM-prior}
+        - {symbol: D, meaning: 観測した結果, key: D, kind: value, concept: TERM-total-prob}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: HgD}]}
+          - op: div
+            args:
+              - op: mul
+                args:
+                  - {op: fn, name: P, args: [{sym: DgH}]}
+                  - {op: fn, name: P, args: [{sym: H}]}
+              - {op: fn, name: P, args: [{sym: D}]}
+      parts:
+        - {path: [1, 0], name: 原因から結果, meaning: 尤度×事前確率（H でありかつ D が起きる確率）}
+        - {path: [1, 1], name: 結果の全体, meaning: D が起きる確率（全確率の公式で原因ごとに足す）}
+  conditions:
+    math:
+      - text: H・D は同じ確率 P の事象（P(D)＞0・P(H)＞0 は条件付き確率の要件）
+        kind: 仮定
+        claim: CLM-23
+        outside: ④-23 は保証されない（違う集団の確率を組み合わせると、事後確率にならない）
+    data:
+      - 事前確率（有病率など）と尤度（検査の感度・偽陽性など）が、同じ集団について決めた数かを確かめる
+  example: 病気の人が 1%、病気の人が陽性になる確率 0.9、病気でない人が陽性になる確率 0.05 の検査で、陽性の人が病気である確率は 0.01×0.9÷0.0585≒0.154。
+  counterexample: 健診の受診者（有病率 1%）の陽性者に、病院に来た人の有病率 30% を事前確率として当てると、0.3×0.9÷(0.3×0.9＋0.7×0.05)≒0.885 となり、健診の受診者での 0.154 と大きく違う。事前確率と尤度が同じ集団の数でないと、事後確率にならない。
+  misconceptions:
+    - misconception: 陽性になる確率が 0.9 の検査で陽性なら、病気の確率も 0.9
+      correction: 0.9 は「病気のとき陽性」の確率（尤度）。「陽性のとき病気」の確率は、病気の人が少ないと小さく、有病率 1% なら約 0.154
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - abs(0.01*0.9/(0.01*0.9 + 0.99*0.05) - 0.154) < 0.001 and abs(0.3*0.9/(0.3*0.9 + 0.7*0.05) - 0.885) < 0.001
 - id: TERM-prior
   name: 事前確率
   en: prior probability
@@ -1065,6 +1109,26 @@
     text: 結果 D を見る前に、原因・仮説 H（事象）に割り当てる確率 P(H)
     terms: [TERM-prob, TERM-event]
   short: データ（結果）を見る前に、原因や仮説について持っている確率
+  definition: 結果（データ）を見る前に、原因や仮説 H に割り当てておく確率 P(H)。
+  version: 1
+  principle: ベイズの定理は、事前確率を結果で更新して事後確率にする。同じ検査結果でも、事前確率が小さい（めったにない原因）ほど、事後確率は小さくとどまる。事前確率は、結果とは別の情報（過去の割合・集団の有病率など）で決める。
+  conditions:
+    math:
+      - text: 事前確率は、結果 D を見る前の情報だけで決める（D を使わない）
+        kind: 要件
+        outside: 事前確率にならない（同じ結果を2回使い、更新が二重になる）
+    data:
+      - どの集団の割合を事前確率にしたかを書く（健診の受診者か、病院に来た人か）
+  example: 健診の受診者で、ある病気の人の割合が 1% なら、検査をする前の事前確率は 0.01。
+  counterexample: 陽性者の中での病気の割合（結果を見たあとの数）を事前確率に使うと、陽性という結果を2回使うことになり、事前確率にならない。
+  misconceptions:
+    - misconception: 事前確率が分からないときは、1/2 にすれば中立
+      correction: 1/2 も1つの決め方で、結果を大きく動かす。有病率 1% の検査で事前確率を 1/2 にすると、陽性のときの事後確率は約 0.947 になり、0.154 とまったく違う
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - abs(0.5*0.9/(0.5*0.9 + 0.5*0.05) - 0.947) < 0.001
 - id: TERM-likelihood
   name: 尤度
   en: likelihood
@@ -1074,6 +1138,26 @@
     text: 原因・仮説 H のもとで、観測した結果 D が起こる条件付き確率 P(D|H)（D を固定し、H を替えて比べる）
     terms: [TERM-cond]
   short: ある原因や仮説のもとで、実際に得られた結果が起こる確率
+  definition: 原因や仮説 H のもとで、実際に観測した結果 D が起こる条件付き確率 P(D|H)。D を固定して、H を替えて比べる。
+  version: 1
+  principle: 観測した結果は1つに決まっているので、「どの原因のもとなら、この結果が起きやすいか」を比べる数になる。H を替えた尤度を足しても1になるとは限らない（H についての確率分布ではない）。ベイズの定理では、尤度が事前確率を重み付けして事後確率を作る。
+  conditions:
+    math:
+      - text: 比べる尤度は、どれも同じ観測結果 D についての条件付き確率
+        kind: 要件
+        outside: 尤度として比べられない（D を替えると、別の問いの数になる）
+    data:
+      - 尤度の数（感度・偽陽性の率など）が、どの結果についての数かを確かめる（陽性になる確率か、陰性になる確率か）
+  example: 陽性という結果について、病気のときの尤度は 0.9、病気でないときの尤度は 0.05。陽性は「病気」のもとで起きやすい。
+  counterexample: 「病気のとき陽性になる確率 0.9」と「病気でないとき陰性になる確率 0.95」を並べて比べるのは、結果 D が陽性と陰性で違うので、尤度の比べ方ではない（陽性について比べるなら 0.9 と 0.05）。
+  misconceptions:
+    - misconception: 同じ結果について、原因ごとの尤度を足すと1になる
+      correction: 足して1になるのは、同じ原因のもとで結果を替えたとき（陽性 0.9＋陰性 0.1）。原因を替えた 0.9＋0.05＝0.95 は1にならない
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - abs(0.9 + 0.05 - 0.95) < 1e-12 and abs(0.9 + 0.1 - 1) < 1e-12
 - id: TERM-rv
   name: 確率変数
   en: random variable
@@ -2625,6 +2709,26 @@
     text: 結果 D を見たあとの、原因・仮説 H の条件付き確率 P(H|D)
     terms: [TERM-cond]
   short: データ（結果）を見たあとで、ベイズの定理で更新した原因や仮説の確率
+  definition: 結果（データ）D を見たあとの、原因や仮説 H の確率 P(H|D)。ベイズの定理で、事前確率を結果で更新して求める。
+  version: 1
+  principle: 事後確率は「事前確率×尤度」に比例する。新しい結果が得られたら、今の事後確率を次の事前確率にして、もう一度更新できる。結果が積み重なるほど、事前確率の決め方の影響は小さくなっていく。
+  conditions:
+    math:
+      - text: 原因 H の事前確率が 0 より大きい（P(H)＞0）
+        kind: 要件
+        outside: どんな結果を見ても事後確率は 0 のままで、更新にならない
+    data:
+      - 2回目の結果で更新するときは、1回目と2回目の結果が（原因を決めたもとで）独立かを確かめる。同じ人を同じ検査で測り直すと、誤りが繰り返されやすい
+  example: 有病率 1%・感度 0.9・偽陽性 0.05 の検査で1回陽性なら事後確率は約 0.154。これを事前確率にして、独立なもう1回の検査でも陽性なら約 0.766 に上がる。
+  counterexample: 事前確率を 0 にした原因は、陽性が何回出ても 0×0.9÷P(D)＝0 で、事後確率は 0 から動かない。
+  misconceptions:
+    - misconception: 事後確率は、計算したら確定した値
+      correction: 次の結果を見るたびに更新される。1回陽性で 0.154 でも、独立なもう1回の陽性で約 0.766 になる
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - abs(0.1538*0.9/(0.1538*0.9 + 0.8462*0.05) - 0.766) < 0.001
 - id: TERM-mean
   name: 平均（算術平均）
   en: arithmetic mean
@@ -2795,6 +2899,54 @@
     text: 事象 A₁, …, A_k が互いに排反で合わせると Ω になり、どれも P(Aᵢ)＞0 のとき、どの事象 B についても P(B)＝Σ P(Aᵢ)P(B|Aᵢ)（④-34）
     terms: [TERM-prob, TERM-cond, TERM-event, TERM-exclusive]
   short: 起こり方を排反な場合に分け、場合ごとの確率×条件付き確率を足して全体の確率を求める式
+  definition: 起こり方を、重なりも漏れもない場合に分け、場合ごとの「その場合の確率×その場合の条件付き確率」を足すと、全体の確率になる。2つの場合なら P(B)＝P(A)P(B|A)＋P(Aᶜ)P(B|Aᶜ)。
+  version: 1
+  principle: B が起きる結果は、場合分けの A₁, …, A_k のどれか1つにだけ入る。だから B を場合ごとの B∩Aᵢ に重なりなく分けて足せる（加法）。それぞれの P(B∩Aᵢ) は乗法定理で P(Aᵢ)P(B|Aᵢ)。場合ごとの条件付き確率を、その場合の起こりやすさで重みを付けて平均した形になる。
+  formulas:
+    - id: F-total-prob
+      label: 2つの場合に分けて足す
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: B, meaning: 確率を求める事象, key: B, kind: value}
+        - {symbol: A, meaning: 場合分けの一方, key: A, kind: value}
+        - {symbol: Aᶜ, meaning: 場合分けのもう一方（A の余事象）, key: Ac, kind: value, concept: TERM-complement}
+        - {symbol: B|A, meaning: A を条件にした B, key: BgA, kind: value, concept: TERM-cond}
+        - {symbol: B|Aᶜ, meaning: Aᶜ を条件にした B, key: BgAc, kind: value, concept: TERM-cond}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: B}]}
+          - op: add
+            args:
+              - op: mul
+                args:
+                  - {op: fn, name: P, args: [{sym: A}]}
+                  - {op: fn, name: P, args: [{sym: BgA}]}
+              - op: mul
+                args:
+                  - {op: fn, name: P, args: [{sym: Ac}]}
+                  - {op: fn, name: P, args: [{sym: BgAc}]}
+      parts:
+        - {path: [1, 0], name: A の場合, meaning: A の確率×A のもとで B の確率}
+        - {path: [1, 1], name: Aᶜ の場合, meaning: Aᶜ の確率×Aᶜ のもとで B の確率}
+  conditions:
+    math:
+      - text: 場合分けの A₁, …, A_k は互いに排反で、合わせると Ω 全体になる（重なりも漏れもない）
+        kind: 仮定
+        claim: CLM-34
+        outside: ④-34 は保証されない（重なりを2回数えたり、漏れた場合を数えなかったりして、足しても P(B) にならない）
+    data:
+      - 場合分けが「どの客もちょうど1つに入る」かを確かめる（会員・クーポン利用者のように重なる分け方は使えない）
+  example: 検査で、病気の人（1%）が陽性になる確率 0.9、病気でない人（99%）が陽性になる確率 0.05 なら、陽性になる確率は 0.01×0.9＋0.99×0.05＝0.0585。
+  counterexample: 客 100 人を「会員 40 人（20 人が買う）」と「クーポン利用者 30 人（18 人が買う）」に分けて 0.4×0.5＋0.3×0.6＝0.38 とすると、両方に入る 10 人（8 人が買う）を2回数え、どちらでもない 40 人（10 人が買う）を数えない。実際の購入率は (20＋18−8＋10)÷100＝0.40。
+  misconceptions:
+    - misconception: 場合ごとの条件付き確率を、そのまま平均すればよい（(0.9＋0.05)÷2）
+      correction: 場合の起こりやすさで重みを付ける。病気の人は 1% しかいないので、0.475 ではなく 0.01×0.9＋0.99×0.05＝0.0585
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - abs(0.01*0.9 + 0.99*0.05 - 0.0585) < 1e-12 and 20+18-8+10 == 40 and abs(0.4*0.5 + 0.3*0.6 - 0.38) < 1e-12 and abs((0.9+0.05)/2 - 0.475) < 1e-12
 - id: TERM-bernoulli
   name: ベルヌーイ分布
   en: Bernoulli distribution
