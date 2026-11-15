@@ -577,6 +577,18 @@ def _pdf(sp: dict):
     if f == "expo":
         lam = sp["lam"]
         return (lambda x: lam * math.exp(-lam * x) if x >= 0 else 0.0), 1 / lam, 1 / lam
+    if f == "t":   # t 分布（#47 の U20）
+        k = sp["df"]
+        c = math.exp(math.lgamma((k + 1) / 2) - math.lgamma(k / 2)) / math.sqrt(k * math.pi)
+        return (lambda x: c * (1 + x * x / k) ** (-(k + 1) / 2)), 0.0, (math.sqrt(k / (k - 2)) if k > 2 else float("nan"))
+    if f == "f":   # F 分布（#47 の U20）。分子の自由度1は 0 の近くで限りなく大きいので（2 は 0 で最大）、図の縦は x＝0.5 の密度の 2.5 倍で切る
+        a_, b_ = sp["d1"], sp["d2"]
+        lc = math.lgamma(a_ / 2) + math.lgamma(b_ / 2) - math.lgamma((a_ + b_) / 2)
+        g = (lambda x: math.exp(0.5 * (a_ * math.log(a_ * x) + b_ * math.log(b_) - (a_ + b_) * math.log(a_ * x + b_)) - math.log(x) - lc) if x > 0 else 0.0)
+        if a_ <= 2:
+            cap = 2.5 * g(0.5)
+            return (lambda x: min(g(x), cap)), (b_ / (b_ - 2) if b_ > 2 else float("nan")), 1.0
+        return g, (b_ / (b_ - 2) if b_ > 2 else float("nan")), 1.0
     if f == "xbar_expo":   # 平均 mu の指数分布から n 個の平均（形 n・率 n/mu のガンマ分布。#47 の U19。場面 clt と同じ）
         mu, n = sp["mu"], sp["n"]
         lg = math.lgamma(n)
@@ -686,6 +698,9 @@ def dist(sp: dict) -> str:
                           f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(sh["label"])}</text>')
         d = "M" + " L".join(f"{X(x):.1f},{base - f(x) * scale:.1f}" for x in xs)
         c.add(f'<path d="{d}" fill="none" stroke="{BLUE}" stroke-width="2.2"/>')
+        for i, mk in enumerate(sp.get("marks") or []):   # 縦の点線と名前（点の位置を比べる。#47 の U20 の概念図）
+            c.line(X(mk["x"]), top - 4 + i * 16, X(mk["x"]), base, INK2, 1.2, dash="4 3")
+            c.text(X(mk["x"]) + 4, top + 6 + i * 16, mk["label"], 11.5, INK2)
         if g:
             d = "M" + " L".join(f"{X(x):.1f},{base - g(x) * scale:.1f}" for x in xs)
             c.add(f'<path d="{d}" fill="none" stroke="{INK}" stroke-width="1.6" stroke-dasharray="4 3"/>')
