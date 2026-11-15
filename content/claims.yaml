@@ -1196,3 +1196,35 @@ claims:
       version: c5eb1c0
     external: なし
   version: 1
+- id: CLM-42
+  label: ④-42
+  kind: 従う
+  statement:
+    text: 2つの標本が互いに独立で、それぞれ N(μ₁, σ²)・N(μ₂, σ²)（同じ σ²＞0）からの大きさ n₁・n₂（どちらも2以上）の無作為標本のとき、不偏分散の比 s₁²/s₂² は F(n₁−1, n₂−1) に従う
+  premises:
+    subjects:
+    - TERM-unbvar
+  conclusion:
+    subjects:
+    - TERM-unbvar
+    predicates:
+    - TERM-f
+  conditions:
+  - text: 2つの標本は互いに独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: F(n₁−1, n₂−1) に従うとは保証できない
+  - text: 2つの母集団はどちらも正規分布で、母分散が等しい
+    kind: 仮定
+    terms:
+    - TERM-normal
+    outside: F(n₁−1, n₂−1) に従うとは保証できない（母分散が違えば、比は σ₁²/σ₂² 倍にずれる）
+  grounds:
+  - claim: CLM-10
+  - source:
+      title: CLM-10 で (nᵢ−1)sᵢ²/σ² は χ²(nᵢ−1) に従い、2つの標本が独立なのでこの2つも独立。F 分布の定義の比 {(n₁−1)s₁²/σ²/(n₁−1)}÷{(n₂−1)s₂²/σ²/(n₂−1)}＝s₁²/s₂²
+  teaching:
+    conclusion: true
+    proof: 扱う
+  version: 1

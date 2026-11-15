@@ -35,6 +35,7 @@ figures:
       ticks: [-4, 4, 2]
       mark_mean: false
       shade: [{outside: [-2.776, 2.776]}]
+      marks: [{x: 1.96, label: "正規 1.96"}, {x: 2.776, label: "t(4) 2.776"}]
       label: t(4)
       overlay: {family: normal, mu: 0, sigma: 1, label: 標準正規分布}
       lines: ["両側5%の点　t(4) 2.776　／　正規 1.96"]

@@ -108,7 +108,7 @@ LK.register("tstat",{name:"t 値を計算",
 
 // ---- t 分布
 function tVals(){const df=+$("tdf").value,side=$("tside").value,a=+$("talpha").value,obs=+$("tobs").value,p=side==="two"?1-a/2:1-a;
- const tc=tq(p,df),zc=zq(p),pv=side==="two"?2*(1-tcdf(obs,df)):1-tcdf(obs,df);return {df,side,alpha:a,obs,tcrit:tc,zcrit:zc,pval:pv,diff:tc-zc,q:p};}
+ const tc=tq(p,df),zc=zq(p),pv=side==="two"?2*(1-tcdf(obs,df)):1-tcdf(obs,df);return {df,side,alpha:a,obs,tcrit:tc,zcrit:zc,pval:pv,diff:tc-zc,q:p,p05:pv<0.05?"0.05 より小さい":"0.05 より大きい"};}
 function tRender(){const T=tVals(),sh=T.side==="two"?[[-99,-T.tcrit],[T.tcrit,99]]:[[T.tcrit,99]];
  $("tplot").innerHTML=plot([{fn:x=>tpdf(x,T.df),col:"var(--acc)"},{fn:npdf,col:"var(--mut)",w:1.2,dash:"4 3"}],-5,5,{shade:sh,ticks:[-4,-2,0,2,4],lines:[{x:T.tcrit,label:`t点 ${f(T.tcrit,3)}`},{x:T.obs,label:`t＝${f(T.obs,2)}`,col:"var(--fg)",dash:"2 2"}],label:"t 分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>t(${T.df})</span><span><i class="sw" style="background:var(--mut)"></i>標準正規</span></div>`;
  $("tsum").innerHTML=`<div>${T.side==="two"?"両側":"片側"}${T.alpha*100}%の点（左側累積 ${f(T.q,3)}）：t(${T.df})＝<b>${f(T.tcrit,3)}</b>　標準正規＝${f(T.zcrit,3)}（差 ${f(T.diff,3)}）</div><div>t＝${f(T.obs,2)} の${T.side==="two"?"両側":"上側"}確率（p 値）＝<b>${f(T.pval)}</b></div><div class="mut">自由度を大きくすると t 点は正規の点に近づく。両側5%は左側累積0.975の点、片側5%は0.95の点。</div>`;
@@ -117,11 +117,11 @@ LK.register("t",{name:"t 分布の点",
  init(){["tdf","tobs"].forEach(id=>LK.stepper($(id),tRender));["tside","talpha"].forEach(id=>$(id).onchange=tRender);tRender();},
  apply(s){if(s.df!==undefined)LK.setRange("tdf",s.df);if(s.side)$("tside").value=s.side;if(s.alpha!==undefined)$("talpha").value=String(s.alpha);if(s.t!==undefined)LK.setRange("tobs",s.t);tRender();},
  render:tRender,
- value(key){const T=tVals(),v=T[key];return {v,text:f(v,key==="pval"?4:3)};}});
+ value(key){const T=tVals(),v=T[key];return {v,text:typeof v==="string"?v:f(v,key==="pval"?4:3)};}});
 
 // ---- カイ二乗
 function cVals(){const n=+$("cn").value,s2=+$("cs").value,v=+$("cv").value,df=n-1,q=df*s2/v;
- return {n,s2,sigma2:v,df,q,lo:chiq(0.025,df),hi:chiq(0.975,df),up5:chiq(0.95,df),pUp:1-chicdf(q,df),mean:df,var:2*df};}
+ return {n,s2,sigma2:v,df,q,lo:chiq(0.025,df),hi:chiq(0.975,df),up5:chiq(0.95,df),pUp:1-chicdf(q,df),mean:df,var:2*df,phalf:1-chicdf(q,df)<0.5?"0.5 より小さい":"0.5 より大きい"};}
 function cRender(){const C=cVals(),x1=Math.max(C.hi*1.3,C.q*1.15,5);
  $("cplot").innerHTML=plot([{fn:x=>chipdf(x,C.df),col:"var(--acc)"}],0,x1,{cap:C.df<=2?1:undefined,shade:[[0,C.lo],[C.hi,1e6]],ticks:[0,C.df,Math.round(x1*0.9)],lines:[{x:C.q,label:`Q＝${f(C.q,2)}`,col:"var(--fg)",dash:"2 2"},{x:C.hi,label:f(C.hi,2)}],label:"カイ二乗分布"})+`<div class="legend mut"><span><i class="sw" style="background:var(--acc)"></i>χ²(${C.df})</span><span><i class="sw" style="background:var(--acc2);opacity:.5"></i>下側・上側2.5%</span></div>`;
  $("csum").innerHTML=`<div>Q＝(n−1)s²÷σ²＝${C.df}×${f(C.s2,2)}÷${f(C.sigma2,2)}＝<b>${f(C.q,3)}</b>　自由度 ${C.df}（平均 ${C.df}・分散 ${C.var}）</div><div>χ²(${C.df}) の下側2.5%点 <b>${f(C.lo,3)}</b>・上側2.5%点 <b>${f(C.hi,3)}</b>・上側5%点 ${f(C.up5,3)}</div><div>Q 以上になる確率（上側）＝<b>${f(C.pUp)}</b></div><div class="mut">左右対称ではないので、下側と上側の点は別々に引く。</div>`;}
@@ -129,7 +129,7 @@ LK.register("chi",{name:"カイ二乗分布",
  init(){["cn","cs","cv"].forEach(id=>LK.stepper($(id),cRender));cRender();},
  apply(s){if(s.n!==undefined)LK.setRange("cn",s.n);if(s.s2!==undefined)LK.setRange("cs",s.s2);if(s.sigma2!==undefined)LK.setRange("cv",s.sigma2);cRender();},
  render:cRender,
- value(key){const C=cVals(),v=C[key];return {v,text:f(v,3)};}});
+ value(key){const C=cVals(),v=C[key];return {v,text:typeof v==="string"?v:f(v,3)};}});
 
 // ---- F
 function fVals(){const s1=+$("fs1").value,n1=+$("fn1").value,s2=+$("fs2").value,n2=+$("fn2").value,d1=n1-1,d2=n2-1,F=s1/s2;
