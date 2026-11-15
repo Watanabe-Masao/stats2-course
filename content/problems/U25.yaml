@@ -1,6 +1,7 @@
 # 単元U25の問題。id は変えない（個人の解答記録がこの id を指す）。
 # t 分布の累積は数値積分で照合：(lambda x,k: 0.5+sum(...))(x, 自由度)
 - id: Q-U25-001
+  concepts: [TERM-paired-t, TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-35, CLM-17]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -24,6 +25,7 @@
     why: t＝2、自由度24で p≒0.057。5%をわずかに超えるので棄却しない。差の区間が0を含むのと同じ判断。
 
 - id: Q-U25-002
+  concepts: [TERM-welch, TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -44,6 +46,7 @@
     why: t≒2.64、p≒0.015。方法を「等分散を仮定」に変えると t≒1.93・p≒0.064 で棄却しない。
 
 - id: Q-U25-003
+  concepts: [TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-28a]
   stage: S1
   difficulty: 1
   format: written
@@ -62,6 +65,7 @@
     why: SE＝2、t＝2.5。自由度8の境目2.306を超え、p≒0.037 で棄却する。
 
 - id: Q-U25-004
+  concepts: [TERM-t, TERM-df, TERM-se, TERM-unbvar, TERM-reject, TERM-welch, TERM-pvalue]
   stage: S1
   difficulty: 2
   format: written
@@ -81,6 +85,7 @@
     why: SE≒0.8944、t≒2.236。ウェルチに切り替えても同じ値になる（人数とばらつきが同じとき）。
 
 - id: Q-U25-005
+  concepts: [TERM-paired-t, TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-35, REL-pairedt-welch-contrast]
   stage: S1
   difficulty: 3
   format: written
@@ -100,6 +105,7 @@
     why: t≒3.54、p≒0.010 で棄却する。「2群」で 53・s10・8店 と 50・s10・8店 を入れると t＝0.6 で棄却しない。
 
 - id: Q-U25-010
+  concepts: [TERM-t, TERM-df, TERM-sides, TERM-reject, TERM-se, TERM-pvalue, CLM-28a]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -117,6 +123,7 @@
     why: 右側だけの面積で p≒0.032。両側に戻すと p≒0.064 で棄却しない。
 
 - id: Q-U25-011
+  concepts: [TERM-paired-t, TERM-t, TERM-df, TERM-se, TERM-ci, TERM-pvalue, CLM-35, CLM-17]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -135,6 +142,7 @@
     why: t≒1.90、自由度9で p≒0.090。人数を増やすと、同じ平均差でも有意になりやすい。
 
 - id: Q-U25-012
+  concepts: [TERM-paired-t, TERM-ci, TERM-reject, TERM-t, TERM-se, TERM-pvalue, CLM-35, CLM-17]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -153,6 +161,7 @@
     why: t≒3.77、p≒0.007。区間（0.746〜3.254）が0を含まないことと同じ結論。
 
 - id: Q-U25-020
+  concepts: [TERM-welch, TERM-t, TERM-df, TERM-se, TERM-unbvar, TERM-reject, TERM-pvalue]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -171,6 +180,7 @@
     why: p≒0.11 で棄却しない。等分散に切り替えると p≒0.044 で棄却してしまう。
 
 - id: Q-U25-021
+  concepts: [TERM-t, TERM-sides, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-28a]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -189,6 +199,7 @@
     why: t≒−1.73、p≒0.056。境目は t(11) の−1.796 で、正規の−1.645 より外側。
 
 - id: Q-U25-022
+  concepts: [TERM-t, TERM-df, TERM-se, TERM-reject, TERM-normal, TERM-pvalue, CLM-28a]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -207,6 +218,7 @@
     why: 約2.571。t≒2.45 は1.96 は超えるが、この境目には届かない。
 
 - id: Q-U25-023
+  concepts: [TERM-welch, TERM-t, TERM-df, TERM-paired-t, TERM-unbvar, TERM-se, TERM-reject, TERM-pvalue, REL-pairedt-welch-contrast, REL-t-normal]
   stage: S3
   tag: 本番形式
   format: choice
@@ -237,6 +249,7 @@
     why: 等分散では p≒0.044 で棄却するが、ウェルチでは p≒0.11 で棄却しない。ばらつきの違いを無視すると差を言いすぎる。
 
 - id: Q-U25-030
+  concepts: [TERM-welch, TERM-t, TERM-se, TERM-df, TERM-reject, TERM-pvalue]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -255,6 +268,7 @@
     why: t≒2.35、p≒0.022。自由度≒65 で、境目は1.997。日数が多いと t と正規の差は小さい。
 
 - id: Q-U25-031
+  concepts: [TERM-paired-t, TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-35]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -273,6 +287,7 @@
     why: t≒−2.98、p≒0.008。差の平均が負でも、両側なら |t| で判断する。
 
 - id: Q-U25-032
+  concepts: [TERM-t, TERM-df, TERM-se, TERM-reject, TERM-pvalue, CLM-28a]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -291,6 +306,7 @@
     why: t＝−2.5、p≒0.020。平均を499 にすると t≒−1.67 で棄却しない。
 
 - id: Q-U25-040
+  concepts: [TERM-t, TERM-df, TERM-pvalue, TERM-reject, REL-t-normal, CLM-28a]
   stage: S3
   format: written
   powers: [P1, P3]

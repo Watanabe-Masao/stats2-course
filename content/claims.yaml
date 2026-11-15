@@ -1270,3 +1270,49 @@ claims:
       version: 087f354
     external: なし
   version: 1
+- id: CLM-44
+  label: ④-44
+  kind: 極限
+  statement:
+    text: 2群の観測がそれぞれ独立に同じ分布（平均 μ₁, μ₂、分散 0＜σ₁², σ₂²＜∞）に従い、2群が互いに独立で、H₀：μ₁＝μ₂ が正しいとき、n₁, n₂ がともに→∞ で（n₁/n₂ の比によらず）、ウェルチの t＝(X̄₁−X̄₂)/√(s₁²/n₁＋s₂²/n₂) の分布は N(0, 1) に近づく
+  premises:
+    subjects:
+    - TERM-welch
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-std-normal
+  conditions:
+  - text: 各群の観測が独立に同じ分布に従い、2群が互いに独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 標準正規分布に近づくとは保証できない
+  - text: 各群の分散が 0＜σ²＜∞
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: 近づくとは保証できない（分散が無限の分布では、近づかない場合がある）
+  - text: H₀（μ₁＝μ₂）が正しい
+    kind: 仮定
+    outside: 0 を中心にした標準正規分布に近づくとは言えない（差があれば t は n とともに大きくなる）
+  grounds:
+  - claim: CLM-6b
+  - claim: CLM-20b
+  - source:
+      title: 各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は ④-20b（Xᵢ と Xᵢ² に当てる）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
+  - source:
+      title: スルツキーの定理
+    external: true
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AA
+      date: '2026-11-16'
+      version: 80da9de
+    external: 未照合
+  version: 1

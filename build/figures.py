@@ -690,6 +690,9 @@ def dist(sp: dict) -> str:
                 parts = [(sh["from"], sh["to"])]
                 col, op = BLUE, 0.35
             for a, b in parts:
+                a, b = max(a, lo), min(b, hi)   # 裾だけを拡大した図（#48 の U25）では、範囲の外の部分を描かない
+                if b <= a:
+                    continue
                 pts = [a + (b - a) * i / 80 for i in range(81)]
                 d = f"M{X(a):.1f},{base} " + " ".join(f"L{X(x):.1f},{base - f(x) * scale:.1f}" for x in pts) + f" L{X(b):.1f},{base} Z"
                 c.add(f'<path d="{d}" fill="{col}" fill-opacity="{op}"/>')

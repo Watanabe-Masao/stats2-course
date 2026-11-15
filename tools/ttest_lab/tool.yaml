@@ -32,11 +32,11 @@ presets:
     why: t＝4÷2＝2.0、自由度15。p≒0.064 で5%を超える。正規なら p≒0.046 で棄却してしまうが、s で代わりにしたぶん t 分布の裾が重い。
   s1-df:
     mode: one
-    set: {side: two, alpha: 0.05, xbar: 104, mu0: 100, s: 8, n: 16}
-    task: 16店（自由度15）、両側5%。t の境目は（小数で）？
+    set: {side: two, alpha: 0.05, xbar: 104, mu0: 100, s: 8, n: 8}
+    task: 8店（自由度7）、両側5%。t の境目は（小数で）？
     predict: {type: number, key: crit, label: "境目 t"}
-    expect: 2.1314
-    why: 約2.131。正規の1.96より外側。n を5に減らすと2.776、100に増やすと1.984 に近づく。
+    expect: 2.3646
+    why: 約2.365。正規の1.96よりかなり外側。n を5に減らすと2.776、100に増やすと1.984 に近づく。
   s3-free:
     mode: one
     modes: [one, paired, two]
@@ -46,11 +46,25 @@ presets:
     modes: [two, paired, one]
     task: 自分の売場の数字（2店の平均・標準偏差・日数、施策前後の差）を入れ、p 値と判断を読む。2群ではウェルチと等分散を切り替えて比べる。
   s5-free:
-    mode: one
-    modes: [one, two]
-    task: 「1標本」で n を増やし、境目が1.96 に近づく様子を見る（発展1）。「2群」でばらつきと人数を変え、ウェルチの自由度がどう変わるかを見る（発展2）。
+    mode: two
+    modes: [two, paired, one]
+    set: {method: welch, side: two, alpha: 0.05, x1: 59, s1: 2, n1: 30, x2: 50, s2: 10, n2: 6}
+    task: 店A（30日・s＝2）と店B（6日・s＝10）の自由度を読む。A の日数を30から増やすと、自由度はどこまで増えるか。方法を等分散に切り替えると、SE・自由度・判断はどう変わるか。
+  s5-ratio:
+    mode: two
+    modes: [two]
+    set: {method: welch, side: two, alpha: 0.05, x1: 1200, s1: 250, n1: 50, x2: 1150, s2: 250, n2: 50}
+    task: 差50円・s＝250円のまま、2店の日数 n₁・n₂ を両方とも増やす。t・p 値は動くか。差÷s は動くか。
   s6-free:
-    task: 自分の課題の数字で、モードを切り替えて確かめる（1標本、対応あり、2群）。
+    mode: two
+    modes: [two, paired, one]
+    set: {method: welch, side: two, alpha: 0.05, x1: 1250, s1: 120, n1: 30, x2: 1150, s2: 120, n2: 30}
+    task: 研修のあとの2店（30日ずつ）の t を読む。そのあと、日数だけを変えると t がどう動くかを見る。t の n に数えているのは何か。
+  s6-before:
+    mode: two
+    modes: [two]
+    set: {method: welch, side: two, alpha: 0.05, x1: 1220, s1: 120, n1: 30, x2: 1160, s2: 120, n2: 30}
+    task: 研修の前の30日ずつ。研修をしていないのに、日を1個と数えた t はどれくらい出るか。
 used_by: [U25]
 tests:
   - node tools/test_labs.js              # 全部の版：エラー・380px・ライト／ダーク・予測の前に結果が隠れる・予測の答え＝ラボの値・埋め込み
