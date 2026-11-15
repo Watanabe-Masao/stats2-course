@@ -231,9 +231,11 @@ def _bayes(state: dict, tour: dict) -> dict:
 
 def _bayes_fig(x: dict, state: dict, tour: dict) -> dict:
     t = x["times"]
+    ev = state.get("event") or "検出"
     return {"type": "count_tree", "n": 1000, "prior": x["prior"], "sens": x["sens"] ** t, "fpr": x["fpr"] ** t,
-            "name": state.get("name") or "不良", "other": state.get("other") or "良品",
-            "event": ("2回とも" if t == 2 else "") + (state.get("event") or "検出")}
+            "name": state.get("name") or "不良", "other": state.get("other") or "良品", "event": ev,
+            "hit": f"2回とも{ev}あり" if t == 2 else f"{ev}あり", "miss": "それ以外" if t == 2 else f"{ev}なし",
+            "lines": False}
 
 
 MODES = {
