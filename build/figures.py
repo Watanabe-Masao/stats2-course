@@ -776,10 +776,13 @@ def arrange(sp: dict) -> str:
         y += 20
         c.text(18, y, f"ほか {len(groups) - len(shown)} 組", 11.5, INK2)
     sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-    y += 28
-    c.text(16, y, f"順列 {str(n).translate(sub)}P{str(r).translate(sub)}＝{perm}　組の中の並べ方 {r}!＝{rf}", 12.5, INK)
-    y += 20
-    c.text(16, y, f"組合せ {str(n).translate(sub)}C{str(r).translate(sub)}＝{perm}÷{rf}＝{comb}", 13.5, INK, weight="bold")
+    y += 28   # 今の数え方の数だけを出す（段の文より先の数を図に出さない。学習者役の指摘 #45）
+    if role:
+        c.text(16, y, f"1つの組の中の並べ方 {r}!＝{rf}", 12.5, INK)
+        y += 20
+        c.text(16, y, f"順列 {str(n).translate(sub)}P{str(r).translate(sub)}＝{perm} 通り", 13.5, INK, weight="bold")
+    else:
+        c.text(16, y, f"組合せ {str(n).translate(sub)}C{str(r).translate(sub)}＝{perm}÷{r}!＝{comb} 通り", 13.5, INK, weight="bold")
     return c.done(y + 14)
 
 
