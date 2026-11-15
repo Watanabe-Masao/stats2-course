@@ -72,7 +72,7 @@ function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,s=1/a,d=s;for(let n=0;n<
 const tcdf=(t,df)=>{const x=df/(df+t*t),tail=0.5*ibeta(df/2,0.5,x);return t>0?1-tail:tail;};
 const chicdf=(q,df)=>gammp(df/2,q/2);
 const fcdf=(F,d1,d2)=>F<=0?0:ibeta(d1/2,d2/2,d1*F/(d1*F+d2));
-function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function erf(x){return (x<0?-1:1)*gammp(0.5,x*x);}   // erf(x)＝P(1/2, x²)（不完全ガンマ関数。近似式 1.5e-7 の誤差では、点が静止図と 1e-9 で合わない。#47 の U20）
 const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
 function inv(cdf,p,lo,hi){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m;}return (lo+hi)/2;}
 const tq=(p,df)=>p===0.5?0:p>0.5?inv(t=>tcdf(t,df),p,0,1e3):-inv(t=>tcdf(t,df),1-p,0,1e3);
