@@ -293,7 +293,7 @@
     why: 20通りのうち3通り。同じ値（2が2店）も別の店として数える。標本から言えることには、選び方による偶然のばらつきが必ず入る。
 
 - id: Q-U17-040
-  concepts: [TERM-sampdist, TERM-random-sampling, TERM-std]
+  concepts: [TERM-sampdist, TERM-random-sampling, TERM-sd]
   stage: S3
   format: written
   powers: [P1, P3]
