@@ -1,7 +1,7 @@
 # 単元U19の問題。id は変えない（個人の解答記録がこの id を指す）。
 # 検算の Φ(z) は 0.5*(1+math.erf(z/math.sqrt(2)))、二項の累積は sum(comb(n,i)*p**i*(1-p)**(n-i) for i in range(k+1))
 - id: Q-U19-001
-  concepts: [REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -64,7 +64,7 @@
     why: √(0.21÷100)≒0.046。回数を400回にすると0.023で半分。割合の線は ±2SE の帯の中を通ることが多い。
 
 - id: Q-U19-004
-  concepts: [REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S1
   difficulty: 2
   format: written
@@ -103,7 +103,7 @@
     why: 1÷2²＝0.25。正規分布なら0.0455で、上限よりずっと小さい。k を3にすると上限0.111、正規なら0.0027。
 
 - id: Q-U19-010
-  concepts: [REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -146,18 +146,19 @@
   prompt: 20人の客がそれぞれ確率0.5で買う（独立）。購入者が12人以下になる確率を、二項分布（{{unit:U14}}）の正確な値と、連続修正ありの正規近似で求めて比べよ。（正確な値は0.8684、Φ(1.12)＝0.8686）
   answer: 平均10・標準偏差 √5≒2.236。12.5 以下として z＝2.5÷2.236≒**1.12**、近似は約 **0.868**。正確な値 **0.8684** とほぼ同じ。n＝20 でも p＝0.5 なら左右対称なので、近似はよく合う。
   checks:
+    - 'abs(0.5*(1+math.erf((2/math.sqrt(5))/math.sqrt(2))) - 0.8145) < 0.00005'
     - 'abs(math.sqrt(5) - 2.236) < 0.0005 and abs(2.5/math.sqrt(5) - 1.12) < 0.005 and abs(sum(comb(20,i) for i in range(13))/2**20 - 0.8684) < 0.00005 and abs(0.5*(1+math.erf(1.12/math.sqrt(2))) - 0.8686) < 0.00005 and abs(0.5*(1+math.erf(2.5/math.sqrt(5)/math.sqrt(2))) - 0.868) < 0.0005'
   lab:
     id: LAB-clt
     mode: bin
     set: {n: 20, p: 0.5, k: 12, kind: le}
-    task: B(20, 0.5) で12回以下になる確率を、連続修正ありの正規近似で（小数で）。
-    predict: {type: number, key: approx, label: "正規近似の P(X≦12)"}
-    expect: 0.8682
-    why: z＝2.5÷√5≒1.118 で約0.868。正確な値0.8684とほぼ同じ。p を0.1にすると、n＝20 では近似が大きくずれる。
+    task: B(20, 0.5) で12回以下になる確率を、連続修正なしの正規近似で求めると（小数で）？
+    predict: {type: number, key: nocc, label: "修正なしの P(X≦12)"}
+    expect: 0.8145
+    why: 修正なしは z＝2÷√5≒0.894 で約0.814 と、正確な値0.8684より大きく小さい。修正ありの 0.868 との差が、12の棒の右半分の面積。p を0.1にすると、n＝20 では修正ありでも近似が大きくずれる。
 
 - id: Q-U19-020
-  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std, TERM-poisson]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -175,7 +176,7 @@
     why: 0.95⁴⁰≒0.129。棒グラフは右に歪み、正規曲線と合わない。np（2）と n(1−p) の両方が十分大きいかを、近似の前に確かめる。
 
 - id: Q-U19-021
-  concepts: [REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -193,7 +194,7 @@
     why: z≒2.44 で約0.007。遠い裾では、二項の右の裾の方が少し厚く、近似が小さめに出る。
 
 - id: Q-U19-022
-  concepts: [TERM-clt]
+  concepts: [TERM-clt, TERM-sample-mean]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -242,7 +243,7 @@
     why: 5÷√100＝0.5分。形は正規曲線とほぼ重なる。母集団を「山が2つ」にしても、n を大きくすると x̄ は山1つの正規分布になる。
 
 - id: Q-U19-030
-  concepts: [REL-binom-normal, TERM-cc, TERM-std]
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S4
   format: written
   powers: [P1, P3]
