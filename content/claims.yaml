@@ -1270,3 +1270,38 @@ claims:
       version: 087f354
     external: なし
   version: 1
+- id: CLM-44
+  label: ④-44
+  kind: 極限
+  statement:
+    text: 2群の観測がそれぞれ独立に同じ分布（平均 μ₁, μ₂、分散 0＜σ₁², σ₂²＜∞）に従い、2群が互いに独立で、H₀：μ₁＝μ₂ が正しいとき、n₁, n₂ がともに→∞ で、ウェルチの t＝(X̄₁−X̄₂)/√(s₁²/n₁＋s₂²/n₂) の分布は N(0, 1) に近づく。各群が正規分布でも、有限の n₁, n₂ でこの t が従う分布はちょうどの t 分布ではなく、自由度を近似で決めた t 分布は近似として使う
+  premises:
+    subjects:
+    - TERM-welch
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-std-normal
+  conditions:
+  - text: 各群の観測が独立に同じ分布に従い、2群が互いに独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 標準正規分布に近づくとは保証できない
+  - text: 各群の分散が 0＜σ²＜∞
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: 近づくとは保証できない（裾の重い分布では近づかない）
+  - text: H₀（μ₁＝μ₂）が正しい
+    kind: 仮定
+    outside: 0 を中心にした標準正規分布に近づくとは言えない（差があれば t は n とともに大きくなる）
+  grounds:
+  - claim: CLM-6b
+  - source:
+      title: 2群の標準化した平均の差に中心極限定理を当て、s₁²/σ₁²・s₂²/σ₂² がともに1に確率収束するので、分母の比 (s₁²/n₁＋s₂²/n₂)/(σ₁²/n₁＋σ₂²/n₂) も1に確率収束する（重みつき平均）。あとはスルツキーの定理
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  version: 1
