@@ -102,7 +102,7 @@ function pRender(){const pn=+$("pn").value;$("px").max=pn;if(+$("px").value>pn)L
  $("ptab").innerHTML=`<table><tr><th>区間</th><th>下</th><th>上</th></tr><tr><td>p̂±z×SE</td><td>${f(P.lo)}</td><td>${f(P.hi)}</td></tr><tr><td>ウィルソン</td><td>${f(P.wLo)}</td><td>${f(P.wHi)}</td></tr></table>`;}
 LK.register("prop",{name:"割合の区間",
  init(){["px","pn","pd"].forEach(id=>LK.stepper($(id),pRender));$("plevel").onchange=pRender;pRender();},
- apply(s){if(s.level!==undefined)$("plevel").value=String(s.level);if(s.n!==undefined)LK.setRange("pn",s.n);if(s.x!==undefined)LK.setRange("px",s.x);if(s.d!==undefined)LK.setRange("pd",s.d);pRender();},
+ apply(s){if(s.level!==undefined)$("plevel").value=String(s.level);if(s.n!==undefined){$("px").max=s.n;LK.setRange("pn",s.n);}if(s.x!==undefined)LK.setRange("px",s.x);if(s.d!==undefined)LK.setRange("pd",s.d);pRender();},
  render:pRender,
  value(key){const P=pVals(),v=P[key];return {v,text:key==="nFor"||key==="nWorst"?String(v):f(v)};}});
 
