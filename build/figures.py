@@ -820,6 +820,43 @@ def sets(sp: dict) -> str:
     return c.done(y + 14)
 
 
+def tree(sp: dict) -> str:
+    """袋から2回引く樹形図（#45 の U11 の概念図）。1回目の枝・2回目の枝に確率、道すじの先に両方の確率（乗法定理）。
+    sp：{red, blue, replace: false, highlight: [赤, 赤]}。戻さないと2回目の確率は1回目の結果で変わる（条件付き確率）"""
+    from fractions import Fraction as F
+    r, b = sp["red"], sp["blue"]
+    rep = sp.get("replace", False)
+    hl = tuple(sp.get("highlight") or [])
+    n = r + b
+    c = Canvas()
+    c.text(12, 18, f"赤 {r} 個・青 {b} 個の袋から{'戻して' if rep else '戻さずに'}2回引く", 12.5, INK2)
+    x0, y0, x1, x2 = 12, 140, 92, 168
+    first = [("赤", F(r, n)), ("青", F(b, n))]
+    ys1 = {"赤": 80, "青": 200}
+    row = 0
+    for c1, p1 in first:
+        on1 = hl[:1] == (c1,)
+        c.add(f'<line x1="{x0}" y1="{y0}" x2="{x1}" y2="{ys1[c1]}" stroke="{BLUE if on1 else GRID}" stroke-width="{3 if on1 else 1.5}"/>')
+        c.text((x0 + x1) / 2 - 8, (y0 + ys1[c1]) / 2 - 6, f"{r if c1 == '赤' else b}/{n}", 12, INK)
+        c.text(x1 + 6, ys1[c1] + 4, c1, 13, INK, weight="bold")
+        rr, bb = (r, b) if rep else ((r - 1, b) if c1 == "赤" else (r, b - 1))
+        m = rr + bb
+        for c2, k2 in (("赤", rr), ("青", bb)):
+            p2 = F(k2, m)
+            y2 = ys1[c1] + (-30 if c2 == "赤" else 30)
+            on2 = hl == (c1, c2)
+            c.add(f'<line x1="{x1 + 22}" y1="{ys1[c1]}" x2="{x2}" y2="{y2}" stroke="{BLUE if on2 else GRID}" stroke-width="{3 if on2 else 1.5}"/>')
+            c.text((x1 + 22 + x2) / 2 - 4, (ys1[c1] + y2) / 2 - 5, f"{k2}/{m}", 11.5, INK2)
+            both = p1 * p2
+            c.text(x2 + 6, y2 - 3, f"{c1}→{c2}", 11.5, INK, weight="bold" if on2 else "normal")
+            if sp.get("products") != "highlight" or on2:   # products: highlight なら、掛けた確率は太くした道すじだけ（問題の答えを先に見せない）
+                c.text(x2 + 6, y2 + 12, f"{r if c1 == '赤' else b}/{n}×{k2}/{m}＝{both.numerator}/{both.denominator}", 11.5, INK, weight="bold" if on2 else "normal")
+            row += 1
+    y = 262
+    c.text(12, y, "2回目の枝の確率は、1回目の結果で変わる（条件付き確率）" if not rep else "戻すので、2回目の枝の確率は1回目の結果によらない（独立）", 12, INK2)
+    return c.done(y + 14)
+
+
 def joint(sp: dict) -> str:
     """2つの「する（1）・しない（0）」の同時確率の表（2×2）。各ますに確率と「独立なら」の値。下に数の行（解説付き再生の静止図）。"""
     q11, q10, q01 = sp["p11"], sp["p10"], sp["p01"]
@@ -850,7 +887,7 @@ def joint(sp: dict) -> str:
 
 
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree}
 
 
 def specs(course: Course) -> dict[str, dict]:
