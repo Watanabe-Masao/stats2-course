@@ -1087,3 +1087,25 @@ claims:
       version: '4660318'
     external: なし
   version: 1
+- id: CLM-40
+  label: ④-40
+  kind: 等しい
+  statement:
+    text: 要素の数 N（N≧1）の抽出枠から、大きさ n（0≦n≦N）の標本を単純無作為抽出する（大きさ n のどの組み合わせも同じ確率で選ぶ）とき、枠のどの要素についても、その要素が標本に入る確率は n/N
+  premises:
+    subjects:
+    - TERM-frame
+    predicates:
+    - TERM-random-sampling
+  conclusion:
+    subjects:
+    - TERM-random-sampling
+    predicates:
+    - TERM-prob
+  grounds:
+  - source:
+      title: 組み合わせは全部で NCn 通りで、どれも確率 1/NCn。ある要素を含む組み合わせは、残りの N−1 個から n−1 個を選ぶ (N−1)C(n−1) 通り。その比は (N−1)C(n−1)/NCn＝n/N（n＝0 では含む組み合わせが0通りで 0＝0/N）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  version: 1

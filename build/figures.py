@@ -918,7 +918,40 @@ def joint(sp: dict) -> str:
     return c.done(y + 12)
 
 
-TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+def frame(sp: dict) -> str:
+    """母集団・抽出枠・標本の入れ子（#47 の U17 の概念図）。外の四角が母集団、中の四角が抽出枠、その中の丸が標本。
+    枠の外の要素は選ばれる確率0、枠の中の要素は単純無作為抽出で n÷N。sp：{pop: {label, n}, frame: {label, n}, sample: {label, n}}"""
+    from fractions import Fraction as F
+    pop, fr, smp = sp["pop"], sp["frame"], sp["sample"]
+    out = pop["n"] - fr["n"]
+    assert out >= 0 and 0 < smp["n"] <= fr["n"]
+    pi = F(smp["n"], fr["n"])
+    u = sp.get("unit", "")
+    pis = str(float(pi)) if pi.denominator in (2, 4, 5, 8, 10, 20, 25, 50, 100) else f"{pi.numerator}/{pi.denominator}"
+    c = Canvas()
+    # 母集団（外の四角）
+    c.rect(8, 8, 344, 252, LIGHT, rx=12, stroke=BLUE)
+    c.text(22, 32, f"母集団：{pop['label']}（{pop['n']}{u}）", 14, BLUE, weight="bold")
+    c.text(22, 52, "結論を広げたい範囲", 12, INK2)
+    # 抽出枠（中の四角）
+    c.add(f'<rect x="22" y="66" width="230" height="180" rx="10" fill="{SURFACE}" stroke="{INK2}" stroke-width="1.5" stroke-dasharray="6 4"/>')
+    c.text(34, 88, f"抽出枠：{fr['label']}（{fr['n']}{u}）", 13.5, INK, weight="bold")
+    c.text(34, 106, f"どの要素も選ばれる確率 {smp['n']}÷{fr['n']}＝{pis}", 12, INK2)
+    # 標本（丸）
+    c.circle(137, 176, 54, fill=WARM_BG, stroke=WARM, width=1.8)
+    c.text(137, 172, f"標本：{smp['label']}", 13, WARM, "middle", "bold")
+    c.text(137, 192, f"（{smp['n']}{u}）", 12.5, WARM, "middle")
+    # 枠の外
+    if out:
+        c.text(304, 140, f"枠の外", 13, RED, "middle", "bold")
+        c.text(304, 160, f"{out}{u}", 14, RED, "middle", "bold")
+        c.text(304, 180, "選ばれる確率 0", 11.5, RED, "middle")
+    y = 284
+    y = c.para(8, y, f"結論を言えるのは抽出枠の{fr['n']}{u}まで。" + (f"枠の外の{out}{u}は、標本を大きくしても入らない" if out else ""), 344, 12.5, INK2)
+    return c.done(y + 4)
+
+
+TYPES = {"popsample": popsample, "frame": frame, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
