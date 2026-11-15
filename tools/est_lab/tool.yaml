@@ -20,7 +20,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     name: 分散の推定量
     purpose: 正規母集団（σ²）から n 個を2000回取り直し（固定の乱数）、s²（n−1 で割る）と v（n で割る）の分布を並べ、理論の平均・偏り・分散・MSE と E[s]＝c₄σ を出す
     set: [sigma2, n]
-    values: [meanS2, meanV, biasV, ratio, varS2, varV, mseS2, mseV, better, meanS, c4]   # better：MSE が小さい方（「n で割る v」／「n−1 で割る s²」）
+    values: [meanS2, meanV, biasV, ratio, varS2, varV, mseS2, mseV, better, meanS, c4, simS]   # simS：2000回の s の平均（固定の乱数）   # better：MSE が小さい方（「n で割る v」／「n−1 で割る s²」）
   - key: self
     name: 集め方の偏り
     purpose: 満足の人と不満の人で回答率が違うとき、回答者の満足率が落ち着く先 p·r₁÷(p·r₁＋(1−p)·r₀)、偏り、SE、MSE と、回答数を増やしたときの推移（固定の乱数）
