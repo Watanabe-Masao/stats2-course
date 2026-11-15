@@ -293,7 +293,7 @@
     why: z≒−1.94、p≒0.053。わずかに5%を超える。左片側に切り替えると約0.026。
 
 - id: Q-U26-040
-  concepts: [TERM-chi2, TERM-reject, REL-normal-chi2, CLM-45]
+  concepts: [TERM-indep-test, TERM-chi2, TERM-reject, REL-normal-chi2, CLM-45]
   stage: S3
   format: written
   powers: [P1, P3]
