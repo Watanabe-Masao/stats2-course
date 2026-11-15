@@ -396,6 +396,12 @@ relations:
     claim: CLM-34
     gist: 起こり方を重ならない場合に分け、「その場合になる確率×その場合で起こる確率」を全部足すと、全体の確率になる。各項が乗法定理の形。
     description: 全確率の公式の各項は、乗法定理で「場合の確率×その場合の条件付き確率」と書いたもの。
+    labs:
+      - {id: LAB-prob, preset: rel-mult-total-tour, purpose: 不良で検出 18 個と良品で検出 49 個の2つの道すじを、乗法定理で求めて足すと全確率になるのを段ごとに見る}
+      - {id: LAB-prob, preset: rel-bayes-free, purpose: 元の割合・検出率・誤検出率を動かし、2つの道すじの個数と、その和（全確率）を確かめる}
+    figures: [FIG-LAB-prob-rel-mult-total-tour-1]
+    checks:
+      - 1000*0.02*0.9 == 18 and abs(1000*0.98*0.05 - 49) < 1e-9 and abs((18+49)/1000 - 0.067) < 1e-12
     basis: {units: [U12]}
   - id: REL-cond-likelihood
     from: TERM-likelihood
@@ -414,6 +420,17 @@ relations:
     mode: exact
     description: 事前確率に尤度を掛け、結果が起こる全体の確率（全確率）で割ると、事後確率になる。
     gist: データを見る前の見込みを、データの起こりやすさで重み付けし直したのが、データを見たあとの見込み。
+    stages:
+      origin: 結果を見る前の見込み P(H)（不良率 2%）。
+      operation: 結果 D の起こりやすさ（尤度：不良なら検出 90%、良品でも 5%）で重み付けし、D が起こる全体（6.7%）で割る。
+      result: 結果を見たあとの見込み P(H|D)（検出された品が不良である確率 約 27%）。
+    labs:
+      - {id: LAB-prob, preset: rel-prior-post-tour, purpose: 不良率 2% から、検出1回で約 27%、2回で約 87% へ更新され、元の割合で事後確率が大きく変わるのを段ごとに見る}
+      - {id: LAB-prob, preset: rel-bayes-free, purpose: 元の割合・検出率・誤検出率を自分で動かし、事後確率の動きを確かめる}
+    figures: [FIG-LAB-prob-rel-prior-post-tour-1, FIG-LAB-prob-rel-prior-post-tour-2, FIG-LAB-prob-rel-prior-post-tour-3]
+    checks:
+      - abs(18/67 - 0.269) < 0.001 and abs(16.2/(16.2+2.45) - 0.869) < 0.001 and abs(0.02*0.9 + 0.98*0.05 - 0.067) < 1e-12
+      - abs(4.5/(4.5+49.75) - 0.083) < 0.001 and abs(90/(90+45) - 0.667) < 0.001
     basis: {units: [U12]}
   # ---- P1 骨格：W3（U17〜U23 標本分布・推定）。#105
 

@@ -880,7 +880,7 @@ def count_tree(sp: dict) -> str:
             c.text(x2 + 6, y2 + 4, f"{klab} {num(kc)}個", 12, INK, weight="bold" if on else "normal")
     tp, fpn = a * se, b * fp
     y = 250
-    c.text(12, y, f"{ev}あり＝{num(tp)}＋{num(fpn)}＝{num(tp + fpn)}個（全確率 {num((tp + fpn) / n * 100)}%）", 12.5, INK)
+    c.text(12, y, f"{ev}あり＝{num(tp)}＋{num(fpn)}＝{num(tp + fpn)}個（{ev}が出る割合 {num((tp + fpn) / n * 100)}%）", 12.5, INK)
     y += 20
     c.text(12, y, f"{ev}ありのうち{nm}＝{num(tp)}÷{num(tp + fpn)}≒{num(tp / (tp + fpn) * 100)}%（事後確率）", 13, INK, weight="bold")
     return c.done(y + 14)
