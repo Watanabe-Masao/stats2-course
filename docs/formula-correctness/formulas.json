@@ -416,7 +416,7 @@
   "index": 0,
   "id": "F-bias-def",
   "label": "偏りの定義",
-  "tex": "b=E(\\thetâ)-\\theta",
+  "tex": "b=E(\\hat{\\theta})-\\theta",
   "symbols": [
    {
     "symbol": "b",
@@ -4471,7 +4471,7 @@
   "index": 0,
   "id": "F-mse-decomp",
   "label": "平均二乗誤差の分け方",
-  "tex": "\\mathrm{MSE}(\\thetâ)=V(\\thetâ)+b^{2}",
+  "tex": "\\mathrm{MSE}(\\hat{\\theta})=V(\\hat{\\theta})+b^{2}",
   "symbols": [
    {
     "symbol": "MSE( )",
