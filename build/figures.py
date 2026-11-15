@@ -987,7 +987,31 @@ def frame(sp: dict) -> str:
     return c.done(y + 4)
 
 
-TYPES = {"popsample": popsample, "frame": frame, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+def targets(sp: dict) -> str:
+    """偏りとばらつきの的（#47 の U21 の概念図）。的を2×2に並べ、取り直した推定値を点で打つ。
+    sp：{items: [{label, bias: 0/1, spread: 0/1, note}]}。点の位置は決まった散らし方（乱数を使わない）"""
+    import math
+    c = Canvas()
+    offs = [(0.0, 0.0), (0.8, 0.3), (-0.6, 0.7), (0.4, -0.8), (-0.9, -0.3), (0.2, 0.9), (-0.3, -0.6), (0.9, -0.4)]
+    for i, it in enumerate(sp["items"]):
+        cx, cy = 92 + (i % 2) * 176, 92 + (i // 2) * 186
+        for r, fill in ((62, LIGHT), (42, SURFACE), (22, LIGHT)):
+            c.circle(cx, cy, r, fill=fill, stroke=GRID, width=1)
+        c.circle(cx, cy, 3, fill=INK2)
+        bx, by = (26, -20) if it.get("bias") else (0, 0)
+        k = 34 if it.get("spread") else 9
+        for ox, oy in offs:
+            c.circle(cx + bx + ox * k, cy + by + oy * k, 4.2, fill=ORANGE, stroke=BG, width=1)
+        c.text(cx, cy + 82, it["label"], 13, INK, "middle", "bold")
+        if it.get("note"):
+            c.text(cx, cy + 98, it["note"], 11.5, INK2, "middle")
+    y = 92 + 186 + 110
+    if sp.get("caption_line"):
+        y = c.para(8, y, sp["caption_line"], 344, 12.5, INK2)
+    return c.done(y)
+
+
+TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
