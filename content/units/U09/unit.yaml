@@ -55,4 +55,5 @@ checks:
   - 'comb(10,3) == comb(10,7) == 120 and comb(10,5) == 252'
   - 'Fraction(6,36) == Fraction(1,6) and comb(6,2)+6 == 21 and Fraction(3,21) == Fraction(1,7) and fact(5) == 120'
   - 'Fraction(comb(2,1)*comb(8,2), comb(10,3)) == Fraction(7,15)'
+  - 'min(1, 6*sum(comb(10,k)*(1/3)**k*(2/3)**(10-k) for k in range(6,11))) < 0.47'
   - 'comb(6,2) == 15 and comb(5,1) == 5 and abs(sum(comb(10,k)*(1/3)**k*(2/3)**(10-k) for k in range(6,11)) - 0.077) < 0.001'
