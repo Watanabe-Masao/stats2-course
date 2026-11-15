@@ -248,8 +248,8 @@ def _clt(state: dict, tour: dict) -> dict:
 
 def _clt_fig(x: dict, state: dict, tour: dict) -> dict:
     return {"type": "dist", "family": "xbar_expo", "mu": 5, "n": x["n"], "unit": "分", "ticks": [0, 25, 5],
-            "label": f"{x['n']}人分の平均", "overlay": {"family": "normal", "mu": 5, "sigma": round(x["se"], 4), "label": "同じ平均・幅の正規分布"},
-            "lines": [f"x̄ の標準偏差 {_n(round(x['se'], 2))}分　歪度 {_n(round(x['skew'], 2))}"]}
+            "label": "1人分の値" if x["n"] == 1 else f"{x['n']}人分の平均", "overlay": {"family": "normal", "mu": 5, "sigma": round(x["se"], 4), "label": "同じ平均・幅の正規分布"},
+            "lines": [f"X̄ の標準偏差 {_n(round(x['se'], 2))}分　歪度 {_n(round(x['skew'], 2))}"]}
 
 
 MODES = {
