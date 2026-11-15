@@ -42,6 +42,15 @@ contracts:
 - formula: F-bias-def
   kinds: [定義]
   properties: [条件しだい]
+- formula: F-xbar-expect
+  kinds: [恒等式]
+  properties: [条件しだい]
+- formula: F-xbar-var
+  kinds: [恒等式]
+  properties: [非負, 単調, 条件しだい]
+- formula: F-se-mean
+  kinds: [恒等式]
+  properties: [非負, 単調, 条件しだい]
 - formula: F-fact-def
   kinds: [定義]
   properties: [非負, 単調, 条件しだい]

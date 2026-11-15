@@ -1,5 +1,6 @@
 # 単元U18の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U18-001
+  concepts: [TERM-sample-mean, TERM-se, CLM-41]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -22,6 +23,7 @@
     why: σ²÷n＝100÷25＝4、SE は √4＝2。n を100にすると分散1・SE1。分散は n に反比例、SE は √n に反比例。
 
 - id: Q-U18-002
+  concepts: [TERM-sample-prop, TERM-se]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: √(0.3×0.7÷400)≒0.023。n を1600にすると半分の約0.011。p を0.5に近づけると SE は大きくなる。
 
 - id: Q-U18-003
+  concepts: [TERM-se]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: 2000÷√16＝500円。1人ずつのばらつき2000円は変わらない。人数を64人にすると250円。
 
 - id: Q-U18-004
+  concepts: [TERM-se]
   stage: S1
   difficulty: 2
   format: written
@@ -66,17 +70,18 @@
   prompt: 標準偏差10の母集団から25個取ると、平均の標準誤差は2。標準誤差を1にするには何個、0.5にするには何個必要か。
   answer: SE＝10÷√n。SE＝1 なら √n＝10 で **n＝100**、SE＝0.5 なら √n＝20 で **n＝400**。SE を半分にするたびに n は4倍要る。
   checks:
-    - '10/math.sqrt(25) == 2 and 10/math.sqrt(100) == 1 and 10/math.sqrt(400) == 0.5 and 100/25 == 4 and 400/100 == 4'
+    - '10/math.sqrt(25) == 2 and math.isclose(1/math.sqrt(25), 0.2) and 10/math.sqrt(100) == 1 and 10/math.sqrt(400) == 0.5 and 100/25 == 4 and 400/100 == 4'
   lab:
     id: LAB-xbar
     mode: se
-    set: {mu: 0, sd: 10, n: 100}
-    task: 標準偏差10の母集団から100個取る。平均の標準誤差はいくつか。
-    predict: {type: number, key: se, label: "SE"}
-    expect: 1
-    why: 10÷√100＝1。25個の2から半分になるのに4倍の個数が要る。n を400にすると0.5。
+    set: {mu: 0, sd: 10, n: 25}
+    task: 標準偏差10の母集団から25個取る。平均の標準誤差は、1個の標準偏差の何倍か（小数で）。
+    predict: {type: number, key: ratio, label: "SE÷σ"}
+    expect: 0.2
+    why: 1÷√25＝0.2 で、SE＝10×0.2＝2。SE÷σ は 1÷√n で決まるので、SE を1（σ の0.1倍）にするには √n＝10、0.5（0.05倍）にするには √n＝20 が要る。n を動かして確かめる。
 
 - id: Q-U18-005
+  concepts: [TERM-sample-mean, TERM-se, TERM-var, TERM-indep]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +100,7 @@
     why: 分散が36倍の5184で、標準偏差は 12×6＝72g。平均にすると36で割って2g。合計のばらつきは大きくなるが、平均のばらつきは小さくなる。
 
 - id: Q-U18-010
+  concepts: [TERM-sample-prop, TERM-se]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -112,6 +118,7 @@
     why: √(0.25÷100)＝0.05。p を0.2にすると0.04、0.1にすると0.03。同じ人数でも、p が0.5に近いほどばらつきは大きい。
 
 - id: Q-U18-011
+  concepts: [TERM-unbvar]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -129,6 +136,7 @@
     why: σ²＝26/3≒8.67 とちょうど一致する。n で割る v の平均は半分の4.33。n−1 で割るのは、x̄ から測った偏差が小さく出る分を補うため。
 
 - id: Q-U18-012
+  concepts: [TERM-sample-mean, TERM-se, TERM-normal, TERM-std]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -140,12 +148,13 @@
     id: LAB-cont
     mode: norm
     set: {mu: 500, sd: 2, a: 494, b: 496, kind: le}
-    task: 25袋の平均 x̄ は平均500g・標準偏差（SE）2g の正規分布。x̄ が496g以下になる確率は（小数で）？
+    task: 25袋の平均 x̄ の分布で、x̄ が496g以下になる確率は（小数で）？
     predict: {type: number, key: p, label: "P(x̄≦496)"}
     expect: 0.0228
     why: z＝−2 で約2.3%。標準偏差を1袋の10にすると約34%。平均の分布は、1個の分布より ÷√n だけ細い。
 
 - id: Q-U18-020
+  concepts: [TERM-sd, TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -163,6 +172,7 @@
     why: 10÷√30≒1.83万円。1日ずつの標準偏差10万円とは別もの。「先月の平均売上が2万円下がった」は、SE の1倍ほどで、偶然でも起こりうる大きさ。
 
 - id: Q-U18-021
+  concepts: [TERM-sample-prop, TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -180,23 +190,25 @@
     why: 0.25÷0.02²＝625人。目標の SE を0.01にすると2500人（4倍）。p＝0.2 が分かっていれば 0.16÷0.0004＝400人で済む。
 
 - id: Q-U18-022
+  concepts: [TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
   prompt: 商品Aは1個の重さの標準偏差が12g、商品Bは24g。商品Aは36個の平均で標準誤差2gになる。商品Bで同じ標準誤差2gにするには何個の平均が必要か。
   answer: 24÷√n＝2 より √n＝12、**n＝144個**。標準偏差が2倍なら、同じ精度に必要な個数は4倍（2²倍）。
   checks:
-    - '12/math.sqrt(36) == 2 and 24/math.sqrt(144) == 2 and 144/36 == 4'
+    - '12/math.sqrt(36) == 2 and 24/math.sqrt(144) == 2 and 144/36 == 4 and 24/math.sqrt(36) == 4'
   lab:
     id: LAB-xbar
     mode: se
-    set: {mu: 50, sd: 24, n: 144}
-    task: 1個の標準偏差が24gの商品で、144個の平均の標準誤差は何gか。
+    set: {mu: 50, sd: 24, n: 36}
+    task: 1個の標準偏差が24gの商品Bで、商品Aと同じ36個の平均をとる。平均の標準誤差は何gか。
     predict: {type: number, key: se, label: "SE", unit: "g"}
-    expect: 2
-    why: 24÷12＝2g。ばらつきの大きい商品ほど、平均を安定させるのに多くの個数が要る（σ² に比例）。
+    expect: 4
+    why: 24÷√36＝4g で、商品Aの2倍。2g に下げるには SE を半分にするので、n は4倍要る。n を動かして確かめる。ばらつきの大きい商品ほど、平均を安定させるのに多くの個数が要る（σ² に比例）。
 
 - id: Q-U18-023
+  concepts: [TERM-sample-mean, TERM-se, TERM-unbvar, CLM-20a, CLM-41]
   stage: S3
   tag: 本番形式
   format: choice
@@ -227,6 +239,7 @@
     why: 144÷36＝4（SE は2）。n を144にすると分散は1で1/4、SE は1で1/2。
 
 - id: Q-U18-030
+  concepts: [TERM-sample-mean, TERM-se, TERM-var, TERM-indep]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -244,6 +257,7 @@
     why: 1200÷20＝60円。客数が100の小さな店なら120円で、客単価はもっと大きく上下する。
 
 - id: Q-U18-031
+  concepts: [TERM-sample-prop, TERM-se]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -261,6 +275,7 @@
     why: √(0.24÷150)＝0.04。±2SE で ±8ポイント。600人に聞けば ±4ポイントになる。
 
 - id: Q-U18-032
+  concepts: [TERM-sample-mean, TERM-se, TERM-normal, TERM-std]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -272,12 +287,13 @@
     id: LAB-cont
     mode: norm
     set: {mu: 500, sd: 1, a: 495, b: 498, kind: le}
-    task: 16袋の平均 x̄ は平均500g・標準偏差（SE）1g の正規分布。x̄ が498g以下になる確率は（小数で）？
+    task: 16袋の平均 x̄ の分布で、x̄ が498g以下になる確率は（小数で）？
     predict: {type: number, key: p, label: "P(x̄≦498)"}
     expect: 0.0228
     why: z＝−2 で約2.3%。標準偏差を1袋の4gにすると約31%。平均で判断すると、正常なのに調整する空振りが減る。
 
 - id: Q-U18-040
+  concepts: [TERM-unbvar, CLM-11]
   stage: S3
   format: written
   powers: [P1, P3]
