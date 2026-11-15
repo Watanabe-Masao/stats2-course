@@ -577,6 +577,11 @@ def _pdf(sp: dict):
     if f == "expo":
         lam = sp["lam"]
         return (lambda x: lam * math.exp(-lam * x) if x >= 0 else 0.0), 1 / lam, 1 / lam
+    if f == "xbar_expo":   # 平均 mu の指数分布から n 個の平均（形 n・率 n/mu のガンマ分布。#47 の U19。場面 clt と同じ）
+        mu, n = sp["mu"], sp["n"]
+        lg = math.lgamma(n)
+        return ((lambda x: math.exp(n * math.log(n / mu) + (n - 1) * math.log(x) - n * x / mu - lg) if x > 0 else (n / mu if n == 1 and x == 0 else 0.0)),
+                mu, mu / math.sqrt(n))
     raise ValueError(f"family {f}")
 
 
@@ -616,7 +621,8 @@ def dist(sp: dict) -> str:
         slot = (right - left) / len(pmf)
         bw = min(40, slot * (0.36 if ov else 0.62))
         dec = sp.get("decimals", 2)
-        hl = set(sp.get("highlight") or [])
+        hl = set(sp.get("highlight") or [])   # 数と目盛りを必ず付ける棒
+        fill = hl | ({x for x, _ in pmf if x <= sp["upto"]} if sp.get("upto") is not None else set())   # 塗る棒（upto：k 以下を全部。数は付けない）
     else:
         f, mean, sd = _pdf(sp)
         lo, hi, step = sp["ticks"]
@@ -637,7 +643,7 @@ def dist(sp: dict) -> str:
     if discrete:
         for x, p in pmf:
             cx = X(x) - (bw / 2 + 1 if ov else 0)
-            col = ORANGE if x in hl else SOFT
+            col = ORANGE if x in fill else SOFT
             c.rect(cx - bw / 2, base - p * scale, bw, p * scale, col, rx=3)
             if ov:   # 重ねる分布は点線の枠（ラボと同じ見せ方）
                 q = ov.get(x, 0.0)
@@ -650,6 +656,10 @@ def dist(sp: dict) -> str:
             every = max(1, math.ceil(len(pmf) / 12))   # 棒が多いときは目盛りを間引く
             if (x - pmf[0][0]) % every == 0 or x in hl:
                 c.text(cx, base + 15, f"{_num(x)}{unit}", 11.5, INK2, "middle")
+        if sp.get("upto") is not None:   # 連続修正の境目 k＋0.5 の点線（#47 の U19。ラボの bin と同じ見せ方）
+            xb = (X(sp["upto"]) + X(sp["upto"] + 1)) / 2
+            c.line(xb, top - 4, xb, base, INK2, 1.2, dash="4 3")
+            c.text(xb + 4, top + 8, _num(sp["upto"] + 0.5), 11.5, INK2)
         if curve:
             mu, sg = curve["mu"], curve["sigma"]
             xs2 = [lo + (hi - lo) * i / 160 for i in range(161)]
@@ -1017,6 +1027,10 @@ def validate_figures(course: Course) -> list[str]:
         extra = set() if f["source"] is None else {x for s in _strings(sp) for x in numbers(s)} - numbers(f["source"]) - {"0", "1"}
         if extra:
             err.append(f"{f['where']}: 図に、問題文・答えにない数 {sorted(extra, key=float)} がある")
+        ov = sp.get("overlay")
+        if isinstance(ov, dict) and set(ov) - {"family", "mu", "sigma", "n", "p", "lam", "N", "K", "kmax", "label"}:
+            # YAML のフロー形式 {…} の値にカンマを入れると、名前が切れて知らない項目ができる（#47 の U19。label: 正規分布 N(50, 5²)）
+            err.append(f"{f['where']}: overlay に知らない項目 {sorted(set(ov) - {'family', 'mu', 'sigma', 'n', 'p', 'lam', 'N', 'K', 'kmax', 'label'})}（値にカンマがあるなら引用符で囲む）")
         try:
             TYPES[sp["type"]](sp)
         except Exception as e:  # noqa: BLE001

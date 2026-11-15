@@ -1,6 +1,7 @@
 # 単元U19の問題。id は変えない（個人の解答記録がこの id を指す）。
 # 検算の Φ(z) は 0.5*(1+math.erf(z/math.sqrt(2)))、二項の累積は sum(comb(n,i)*p**i*(1-p)**(n-i) for i in range(k+1))
 - id: Q-U19-001
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -24,6 +25,7 @@
     why: 44.5 から上の面積で z＝0.75、約0.227。正確な値0.224と近い。修正なし（z＝5÷6）だと0.202で、ずれが大きい。
 
 - id: Q-U19-002
+  concepts: [TERM-clt, TERM-se, TERM-std]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -43,6 +45,7 @@
     why: 5÷√25＝1分。2000回取り直した x̄ の標準偏差も1分に近く、形は正規曲線にかなり近い（歪度 2÷5＝0.4）。n を1にすると母集団の右に長い形のまま。
 
 - id: Q-U19-003
+  concepts: [TERM-lln, TERM-sample-prop, TERM-se]
   stage: S1
   difficulty: 1
   format: written
@@ -61,6 +64,7 @@
     why: √(0.21÷100)≒0.046。回数を400回にすると0.023で半分。割合の線は ±2SE の帯の中を通ることが多い。
 
 - id: Q-U19-004
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S1
   difficulty: 2
   format: written
@@ -80,6 +84,7 @@
     why: 49.5 から上で z≒1.68、約0.047。正確な値は0.049。p＝0.2 で分布が少し右に歪むので、右の裾は近似が少し小さめに出る。
 
 - id: Q-U19-005
+  concepts: [TERM-sd, TERM-normal, TERM-std]
   stage: S1
   difficulty: 3
   format: written
@@ -98,6 +103,7 @@
     why: 1÷2²＝0.25。正規分布なら0.0455で、上限よりずっと小さい。k を3にすると上限0.111、正規なら0.0027。
 
 - id: Q-U19-010
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -115,6 +121,7 @@
     why: 59.5 から上で z＝1.9。「以上」は棒の左端 k−0.5 から数える。60＋0.5 にすると向きが逆。
 
 - id: Q-U19-011
+  concepts: [TERM-sample-prop, TERM-se]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -132,23 +139,26 @@
     why: √(0.25÷400)＝0.025。割合は0.5に近づくが、表の「回数」と200の差は回数を増やしても小さくならない（割合で見るから近づく）。
 
 - id: Q-U19-012
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S2
   format: written
   powers: [P1, P3]
   prompt: 20人の客がそれぞれ確率0.5で買う（独立）。購入者が12人以下になる確率を、二項分布（{{unit:U14}}）の正確な値と、連続修正ありの正規近似で求めて比べよ。（正確な値は0.8684、Φ(1.12)＝0.8686）
   answer: 平均10・標準偏差 √5≒2.236。12.5 以下として z＝2.5÷2.236≒**1.12**、近似は約 **0.868**。正確な値 **0.8684** とほぼ同じ。n＝20 でも p＝0.5 なら左右対称なので、近似はよく合う。
   checks:
+    - 'abs(0.5*(1+math.erf((2/math.sqrt(5))/math.sqrt(2))) - 0.8145) < 0.00005'
     - 'abs(math.sqrt(5) - 2.236) < 0.0005 and abs(2.5/math.sqrt(5) - 1.12) < 0.005 and abs(sum(comb(20,i) for i in range(13))/2**20 - 0.8684) < 0.00005 and abs(0.5*(1+math.erf(1.12/math.sqrt(2))) - 0.8686) < 0.00005 and abs(0.5*(1+math.erf(2.5/math.sqrt(5)/math.sqrt(2))) - 0.868) < 0.0005'
   lab:
     id: LAB-clt
     mode: bin
     set: {n: 20, p: 0.5, k: 12, kind: le}
-    task: B(20, 0.5) で12回以下になる確率を、連続修正ありの正規近似で（小数で）。
-    predict: {type: number, key: approx, label: "正規近似の P(X≦12)"}
-    expect: 0.8682
-    why: z＝2.5÷√5≒1.118 で約0.868。正確な値0.8684とほぼ同じ。p を0.1にすると、n＝20 では近似が大きくずれる。
+    task: B(20, 0.5) で12回以下になる確率を、連続修正なしの正規近似で求めると（小数で）？
+    predict: {type: number, key: nocc, label: "修正なしの P(X≦12)"}
+    expect: 0.8145
+    why: 修正なしは z＝2÷√5≒0.894 で約0.814 と、正確な値0.8684より大きく小さい。修正ありの 0.868 との差が、12の棒の右半分の面積。p を0.1にすると、n＝20 では修正ありでも近似が大きくずれる。
 
 - id: Q-U19-020
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std, TERM-poisson]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -166,6 +176,7 @@
     why: 0.95⁴⁰≒0.129。棒グラフは右に歪み、正規曲線と合わない。np（2）と n(1−p) の両方が十分大きいかを、近似の前に確かめる。
 
 - id: Q-U19-021
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -183,23 +194,25 @@
     why: z≒2.44 で約0.007。遠い裾では、二項の右の裾の方が少し厚く、近似が小さめに出る。
 
 - id: Q-U19-022
+  concepts: [TERM-clt, TERM-sample-mean]
   stage: S3
   format: written
   powers: [P1, P3]
   prompt: 待ち時間の分布は歪度2（右に長い裾）。標本平均 x̄ の歪度は 2÷√n になる。x̄ の歪度を0.25以下にするには、何人分の平均が必要か。
   answer: 2÷√n≦0.25 より √n≧8、**n≧64**。歪んだ母集団ほど、正規に近づくのに大きい n が要る。「n＝30 で十分」は、この母集団では歪度0.37 が残る。
   checks:
-    - '2/math.sqrt(64) == 0.25 and abs(2/math.sqrt(30) - 0.37) < 0.005'
+    - '2/math.sqrt(64) == 0.25 and 2/math.sqrt(16) == 0.5 and abs(2/math.sqrt(30) - 0.37) < 0.005'
   lab:
     id: LAB-clt
     mode: clt
-    set: {shape: expo, n: 64}
-    task: 待ち時間（歪度2）から64人の平均を取る。x̄ の歪度は（小数で）？
+    set: {shape: expo, n: 16}
+    task: 待ち時間（歪度2）から16人の平均を取る。x̄ の歪度は（小数で）？
     predict: {type: number, key: gmean, label: "x̄ の歪度"}
-    expect: 0.25
-    why: 2÷√64＝0.25。歪度を半分にするには n を4倍。「0か1」で p＝0.05 にすると母集団の歪度は約4.1で、もっと大きい n が要る。
+    expect: 0.5
+    why: 2÷√16＝0.5。歪度を半分にするには n を4倍。n を動かして 0.25 になる所を確かめる。「0か1」で p＝0.05 にすると母集団の歪度は約4.1で、もっと大きい n が要る。
 
 - id: Q-U19-023
+  concepts: [TERM-lln, TERM-clt, TERM-se]
   stage: S3
   tag: 本番形式
   format: choice
@@ -230,23 +243,25 @@
     why: 5÷√100＝0.5分。形は正規曲線とほぼ重なる。母集団を「山が2つ」にしても、n を大きくすると x̄ は山1つの正規分布になる。
 
 - id: Q-U19-030
+  concepts: [TERM-binom, REL-binom-normal, TERM-cc, TERM-std]
   stage: S4
   format: written
   powers: [P1, P3]
   prompt: 当選率0.1のキャンペーンに1000人が応募する。賞品が足りなくなる確率を5%以下にするには、賞品を何個用意すればよいか。正規近似（連続修正あり）で求めよ。（上側5%の z は1.645）
   answer: 平均100・標準偏差 √90≒9.49。k 個用意して足りる確率 P(X≦k)≒Φ((k＋0.5−100)÷9.49)≧0.95 より k＋0.5≧100＋1.645×9.49≒115.6、**k＝116個**。116個なら足りる確率は約96%、115個だと約95% にわずかに届かない。
   checks:
-    - 'abs(math.sqrt(90) - 9.49) < 0.005 and abs(100+1.645*math.sqrt(90) - 115.6) < 0.05 and 116+0.5 >= 100+1.645*math.sqrt(90) > 115+0.5 and abs(0.5*(1+math.erf(16.5/math.sqrt(90)/math.sqrt(2))) - 0.96) < 0.005 and 0.5*(1+math.erf(15.5/math.sqrt(90)/math.sqrt(2))) < 0.95'
+    - 'abs(0.5*(1+math.erf(10.5/math.sqrt(90)/math.sqrt(2))) - 0.866) < 0.0005 and abs(math.sqrt(90) - 9.49) < 0.005 and abs(100+1.645*math.sqrt(90) - 115.6) < 0.05 and 116+0.5 >= 100+1.645*math.sqrt(90) > 115+0.5 and abs(0.5*(1+math.erf(16.5/math.sqrt(90)/math.sqrt(2))) - 0.96) < 0.005 and 0.5*(1+math.erf(15.5/math.sqrt(90)/math.sqrt(2))) < 0.95'
   lab:
     id: LAB-clt
     mode: bin
-    set: {n: 1000, p: 0.1, k: 116, kind: le}
-    task: B(1000, 0.1) で116回以下になる確率を、連続修正ありの正規近似で（小数で）。
-    predict: {type: number, key: approx, label: "正規近似の P(X≦116)"}
-    expect: 0.959
-    why: z＝16.5÷√90≒1.74 で約0.959。k を115にすると0.949で5%をわずかに超えて足りなくなる。正確な二項でも116個が境目。
+    set: {n: 1000, p: 0.1, k: 110, kind: le}
+    task: 賞品を110個用意したとき、当選者が110人以下に収まる確率を、連続修正ありの正規近似で（小数で）。
+    predict: {type: number, key: approx, label: "正規近似の P(X≦110)"}
+    expect: 0.8658
+    why: z＝10.5÷√90≒1.11 で約0.866。足りなくなる確率は約13%で5%を超える。k を増やして 0.95 を超える所を探すと116個（z＝16.5÷√90≒1.74 で約0.959。115個では0.949）。正確な二項でも116個が境目。
 
 - id: Q-U19-031
+  concepts: [TERM-clt, TERM-se, TERM-std]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -264,6 +279,7 @@
     why: z＝2 で約2.3%。平均購入点数が9点を超えた日は、偶然では50日に1日ほど。続くなら売場の変化を疑う。
 
 - id: Q-U19-032
+  concepts: [TERM-sample-prop, TERM-se, TERM-lln]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -281,6 +297,7 @@
     why: √(0.09÷800)≒0.011。N を50にすると0.042。割合の線は、最初は大きくばらつき、回数が増えるほど p のまわりに落ち着く。
 
 - id: Q-U19-040
+  concepts: [TERM-sd, TERM-normal, TERM-std]
   stage: S3
   format: written
   powers: [P1, P3]

@@ -238,6 +238,20 @@ def _bayes_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": False}
 
 
+def _clt(state: dict, tour: dict) -> dict:
+    """中心極限定理（中心極限定理ラボの clt。#47 の U19）：待ち時間（指数分布・平均5分・標準偏差5分・歪度2）の n 人分の平均。
+    ラボの cVals と同じ理論の値（se＝σ÷√n、skew＝|歪度|÷√n）。取り直しの乱数の値（simsd など）は使わない"""
+    assert (state.get("shape") or "expo") == "expo", "解説で使える母集団の形は expo だけ（場面 clt が正確な密度を描けるのは指数分布だけ）"
+    n = state["n"]
+    return {"n": n, "mu": 5.0, "se": 5 / math.sqrt(n), "skew": 2 / math.sqrt(n)}
+
+
+def _clt_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "dist", "family": "xbar_expo", "mu": 5, "n": x["n"], "unit": "分", "ticks": [0, 25, 5],
+            "label": "1人分の値" if x["n"] == 1 else f"{x['n']}人分の平均", "overlay": {"family": "normal", "mu": 5, "sigma": round(x["se"], 4), "label": "同じ平均・幅の正規分布"},
+            "lines": [f"X̄ の標準偏差 {_n(round(x['se'], 2))}分　歪度 {_n(round(x['skew'], 2))}"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -248,6 +262,7 @@ MODES = {
     ("LAB-expect", "joint"): {"calc": _joint, "check": ("px", "py", "exy", "cov", "vx"), "figure": _joint_fig},
     ("LAB-count", "list"): {"calc": _list, "check": ("perm", "comb", "count"), "figure": _list_fig},
     ("LAB-prob", "bayes"): {"calc": _bayes, "check": ("tpn", "fpn", "total", "post"), "figure": _bayes_fig},
+    ("LAB-clt", "clt"): {"calc": _clt, "check": ("mu", "se", "skew"), "figure": _clt_fig},
 }
 
 
