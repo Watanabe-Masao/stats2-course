@@ -203,7 +203,7 @@ def _joint_fig(x: dict, state: dict, tour: dict) -> dict:
         lines += [f"Cov＝E(XY)−E(X)E(Y)＝{_n(round(x['exy'], dec))}−{_n(round(x['px'], dec))}×{_n(round(x['py'], dec))}＝{_n(round(x['cov'], dec))}",
                   f"V(X)＝{_n(round(x['vx'], dec))}"]
     return {"type": "joint", "p11": x["p11"], "p10": x["p10"], "p01": x["p01"], "lines": lines,
-            "names": [state.get("nameX") or "X", state.get("nameY") or "Y"]}
+            "names": [state.get("nameX") or "X", state.get("nameY") or "Y"], "events": bool(state.get("events"))}
 
 
 def _list(state: dict, tour: dict) -> dict:

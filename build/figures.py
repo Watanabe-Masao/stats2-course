@@ -829,17 +829,20 @@ def joint(sp: dict) -> str:
     cw, ch, ox, oy = 110, 46, 82, 30
     pc = lambda v: f"{round(v * 100, 2):g}%"  # noqa: E731
     nx, ny = sp.get("names") or ["X", "Y"]   # 量の名前（解説の版の nameX・nameY。事象なら A・B）
-    c.text(ox + cw / 2, oy - 10, f"{ny}＝1", 12, INK, "middle")
-    c.text(ox + cw * 1.5, oy - 10, f"{ny}＝0", 12, INK, "middle")
-    c.text(ox - 8, oy + ch / 2 + 4, f"{nx}＝1", 12, INK, "end")
-    c.text(ox - 8, oy + ch * 1.5 + 4, f"{nx}＝0", 12, INK, "end")
+    ev = sp.get("events")   # 2つの事象として見る（#45 の U10）：見出しを A／Aᶜ、下を P(A)
+    hy1, hy0, hx1, hx0 = (ny, f"{ny}ᶜ", nx, f"{nx}ᶜ") if ev else (f"{ny}＝1", f"{ny}＝0", f"{nx}＝1", f"{nx}＝0")
+    c.text(ox + cw / 2, oy - 10, hy1, 12, INK, "middle")
+    c.text(ox + cw * 1.5, oy - 10, hy0, 12, INK, "middle")
+    c.text(ox - 8, oy + ch / 2 + 4, hx1, 12, INK, "end")
+    c.text(ox - 8, oy + ch * 1.5 + 4, hx0, 12, INK, "end")
     for r, cc, q, e in ((0, 0, q11, px * py), (0, 1, q10, px * (1 - py)), (1, 0, q01, (1 - px) * py), (1, 1, q00, (1 - px) * (1 - py))):
         x, y = ox + cc * cw, oy + r * ch
         c.add(f'<rect x="{x}" y="{y}" width="{cw}" height="{ch}" fill="{BLUE}" fill-opacity="{0.08 + q * 0.9:.3f}" stroke="{GRID}"/>')
         c.text(x + cw / 2, y + 20, pc(q), 13.5, INK, "middle", "bold")
         c.text(x + cw / 2, y + 37, f"独立なら {pc(e)}", 10.5, INK2, "middle")
     y = oy + 2 * ch + 20
-    c.text(ox + cw, y, f"P({nx}＝1)＝{pc(px)}　P({ny}＝1)＝{pc(py)}", 12, INK2, "middle")
+    px_l, py_l = (f"P({nx})", f"P({ny})") if ev else (f"P({nx}＝1)", f"P({ny}＝1)")
+    c.text(ox + cw, y, f"{px_l}＝{pc(px)}　{py_l}＝{pc(py)}", 12, INK2, "middle")
     for line in sp.get("lines") or []:
         y += 20
         c.text(8, y, line, 12.5, INK)

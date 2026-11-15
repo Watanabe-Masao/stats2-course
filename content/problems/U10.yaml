@@ -62,7 +62,7 @@
     why: 2÷5＝0.4＝40%。基準量は「色の数」ではなく「玉の数」5個。数えて割るのは、玉1個1個が同じくらい取り出されやすいから。
 
 - id: Q-U10-004
-  concepts: [TERM-addition]
+  concepts: [TERM-addition, TERM-event]
   stage: S1
   difficulty: 2
   format: written
@@ -214,7 +214,7 @@
     why: 10回とも外れ (9/10)¹⁰≒0.349 を1から引いて約0.651。図の丸（p×回数）は10回目でちょうど1に届くが、棒（正しい確率）はまだ0.65。
 
 - id: Q-U10-023
-  concepts: [TERM-exclusive, TERM-indep, REL-exclusive-indep-contrast]
+  concepts: [TERM-exclusive, TERM-indep, TERM-prob, REL-exclusive-indep-contrast]
   stage: S3
   tag: 本番形式
   format: choice
