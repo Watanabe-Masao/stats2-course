@@ -743,6 +743,46 @@ def paths(sp: dict) -> str:
     return c.done(y + 14)
 
 
+def arrange(sp: dict) -> str:
+    """並べて数える（#45 の U09。解説付き再生の静止図）：n 人から r 人。組（帯1本）ごとに、役割ありならその中の並べ方、なしなら組を1つ。
+    画面の場面（math-lab の list）と同じ書き出し（組は役割ありで 6、なしで 18 まで）。下に順列・組合せの数の行。"""
+    import itertools
+    import math
+    n, r, role = sp["n"], min(sp["r"], sp["n"]), sp.get("role") == "あり"
+    names = "ABCDEFGHIJ"[:n]
+    groups = list(itertools.combinations(names, r))
+    perm, comb, rf = math.perm(n, r), math.comb(n, r), math.factorial(r)
+    c = Canvas()
+    c.text(16, 18, f"{n} 人から {r} 人。役割を{'区別する' if role else '区別しない'}（{perm if role else comb} 通り）", 12.5, INK2)
+    y = 26
+    shown = groups[:6] if role else groups[:18]
+    if role:
+        per = 6 if r <= 2 else 3   # 1行に並べる数（横にはみ出さない。A→B→C→D でも3つで 300px ほど）
+        for g in shown:
+            rows = ["→".join(p) for p in itertools.permutations(g)]
+            lines = [rows[i:i + per] for i in range(0, len(rows), per)]
+            top = y + 8
+            c.add(f'<rect x="12" y="{top}" width="324" height="{len(lines) * 20 + 6}" rx="6" fill="{BLUE}" fill-opacity="0.08" stroke="{GRID}"/>')
+            for ln in lines:
+                y += 20
+                c.text(20, y + 3, "　".join(ln), 12.5, INK)
+            y += 10
+    else:
+        per = 6
+        for i in range(0, len(shown), per):
+            y += 24
+            c.text(18, y, "　".join("{" + ",".join(g) + "}" for g in shown[i:i + per]), 12.5, INK)
+    if len(groups) > len(shown):
+        y += 20
+        c.text(18, y, f"ほか {len(groups) - len(shown)} 組", 11.5, INK2)
+    sub = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    y += 28
+    c.text(16, y, f"順列 {str(n).translate(sub)}P{str(r).translate(sub)}＝{perm}　組の中の並べ方 {r}!＝{rf}", 12.5, INK)
+    y += 20
+    c.text(16, y, f"組合せ {str(n).translate(sub)}C{str(r).translate(sub)}＝{perm}÷{rf}＝{comb}", 13.5, INK, weight="bold")
+    return c.done(y + 14)
+
+
 def joint(sp: dict) -> str:
     """2つの「する（1）・しない（0）」の同時確率の表（2×2）。各ますに確率と「独立なら」の値。下に数の行（解説付き再生の静止図）。"""
     q11, q10, q01 = sp["p11"], sp["p10"], sp["p01"]
@@ -769,7 +809,7 @@ def joint(sp: dict) -> str:
 
 
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange}
 
 
 def specs(course: Course) -> dict[str, dict]:

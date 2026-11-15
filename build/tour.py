@@ -200,6 +200,20 @@ def _joint_fig(x: dict, state: dict, tour: dict) -> dict:
                       f"V(X)＝{_n(round(x['vx'], dec))}"]}
 
 
+def _list(state: dict, tour: dict) -> dict:
+    """並べて数える（数え方ラボの list。#45 の U09）：順列・組合せ・数える数（ラボの lVals と同じ。r は 4 と n まで）"""
+    n = state["n"]
+    r = min(state.get("r", 1), n, 4)
+    perm = math.perm(n, r)
+    comb = math.comb(n, r)
+    return {"n": n, "r": r, "role": state.get("role", "なし"), "perm": perm, "comb": comb,
+            "count": perm if state.get("role") == "あり" else comb}
+
+
+def _list_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "arrange", "n": x["n"], "r": x["r"], "role": x["role"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -208,6 +222,7 @@ MODES = {
     ("LAB-pois", "hyper"): {"calc": _hyper, "check": ("pk", "mean", "var", "binom", "fpc"), "figure": _hyper_fig},
     ("LAB-pois", "pois"): {"calc": _pois, "check": ("pk", "p0", "lambda"), "figure": _pois_fig},
     ("LAB-expect", "joint"): {"calc": _joint, "check": ("px", "py", "exy", "cov", "vx"), "figure": _joint_fig},
+    ("LAB-count", "list"): {"calc": _list, "check": ("perm", "comb", "count"), "figure": _list_fig},
 }
 
 
@@ -301,7 +316,8 @@ def validate(where: str, p: dict, mode: dict | None, lid: str, modes: dict | Non
         first = states(tour)[0]["start"]
         need = {("LAB-pois", "approx"): {"n", "lam"}, ("LAB-binom", "path"): {"n", "p", "k"}, ("LAB-binom", "pmf"): {"n", "p", "k"},
                 ("LAB-pois", "geom"): {"p", "k"}, ("LAB-pois", "hyper"): {"N", "K", "n", "k"},
-                ("LAB-pois", "pois"): {"rate", "t", "k"}, ("LAB-expect", "joint"): {"p11", "p10", "p01"}}.get((lid, p.get("mode")), set())
+                ("LAB-pois", "pois"): {"rate", "t", "k"}, ("LAB-expect", "joint"): {"p11", "p10", "p01"},
+                ("LAB-count", "list"): {"n", "r", "role"}}.get((lid, p.get("mode")), set())
         if not need <= set(first):
             err.append(f"{where}: 段1の set に {sorted(need)} を書く（静止図と照合の計算に要る）")
     return err

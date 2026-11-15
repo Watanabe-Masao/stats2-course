@@ -327,6 +327,16 @@ relations:
     axis: 場面に役・順位があるか（順番を区別して数えるか）
     description: どちらも n 個から k 個を取り出す数。役や順位がある場面なら順列、選ぶだけの場面なら組合せで数える（数どうしのつながりは 順列 → 組合せ の移る）。
     gist: 順番が意味を持つ（1位・2位）なら順列、持たない（選ぶだけ）なら組合せ。場面に役や順位があるかで決める。
+    stages:
+      same: どちらも、異なる n 個から k 個を取り出す数。取り出す組（たとえば6人から3人なら20組）は同じ。
+      differ: 順列は1つの組の中の並べ方 k! 通りを別々に数え、組合せは1通りと数える（6人から3人なら 120 通りと 20 通り）。
+      so: 場面に役・順位があるかで決める。委員長・副委員長・書記なら順列、委員を選ぶだけなら組合せ。
+    labs:
+      - {id: LAB-count, preset: rel-perm-comb-contrast-tour, purpose: 6人から3人の同じ20組を、役割を区別しない・する で数え分けるのを段ごとに見る}
+      - {id: LAB-count, preset: rel-perm-free, purpose: 役割の切り替えと n・r を自分で動かし、帯1本が r! 通りになるのを確かめる}
+    figures: [FIG-LAB-count-rel-perm-comb-contrast-tour-1, FIG-LAB-count-rel-perm-comb-contrast-tour-2]
+    checks:
+      - math.comb(6,3)==20 and math.perm(6,3)==120 and math.factorial(3)==6
     basis: {units: [U09]}
   - id: REL-ss-event
     from: TERM-sample-space
@@ -2026,6 +2036,17 @@ relations:
     claim: CLM-38
     description: 組合せの数は、順列の数を、選んだ k 個の中の並べ替えの数 k! で割ったもの（ₙCₖ＝ₙPₖ/k!）。
     gist: 順列は並べ方まで数え、組合せは選ぶだけ。同じ k 個の組が順列では k! 通りに数えられるので、k! で割ると組合せになる。
+    stages:
+      origin: 役割を区別して並べた数 ₙPₖ（6人から2人なら 6×5＝30 通り）。
+      operation: 同じ k 人の組の中の並べ方 k! 通りを1通りにまとめる（k! で割る）。
+      result: 組合せ ₙCₖ（30÷2!＝15 通り）。
+    labs:
+      - {id: LAB-count, preset: rel-perm-comb-tour, purpose: 6人から2人・3人で、帯1本の r! 通りを1通りにまとめると組合せになるのを段ごとに見る}
+      - {id: LAB-count, preset: rel-perm-free, purpose: n・r と役割を自分で動かし、順列 ÷ r! が組合せになるのを確かめる}
+    figures: [FIG-LAB-count-rel-perm-comb-tour-1, FIG-LAB-count-rel-perm-comb-tour-2, FIG-LAB-count-rel-perm-comb-tour-3]
+    checks:
+      - math.perm(6,2)==30 and math.comb(6,2)==15 and 30//math.factorial(2)==15
+      - math.perm(6,3)==120 and math.comb(6,3)==20 and 120//math.factorial(3)==20
     basis:
       units: [U09]
   - id: REL-perm-to-fact
@@ -2038,6 +2059,16 @@ relations:
     claim: CLM-39
     description: 順列で n 個を全部並べる（k＝n）と、並べ方の数は階乗に等しい（ₙPₙ＝n!）。
     gist: n 個を全部1列に並べる並べ方は、先頭が n 通り、次が n−1 通り……と掛けていくので n!。全部を並べる順列が階乗。
+    stages:
+      origin: n 人から k 人を役割を区別して並べた数 ₙPₖ（4人から2人なら 12 通り）。
+      operation: 取り出す人数 k を n まで増やし、全員を並べる。
+      result: ₙPₙ＝n×(n−1)×…×1＝n!（4人なら 24 通り）。
+    labs:
+      - {id: LAB-count, preset: rel-perm-fact-tour, purpose: 4人から r 人を並べ、r を 4 まで増やすと 4! になるのを段ごとに見る}
+      - {id: LAB-count, preset: rel-perm-free, purpose: r を n に合わせ、順列が n! になるのを自分で確かめる}
+    figures: [FIG-LAB-count-rel-perm-fact-tour-1, FIG-LAB-count-rel-perm-fact-tour-2]
+    checks:
+      - math.perm(4,2)==12 and math.perm(4,4)==math.factorial(4)==24
     basis:
       units:
       - U09
