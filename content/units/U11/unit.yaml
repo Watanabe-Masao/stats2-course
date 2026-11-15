@@ -27,15 +27,17 @@ evidence:
   S6: 探究か課題を1つ行い、統計で言えることと解釈を分けて書いた（任意）
 figures:
   - id: FIG-U11-concept
-    caption: 赤2・青3の袋から戻さずに2回引く樹形図。2回目の枝の確率は1回目の結果で変わる（条件付き確率）。道すじの確率は枝の確率を順に掛ける（乗法定理）。赤→赤は 2/5×1/4＝1/10。
+    caption: 赤2・青3の袋から戻さずに2回引く樹形図。2回目の枝の確率は1回目の結果で変わる（条件付き確率）。道すじの確率は枝の確率を順に掛ける（乗法定理）。太くした赤→赤は 2/5×1/4＝1/10。
     spec:
       type: tree
       red: 2
       blue: 3
       highlight: [赤, 赤]
+      products: highlight   # 掛けた確率は太くした道すじだけ（確認問題 Q-U11-004 の 2/5 を先に見せない）
 status: drafted
 version: 1
 checks:
+  - 'Fraction(3,10)*Fraction(2,9)+Fraction(7,10)*Fraction(3,9) == Fraction(3,10) and Fraction(80,200) == Fraction(2,5)'
   - 'Fraction(48,84) == Fraction(4,7) and Fraction(48,80) == Fraction(3,5) and Fraction(36,120) == Fraction(3,10) and 48+4 == 52 and 14+24 == 38 and Fraction(2,10)*Fraction(1,9)+Fraction(8,10)*Fraction(2,9) == Fraction(2,10)'
   - 'Fraction(25,50) == Fraction(1,2) and Fraction(45,150) == Fraction(3,10) and Fraction(70,200) == Fraction(7,20) and abs(0.7*0.7+0.3*0.4 - 0.61) < 1e-12'
   # 例題A：赤2青3を戻さず

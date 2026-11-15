@@ -849,7 +849,8 @@ def tree(sp: dict) -> str:
             c.text((x1 + 22 + x2) / 2 - 4, (ys1[c1] + y2) / 2 - 5, f"{k2}/{m}", 11.5, INK2)
             both = p1 * p2
             c.text(x2 + 6, y2 - 3, f"{c1}→{c2}", 11.5, INK, weight="bold" if on2 else "normal")
-            c.text(x2 + 6, y2 + 12, f"{r if c1 == '赤' else b}/{n}×{k2}/{m}＝{both.numerator}/{both.denominator}", 11.5, INK, weight="bold" if on2 else "normal")
+            if sp.get("products") != "highlight" or on2:   # products: highlight なら、掛けた確率は太くした道すじだけ（問題の答えを先に見せない）
+                c.text(x2 + 6, y2 + 12, f"{r if c1 == '赤' else b}/{n}×{k2}/{m}＝{both.numerator}/{both.denominator}", 11.5, INK, weight="bold" if on2 else "normal")
             row += 1
     y = 262
     c.text(12, y, "2回目の枝の確率は、1回目の結果で変わる（条件付き確率）" if not rep else "戻すので、2回目の枝の確率は1回目の結果によらない（独立）", 12, INK2)
