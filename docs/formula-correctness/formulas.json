@@ -1485,6 +1485,124 @@
   }
  },
  {
+  "concept": "TERM-bayes",
+  "index": 0,
+  "id": "F-bayes",
+  "label": "向きを替える",
+  "tex": "P(H|D)=\\dfrac{P(D|H)\\,P(H)}{P(D)}",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "H|D",
+    "meaning": "D を条件にした H（事後確率）",
+    "key": "HgD",
+    "kind": "value",
+    "concept": "TERM-posterior"
+   },
+   {
+    "symbol": "D|H",
+    "meaning": "H を条件にした D（尤度）",
+    "key": "DgH",
+    "kind": "value",
+    "concept": "TERM-likelihood"
+   },
+   {
+    "symbol": "H",
+    "meaning": "原因・仮説（その確率 P(H) が事前確率）",
+    "key": "H",
+    "kind": "value"
+   },
+   {
+    "symbol": "D",
+    "meaning": "観測した結果",
+    "key": "D",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "HgD"
+      }
+     ]
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "mul",
+       "args": [
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "DgH"
+          }
+         ]
+        },
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "H"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "D"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "原因から結果",
+    "meaning": "尤度×事前確率（H でありかつ D が起きる確率）"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "結果の全体",
+    "meaning": "D が起きる確率（全確率の公式で原因ごとに足す）"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-rv",
   "index": 0,
   "id": "F-rv-pmf",
@@ -4347,6 +4465,145 @@
     ],
     "name": "条件付きの確率",
     "meaning": "A のうちで B も起きる割合"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-total-prob",
+  "index": 0,
+  "id": "F-total-prob",
+  "label": "2つの場合に分けて足す",
+  "tex": "P(B)=P(A)\\,P(B|A)+P(Aᶜ)\\,P(B|Aᶜ)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "B",
+    "meaning": "確率を求める事象",
+    "key": "B",
+    "kind": "value"
+   },
+   {
+    "symbol": "A",
+    "meaning": "場合分けの一方",
+    "key": "A",
+    "kind": "value"
+   },
+   {
+    "symbol": "Aᶜ",
+    "meaning": "場合分けのもう一方（A の余事象）",
+    "key": "Ac",
+    "kind": "value",
+    "concept": "TERM-complement"
+   },
+   {
+    "symbol": "B|A",
+    "meaning": "A を条件にした B",
+    "key": "BgA",
+    "kind": "value",
+    "concept": "TERM-cond"
+   },
+   {
+    "symbol": "B|Aᶜ",
+    "meaning": "Aᶜ を条件にした B",
+    "key": "BgAc",
+    "kind": "value",
+    "concept": "TERM-cond"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "B"
+      }
+     ]
+    },
+    {
+     "op": "add",
+     "args": [
+      {
+       "op": "mul",
+       "args": [
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "A"
+          }
+         ]
+        },
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "BgA"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "mul",
+       "args": [
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "Ac"
+          }
+         ]
+        },
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "BgAc"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "A の場合",
+    "meaning": "A の確率×A のもとで B の確率"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "Aᶜ の場合",
+    "meaning": "Aᶜ の確率×Aᶜ のもとで B の確率"
    }
   ],
   "contract": {
