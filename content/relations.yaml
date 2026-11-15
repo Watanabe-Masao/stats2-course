@@ -333,7 +333,7 @@ relations:
       so: 同じ6人から3人でも、委員長・副委員長・書記を決めるなら 120 通り、委員を3人選ぶだけなら 20 通り。迷ったら、選んだ2人を入れ替えて別の結果になるかを見る。
     labs:
       - {id: LAB-count, preset: rel-perm-comb-contrast-tour, purpose: 6人から3人の同じ20組を、役割を区別しない・する で数え分けるのを段ごとに見る}
-      - {id: LAB-count, preset: rel-perm-free, purpose: 役割の切り替えと n・r を自分で動かし、帯1本が r! 通りになるのを確かめる}
+      - {id: LAB-count, preset: rel-perm-free, purpose: 役割の切り替えと人数・選ぶ人数を自分で動かし、帯1本の並べ方の数を確かめる}
     figures: [FIG-LAB-count-rel-perm-comb-contrast-tour-1, FIG-LAB-count-rel-perm-comb-contrast-tour-2]
     checks:
       - math.comb(6,3)==20 and math.perm(6,3)==120 and math.factorial(3)==6
@@ -2041,8 +2041,8 @@ relations:
       operation: 同じ k 人の組の中の並べ方 k! 通りを1通りにまとめる（k! で割る）。
       result: 組合せ ₙCₖ（30÷2!＝15 通り）。
     labs:
-      - {id: LAB-count, preset: rel-perm-comb-tour, purpose: 6人から2人・3人で、帯1本の r! 通りを1通りにまとめると組合せになるのを段ごとに見る}
-      - {id: LAB-count, preset: rel-perm-free, purpose: n・r と役割を自分で動かし、順列 ÷ r! が組合せになるのを確かめる}
+      - {id: LAB-count, preset: rel-perm-comb-tour, purpose: 6人から2人・3人で、同じ組の並べ方を1通りにまとめると組合せになるのを段ごとに見る}
+      - {id: LAB-count, preset: rel-perm-free, purpose: 人数・選ぶ人数・役割を自分で動かし、順列を組の中の並べ方の数で割ると組合せになるのを確かめる}
     figures: [FIG-LAB-count-rel-perm-comb-tour-1, FIG-LAB-count-rel-perm-comb-tour-2, FIG-LAB-count-rel-perm-comb-tour-3]
     checks:
       - math.perm(6,2)==30 and math.comb(6,2)==15 and 30//math.factorial(2)==15
@@ -2064,8 +2064,8 @@ relations:
       operation: 取り出す人数 k を n まで増やし、全員を並べる。
       result: ₙPₙ＝n×(n−1)×…×1＝n!（4人なら 24 通り）。
     labs:
-      - {id: LAB-count, preset: rel-perm-fact-tour, purpose: 4人から r 人を並べ、r を 4 まで増やすと 4! になるのを段ごとに見る}
-      - {id: LAB-count, preset: rel-perm-free, purpose: r を n に合わせ、順列が n! になるのを自分で確かめる}
+      - {id: LAB-count, preset: rel-perm-fact-tour, purpose: 4人から選ぶ人数を1人ずつ増やして並べ、全員で 4! になるのを段ごとに見る}
+      - {id: LAB-count, preset: rel-perm-free, purpose: 選ぶ人数を全員に合わせ、順列が人数の階乗になるのを自分で確かめる}
     figures: [FIG-LAB-count-rel-perm-fact-tour-1, FIG-LAB-count-rel-perm-fact-tour-2]
     checks:
       - math.perm(4,2)==12 and math.perm(4,4)==math.factorial(4)==24

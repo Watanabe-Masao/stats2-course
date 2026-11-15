@@ -86,7 +86,8 @@ presets:
           set: {role: なし}
         - title: 3人なら 3! で割る
           text: 3人を選ぶと、1つの組の中の並べ方は **3!＝6 通り**。順列 120 通りを 6 で割ると、組合せは **20 通り**。
-          frames: [{r: 3, role: あり}, {r: 3, role: なし}]
+          set: {r: 3, role: あり}
+          frames: [{role: なし}]
   rel-perm-fact-tour:   # 解説付き再生（#95）。関係「順列 → 階乗（移る）」から開く。r を n まで増やす
     mode: list
     tour:
