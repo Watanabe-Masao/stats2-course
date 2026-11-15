@@ -947,6 +947,7 @@ relations:
   - id: REL-freqtable-hist
     from: TERM-freqtable
     to: TERM-hist
+    to_form: function   # ヒストグラムは2つの姿。定義はデータを固定した関数で作る（#342）
     type: 定める
     description: ヒストグラムは、度数分布表の各階級の上に、面積が相対度数に等しい柱を並べた図。度数分布表が定義に直接出る。
     basis:
@@ -1997,6 +1998,7 @@ relations:
   - id: REL-hist-pdf
     from: TERM-hist
     to: TERM-pdf
+    from_form: random_set   # 標本から作って密度を推定するときの姿（#342）
     version: 1
     type: 推定する
     properties: [CLM-30]
