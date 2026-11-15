@@ -377,6 +377,16 @@ relations:
     axis: 2つの事象の関わりを、集合の重なりで言うか、確率の掛け算で言うか
     description: 排反は同時に起こらないこと、独立は互いの確率に影響しないこと。どちらも確率が0でない2つの事象が排反なら、一方が起きると他方は起こらないので、独立ではない。
     gist: 「同時に起きない」と「影響しない」は別のこと。むしろ排反なら、一方が起きたと分かれば他方は起きないと分かるので、強く影響し合っている。
+    stages:
+      same: どちらも、同じ標本空間の2つの事象 A・B がどう関わるかを言う（P(A)＝30%・P(B)＝20% のような同じ2つで比べられる）。
+      differ: 排反は両方の確率が 0（重なりが空）、独立は両方の確率が積 30%×20%＝6%。
+      so: どちらの確率も0でない2つの事象は、排反なら両方が 0 で積は 0 より大きいので、独立にはなれない。
+    labs:
+      - {id: LAB-expect, preset: rel-excl-indep-tour, purpose: P(A)・P(B) を同じまま、両方の確率を積（独立）から 0（排反）へ変えるのを段ごとに見る}
+      - {id: LAB-expect, preset: rel-excl-free, purpose: 両方の確率を自分で動かし、排反（0%）と独立（積）が別の所にあるのを確かめる}
+    figures: [FIG-LAB-expect-rel-excl-indep-tour-1, FIG-LAB-expect-rel-excl-indep-tour-2]
+    checks:
+      - abs(0.3*0.2 - 0.06) < 1e-12 and 0.3 + 0.2 + 0 <= 1
     basis: {units: [U10, U11]}
   - id: REL-multiplication-total
     from: TERM-multiplication

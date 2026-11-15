@@ -313,7 +313,7 @@ claims:
 
 ## 図の型（build/figures.py）
 
-図は設定から作る：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`paths`（n 回中ちょうど k 回成功する並びを全部書き出す。解説付き再生の静止図）、`joint`（2つの 0/1 の同時確率の2×2の表。独立なら の値つき）、`arrange`（n 人から r 人の組と、役割ありならその中の並べ方を書き出す。下に順列・組合せの数。解説付き再生の静止図）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・geom・hyper・normal・uniform・expo。`overlay` で2つ目の分布を点線の棒か正規分布の曲線で重ね、`lines` で数の行、`maxdiff` で差の最大（丸めて0になるときは「0.001未満」）を出す）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
+図は設定から作る：`popsample`（母集団と標本・どちらの側の数か）、`ladder`（尺度の段にデータを置く）、`bars`、`pairs`、`product`、`capture`、`fpc`、`hist`、`boxplot`、`line`、`dev`（平均からの偏差）、`paths`（n 回中ちょうど k 回成功する並びを全部書き出す。解説付き再生の静止図）、`joint`（2つの 0/1 の同時確率の2×2の表。独立なら の値つき）、`sets`（標本空間の結果を並べ、2つの事象 A・B を上下の帯で、両方を太い枠で示す。加法定理の数の行つき。例：`{type: sets, outcomes: [1, 2, 3, 4, 5, 6], a: [2, 4, 6], b: [4, 5, 6], name_a: 偶数, name_b: 4以上}`）、`arrange`（n 人から r 人の組と、役割ありならその中の並べ方を書き出す。下に順列・組合せの数。解説付き再生の静止図）、`dist`（確率分布の棒か曲線。期待値の▲・±標準偏差の帯・確率の面積。例：`{type: dist, family: binom, n: 4, p: 0.25, unit: 人, highlight: [1]}`、`{type: dist, family: normal, mu: 100, sigma: 10, ticks: [70, 130, 10], shade: [{from: 90, to: 110, label: 約68%}]}`。family は table・binom・poisson・geom・hyper・normal・uniform・expo。`overlay` で2つ目の分布を点線の棒か正規分布の曲線で重ね、`lines` で数の行、`maxdiff` で差の最大（丸めて0になるときは「0.001未満」）を出す）。新しい形が要るときは figures.py に型を足す（設定から作れない図を手で描かない）。
 
 ## 直したら一緒に直すもの（#336）
 
