@@ -1513,17 +1513,15 @@
    },
    {
     "symbol": "H",
-    "meaning": "原因・仮説（事前確率の事象）",
+    "meaning": "原因・仮説（その確率 P(H) が事前確率）",
     "key": "H",
-    "kind": "value",
-    "concept": "TERM-prior"
+    "kind": "value"
    },
    {
     "symbol": "D",
     "meaning": "観測した結果",
     "key": "D",
-    "kind": "value",
-    "concept": "TERM-total-prob"
+    "kind": "value"
    }
   ],
   "tree": {
