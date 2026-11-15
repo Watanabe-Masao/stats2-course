@@ -2,6 +2,7 @@
 # 確率点は問題文に数表の値として書く。答えにだけ出る点は、密度の数値積分（中点則4000分割）で左側累積を出して照合する
 # 式の中の (lambda x,k: …) は t(k) の P(T≦x)、(lambda q,k: …) は χ²(k) の P(Q≦q)、(lambda x,a,b: …) は F(a,b) の P(F≦x)
 - id: Q-U20-001
+  concepts: [TERM-t, TERM-se, TERM-df]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -24,6 +25,7 @@
     why: SE＝5÷5＝1、t＝2。t(24) の点2.064にわずかに届かない。1.96なら超えていたので、z と t の違いで判断が変わる例。
 
 - id: Q-U20-002
+  concepts: [TERM-chi2, TERM-unbvar, TERM-df]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -42,6 +44,7 @@
     why: 9×12÷8＝13.5。上側5%点16.919より小さい。Q 以上になる確率は約0.14で、10回に1回以上は起こる大きさ。
 
 - id: Q-U20-003
+  concepts: [TERM-t, TERM-se, TERM-df]
   stage: S1
   difficulty: 1
   format: written
@@ -60,6 +63,7 @@
     why: 12÷√36＝2万円。t＝2 で、t(35) の点2.030にわずかに届かない。n を49にすると SE は約1.71、t は約2.33 で超える。
 
 - id: Q-U20-004
+  concepts: [TERM-f, TERM-unbvar, TERM-df]
   stage: S1
   difficulty: 2
   format: written
@@ -78,6 +82,7 @@
     why: 18÷9＝2。F(10, 12) の上側5%点2.753より小さい。自由度を逆にした F(12, 10) の点は2.913で別の値。
 
 - id: Q-U20-005
+  concepts: [TERM-t, TERM-normal]
   stage: S1
   difficulty: 3
   format: written
@@ -85,17 +90,19 @@
   prompt: 10店のデータで、σ が分からないので s を使って t＝2.1 を出した。担当者は「1.96を超えたので差がある」と判断した。正しい基準の点（t(9) の0.975点）は2.262。判断はどう変わるか。正規の点との差はいくつか。
   answer: s を使ったので基準は t(9) の **2.262**。2.1＜2.262 なので、差があるとは**言えない**（偶然の範囲）。正規の点との差は 2.262−1.96＝**0.302**。n が小さいほどこの差は大きく、1.96と比べると差を見つけすぎる。
   checks:
+    - 'abs(2*(0.5-sum(math.gamma(5.0)/(math.sqrt(9*math.pi)*math.gamma(4.5))*(1+((i+.5)*2.1/20000)**2/9)**(-5.0) for i in range(20000))*2.1/20000) - 0.0651) < 0.0005'
     - 'abs(2.262-1.96 - 0.302) < 1e-9 and 1.96 < 2.1 < 2.262'
   lab:
     id: LAB-tcf
     mode: t
     set: {df: 9, side: two, alpha: 0.05, t: 2.1}
-    task: 自由度9、両側5%の t の点は？
-    predict: {type: number, key: tcrit, label: "t(9) の0.975点"}
-    expect: 2.2622
-    why: 約2.262で、1.96より0.3ほど大きい。t＝2.1 はその内側。自由度を30にすると点は2.042で、2.1 は外側になる。
+    task: 自由度9で t＝2.1 のとき、両側の p 値（|T| が 2.1 以上になる確率）は（小数で）？
+    predict: {type: number, key: pval, label: "両側の p 値"}
+    expect: 0.0651
+    why: 約0.065で、0.05 より大きい。t＝2.1 は t(9) の両側5%の点 2.262 の内側。自由度を30にすると点は2.042で、2.1 は外側になる。
 
 - id: Q-U20-010
+  concepts: [TERM-t, TERM-se, TERM-df]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -113,40 +120,45 @@
     why: SE＝1、t＝3。t(8) の点2.306を超える。分母に s をそのまま入れると1になり、判断を誤る。
 
 - id: Q-U20-011
+  concepts: [TERM-chi2, TERM-df]
   stage: S2
   format: written
   powers: [P1, P3]
   prompt: 自由度9のカイ二乗分布の、下側2.5%点（0.025点）と上側2.5%点（0.975点）を表から引き、平均9からの距離を比べよ。表は χ²(9) で 0.025点2.700、0.975点19.023。
   answer: 下側 **2.700**（平均から6.3）、上側 **19.023**（平均から約10）。右に長い形なので、上側の点の方が遠い。z や t のように「平均±同じ幅」にはならない。
   checks:
+    - 'abs(1-sum(((i+.5)*9/20000)**3.5*math.exp(-((i+.5)*9/20000)/2)/(2**4.5*math.gamma(4.5)) for i in range(20000))*9/20000 - 0.437) < 0.0005'
     - 'abs(9-2.700 - 6.3) < 1e-9 and abs(19.023-9 - 10) < 0.05 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(2.700,9)-0.025) < 5e-4 and abs((lambda q,k: sum(math.exp((k/2-1)*math.log(q*(i+0.5)/4000)-q*(i+0.5)/8000-k/2*math.log(2)-math.lgamma(k/2)) for i in range(4000))*q/4000)(19.023,9)-0.975) < 5e-4'
   lab:
     id: LAB-tcf
     mode: chi
     set: {n: 10, s2: 8, sigma2: 8}
-    task: 自由度9のカイ二乗分布。下側2.5%点は（小数で）？
-    predict: {type: number, key: lo, label: "χ²(9) の0.025点"}
-    expect: 2.7004
-    why: 約2.700。上側2.5%点は19.023。平均9から見ると、下は6.3、上は約10離れている。
+    task: 自由度9のカイ二乗分布で、Q＝9（平均ちょうど）以上になる確率は（小数で）？ 0.5 と比べて予測する。
+    predict: {type: number, key: pUp, label: "Q≧9 の確率"}
+    expect: 0.4373
+    why: 約0.437で、0.5 より小さい。右に長い裾があるので、平均は真ん中（中央値）より右にある。だから下側と上側の2.5%点も、平均から等しくは離れない（下は 6.3、上は約10）。
 
 - id: Q-U20-012
+  concepts: [TERM-t, TERM-se, TERM-normal, TERM-std]
   stage: S2
   format: written
   powers: [P1, P3]
   prompt: 25日分の平均は104、基準は100。① 過去の記録から σ＝10 が分かっている場合（{{unit:U16}} の z）と、② σ が分からずデータの s＝10 を使う場合で、両側5%の判断を比べよ。（t(24) の0.975点は2.064）
   answer: どちらも分母は 10÷√25＝2、値は (104−100)÷2＝**2**。① z＝2＞1.96 で**基準を超える**。② t＝2＜2.064 で**基準以内**。同じ数でも、σ を知っているかで判断が分かれる。
   checks:
+    - '10/math.sqrt(25) == 2 and 4/2 == 2'
     - '10/math.sqrt(25) == 2 and (104-100)/2 == 2 and 2 > 1.96 and 2 < 2.064'
   lab:
     id: LAB-tcf
     mode: tstat
     set: {xbar: 104, mu0: 100, s: 10, n: 25}
-    task: 25日の平均104、s＝10、基準100。両側5%の t の点（自由度24）は？
-    predict: {type: number, key: tcrit, label: "t(24) の0.975点"}
-    expect: 2.0639
-    why: 約2.064で、t＝2 はわずかに内側。σ＝10 が分かっていれば点は1.96で、2 は外側になる。
+    task: 25日の平均104、s＝10、基準100。t の値は？
+    predict: {type: number, key: t, label: "t"}
+    expect: 2
+    why: SE＝10÷√25＝2、t＝4÷2＝2。t(24) の両側5%の点 2.064 のわずかに内側。σ＝10 が分かっていれば点は1.96で、2 は外側になる。
 
 - id: Q-U20-020
+  concepts: [TERM-f, TERM-unbvar, TERM-df]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -164,23 +176,26 @@
     why: 16÷4＝4。F(9, 7) の上側5%点3.677を超える。F 以上になる確率は約0.04。
 
 - id: Q-U20-021
+  concepts: [TERM-t]
   stage: S3
   format: written
   powers: [P1, P3]
   prompt: 自由度20の t 分布で、表には1.725と2.086がある。片側5%と両側5%の点はそれぞれどちらで、左側累積のいくつの点か。t＝1.9 のとき、片側と両側で判断はどう変わるか。
   answer: 片側5%は0.95点の **1.725**、両側5%は0.975点の **2.086**。t＝1.9 は片側なら**超える**、両側なら**基準以内**。どちらで調べるかは、データを見る前に決めておく。
   checks:
+    - 'abs(0.5-sum(math.gamma(10.5)/(math.sqrt(20*math.pi)*math.gamma(10.0))*(1+((i+.5)*1.9/20000)**2/20)**(-10.5) for i in range(20000))*1.9/20000 - 0.036) < 0.0005 and abs(2*(0.5-sum(math.gamma(10.5)/(math.sqrt(20*math.pi)*math.gamma(10.0))*(1+((i+.5)*1.9/20000)**2/20)**(-10.5) for i in range(20000))*1.9/20000) - 0.072) < 0.0005'
     - 'abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(1.725,20)-0.95) < 5e-4 and abs((lambda x,k: 0.5+sum(math.exp(math.lgamma((k+1)/2)-math.lgamma(k/2)-0.5*math.log(k*math.pi)-(k+1)/2*math.log(1+(x*(i+0.5)/4000)**2/k)) for i in range(4000))*x/4000)(2.086,20)-0.975) < 5e-4 and 1.725 < 1.9 < 2.086'
   lab:
     id: LAB-tcf
     mode: t
     set: {df: 20, side: one, alpha: 0.05, t: 1.9}
-    task: 自由度20、片側（上側）5%の t の点は？
-    predict: {type: number, key: tcrit, label: "t(20) の0.95点"}
-    expect: 1.7247
-    why: 約1.725。両側に切り替えると2.086。t＝1.9 は片側なら外側、両側なら内側。
+    task: 自由度20で t＝1.9 のとき、片側（上側）の p 値は（小数で）？
+    predict: {type: number, key: pval, label: "片側の p 値"}
+    expect: 0.036
+    why: 約0.036で、片側5%なら基準の外側（片側の点は1.725）。両側に切り替えると p 値は約0.072 で、両側の点 2.086 の内側になる。
 
 - id: Q-U20-022
+  concepts: [TERM-chi2, TERM-unbvar, TERM-df]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -198,6 +213,7 @@
     why: 20×1.5＝30。上側5%点31.410に届かない。分散が1.5倍でも、20日ほどでは偶然の範囲。
 
 - id: Q-U20-023
+  concepts: [TERM-t, TERM-chi2, TERM-f]
   stage: S3
   tag: 本番形式
   format: choice
@@ -228,6 +244,7 @@
     why: 約1.984で、1.96とほとんど同じ。自由度を4にすると2.776で、差は大きい。
 
 - id: Q-U20-030
+  concepts: [TERM-t, TERM-se, TERM-df]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -245,6 +262,7 @@
     why: SE＝1.5、t＝2。t(8) の点2.306に届かない。店数を16にすると SE は約1.13、t は約2.67 で超える。
 
 - id: Q-U20-031
+  concepts: [TERM-chi2, TERM-unbvar, TERM-df]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -262,6 +280,7 @@
     why: 15×9÷4＝33.75。上側5%点24.996を大きく超える。s と σ を2乗せずに入れると 15×3÷2＝22.5 になり、判断が変わってしまう。
 
 - id: Q-U20-032
+  concepts: [TERM-f, TERM-unbvar, TERM-df]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -279,18 +298,20 @@
     why: 900÷400＝2.25。F(12, 10) の上側5%点2.913に届かない。F 以上になる確率は約0.10。
 
 - id: Q-U20-040
+  concepts: [TERM-t, TERM-f, REL-t-f]
   stage: S3
   format: written
   powers: [P1, P3]
   prompt: t(15) の0.975点は2.131、F(1, 15) の上側5%点は4.543。2.131² を計算して比べよ。なぜ近い値になるか。
   answer: 2.131²≒**4.541**で、4.543 とほぼ同じ（表の丸めの差）。t(15) の2乗は F(1, 15) に従い、「|t| が2.131を超える（両側5%）」と「t² が4.543を超える（上側5%）」は同じ出来事だから。
   checks:
+    - 'abs(2.262**2 - 5.117) < 0.005'
     - 'abs(2.131**2 - 4.541) < 0.0005 and abs(2.131**2 - 4.543) < 0.003'
   lab:
     id: LAB-tcf
     mode: f
-    set: {s1: 20, n1: 2, s2: 4, n2: 16}
-    task: 分子の自由度1・分母の自由度15の F 分布。上側5%点は（小数で）？
-    predict: {type: number, key: fcrit, label: "F(1, 15) の上側5%点"}
-    expect: 4.543
-    why: 約4.543。「t 分布の点」で自由度15・両側5%の点2.131を2乗した値と一致する。自由度を変えても t² と F(1, k) の点は一致し続ける。
+    set: {s1: 20, n1: 2, s2: 4, n2: 10}
+    task: 分子の自由度1・分母の自由度9の F 分布。上側5%点は（小数で）？ t(9) の両側5%の点 2.262 から予測する。
+    predict: {type: number, key: fcrit, label: "F(1, 9) の上側5%点"}
+    expect: 5.1174
+    why: 約5.117 で、2.262²≒5.117 と一致する。問題の t(15) と F(1, 15) でも同じことが起きる。自由度を変えても t² と F(1, k) の点は一致し続ける。

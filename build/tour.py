@@ -252,6 +252,74 @@ def _clt_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": [f"X̄ の標準偏差 {_n(round(x['se'], 2))}分　歪度 {_n(round(x['skew'], 2))}"]}
 
 
+def _t_pdf(t: float, df: int) -> float:
+    return math.exp(math.lgamma((df + 1) / 2) - math.lgamma(df / 2) - 0.5 * math.log(df * math.pi) - (df + 1) / 2 * math.log(1 + t * t / df))
+
+
+def _f_pdf(x: float, a: int, b: int) -> float:
+    if x <= 0:
+        return 0.0
+    return math.exp(0.5 * (a * math.log(a * x) + b * math.log(b) - (a + b) * math.log(a * x + b)) - math.log(x)
+                    - (math.lgamma(a / 2) + math.lgamma(b / 2) - math.lgamma((a + b) / 2)))
+
+
+def _area(f, a: float, b: float, m: int = 4000) -> float:
+    h = (b - a) / m
+    return sum((1 if i in (0, m) else 4 if i % 2 else 2) * f(a + i * h) for i in range(m + 1)) * h / 3
+
+
+def _t_cdf(t: float, df: int) -> float:
+    return 0.5 + math.copysign(_area(lambda x: _t_pdf(x, df), 0, abs(t)), t)
+
+
+def _f_cdf(x: float, a: int, b: int) -> float:
+    """x＝u² と置いて u の中点則で積分する（a＝1 では 0 の近くで密度が限りなく大きいが、2u·f(u²) は有限）"""
+    if x <= 0:
+        return 0.0
+    m, r = 20000, math.sqrt(x)
+    h = r / m
+    return sum(2 * u * _f_pdf(u * u, a, b) for u in ((i + 0.5) * h for i in range(m))) * h
+
+
+def _bisect(cdf, p: float, lo: float, hi: float) -> float:
+    for _ in range(80):
+        m = (lo + hi) / 2
+        lo, hi = (m, hi) if cdf(m) < p else (lo, m)
+    return (lo + hi) / 2
+
+
+def _tdist(state: dict, tour: dict) -> dict:
+    """t 分布の点（t・χ²・F ラボの t。#47 の U20）。ラボの値 tcrit・zcrit・diff と同じ（ラボは不完全ベータ関数、ここは数値積分。別の道）"""
+    df = int(state["df"])
+    two = state.get("side", "two") != "one"
+    q = 1 - state.get("alpha", 0.05) / (2 if two else 1)
+    tc = _bisect(lambda t: _t_cdf(t, df), q, 0, 50)
+    zc = _bisect(lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2))), q, 0, 10)
+    return {"df": df, "two": two, "tcrit": tc, "zcrit": zc, "diff": tc - zc}
+
+
+def _tdist_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "dist", "family": "t", "df": x["df"], "ticks": [-4, 4, 2], "mark_mean": False,
+            "shade": [{"outside": [-x["tcrit"], x["tcrit"]] if x["two"] else [-99, x["tcrit"]]}],
+            "label": f"t({x['df']})", "overlay": {"family": "normal", "mu": 0, "sigma": 1, "label": "標準正規分布"},
+            "lines": [f"両側5%の点　t({x['df']}) {_n(round(x['tcrit'], 3))}　／　正規 {_n(round(x['zcrit'], 3))}"]}
+
+
+def _fdist(state: dict, tour: dict) -> dict:
+    """F 分布（t・χ²・F ラボの f）。ラボの値 F・fcrit・pUp と同じ（別の道：数値積分と二分法）"""
+    d1, d2 = int(state["n1"]) - 1, int(state["n2"]) - 1
+    F = state["s1"] / state["s2"]
+    fc = _bisect(lambda v: _f_cdf(v, d1, d2), 0.95, 0, 500)
+    return {"d1": d1, "d2": d2, "F": F, "fcrit": fc, "pUp": 1 - _f_cdf(F, d1, d2)}
+
+
+def _fdist_fig(x: dict, state: dict, tour: dict) -> dict:
+    return {"type": "dist", "family": "f", "d1": x["d1"], "d2": x["d2"], "ticks": [0, 10, 2], "mark_mean": False,
+            "shade": [{"outside": [-99, x["fcrit"]]}],
+            "label": f"F({x['d1']}, {x['d2']})",
+            "lines": [f"上側5%の点 {_n(round(x['fcrit'], 3))}　F＝{_n(round(x['F'], 3))}"]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -263,6 +331,8 @@ MODES = {
     ("LAB-count", "list"): {"calc": _list, "check": ("perm", "comb", "count"), "figure": _list_fig},
     ("LAB-prob", "bayes"): {"calc": _bayes, "check": ("tpn", "fpn", "total", "post"), "figure": _bayes_fig},
     ("LAB-clt", "clt"): {"calc": _clt, "check": ("mu", "se", "skew"), "figure": _clt_fig},
+    ("LAB-tcf", "t"): {"calc": _tdist, "check": ("tcrit", "zcrit", "diff"), "figure": _tdist_fig},
+    ("LAB-tcf", "f"): {"calc": _fdist, "check": ("F", "fcrit", "pUp"), "figure": _fdist_fig},
 }
 
 

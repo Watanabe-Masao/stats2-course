@@ -550,6 +550,16 @@ relations:
     mode: limit
     description: 自由度を大きくすると、t 分布は標準正規分布に近づく。
     gist: データが多いと、不偏分散で σ を置き換えたばらつきがほとんど消える。だから t 分布の裾は細くなり、正規分布と見分けがつかなくなる。
+    stages:
+      origin: 自由度5の t 分布。山が低く裾が厚く、両側5%の点は 2.571（正規は 1.96）。
+      operation: 自由度を増やす（データを増やし、s が σ に近づく）。15 で 2.131、120 で 1.98。
+      result: 自由度が限りなく大きいとき、t 分布は標準正規分布に近づく（極限。有限の自由度ではいつも少し外）。
+    labs:
+      - {id: LAB-tcf, preset: rel-t-normal-tour, purpose: 自由度を 5・15・120 と増やし、両側5%の点が 1.96 に近づくのを段ごとに見る}
+      - {id: LAB-tcf, preset: rel-t-normal-free, purpose: 自由度を自分で動かし、t の点と正規の点の差の縮み方を確かめる}
+    figures: [FIG-LAB-tcf-rel-t-normal-tour-1, FIG-LAB-tcf-rel-t-normal-tour-3]
+    checks:
+      - abs(1.98 - 1.96) < 0.025
     basis:
       units:
       - U20
@@ -1485,6 +1495,16 @@ relations:
     claim: CLM-9
     description: T が自由度 ν の t 分布に従うとき、T² は自由度 (1, ν) の F 分布に従う。
     gist: t 分布に従う量を2乗すると、F 分布（分子の自由度1）に従う。だから、F 統計量が t 統計量の2乗になる場面（2群の一元配置分散分析とプールした t 検定など）では、両側の t 検定と F 検定は同じ判定になる。
+    stages:
+      origin: 自由度9の t 分布。|T| が両側5%の点 2.262 を超える確率は 5%。
+      operation: T を2乗する。|T|＞2.262 と T²＞2.262² は同じ出来事なので、確率も同じ 5%。
+      result: T² は F(1, 9) に従い、上側5%の点は 5.117＝2.262²。
+    labs:
+      - {id: LAB-tcf, preset: rel-t-f-tour, purpose: "t(9) の両側5%の点を2乗すると、F(1, 9) の上側5%の点になるのを段ごとに見る"}
+      - {id: LAB-tcf, preset: rel-t-f-free, purpose: "自由度を変えても、t の両側の点の2乗と F(1, k) の上側の点が同じになるかを確かめる"}
+    figures: [FIG-LAB-tcf-rel-t-f-tour-1, FIG-LAB-tcf-rel-t-f-tour-2]
+    checks:
+      - abs(2.262**2 - 5.117) < 0.005
     basis:
       units: [U20]
 
