@@ -589,6 +589,10 @@ def _pdf(sp: dict):
             cap = 2.5 * g(0.5)
             return (lambda x: min(g(x), cap)), (b_ / (b_ - 2) if b_ > 2 else float("nan")), 1.0
         return g, (b_ / (b_ - 2) if b_ > 2 else float("nan")), 1.0
+    if f == "chi2":   # カイ二乗分布（#47 の U23 の概念図）
+        k = sp["df"]
+        lc = (k / 2) * math.log(2) + math.lgamma(k / 2)
+        return (lambda x: math.exp((k / 2 - 1) * math.log(x) - x / 2 - lc) if x > 0 else 0.0), float(k), math.sqrt(2 * k)
     if f == "xbar_expo":   # 平均 mu の指数分布から n 個の平均（形 n・率 n/mu のガンマ分布。#47 の U19。場面 clt と同じ）
         mu, n = sp["mu"], sp["n"]
         lg = math.lgamma(n)
@@ -1057,11 +1061,13 @@ def ci_bar(sp: dict) -> str:
         c.line(X(t), y + 22, X(t), y + 30, INK2, 1)
         c.text(X(t), y + 46, _num(t), 11.5, INK2, "middle")
         t += step
+    if sp.get("zero"):   # 0 の縦の点線（差の区間が 0 を含むかを読む。#47 の U23）
+        c.line(X(0), y - 14, X(0), y + 26, INK2, 1.4, dash="4 3")
     c.line(X(sp["lo"]), y, X(sp["hi"]), y, BLUE, 7)
     c.circle(X(sp["center"]), y, 6, fill=ORANGE, stroke=BG, width=2)
     c.text(X(sp["center"]), y - 16, sp.get("center_label", ""), 12.5, ORANGE, "middle", "bold")
-    c.text(X(sp["lo"]), y + 4 - 26, _num(round(sp["lo"], 3)), 12, INK, "start")
-    c.text(X(sp["hi"]), y + 4 - 26, _num(round(sp["hi"], 3)), 12, INK, "end")
+    c.text(X(sp["lo"]), y + 4 - 26, _num(round(sp["lo"], sp.get("decimals", 3))), 12, INK, "start")
+    c.text(X(sp["hi"]), y + 4 - 26, _num(round(sp["hi"], sp.get("decimals", 3))), 12, INK, "end")
     yy = y + 70
     if sp.get("label"):
         c.text(8, yy, sp["label"], 12.5, BLUE, "start", "bold")
@@ -1123,7 +1129,9 @@ def validate_figures(course: Course) -> list[str]:
             err.append(f"{f['where']}: 図の caption（説明文）がない")
         if fid in course.figures and not course.figures[fid].get("generated"):
             err.append(f"{f['where']}: 図ID {fid} が assets.yaml の図と重なる")
-        extra = set() if f["source"] is None else {x for s in _strings(sp) for x in numbers(s)} - numbers(f["source"]) - {"0", "1"}
+        # 数として比べる（本文の 2.700 と、YAML が数として読んだ 2.7 は同じ数。#47 の U23）
+        src = set() if f["source"] is None else {float(y) for y in numbers(f["source"])}
+        extra = set() if f["source"] is None else {x for s in _strings(sp) for x in numbers(s) if float(x) not in src} - {"0", "1"}
         if extra:
             err.append(f"{f['where']}: 図に、問題文・答えにない数 {sorted(extra, key=float)} がある")
         ov = sp.get("overlay")

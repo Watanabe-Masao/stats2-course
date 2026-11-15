@@ -370,6 +370,39 @@ def _cimean_fig(x: dict, state: dict, tour: dict) -> dict:
             "lines": [f"{_n(round(x['lo'], 3))}〜{_n(round(x['hi'], 3))}（誤差幅 {_n(round(x['margin'], 3))}）"]}
 
 
+def _tq975(df: float) -> float:
+    return _bisect(lambda t: _t_cdf(t, df), 0.975, 0, 50)
+
+
+def _twodiff(state: dict, tour: dict) -> dict:
+    """平均の差（2群のラボの diff。#47 の U23）：ラボの dVals と同じ式（ウェルチ：SE＝√(s₁²/n₁＋s₂²/n₂)・近似の自由度、等分散：合わせた分散・n₁＋n₂−2）"""
+    x1, s1, n1, x2, s2, n2 = (state[k] for k in ("x1", "s1", "n1", "x2", "s2", "n2"))
+    a, b = s1 * s1 / n1, s2 * s2 / n2
+    if state.get("method", "welch") == "welch":
+        se, df = math.sqrt(a + b), (a + b) ** 2 / (a * a / (n1 - 1) + b * b / (n2 - 1))
+    else:
+        sp2 = ((n1 - 1) * s1 * s1 + (n2 - 1) * s2 * s2) / (n1 + n2 - 2)
+        se, df = math.sqrt(sp2 * (1 / n1 + 1 / n2)), n1 + n2 - 2
+    tc = _tq975(df)
+    d = x1 - x2
+    return {"label": "ウェルチ" if state.get("method", "welch") == "welch" else "等分散", "diff": d, "se": se, "df": df,
+            "tcrit": tc, "margin": tc * se, "lo": d - tc * se, "hi": d + tc * se}
+
+
+def _twopaired(state: dict, tour: dict) -> dict:
+    """対応あり（2群のラボの paired）：差の平均の区間 D̄ ± t(n−1)×s_D÷√n（ラボの pVals と同じ式）"""
+    d, sd, n = state["dbar"], state["sd"], int(state["n"])
+    se, tc = sd / math.sqrt(n), _tq975(n - 1)
+    return {"label": "対応あり", "diff": d, "se": se, "df": n - 1, "tcrit": tc, "margin": tc * se, "lo": d - tc * se, "hi": d + tc * se}
+
+
+def _twoci_fig(x: dict, state: dict, tour: dict) -> dict:
+    """差の区間の横の棒（0 の位置に印を付けて、区間が 0 を含むかを読む）"""
+    return {"type": "ci_bar", "lo": x["lo"], "hi": x["hi"], "center": x["diff"], "ticks": [-10, 15, 5], "zero": True, "decimals": 2,
+            "center_label": f"差 {_n(x['diff'])}", "label": f"{x['label']}の95%信頼区間（自由度 {_n(round(x['df'], 1))}）",
+            "lines": [f"{x['lo']:.2f}〜{x['hi']:.2f}（誤差幅 {x['margin']:.2f}）".replace("-", "−")]}
+
+
 MODES = {
     ("LAB-pois", "approx"): {"calc": _approx, "check": ("lambda", "bin", "poi", "diff", "maxdiff", "bvar"), "figure": _approx_fig},
     ("LAB-binom", "path"): {"calc": _path, "check": ("path", "ncr", "pk"), "figure": _path_fig},
@@ -385,6 +418,8 @@ MODES = {
     ("LAB-tcf", "f"): {"calc": _fdist, "check": ("F", "fcrit", "pUp"), "figure": _fdist_fig},
     ("LAB-est", "comp"): {"calc": _comp, "check": ("seMean", "seFirst", "biasShift"), "figure": _comp_fig},
     ("LAB-est", "var"): {"calc": _vest, "check": ("biasV", "mseS2", "mseV"), "figure": _vest_fig},
+    ("LAB-two", "diff"): {"calc": _twodiff, "check": ("diff", "se", "df", "tcrit", "margin", "lo", "hi"), "figure": _twoci_fig},
+    ("LAB-two", "paired"): {"calc": _twopaired, "check": ("se", "df", "tcrit", "margin", "lo", "hi"), "figure": _twoci_fig},
     ("LAB-ci", "mean"): {"calc": _cimean, "check": ("se", "crit", "margin", "lo", "hi"), "figure": _cimean_fig},
 }
 
