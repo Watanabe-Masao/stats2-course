@@ -1,6 +1,6 @@
 # 単元U18の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U18-001
-  concepts: [TERM-sample-mean, TERM-se]
+  concepts: [TERM-sample-mean, TERM-se, CLM-41]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -81,7 +81,7 @@
     why: 1÷√25＝0.2 で、SE＝10×0.2＝2。SE÷σ は 1÷√n で決まるので、SE を1（σ の0.1倍）にするには √n＝10、0.5（0.05倍）にするには √n＝20 が要る。n を動かして確かめる。
 
 - id: Q-U18-005
-  concepts: [TERM-sample-mean, TERM-se, TERM-var]
+  concepts: [TERM-sample-mean, TERM-se, TERM-var, TERM-indep]
   stage: S1
   difficulty: 3
   format: written
@@ -136,7 +136,7 @@
     why: σ²＝26/3≒8.67 とちょうど一致する。n で割る v の平均は半分の4.33。n−1 で割るのは、x̄ から測った偏差が小さく出る分を補うため。
 
 - id: Q-U18-012
-  concepts: [TERM-sample-mean, TERM-se, TERM-normal]
+  concepts: [TERM-sample-mean, TERM-se, TERM-normal, TERM-std]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -148,7 +148,7 @@
     id: LAB-cont
     mode: norm
     set: {mu: 500, sd: 2, a: 494, b: 496, kind: le}
-    task: 25袋の平均 x̄ は平均500g・標準偏差（SE）2g の正規分布。x̄ が496g以下になる確率は（小数で）？
+    task: 25袋の平均 x̄ の分布で、x̄ が496g以下になる確率は（小数で）？
     predict: {type: number, key: p, label: "P(x̄≦496)"}
     expect: 0.0228
     why: z＝−2 で約2.3%。標準偏差を1袋の10にすると約34%。平均の分布は、1個の分布より ÷√n だけ細い。
@@ -208,7 +208,7 @@
     why: 24÷√36＝4g で、商品Aの2倍。2g に下げるには SE を半分にするので、n は4倍要る。n を動かして確かめる。ばらつきの大きい商品ほど、平均を安定させるのに多くの個数が要る（σ² に比例）。
 
 - id: Q-U18-023
-  concepts: [TERM-sample-mean, TERM-se, TERM-unbvar]
+  concepts: [TERM-sample-mean, TERM-se, TERM-unbvar, CLM-20a, CLM-41]
   stage: S3
   tag: 本番形式
   format: choice
@@ -239,7 +239,7 @@
     why: 144÷36＝4（SE は2）。n を144にすると分散は1で1/4、SE は1で1/2。
 
 - id: Q-U18-030
-  concepts: [TERM-sample-mean, TERM-se]
+  concepts: [TERM-sample-mean, TERM-se, TERM-var, TERM-indep]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -275,7 +275,7 @@
     why: √(0.24÷150)＝0.04。±2SE で ±8ポイント。600人に聞けば ±4ポイントになる。
 
 - id: Q-U18-032
-  concepts: [TERM-sample-mean, TERM-se, TERM-normal]
+  concepts: [TERM-sample-mean, TERM-se, TERM-normal, TERM-std]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -287,13 +287,13 @@
     id: LAB-cont
     mode: norm
     set: {mu: 500, sd: 1, a: 495, b: 498, kind: le}
-    task: 16袋の平均 x̄ は平均500g・標準偏差（SE）1g の正規分布。x̄ が498g以下になる確率は（小数で）？
+    task: 16袋の平均 x̄ の分布で、x̄ が498g以下になる確率は（小数で）？
     predict: {type: number, key: p, label: "P(x̄≦498)"}
     expect: 0.0228
     why: z＝−2 で約2.3%。標準偏差を1袋の4gにすると約31%。平均で判断すると、正常なのに調整する空振りが減る。
 
 - id: Q-U18-040
-  concepts: [TERM-unbvar]
+  concepts: [TERM-unbvar, CLM-11]
   stage: S3
   format: written
   powers: [P1, P3]

@@ -4388,10 +4388,13 @@
    },
    {
     "symbol": "σ",
-    "meaning": "母標準偏差（1個の値のばらつき）",
+    "meaning": "母標準偏差（1個の値 Xᵢ のばらつき）",
     "key": "sigma",
     "concept": "TERM-sd",
-    "kind": "param"
+    "kind": "param",
+    "domain": {
+     "min": 0
+    }
    },
    {
     "symbol": "n",
@@ -5075,10 +5078,13 @@
    },
    {
     "symbol": "σ",
-    "meaning": "母標準偏差（1個の値のばらつき）",
+    "meaning": "母標準偏差（1個の値 Xᵢ のばらつき）",
     "key": "sigma",
     "concept": "TERM-sd",
-    "kind": "param"
+    "kind": "param",
+    "domain": {
+     "min": 0
+    }
    },
    {
     "symbol": "n",

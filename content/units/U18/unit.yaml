@@ -35,6 +35,8 @@ figures:
       sigma: 2
       unit: g
       ticks: [26, 74, 24]
+      band: 2
+      band_label: ±2標準誤差（46〜54）
       label: 36個の平均（標準誤差 2g）
       overlay: {family: normal, mu: 50, sigma: 12, label: 1個ずつ（標準偏差 12g）}
 status: drafted
@@ -53,12 +55,13 @@ checks:
   # 転用の読み取り・仕事の場面
   - '1200/math.sqrt(400) == 60 and 1200/math.sqrt(100) == 120 and math.isclose(math.sqrt(0.6*0.4/150), 0.04) and 4/math.sqrt(16) == 1'
   - 'math.isclose(0.05/2, 0.025) and math.isclose(0.25/0.025**2, 400) and math.isclose(0.16/0.025**2, 256)'
-  # 創造：内容量の上乗せ
-  - 'abs(1.96*2 - 3.9) < 0.05 and abs(1.96*1 - 2) < 0.05'
   # 概念図の下の文：50±2×12・50±2×2
   - '2*12 == 24 and 2*2 == 4 and 50-2*12 == 26 and 50+2*12 == 74 and 50-2*2 == 46 and 50+2*2 == 54'
-  # 発展：まとまりの効き方・充填機
+  # 発展：まとまりの効き方
   - '1500/math.sqrt(400) == 75 and math.isclose(1+(20-1)*0.05, 1.95) and abs(math.sqrt(1.95) - 1.40) < 0.005 and abs(75*math.sqrt(1.95) - 105) < 0.5 and 20*20 == 400'
-  - 'abs(0.1*math.sqrt(1000) - 3.16) < 0.005 and abs(2*0.1*math.sqrt(1000) - 6.3) < 0.05 and round(0.1*math.sqrt(1000)/0.1) == 32'
   # 創造：満足率 62% と 68%
   - 'abs(math.sqrt(0.62*0.38/150) - 0.040) < 0.0005 and abs(math.sqrt(0.68*0.32/150) - 0.038) < 0.0005 and abs(math.sqrt(0.040**2+0.038**2) - 0.055) < 0.0005 and abs(0.06/0.055 - 1.1) < 0.01 and round(68-62) == 6'
+  # 初学のラボ s1-se（16個）と、発展の警告の例
+  - '12/math.sqrt(16) == 3 and 12/math.sqrt(64) == 1.5'
+  - '1500/math.sqrt(900) == 50 and abs(math.sqrt(50**2+50**2) - 71) < 0.5 and abs(100/math.sqrt(50**2+50**2) - 1.4) < 0.05'
+  - 'math.isclose(0.25/0.025**2, 400) and math.isclose(0.16/0.025**2, 256)'

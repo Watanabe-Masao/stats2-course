@@ -632,7 +632,7 @@ def dist(sp: dict) -> str:
         a, b = max(lo, mean - k * sd), min(hi, mean + k * sd)
         c.rect(X(a), top - 4, X(b) - X(a), base - top + 4, LIGHT)
         c.line(X(a), top - 14, X(b), top - 14, BLUE, 1.5)
-        c.text(X(mean), top - 20, ("±標準偏差" if k == 1 else f"±{_num(k)}標準偏差") + f"（{_num(round(mean - k * sd, 2))}〜{_num(round(mean + k * sd, 2))}）", 11.5, BLUE, "middle", "bold")
+        c.text(X(mean), top - 20, sp.get("band_label") or ("±標準偏差" if k == 1 else f"±{_num(k)}標準偏差") + f"（{_num(round(mean - k * sd, 2))}〜{_num(round(mean + k * sd, 2))}）", 11.5, BLUE, "middle", "bold")
     c.line(left, base, right, base, INK2, 1)
     if discrete:
         for x, p in pmf:

@@ -525,8 +525,9 @@ claims:
     terms:
     - TERM-var
   grounds:
+  - claim: CLM-41
   - source:
-      title: V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+      title: V(X̄)＝σ²/n（CLM-41）とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
   verification:
     math:
     - method: 独立な確かめ
@@ -1142,10 +1143,17 @@ claims:
     - TERM-expect
   grounds:
   - source:
-      title: 期待値の線形性で E(X̄)＝(E(X₁)＋…＋E(Xₙ))/n＝nμ/n＝μ。独立も同じ分布も使わない（独立同分布は教材で置く十分条件）
+      title: 期待値の線形性で E(X̄)＝(E(X₁)＋…＋E(Xₙ))/n＝nμ/n＝μ。独立も同じ分布も使わない
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: X
+      date: '2026-11-16'
+      version: c5eb1c0
+    external: なし
   version: 1
 - id: CLM-41
   label: ④-41
@@ -1168,11 +1176,23 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる）
+    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる）
+  - text: 分散 σ² が有限
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: V(X̄) が有限の値に定まるとは保証できない
   grounds:
   - source:
       title: 独立なら分散は足せるので V(X₁＋…＋Xₙ)＝nσ²。X̄ は合計の 1/n 倍なので V(X̄)＝nσ²/n²＝σ²/n（根拠で使うのは、各 Xᵢ の分散が σ² で互いに無相関なこと）
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: X
+      date: '2026-11-16'
+      version: c5eb1c0
+    external: なし
   version: 1
