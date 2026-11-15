@@ -1004,10 +1004,48 @@
   en: conditional probability
   category: 確率
   forms: [number]
-  basis:
-    text: P(A)＞0 の事象 A と事象 B について、A が起きたもとでの B の確率 P(B|A)＝P(A∩B)/P(A)
-    terms: [TERM-prob, TERM-event]
+  basis_formula: F-cond-def
   short: ある事象が起きたと分かったうえで、別の事象が起こる確率
+  definition: 事象 A が起きたと分かったうえで、事象 B が起こる確率。P(B|A) と書き、両方の確率を A の確率で割った P(A∩B)÷P(A)。
+  version: 1
+  principle: A が起きたと分かると、起こりうる結果は A の中だけに絞られる。標本空間を A に取り直し、その中で B にも入る結果（A∩B）の割合を見る。だから両方の確率 P(A∩B) を、新しい全体 P(A) で割る。
+  formulas:
+    - id: F-cond-def
+      label: 条件付き確率の定義
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: B|A, meaning: A を条件にした B（P( | ) の中だけの書き方。B|A という事象があるのではない）, key: BgA, kind: value}
+        - {symbol: A∩B, meaning: A と B が両方起きる, key: AB, kind: value}
+        - {symbol: A, meaning: 条件にする事象（起きたと分かっている）, key: A, kind: value}
+        - {symbol: B, meaning: 確率を求める事象, key: B, kind: value}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: BgA}]}
+          - op: div
+            args:
+              - {op: fn, name: P, args: [{sym: AB}]}
+              - {op: fn, name: P, args: [{sym: A}]}
+      parts:
+        - {path: [1, 0], name: 両方, meaning: A の中で B にも入る結果の確率}
+        - {path: [1, 1], name: 新しい全体, meaning: 起きたと分かった A の確率で割り、A を全体として見直す}
+  conditions:
+    math:
+      - text: 条件にする事象 A の確率は 0 より大きい（P(A)＞0）
+        kind: 要件
+        outside: 条件付き確率が定義されない（0 で割ることになる）
+    data:
+      - 「〜のうち」の分母が何かを確かめる。P(B|A)（A のうち B）と P(A|B)（B のうち A）は分母が違う
+  example: 来店客 100 人のうち会員が 40 人、会員で買った人が 20 人なら、会員が買う確率は P(買う|会員)＝0.2÷0.4＝0.5。
+  counterexample: さいころ1回で A＝「7の目」（どの結果も含まない A＝∅）とすると P(A)＝0 なので、「7の目が出たもとで偶数の確率」は 0 で割ることになり定義されない。
+  misconceptions:
+    - misconception: P(B|A) と P(A|B) は同じ
+      correction: 分母が違う。会員 40 人のうち買った 20 人なら P(買う|会員)＝0.5、買った人が 50 人なら P(会員|買う)＝20÷50＝0.4
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - 'Fraction(20,100)/Fraction(40,100) == Fraction(1,2) and Fraction(20,50) == Fraction(2,5)'
 - id: TERM-bayes
   name: ベイズの定理
   en: Bayes' theorem
@@ -2707,6 +2745,46 @@
     text: P(A)＞0 の事象 A とどの事象 B についても P(A∩B)＝P(A)P(B|A)（④-33）
     terms: [TERM-prob, TERM-cond, TERM-event]
   short: 2つの事象が両方起こる確率は、一方の確率と、それが起きたときの他方の条件付き確率の積
+  definition: 2つの事象が両方起こる確率は、一方の確率と、それが起きたもとでの他方の条件付き確率の積。P(A∩B)＝P(A)P(B|A)。
+  version: 1
+  principle: 条件付き確率の定義 P(B|A)＝P(A∩B)÷P(A) の両辺に P(A) を掛けた形。「A の確率」に「A のうちで B も起きる割合」を掛ける。どちらを条件にしてもよく、P(A∩B)＝P(B)P(A|B) も成り立つ。A と B が独立なら（P(A)＞0 のとき）P(B|A)＝P(B) なので、P(A∩B)＝P(A)P(B) になる。
+  formulas:
+    - id: F-multiplication
+      label: 両方の確率を順に掛ける
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: A∩B, meaning: A と B が両方起きる, key: AB, kind: value}
+        - {symbol: A, meaning: 条件にする事象, key: A, kind: value}
+        - {symbol: B|A, meaning: A を条件にした B（P( | ) の中だけの書き方）, key: BgA, kind: value, concept: TERM-cond}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: AB}]}
+          - op: mul
+            args:
+              - {op: fn, name: P, args: [{sym: A}]}
+              - {op: fn, name: P, args: [{sym: BgA}]}
+      parts:
+        - {path: [1, 0], name: 条件の確率, meaning: A が起きる確率}
+        - {path: [1, 1], name: 条件付きの確率, meaning: A のうちで B も起きる割合}
+  conditions:
+    math:
+      - text: A・B は同じ標本空間の上の、同じ確率 P の事象（P(A)＞0 は条件付き確率の要件）
+        kind: 仮定
+        claim: CLM-33
+        outside: ④-33 は保証されない（違う確率の掛け算は、両方の確率にならない）
+    data:
+      - 2回目の確率が1回目の結果で変わるか（戻す・戻さない、売れたら棚から減る）を確かめる
+  example: 赤玉 3 個・白玉 2 個の袋から戻さずに2回引き、2回とも赤の確率は 3/5×2/4＝3/10。
+  counterexample: 会員の割合 0.4 は店 X、会員が買う割合 0.8 は店 Y の数を使うと、0.4×0.8＝0.32 で、店 X の「会員で買った人」の割合 0.2 と合わない。2つの確率が同じ P（同じ店の客）でないと、掛けても両方の確率にならない。
+  misconceptions:
+    - misconception: 戻さずに引くときも、2回とも赤は 3/5×3/5
+      correction: 1回目に赤を引くと、袋は赤 2 個・白 2 個になる。2回目の赤は 2/4 で、3/5×2/4＝3/10（戻すときの 9/25 とは違う）。戻さずに引いた数の分布は超幾何分布になる
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - 'Fraction(3,5)*Fraction(2,4) == Fraction(3,10) and Fraction(3,5)**2 == Fraction(9,25) and abs(0.4*0.8 - 0.32) < 1e-12'
 - id: TERM-total-prob
   name: 全確率の公式
   en: law of total probability

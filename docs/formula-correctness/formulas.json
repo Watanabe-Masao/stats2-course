@@ -1383,6 +1383,108 @@
   }
  },
  {
+  "concept": "TERM-cond",
+  "index": 0,
+  "id": "F-cond-def",
+  "label": "条件付き確率の定義",
+  "tex": "P(B|A)=\\dfrac{P(A\\cap B)}{P(A)}",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "B|A",
+    "meaning": "A を条件にした B（P( | ) の中だけの書き方。B|A という事象があるのではない）",
+    "key": "BgA",
+    "kind": "value"
+   },
+   {
+    "symbol": "A∩B",
+    "meaning": "A と B が両方起きる",
+    "key": "AB",
+    "kind": "value"
+   },
+   {
+    "symbol": "A",
+    "meaning": "条件にする事象（起きたと分かっている）",
+    "key": "A",
+    "kind": "value"
+   },
+   {
+    "symbol": "B",
+    "meaning": "確率を求める事象",
+    "key": "B",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "BgA"
+      }
+     ]
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "AB"
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "A"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "両方",
+    "meaning": "A の中で B にも入る結果の確率"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "新しい全体",
+    "meaning": "起きたと分かった A の確率で割り、A を全体として見直す"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "定義"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-rv",
   "index": 0,
   "id": "F-rv-pmf",
@@ -4148,6 +4250,103 @@
     ],
     "name": "重なり",
     "meaning": "二重に数えた両方の確率を1回引く"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-multiplication",
+  "index": 0,
+  "id": "F-multiplication",
+  "label": "両方の確率を順に掛ける",
+  "tex": "P(A\\cap B)=P(A)\\,P(B|A)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "A∩B",
+    "meaning": "A と B が両方起きる",
+    "key": "AB",
+    "kind": "value"
+   },
+   {
+    "symbol": "A",
+    "meaning": "条件にする事象",
+    "key": "A",
+    "kind": "value"
+   },
+   {
+    "symbol": "B|A",
+    "meaning": "A を条件にした B（P( | ) の中だけの書き方）",
+    "key": "BgA",
+    "kind": "value",
+    "concept": "TERM-cond"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "AB"
+      }
+     ]
+    },
+    {
+     "op": "mul",
+     "args": [
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "A"
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "BgA"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "条件の確率",
+    "meaning": "A が起きる確率"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "条件付きの確率",
+    "meaning": "A のうちで B も起きる割合"
    }
   ],
   "contract": {
