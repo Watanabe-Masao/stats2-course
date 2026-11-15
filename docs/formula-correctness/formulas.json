@@ -1303,6 +1303,72 @@
   }
  },
  {
+  "concept": "TERM-complement",
+  "index": 0,
+  "id": "F-complement",
+  "label": "余事象の確率",
+  "tex": "P(Aᶜ)=1-P(A)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "Aᶜ",
+    "meaning": "A が起こらない事象（余事象）",
+    "key": "Ac",
+    "kind": "value"
+   },
+   {
+    "symbol": "A",
+    "meaning": "事象",
+    "key": "A",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "Ac"
+      }
+     ]
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "num": 1
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "A"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-indep",
   "index": 0,
   "id": "F-indep-def",
@@ -3973,6 +4039,122 @@
     "非負",
     "不変",
     "同値"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-addition",
+  "index": 0,
+  "id": "F-addition",
+  "label": "和の確率",
+  "tex": "P(A\\cup B)=P(A)+P(B)-P(A\\cap B)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "確率",
+    "key": "P",
+    "concept": "TERM-prob"
+   },
+   {
+    "symbol": "A∪B",
+    "meaning": "A か B の少なくとも一方が起きる",
+    "key": "AuB",
+    "kind": "value"
+   },
+   {
+    "symbol": "A",
+    "meaning": "事象",
+    "key": "A",
+    "kind": "value"
+   },
+   {
+    "symbol": "B",
+    "meaning": "事象",
+    "key": "B",
+    "kind": "value"
+   },
+   {
+    "symbol": "A∩B",
+    "meaning": "A と B が両方起きる",
+    "key": "AB",
+    "kind": "value"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "sym": "AuB"
+      }
+     ]
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "op": "add",
+       "args": [
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "A"
+          }
+         ]
+        },
+        {
+         "op": "fn",
+         "name": "P",
+         "args": [
+          {
+           "sym": "B"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "P",
+       "args": [
+        {
+         "sym": "AB"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "和",
+    "meaning": "2つの確率を足す。両方に入る結果を二重に数えている"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "重なり",
+    "meaning": "二重に数えた両方の確率を1回引く"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
    ]
   }
  },

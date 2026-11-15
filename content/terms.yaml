@@ -206,6 +206,26 @@
     text: 1回の試行で起こりうる結果を、重なりなく漏れなく全部集めた集合 Ω
     terms: []
   short: 1回の試行で起こりうる結果を、すべて集めた集合
+  definition: 1回の試行で起こりうる結果を、重なりなく漏れなく全部集めた集合。Ω と書く。
+  version: 1
+  principle: 確率を考える前に、「何が起こりうるか」の全体を決める。結果を1つずつ数え上げると、どの結果も Ω のちょうど1つの要素になる。確率は Ω の上の事象に割り当てるので、Ω の決め方で、同じ出来事の確率の計算のしかたが変わる。
+  conditions:
+    math:
+      - text: 結果どうしは重ならず（1回の試行で2つの結果が同時に起きない）、起こりうる結果を全部含む
+        kind: 要件
+        outside: 標本空間として扱えない（重なりがあると確率を足すと二重に数え、漏れがあると全体の確率が1にならない）
+    data:
+      - 何を1つの結果とするかを先に決める。2個のさいころなら、区別して (1回目, 2回目) の36通りにすると、どれも同じ確率で起きると考えやすい
+  example: さいころを1回投げるときの標本空間は Ω＝{1, 2, 3, 4, 5, 6}。
+  counterexample: さいころの結果を「偶数の目」「3以下の目」の2つにすると、2 はどちらにも入って重なり、5 はどちらにも入らず漏れる。重なりも漏れもあるので標本空間にならない。
+  misconceptions:
+    - misconception: 標本空間の結果は、いつも同じ確率で起きる
+      correction: 標本空間は「起こりうる結果の全体」を決めるだけ。同じ確率で起きるかは別の仮定（ゆがんださいころでも Ω は {1, …, 6}）
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - len({1,2,3,4,5,6}) == 6 and len([(a,b) for a in range(1,7) for b in range(1,7)]) == 36
 - id: TERM-event
   name: 事象
   en: event
@@ -215,6 +235,26 @@
     text: 標本空間 Ω の部分集合（起こりうる結果のうち、注目するものの集まり）
     terms: [TERM-sample-space]
   short: 標本空間の中で、注目する結果を集めた部分集合
+  definition: 標本空間の中で、注目する結果を集めた部分集合。A などと書き、その中のどれかの結果が出たとき「A が起きた」と言う。
+  version: 1
+  principle: 「偶数の目が出る」のような言葉の出来事を、結果の集まり {2, 4, 6} に置き換える。集まりにすると、「または」は和集合 A∪B、「かつ」は共通部分 A∩B、「起きない」は残り（余事象）として計算できる。
+  conditions:
+    math:
+      - text: 事象は標本空間 Ω の部分集合（Ω 全体と、何も含まない空事象 ∅ も事象）
+        kind: 要件
+        outside: 事象として扱えない（Ω にない結果を含む集まりには確率を割り当てられない）
+    data:
+      - 言葉の出来事を、どの結果の集まりにするかを書き出して確かめる（「6 以外」「少なくとも1回」などは、集まりにすると数え漏れが見つかる）
+  example: さいころで「偶数の目が出る」は A＝{2, 4, 6}、「3以下の目が出る」は B＝{1, 2, 3}。「偶数かつ3以下」は A∩B＝{2}。
+  counterexample: 1回のさいころで「7の目が出る」は、どの結果も含まない空事象 ∅。事象だが、Ω にない結果 7 を含む集まりではない（起きない出来事は ∅ で表す）。
+  misconceptions:
+    - misconception: 事象は1つの結果のこと
+      correction: 事象は結果の集まり。1つの結果だけの事象 {6} もあるが、「偶数」{2, 4, 6} のように複数の結果を含む事象もある
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - '{2,4,6} & {1,2,3} == {2}'
 - id: TERM-frame
   name: 抽出枠
   en: sampling frame
@@ -860,6 +900,42 @@
     text: 事象 A に対して、標本空間 Ω のうち A に入らない結果を全部集めた事象 Aᶜ＝Ω∖A
     terms: [TERM-event, TERM-sample-space]
   short: ある事象が起こらないという事象で、標本空間からその事象を除いた残り
+  definition: 事象 A が起こらないという事象。標本空間 Ω から A の結果を除いた残りで、Aᶜ（または Ā）と書く。
+  version: 1
+  principle: A と Aᶜ は重ならず、合わせると Ω 全体になる。だから確率の公理から P(A)＋P(Aᶜ)＝P(Ω)＝1、つまり P(Aᶜ)＝1−P(A)。「少なくとも1回」のように直接数えると場合が多い事象は、起こらない側を数えて1から引くと楽になる。
+  formulas:
+    - id: F-complement
+      label: 余事象の確率
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: Aᶜ, meaning: A が起こらない事象（余事象）, key: Ac, kind: value}
+        - {symbol: A, meaning: 事象, key: A, kind: value}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: Ac}]}
+          - op: sub
+            args:
+              - {num: 1}
+              - {op: fn, name: P, args: [{sym: A}]}
+  conditions:
+    math:
+      - text: A は標本空間 Ω の事象で、Aᶜ はその同じ Ω に対して取る
+        kind: 要件
+        outside: 余事象が決まらない（Ω が違えば「残り」が違う）
+    data:
+      - 「起こらない」の中身を書き出して確かめる。「6 が少なくとも1回」の余事象は「6 が1回も出ない」で、「6 がちょうど1回」ではない
+  example: さいころを3回投げて6が少なくとも1回出る確率は、1回も出ない確率 (5/6)³＝125/216 を1から引いて 1−125/216＝91/216。
+  counterexample: さいころで A＝{1, 2} の余事象を「3以上の偶数」{4, 6} とすると、3・5 が漏れる。A と合わせても Ω にならないので余事象ではない（余事象は {3, 4, 5, 6}）。
+  misconceptions:
+    - misconception: 「少なくとも1回」の余事象は「ちょうど1回」
+      correction: 「少なくとも1回」に入らないのは「1回も起きない」だけ。ちょうど1回は「少なくとも1回」の中に入る
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - Fraction(5,6)**3 == Fraction(125,216) and 1 - Fraction(125,216) == Fraction(91,216)
+    - '{1,2,3,4,5,6} - {1,2} == {3,4,5,6}'
 - id: TERM-exclusive
   name: 排反
   en: mutually exclusive
@@ -869,6 +945,27 @@
     text: 2つの事象 A・B が共通の結果を持たない（A∩B＝∅）こと
     terms: [TERM-event]
   short: 2つの事象が同時には起こらないこと（共通部分がない）
+  definition: 2つの事象が同時には起こらないこと。共通部分がない（A∩B＝∅）。
+  version: 1
+  principle: 共通の結果がないので、A∪B の結果は A の結果と B の結果に重なりなく分かれる。だから確率の公理から P(A∪B)＝P(A)＋P(B) と足せる。重なりがあるときは、重なりを二重に数えないよう引く（加法定理）。
+  conditions:
+    math:
+      - text: A・B は同じ標本空間 Ω の事象
+        kind: 要件
+        outside: 排反かどうかを決められない（違う試行の事象は、そもそも同じ集合の上にない）
+    data:
+      - 2つの出来事が「同時に起こりうるか」を、結果を書き出して確かめる。違う試行（1回目と2回目）の出来事は、ふつう排反ではなく、独立かどうかを考える
+  example: さいころで A＝{1, 2}（2以下）と B＝{5, 6}（5以上）は共通の結果がないので排反。2以下か5以上の確率は 2/6＋2/6＝4/6＝2/3。
+  counterexample: A＝{2, 4, 6}（偶数）と B＝{1, 2, 3}（3以下）は 2 を共有するので排反ではない。3/6＋3/6＝1 と足すと、2 を二重に数えて誤る（正しくは {1, 2, 3, 4, 6} で 5/6）。
+  misconceptions:
+    - misconception: 排反なら独立
+      correction: 排反は「一方が起きたらもう一方は起きない」なので、どちらの確率も0でなければ、むしろ強く関係している（独立ではない）
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - 'len({1,2} & {5,6}) == 0 and Fraction(2,6)+Fraction(2,6) == Fraction(2,3)'
+    - 'len({2,4,6} | {1,2,3}) == 5 and Fraction(3,6)+Fraction(3,6) == 1'
 - id: TERM-indep
   name: 独立
   en: independence
@@ -2523,6 +2620,27 @@
     text: 標本空間の事象 A のそれぞれに数 P(A) を対応させる関数で、どの A でも P(A)≧0、P(Ω)＝1、互いに排反な事象 A₁, A₂, … では P(A₁∪A₂∪…)＝P(A₁)＋P(A₂)＋…（確率の公理）を満たすもの。その値 P(A) も確率と呼ぶ
     terms: [TERM-event, TERM-sample-space, TERM-exclusive]
   short: 事象の起こりやすさを0〜1の数で表したもので、全体は1、排反な事象では確率を足せる
+  definition: 事象の起こりやすさを0から1の数で表したもの。事象 A の確率を P(A) と書く。どの事象でも0以上、全体（標本空間）は1、互いに排反な事象の和の確率はそれぞれの確率の和（確率の公理）。
+  version: 1
+  principle: 確率は、公理の3つ（0以上・全体が1・排反なら足せる）を満たす割り当てなら何でもよい。どの割り当てを使うかは、仮定（同様に確からしい・過去の割合・モデル）で決める。公理から、余事象の確率 1−P(A)、加法定理、空事象の確率0 などが導ける。
+  conditions:
+    math:
+      - text: 確率は同じ標本空間 Ω の事象に割り当てる
+        kind: 要件
+        outside: 確率を比べたり足したりできない（違う Ω の事象の確率は、同じ公理の上にない）
+    data:
+      - 結果が有限個で、どれも同じ確率で起きる（同様に確からしい）と言えるときだけ、P(A)＝（A の結果の数）÷（Ω の結果の数）で求められる。2個のさいころの目の組 {1,6} のように、同じ確率でない結果を1つと数えると誤る
+      - 確率の割り当て方（同様に確からしい・過去の割合・モデル）を書き、その仮定が場面に合うかを確かめる。過去の割合を使うときは、条件が変わっていないか
+  example: ゆがみのないさいころで偶数の目が出る確率は、6通りのうち 3通りで 3/6＝1/2。
+  counterexample: 「明日は晴れか雨のどちらかなので、晴れの確率は 1/2」は誤り。晴れと雨は同じ確率で起きるとは限らず、「同様に確からしい」の仮定が成り立たない。
+  misconceptions:
+    - misconception: 確率 1/6 なら、6回投げると必ず1回出る
+      correction: 確率は1回ごとの起こりやすさ。6回で1回も出ないことも (5/6)⁶≒0.33 の確率で起きる。回数を増やすと割合が 1/6 に近づく（大数の法則）
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - Fraction(3,6) == Fraction(1,2) and abs((5/6)**6 - 0.335) < 0.001
 - id: TERM-addition
   name: 加法定理
   en: addition rule
@@ -2533,6 +2651,49 @@
     text: どの2つの事象 A・B についても P(A∪B)＝P(A)＋P(B)−P(A∩B)（④-32）
     terms: [TERM-prob, TERM-event]
   short: 2つの事象のどちらかが起こる確率は、それぞれの確率の和から両方が起こる確率を引いたもの
+  definition: 2つの事象のどちらかが起こる確率は、それぞれの確率の和から、両方が起こる確率を引いたもの。P(A∪B)＝P(A)＋P(B)−P(A∩B)。
+  version: 1
+  principle: P(A)＋P(B) は、A と B の両方に入る結果（A∩B）を二重に数えている。その分を1回引くと、A∪B の確率になる。A と B が排反なら A∩B は空なので、ただ足すだけになる。
+  formulas:
+    - id: F-addition
+      label: 和の確率
+      symbols:
+        - {symbol: P( ), meaning: 確率, key: P, concept: TERM-prob}
+        - {symbol: A∪B, meaning: A か B の少なくとも一方が起きる, key: AuB, kind: value}
+        - {symbol: A, meaning: 事象, key: A, kind: value}
+        - {symbol: B, meaning: 事象, key: B, kind: value}
+        - {symbol: A∩B, meaning: A と B が両方起きる, key: AB, kind: value}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: P, args: [{sym: AuB}]}
+          - op: sub
+            args:
+              - op: add
+                args:
+                  - {op: fn, name: P, args: [{sym: A}]}
+                  - {op: fn, name: P, args: [{sym: B}]}
+              - {op: fn, name: P, args: [{sym: AB}]}
+      parts:
+        - {path: [1, 0], name: 和, meaning: 2つの確率を足す。両方に入る結果を二重に数えている}
+        - {path: [1, 1], name: 重なり, meaning: 二重に数えた両方の確率を1回引く}
+  conditions:
+    math:
+      - text: A・B は同じ標本空間の上の、同じ確率 P の事象
+        kind: 要件
+        outside: この式で足し引きできない（④-32 の前提）
+    data:
+      - 重なり（両方に当てはまる人・品）を数えているかを確かめる。アンケートの「どちらかに当てはまる」を、2つの割合の和で出すと重なりの分だけ多くなる
+  example: さいころで A＝{2, 4, 6}（偶数）、B＝{1, 2, 3}（3以下）なら、P(A∪B)＝3/6＋3/6−1/6＝5/6（A∩B＝{2}）。
+  counterexample: 3つの事象 A・B・C のどれかが起こる確率を P(A)＋P(B)＋P(C)−P(A∩B)−P(B∩C)−P(A∩C) とすると、3つとも起こる部分を一度も数えない。2つの事象の式をそのまま3つに広げることはできない（3つの重なり P(A∩B∩C) を足し戻す）。
+  misconceptions:
+    - misconception: 「または」の確率はいつも足し算
+      correction: 足すだけでよいのは排反のときだけ。重なりがあるときは、重なりの確率を引く
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - Fraction(3,6)+Fraction(3,6)-Fraction(1,6) == Fraction(5,6) and len({2,4,6}|{1,2,3}) == 5
 - id: TERM-multiplication
   name: 乗法定理
   en: multiplication rule
