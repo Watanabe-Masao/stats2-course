@@ -9,6 +9,7 @@ prereq: [U02]
 used_by: [U10, U14, U15, U17]
 terms: [TERM-perm, TERM-comb, TERM-fact]
 labs: [LAB-count]
+concepts_linked: true
 goal: 「何通りあるか」を数えるとき、**何を1通りとするか**を決め、順列・組合せ・重複を許す数え方を理由とともに選べる。
 stage_goals:
   S1: 最後に「÷r! の意味」を自分の言葉で1文にできれば完了。
