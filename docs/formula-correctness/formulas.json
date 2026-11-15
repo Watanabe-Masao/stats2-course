@@ -329,6 +329,176 @@
   }
  },
  {
+  "concept": "TERM-random-sampling",
+  "index": 0,
+  "id": "F-srs-incl",
+  "label": "単純無作為抽出の包含確率",
+  "tex": "\\pi=\\dfrac{n}{N}",
+  "symbols": [
+   {
+    "symbol": "π",
+    "meaning": "枠の1つの要素が標本に入る確率（包含確率。円周率の π とは別）",
+    "key": "incl",
+    "concept": "TERM-prob",
+    "kind": "value"
+   },
+   {
+    "symbol": "n",
+    "meaning": "選ぶ数（標本の大きさ）",
+    "key": "n",
+    "kind": "value",
+    "domain": {
+     "min": 0,
+     "max": "N",
+     "integer": true
+    }
+   },
+   {
+    "symbol": "N",
+    "meaning": "抽出枠の要素の数（母集団の数ではない）",
+    "key": "N",
+    "kind": "value",
+    "domain": {
+     "min": 1,
+     "integer": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "incl"
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "sym": "n"
+      },
+      {
+       "sym": "N"
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "選ぶ数",
+    "meaning": "選ぶ数が多いほど、どの要素も入りやすい"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "枠の数",
+    "meaning": "割るのは枠の数。枠に載らない要素は、どの組み合わせにも入らないので確率0"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-bias",
+  "index": 0,
+  "id": "F-bias-def",
+  "label": "偏りの定義",
+  "tex": "b=E(\\thetâ)-\\theta",
+  "symbols": [
+   {
+    "symbol": "b",
+    "meaning": "推定量の偏り（バイアス）",
+    "key": "b",
+    "concept": "TERM-bias",
+    "kind": "value"
+   },
+   {
+    "symbol": "E( )",
+    "meaning": "期待値（くり返したときの平均。標本の選び方と、測り方・回答を含む取り方の全体について）",
+    "key": "E",
+    "concept": "TERM-expect"
+   },
+   {
+    "symbol": "θ̂",
+    "meaning": "標本から計算する推定量",
+    "key": "thetahat",
+    "concept": "TERM-estimator",
+    "kind": "rv"
+   },
+   {
+    "symbol": "θ",
+    "meaning": "推し量りたい母数（母集団の平均など）",
+    "key": "theta",
+    "concept": "TERM-parameter",
+    "kind": "param"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "b"
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "op": "fn",
+       "name": "E",
+       "args": [
+        {
+         "sym": "thetahat"
+        }
+       ]
+      },
+      {
+       "sym": "theta"
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "くり返しの平均",
+    "meaning": "同じ取り方をくり返したときの推定値の平均"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "本当の値",
+    "meaning": "推し量りたい母数。差が0なら、平均としてずれない"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "定義"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-var",
   "index": 0,
   "id": "F-var-def",

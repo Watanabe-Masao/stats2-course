@@ -1,5 +1,6 @@
 # 単元U17の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U17-001
+  concepts: [TERM-random-sampling, TERM-multiplication]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -22,6 +23,7 @@
     why: 20/200×19/199≒0.0095。1店が入ると残りの枠が19に減るので、0.1×0.1＝0.01 より少し小さい。
 
 - id: Q-U17-002
+  concepts: [TERM-random-sampling, TERM-comb, TERM-sampdist]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: ₅C₂＝10通りで、どれも確率0.1。x̄ は4〜10にばらつくが、10通りの x̄ の平均は μ＝7 に一致する。
 
 - id: Q-U17-003
+  concepts: [TERM-random-sampling, TERM-frame]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: n÷N＝60÷1200＝0.05。名簿の人数や選ぶ人数を変えても、名簿の中では全員が同じ確率になる。
 
 - id: Q-U17-004
+  concepts: [TERM-random-sampling, TERM-sampdist]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +81,7 @@
     why: 6通りのうち (4,8) と (6,8) の2通り。どの標本も同じ確率 1/6 なので 2÷6。n を3にすると x̄ は μ＝5 の近くに集まる。
 
 - id: Q-U17-005
+  concepts: [TERM-random-sampling, TERM-complement, TERM-perm]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +100,7 @@
     why: 1−(30×29×28×27×26)÷30⁵≒0.296。N を300にすると約0.03に下がる。名簿が大きければ、戻す・戻さないの差は小さい。
 
 - id: Q-U17-010
+  concepts: [TERM-random-sampling, TERM-frame, TERM-population]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -112,6 +118,7 @@
     why: 25÷500＝0.05。名簿の外の20社は0のまま。n を増やしても、台帳の漏れは埋まらない。
 
 - id: Q-U17-011
+  concepts: [TERM-random-sampling, TERM-sampdist]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -129,6 +136,7 @@
     why: x̄ は 5・7.5・8.5 で、平均は7。母集団の平均 μ＝7 と一致する（標本平均は μ の不偏推定量）。どの1つの x̄ も μ とは限らない。
 
 - id: Q-U17-012
+  concepts: [TERM-random-sampling, TERM-hyper]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -146,6 +154,7 @@
     why: 3×35÷210＝0.5。単純無作為抽出の確率は、どの組み合わせも同じ確率であることから場合の数で出せる。
 
 - id: Q-U17-020
+  concepts: [TERM-random-sampling]
   stage: S3
   format: written
   powers: [P3]
@@ -163,6 +172,7 @@
     why: 20÷400＝0.05 で全員同じ。担当者が「偏らないよう気をつけて」選んでも、全員の確率が決まっていなければ無作為とは言えない。
 
 - id: Q-U17-021
+  concepts: [TERM-frame, TERM-population]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -180,6 +190,7 @@
     why: 100÷120≒0.83。n を増やしても覆う割合は変わらない。名簿の漏れは、選び方ではなく名簿を直すことで減らす。
 
 - id: Q-U17-022
+  concepts: [TERM-random-sampling, TERM-complement]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -197,6 +208,7 @@
     why: 1−(45×44)÷(50×49)≒0.192。0.1＋0.1 から「両方入る」約0.008を引いた値と同じ（加法定理）。
 
 - id: Q-U17-023
+  concepts: [TERM-random-sampling, TERM-frame, TERM-bias]
   stage: S3
   tag: 本番形式
   format: choice
@@ -227,6 +239,7 @@
     why: 10通りがどれも同じ確率 1/10。だから各店の選ばれる確率も、その店を含む4通り分の 4/10＝2/5＝n/N になる。
 
 - id: Q-U17-030
+  concepts: [TERM-random-sampling, TERM-complement]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -244,6 +257,7 @@
     why: 1−(36×35)÷(40×39)≒0.192。担当が3店・4店と増えると確率も上がるが、どの店も1店あたりは0.1のまま。
 
 - id: Q-U17-031
+  concepts: [TERM-random-sampling, TERM-complement, TERM-perm]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -261,6 +275,7 @@
     why: 1−(500×499×…×481)÷500²⁰≒0.32。「500枚もあれば重複しない」と思いがちだが、組（ペア）の数が多いので重複は起きやすい（誕生日の問題と同じ形）。
 
 - id: Q-U17-032
+  concepts: [TERM-random-sampling, TERM-sampdist]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -278,6 +293,7 @@
     why: 20通りのうち3通り。同じ値（2が2店）も別の店として数える。標本から言えることには、選び方による偶然のばらつきが必ず入る。
 
 - id: Q-U17-040
+  concepts: [TERM-sampdist, TERM-random-sampling, TERM-sd]
   stage: S3
   format: written
   powers: [P1, P3]
