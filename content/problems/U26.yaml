@@ -208,7 +208,7 @@
     why: P(X≧4)≒0.061 で棄却しない。正規近似の p 値（約0.018）は小さすぎる。np₀＝1.5 では近似が崩れる。
 
 - id: Q-U26-023
-  concepts: [TERM-pool, TERM-se, TERM-chi2, TERM-f, TERM-reject, REL-unbvar-chi2, CLM-45]
+  concepts: [TERM-pool, TERM-se, TERM-ci, TERM-chi2, TERM-f, TERM-reject, REL-unbvar-chi2]
   stage: S3
   tag: 本番形式
   format: choice
@@ -293,7 +293,7 @@
     why: z≒−1.94、p≒0.053。わずかに5%を超える。左片側に切り替えると約0.026。
 
 - id: Q-U26-040
-  concepts: [TERM-pool, TERM-chi2, TERM-reject, REL-normal-chi2, CLM-45]
+  concepts: [TERM-chi2, TERM-reject, REL-normal-chi2, CLM-45]
   stage: S3
   format: written
   powers: [P1, P3]
