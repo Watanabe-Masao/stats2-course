@@ -194,10 +194,16 @@ def _joint(state: dict, tour: dict) -> dict:
 
 
 def _joint_fig(x: dict, state: dict, tour: dict) -> dict:
+    """両方の確率と、それぞれの確率の積（等しければ独立）。共分散の行は、共分散を見せる解説（段の focus に cov がある）だけ
+    （事象の排反・独立の解説〔#45 の U10〕で、まだ学んでいない共分散を出さない）"""
     dec = tour.get("decimals", 3)
-    return {"type": "joint", "p11": x["p11"], "p10": x["p10"], "p01": x["p01"],
-            "lines": [f"Cov＝E(XY)−E(X)E(Y)＝{_n(round(x['exy'], dec))}−{_n(round(x['px'], dec))}×{_n(round(x['py'], dec))}＝{_n(round(x['cov'], dec))}",
-                      f"V(X)＝{_n(round(x['vx'], dec))}"]}
+    pc = lambda v: f"{_n(round(v * 100, 2))}%"  # noqa: E731
+    lines = [f"両方 {pc(x['p11'])}　積 {pc(x['px'])}×{pc(x['py'])}＝{pc(x['px'] * x['py'])}"]
+    if any(s.get("focus") == "cov" for s in tour.get("steps") or []):
+        lines += [f"Cov＝E(XY)−E(X)E(Y)＝{_n(round(x['exy'], dec))}−{_n(round(x['px'], dec))}×{_n(round(x['py'], dec))}＝{_n(round(x['cov'], dec))}",
+                  f"V(X)＝{_n(round(x['vx'], dec))}"]
+    return {"type": "joint", "p11": x["p11"], "p10": x["p10"], "p01": x["p01"], "lines": lines,
+            "names": [state.get("nameX") or "X", state.get("nameY") or "Y"], "events": bool(state.get("events"))}
 
 
 def _list(state: dict, tour: dict) -> dict:

@@ -786,6 +786,40 @@ def arrange(sp: dict) -> str:
     return c.done(y + 14)
 
 
+def sets(sp: dict) -> str:
+    """標本空間の結果を横に並べ、2つの事象 A・B の印を付ける（#45 の U10 の概念図）。A は上の帯、B は下の帯、両方に入る結果は太字。
+    下に「両方」「または」の結果と、加法定理の数の行。sp：{outcomes: [1..6], a: [...], b: [...], name_a, name_b}"""
+    from fractions import Fraction
+    out, A, B = sp["outcomes"], set(sp["a"]), set(sp["b"])
+    na, nb = sp.get("name_a", "A"), sp.get("name_b", "B")
+    c = Canvas()
+    w, ox, oy = 46, 24, 40
+    c.text(ox, 18, f"標本空間 Ω＝{{{', '.join(map(str, out))}}}（{len(out)} 通り）", 12.5, INK2)
+    for i, o in enumerate(out):
+        x = ox + i * w
+        if o in A:
+            c.add(f'<rect x="{x + 2}" y="{oy}" width="{w - 4}" height="10" rx="3" fill="{BLUE}" fill-opacity="0.8"/>')
+        c.add(f'<rect x="{x + 4}" y="{oy + 14}" width="{w - 8}" height="34" rx="6" fill="{SURFACE}" stroke="{INK2 if (o in A and o in B) else GRID}" stroke-width="{2 if (o in A and o in B) else 1}"/>')
+        c.text(x + w / 2, oy + 37, str(o), 15, INK, "middle", "bold" if (o in A and o in B) else "normal")
+        if o in B:
+            c.add(f'<rect x="{x + 2}" y="{oy + 52}" width="{w - 4}" height="10" rx="3" fill="{ORANGE}" fill-opacity="0.8"/>')
+    y = oy + 84
+    c.add(f'<rect x="{ox}" y="{y - 9}" width="14" height="8" rx="2" fill="{BLUE}" fill-opacity="0.8"/>')
+    c.text(ox + 20, y, f"上の帯：{na} {{{', '.join(str(o) for o in out if o in A)}}}", 12, INK)
+    y += 20
+    c.add(f'<rect x="{ox}" y="{y - 9}" width="14" height="8" rx="2" fill="{ORANGE}" fill-opacity="0.8"/>')
+    c.text(ox + 20, y, f"下の帯：{nb} {{{', '.join(str(o) for o in out if o in B)}}}", 12, INK)
+    both = [o for o in out if o in A and o in B]
+    either = [o for o in out if o in A or o in B]
+    n = len(out)
+    y += 24
+    c.text(ox, y, f"両方（太い枠）{{{', '.join(map(str, both))}}}　または {{{', '.join(map(str, either))}}}", 12.5, INK)
+    y += 22
+    c.text(ox, y, f"{len(A)}/{n}＋{len(B)}/{n}−{len(both)}/{n}＝{len(either)}/{n}", 13.5, INK, weight="bold")
+    assert Fraction(len(A), n) + Fraction(len(B), n) - Fraction(len(both), n) == Fraction(len(either), n)
+    return c.done(y + 14)
+
+
 def joint(sp: dict) -> str:
     """2つの「する（1）・しない（0）」の同時確率の表（2×2）。各ますに確率と「独立なら」の値。下に数の行（解説付き再生の静止図）。"""
     q11, q10, q01 = sp["p11"], sp["p10"], sp["p01"]
@@ -794,17 +828,21 @@ def joint(sp: dict) -> str:
     c = Canvas()
     cw, ch, ox, oy = 110, 46, 82, 30
     pc = lambda v: f"{round(v * 100, 2):g}%"  # noqa: E731
-    c.text(ox + cw / 2, oy - 10, "Y＝1", 12, INK, "middle")
-    c.text(ox + cw * 1.5, oy - 10, "Y＝0", 12, INK, "middle")
-    c.text(ox - 8, oy + ch / 2 + 4, "X＝1", 12, INK, "end")
-    c.text(ox - 8, oy + ch * 1.5 + 4, "X＝0", 12, INK, "end")
+    nx, ny = sp.get("names") or ["X", "Y"]   # 量の名前（解説の版の nameX・nameY。事象なら A・B）
+    ev = sp.get("events")   # 2つの事象として見る（#45 の U10）：見出しを A／Aᶜ、下を P(A)
+    hy1, hy0, hx1, hx0 = (ny, f"{ny}ᶜ", nx, f"{nx}ᶜ") if ev else (f"{ny}＝1", f"{ny}＝0", f"{nx}＝1", f"{nx}＝0")
+    c.text(ox + cw / 2, oy - 10, hy1, 12, INK, "middle")
+    c.text(ox + cw * 1.5, oy - 10, hy0, 12, INK, "middle")
+    c.text(ox - 8, oy + ch / 2 + 4, hx1, 12, INK, "end")
+    c.text(ox - 8, oy + ch * 1.5 + 4, hx0, 12, INK, "end")
     for r, cc, q, e in ((0, 0, q11, px * py), (0, 1, q10, px * (1 - py)), (1, 0, q01, (1 - px) * py), (1, 1, q00, (1 - px) * (1 - py))):
         x, y = ox + cc * cw, oy + r * ch
         c.add(f'<rect x="{x}" y="{y}" width="{cw}" height="{ch}" fill="{BLUE}" fill-opacity="{0.08 + q * 0.9:.3f}" stroke="{GRID}"/>')
         c.text(x + cw / 2, y + 20, pc(q), 13.5, INK, "middle", "bold")
         c.text(x + cw / 2, y + 37, f"独立なら {pc(e)}", 10.5, INK2, "middle")
     y = oy + 2 * ch + 20
-    c.text(ox + cw, y, f"P(X＝1)＝{pc(px)}　P(Y＝1)＝{pc(py)}", 12, INK2, "middle")
+    px_l, py_l = (f"P({nx})", f"P({ny})") if ev else (f"P({nx}＝1)", f"P({ny}＝1)")
+    c.text(ox + cw, y, f"{px_l}＝{pc(px)}　{py_l}＝{pc(py)}", 12, INK2, "middle")
     for line in sp.get("lines") or []:
         y += 20
         c.text(8, y, line, 12.5, INK)
@@ -812,7 +850,7 @@ def joint(sp: dict) -> str:
 
 
 TYPES = {"popsample": popsample, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange}
+         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets}
 
 
 def specs(course: Course) -> dict[str, dict]:
