@@ -1,6 +1,7 @@
 # 単元U26の問題。id は変えない（個人の解答記録がこの id を指す）。
 # Φ(z)＝0.5*(1+math.erf(z/math.sqrt(2)))
 - id: Q-U26-001
+  concepts: [TERM-sample-prop, TERM-se, TERM-pvalue, TERM-reject, CLM-5a]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -23,6 +24,7 @@
     why: SE＝√(0.25÷400)＝0.025、z＝0.05÷0.025＝2。p≒0.046 で5%以下。
 
 - id: Q-U26-002
+  concepts: [TERM-sample-prop, TERM-pool, TERM-se, TERM-pvalue, TERM-reject, CLM-45]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: z≒−2.31、p≒0.021。各100人に戻すと z≒−1.63 で棄却しない。
 
 - id: Q-U26-003
+  concepts: [TERM-sample-prop, TERM-se, TERM-sides, TERM-pvalue, TERM-reject, CLM-5a]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: z≒1.84、右側の面積は約0.033。両側にすると約0.066 で5%を超える。片側か両側かは先に決める。
 
 - id: Q-U26-004
+  concepts: [TERM-unbvar, TERM-chi2, TERM-sides, TERM-reject, REL-unbvar-chi2]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +81,7 @@
     why: χ²＝26.25 が境目24.996 を超える（p≒0.035）。s²＝6 にすると χ²＝22.5 で棄却しない。
 
 - id: Q-U26-005
+  concepts: [TERM-unbvar, TERM-f, TERM-reject, TERM-ci, CLM-42]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +100,7 @@
     why: F＝2.25 は上側の点3.621 より小さい（p≒0.21）。分散が2倍以上違って見えても、10日ほどでは偶然の範囲。
 
 - id: Q-U26-010
+  concepts: [TERM-sample-prop, TERM-se, TERM-ci, TERM-pvalue, TERM-reject, CLM-5a]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -112,6 +118,7 @@
     why: √(0.3×0.7÷100)≒0.0458。「くわしく」の区間推定の SE（p̂ で作る）は約0.049。
 
 - id: Q-U26-011
+  concepts: [TERM-sample-prop, TERM-pool, TERM-se, TERM-pvalue, TERM-reject, CLM-45]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -129,6 +136,7 @@
     why: z≒−2.16、p≒0.031。各100人（20人と24人）なら z≒−0.68 で、とても有意にならない。
 
 - id: Q-U26-012
+  concepts: [TERM-sample-prop, TERM-binom, TERM-pvalue, TERM-reject, REL-binom-normal, CLM-5a]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -146,6 +154,7 @@
     why: z≒2.24、p≒0.025。「くわしく」の二項分布の p 値は約0.041。人数が少ないと、近似の p 値は直接計算とずれる。
 
 - id: Q-U26-020
+  concepts: [TERM-unbvar, TERM-f, TERM-sides, TERM-pvalue, TERM-reject, CLM-42]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -163,6 +172,7 @@
     why: F＝2.5 は上側2.5%点2.862 より小さい（p≒0.086）。右片側に切り替えると境目は2.403 で棄却する。
 
 - id: Q-U26-021
+  concepts: [TERM-unbvar, TERM-chi2, TERM-sides, TERM-pvalue, TERM-reject, REL-unbvar-chi2]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -180,6 +190,7 @@
     why: χ²＝10 は左側の境目10.851 より小さく、左側の面積は約0.032。
 
 - id: Q-U26-022
+  concepts: [TERM-sample-prop, TERM-binom, TERM-sides, TERM-pvalue, TERM-reject, REL-binom-normal]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -197,6 +208,7 @@
     why: P(X≧4)≒0.061 で棄却しない。正規近似の p 値（約0.018）は小さすぎる。np₀＝1.5 では近似が崩れる。
 
 - id: Q-U26-023
+  concepts: [TERM-pool, TERM-se, TERM-chi2, TERM-f, TERM-reject, REL-unbvar-chi2, CLM-45]
   stage: S3
   tag: 本番形式
   format: choice
@@ -227,6 +239,7 @@
     why: (20＋30)÷200＝0.25。SE はこの p̄ で作る。「くわしく」の区間推定の SE（各群の p̂）と比べる。
 
 - id: Q-U26-030
+  concepts: [TERM-sample-prop, TERM-pool, TERM-se, TERM-ci, TERM-pvalue, TERM-reject, CLM-45]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -244,6 +257,7 @@
     why: z≒2.66、p≒0.008。差の区間が0を含まないことと一致する。
 
 - id: Q-U26-031
+  concepts: [TERM-unbvar, TERM-chi2, TERM-sides, TERM-pvalue, TERM-reject, REL-unbvar-chi2]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -261,6 +275,7 @@
     why: χ²＝40.56 が境目36.415 を超える（p≒0.019）。
 
 - id: Q-U26-032
+  concepts: [TERM-sample-prop, TERM-se, TERM-sides, TERM-pvalue, TERM-reject, CLM-5a]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -278,6 +293,7 @@
     why: z≒−1.94、p≒0.053。わずかに5%を超える。左片側に切り替えると約0.026。
 
 - id: Q-U26-040
+  concepts: [TERM-pool, TERM-chi2, TERM-reject, REL-normal-chi2, CLM-45]
   stage: S3
   format: written
   powers: [P1, P3]
