@@ -1397,7 +1397,7 @@
    },
    {
     "symbol": "B|A",
-    "meaning": "A が起きたもとでの B（条件付きの事象）",
+    "meaning": "A を条件にした B（P( | ) の中だけの書き方。B|A という事象があるのではない）",
     "key": "BgA",
     "kind": "value"
    },
@@ -1411,6 +1411,12 @@
     "symbol": "A",
     "meaning": "条件にする事象（起きたと分かっている）",
     "key": "A",
+    "kind": "value"
+   },
+   {
+    "symbol": "B",
+    "meaning": "確率を求める事象",
+    "key": "B",
     "kind": "value"
    }
   ],
@@ -4276,13 +4282,13 @@
    },
    {
     "symbol": "A",
-    "meaning": "先に起きる事象",
+    "meaning": "条件にする事象",
     "key": "A",
     "kind": "value"
    },
    {
     "symbol": "B|A",
-    "meaning": "A が起きたもとでの B",
+    "meaning": "A を条件にした B（P( | ) の中だけの書き方）",
     "key": "BgA",
     "kind": "value",
     "concept": "TERM-cond"
@@ -4331,16 +4337,16 @@
      1,
      0
     ],
-    "name": "先の確率",
-    "meaning": "まず A が起きる確率"
+    "name": "条件の確率",
+    "meaning": "A が起きる確率"
    },
    {
     "path": [
      1,
      1
     ],
-    "name": "そのうえでの確率",
-    "meaning": "A が起きたもとで B が起きる確率（独立なら P(B) と同じ）"
+    "name": "条件付きの確率",
+    "meaning": "A のうちで B も起きる割合"
    }
   ],
   "contract": {
