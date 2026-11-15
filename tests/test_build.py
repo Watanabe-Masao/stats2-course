@@ -32,6 +32,15 @@ def course():
     return copy.deepcopy(COURSE)
 
 
+def as_skeleton(c, tid):
+    """テストの中だけ、その語を骨格（short だけ）に戻す。原本で説明を書いても、骨格の扱いを確かめるテストが崩れない
+    （2026-11-15：W1 で TERM-perm に説明を書いて3つのテストが落ちた。#45。docs/authoring.md「直したら一緒に直すもの」）"""
+    t = c.terms[tid]
+    for k in ("definition", "principle", "conditions", "example", "counterexample", "misconceptions", "formulas", "checks", "sources", "version"):
+        t.pop(k, None)
+    return c
+
+
 class TestCourseIsClean(unittest.TestCase):
     def test_validate_and_checks_pass(self):
         c = course()
@@ -506,7 +515,7 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("似ている" in e for e in err))
 
     def test_problem_concepts(self):
-        c = course()
+        c = as_skeleton(course(), "TERM-perm")
         qid = next(iter(c.units["U13"]["problems"]))
         q = c.units["U13"]["problems"][qid]
         q["concepts"] = ["TERM-nothing", "TERM-perm", "REL-expect-var", "TERM-expect"]
@@ -964,7 +973,7 @@ class TestNetwork(unittest.TestCase):
         # 主概念の書き誤り（概念のページ・実験室のタブで問いが出ない）、まだ説明のない概念を主にした問いを開ける、同じ id が2つ、id の形（概念-まとまり-番号）の崩れ、同じ画面を開くだけの2つの問い、予測・操作・理解判定のない開ける問い。
         # 見つけ方：本物の定義は通り、1つずつ崩した定義がそれぞれの理由で止まる。書き出しは id に教材名が付き、型に合う。既存との違い：テーマ体系は初めて
         import network
-        c = course()
+        c = as_skeleton(course(), "TERM-perm")
         rel_ids = {r["id"] for r in network.load_network()[0]}
         der_ids = {d["id"] for d in network.load_network()[1]}
         orig = network.load_experiments
@@ -1074,7 +1083,7 @@ class TestNetwork(unittest.TestCase):
     def test_skeleton(self):
         # 骨格（#105・P1）：定義1文と分類だけの語は skeleton として書き出し、型に合う。書き方の誤りを止め、skeleton_required で完了の条件も止める
         import network
-        c = course()
+        c = as_skeleton(course(), "TERM-perm")
         c.terms["TERM-perm"]["short"] = "区別できるものを並べる並べ方の数"
         c.terms["TERM-clt"]["short"] = "独立に同じ分布から取った平均は、n が大きいと正規分布に近づく"
         self.assertFalse([e for e in network.skeleton_errors(c)])
@@ -1088,7 +1097,7 @@ class TestNetwork(unittest.TestCase):
         err = network.skeleton_errors(c)
         for want in ("TERM-perm: short は1文で書く", "TERM-clt: category「その他」", "TERM-cc: 骨格（short）には category"):
             self.assertTrue(any(want in x for x in err), want)
-        c2 = course()
+        c2 = as_skeleton(course(), "TERM-perm")
         c2.shared["skeleton_required"] = True
         c2.terms["TERM-perm"].pop("short", None)   # 1語だけ定義1文を外す
         err2 = network.skeleton_errors(c2)

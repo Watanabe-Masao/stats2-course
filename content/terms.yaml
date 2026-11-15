@@ -7,6 +7,48 @@
   basis:
     text: 異なる n 個のものから k 個（n・k は 0≦k≦n の整数。定義の要件）を取り出し、順番を区別して1列に並べる並べ方の数 ₙPₖ（何も取り出さない k＝0 は1通り）
   short: 異なるものから順番を区別して並べる並べ方と、その数
+  definition: 異なる n 個の中から k 個を取り出し、順番を区別して1列に並べる並べ方の数。ₙPₖ と書く。
+  version: 1
+  principle: 1番目は n 通り、2番目は残りの n−1 通り……と、1つ置くたびに選べるものが1つ減る。k 番目まで掛けた n(n−1)…(n−k+1) が並べ方の数。n 個を全部並べて前の k 個だけを見ると、後ろの n−k 個の並べ替え (n−k)! 通りは同じ並べ方になるので、n! を (n−k)! で割っても同じ数になる。
+  formulas:
+    - id: F-perm-def
+      label: 階乗で表す
+      symbols:
+        - {symbol: ₙPₖ, meaning: n 個から k 個を取り出して並べる並べ方の数, key: perm, concept: TERM-perm}
+        - {symbol: n, meaning: 全体の個数, key: n, kind: value, domain: {min: 0, integer: true}}
+        - {symbol: k, meaning: 取り出して並べる個数, key: k, kind: value, domain: {min: 0, max: n, integer: true}}
+        - {symbol: n!, meaning: 階乗（1からその数までを掛けた数）, key: fact, concept: TERM-fact}
+      tree:
+        op: eq
+        args:
+          - {op: fn, name: perm, args: [{sym: n}, {sym: k}]}
+          - op: div
+            args:
+              - {op: fn, name: fact, args: [{sym: n}]}
+              - {op: fn, name: fact, args: [{op: sub, args: [{sym: n}, {sym: k}]}]}
+      parts:
+        - {path: [1, 0], name: 全部の並べ方, meaning: n 個を全部1列に並べる並べ方の数}
+        - {path: [1, 1], name: 残した中の並べ方, meaning: 取り出さずに残した n−k 個の並びは数えないので、その並べ方の数で割る}
+  conditions:
+    math:
+      - n と k は整数で、0 ≦ k ≦ n
+      - n 個はどれも区別できる
+      - 同じものを2回使わない（取り出したものは戻さない）
+    data:
+      - 「順番を区別する」場面かを確かめる。役（委員長・副委員長）・順位・並ぶ位置があれば順列、選ぶだけなら組合せで数える
+      - 同じものを2回使える場面（暗証番号の数字など）かを確かめる
+  example: 5人から委員長と副委員長を1人ずつ選ぶ選び方は ₅P₂＝5×4＝20 通り（5!÷3!＝120÷6＝20）。
+  counterexample: 暗証番号のように同じ数字を何度使ってもよい4桁は、使った数字を除かないので ₁₀P₄＝5040 通りではなく 10⁴＝10000 通り。
+  misconceptions:
+    - misconception: ₅P₂＝5!÷2!（取り出す個数の階乗で割る）
+      correction: 割るのは、取り出さずに残す 5−2＝3 個の並べ替え 3!。5!÷3!＝20 で、5!÷2!＝60 は 5人のうち3人を並べる数 ₅P₃
+  sources:
+    - source: 公式2級範囲表
+      locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+    - math.perm(5,2)==20==5*4 and math.factorial(5)//math.factorial(3)==20
+    - math.perm(10,4)==5040 and 10**4==10000
+    - math.factorial(5)//math.factorial(2)==60==math.perm(5,3)
 - id: TERM-comb
   name: 組合せ
   en: combination
@@ -53,6 +95,8 @@
   conditions:
     math:
     - n と k は整数で、0 ≦ k ≦ n
+    - n 個はどれも区別できる
+    - 同じものを2回選ばない（選んだものは戻さない）
     data:
     - 「順番を区別しない」選び方かを確かめる。役（委員長・副委員長）や順位があるなら順列で数える
   example: 5人から2人の係を選ぶ選び方は ₅C₂＝5!÷(2!×3!)＝120÷12＝10 通り。

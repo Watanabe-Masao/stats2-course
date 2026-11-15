@@ -1,5 +1,122 @@
 [
  {
+  "concept": "TERM-perm",
+  "index": 0,
+  "id": "F-perm-def",
+  "label": "階乗で表す",
+  "tex": "{}_{n}\\mathrm{P}_{k}=\\dfrac{n!}{(n-k)!}",
+  "symbols": [
+   {
+    "symbol": "ₙPₖ",
+    "meaning": "n 個から k 個を取り出して並べる並べ方の数",
+    "key": "perm",
+    "concept": "TERM-perm"
+   },
+   {
+    "symbol": "n",
+    "meaning": "全体の個数",
+    "key": "n",
+    "kind": "value",
+    "domain": {
+     "min": 0,
+     "integer": true
+    }
+   },
+   {
+    "symbol": "k",
+    "meaning": "取り出して並べる個数",
+    "key": "k",
+    "kind": "value",
+    "domain": {
+     "min": 0,
+     "max": "n",
+     "integer": true
+    }
+   },
+   {
+    "symbol": "n!",
+    "meaning": "階乗（1からその数までを掛けた数）",
+    "key": "fact",
+    "concept": "TERM-fact"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "perm",
+     "args": [
+      {
+       "sym": "n"
+      },
+      {
+       "sym": "k"
+      }
+     ]
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "fn",
+       "name": "fact",
+       "args": [
+        {
+         "sym": "n"
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "fact",
+       "args": [
+        {
+         "op": "sub",
+         "args": [
+          {
+           "sym": "n"
+          },
+          {
+           "sym": "k"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "全部の並べ方",
+    "meaning": "n 個を全部1列に並べる並べ方の数"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "残した中の並べ方",
+    "meaning": "取り出さずに残した n−k 個の並びは数えないので、その並べ方の数で割る"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-comb",
   "index": 0,
   "id": "F-comb-def",
