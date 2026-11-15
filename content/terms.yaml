@@ -238,6 +238,26 @@
     text: 標本 X₁, …, Xₙ の値だけで値が数（実数1つ）に決まる関数 T＝t(X₁, …, Xₙ) として作る確率変数（分からない母数を含まないことと、値が数であることは定義の要件。観測したあとの値も同じ名前で呼ぶ。定義ではない補足：標本を取り直すたびに値が変わりうる。分からない母数を推し量る推定や、仮説を確かめる検定に使う）
     terms: [TERM-sample, TERM-rv]
   short: 標本のデータから計算して求める値（標本平均・標本分散など）
+  definition: 標本の値だけから計算して1つの数に決まる量（標本平均・不偏分散など）。分からない母数を含まず、標本を取り直すたびに値が変わる。
+  version: 1
+  principle: 母数（母集団の平均など）は分からないので、手元の標本から計算できる量で推し量り、確かめる。計算に分からない母数が入ると、その量は手元のデータからは出せない。統計量は標本の偶然で値が変わる確率変数なので、取り直したときの分布（標本分布）を考えて、手元の1つの値をどれだけ当てにできるかを決める。
+  conditions:
+    math:
+    - text: 値が標本の値だけで決まる（分からない母数を含まない）
+      kind: 要件
+      outside: 手元の標本から計算できないので、統計量ではない
+    data:
+    - 計算に使った値が全部手元にあるかを確かめる。母標準偏差 σ を過去の記録の値で置いたなら、その値を分かっているものとして扱ったことを書く
+  example: 3店の売上 10・12・14 万円から計算した標本平均 12 万円と、最大−最小の 4 万円は、どちらも統計量。別の3店を選べば値は変わる。
+  counterexample: 標本平均と母平均の差 x̄−μ は、母平均 μ が分からなければ標本から計算できないので、統計量ではない（検定で μ に仮説の値を入れたときは、その値の下で計算できる量になる）。
+  misconceptions:
+  - misconception: 統計量は、データから出した決まった1つの値
+    correction: 手元のデータから出た値は、統計量がとった1つの値。統計量そのものは「どの標本を取ったか」で値が変わる確率変数で、その変わり方が推定や検定の土台になる
+  sources:
+  - source: 公式2級範囲表
+    locator: 標本分布（統計量と標本分布）
+  checks:
+  - (10 + 12 + 14) / 3 == 12 and 14 - 10 == 4
 - id: TERM-sample-space
   name: 標本空間
   en: sample space
@@ -711,6 +731,32 @@
     text: 標本 X₁, …, Xₙ（n≧2。n≧2 は定義の要件）から作る統計量 s²＝{(X₁−X̄)²＋…＋(Xₙ−X̄)²}/(n−1)（X̄ は標本平均。観測したあとの値も同じ名前で呼ぶ）
     terms: [TERM-statistic, TERM-sample-mean]
   short: 偏差の2乗の和を n−1 で割った分散で、その期待値が母分散に一致する
+  definition: 偏差の2乗の和を n−1 で割った分散 s²（n≧2）。母分散 σ² を推し量るのに使い、独立に同じ分布から取るなら、その期待値はちょうど σ² になる。
+  version: 1
+  principle: 偏差を、母平均 μ ではなく標本平均 x̄ から測ると、x̄ は標本そのものの真ん中なので、偏差の2乗の和は μ から測るより小さくなる。その不足は平均して σ² 1つ分（偏差の2乗の和の期待値は (n−1)σ²）なので、n−1 で割るとちょうど補える。n で割った分散は、平均して σ² の (n−1)/n 倍に小さく出る。
+  conditions:
+    math:
+    - text: n は2以上
+      kind: 要件
+      outside: n−1＝0 で割ることになり、定義されない
+    - text: X₁, …, Xₙ は独立に同じ分布に従い、分散 σ² が有限
+      kind: 仮定
+      claim: CLM-11
+      outside: ④-11 は保証されない（E(s²)＝σ² とは限らない）
+    data:
+    - 電卓・表計算の「分散」が n で割るか n−1 で割るかを確かめる（VAR.P は n、VAR.S は n−1）。n が大きければ差は小さいが、n が小さいと大きい
+  example: 1・3・5 から戻しながら2個取る9通りで、(1, 5) の偏差の2乗の和は (1−3)²＋(5−3)²＝8。n で割ると 4、n−1 で割ると s²＝8。9通りの s² の平均は母分散 8/3 に一致し、n で割った値の平均は その半分の 4/3。
+  counterexample: 標本が1個（n＝1）だと、偏差は 0 で、偏差の2乗の和を n−1＝0 で割ることになり、不偏分散は定義されない。1個の値からは、ばらつきは推し量れない。
+  misconceptions:
+  - misconception: 不偏分散 s² の平方根 s も、母標準偏差 σ を平均してずれずに推し量る
+    correction: 不偏なのは s² だけ。平方根をとった s の期待値は σ より小さい（s がばらつくとき。平方根は2乗の平均をそのまま移さない）
+  sources:
+  - source: 公式2級範囲表
+    locator: 標本分布（統計量と標本分布）
+  checks:
+  - (1 - 3) ** 2 + (5 - 3) ** 2 == 8 and 8 / 2 == 4 and 8 / 1 == 8
+  - math.isclose(sum(((a - (a + b) / 2) ** 2 + (b - (a + b) / 2) ** 2) for a in [1, 3, 5] for b in [1, 3, 5]) / 9, 8 / 3)
+  - math.isclose(sum(((a - (a + b) / 2) ** 2 + (b - (a + b) / 2) ** 2) / 2 for a in [1, 3, 5] for b in [1, 3, 5]) / 9, 4 / 3)
 - id: TERM-sd
   name: 標準偏差
   en: standard deviation
@@ -2407,6 +2453,79 @@
     text: 推定量 θ̂ の標本分布の標準偏差 √V(θ̂)（例：独立に同じ分布に従う標本で、標本平均の標準誤差は σ/√n）
     terms: [TERM-estimator, TERM-sampdist, TERM-sd]
   short: 推定量の標本分布の標準偏差で、推定値がくり返しでどれだけばらつくかの大きさ
+  definition: 推定量（標本平均など）の標本分布の標準偏差。推定値を取り直したら、どれくらいばらつくかの大きさで、標本平均なら σ÷√n。
+  version: 1
+  formulas:
+  - id: F-se-mean
+    label: 標本平均の標準誤差
+    symbols:
+    - symbol: SE( )
+      meaning: 標準誤差（推定量の標本分布の標準偏差）
+      key: SE
+      concept: TERM-se
+    - symbol: X̄
+      meaning: 標本平均
+      key: Xbar
+      concept: TERM-sample-mean
+      kind: rv
+    - symbol: σ
+      meaning: 母標準偏差（1個の値のばらつき）
+      key: sigma
+      concept: TERM-sd
+      kind: param
+    - symbol: n
+      meaning: 平均をとる個数（標本の大きさ）
+      key: n
+      kind: value
+      domain:
+        min: 1
+        integer: true
+    tree:
+      op: eq
+      args:
+      - op: fn
+        name: SE
+        args:
+        - sym: Xbar
+      - op: div
+        args:
+        - sym: sigma
+        - op: sqrt
+          args:
+          - sym: n
+    parts:
+    - path:
+      - 1
+      - 0
+      name: 1個のばらつき
+      meaning: 母標準偏差 σ。n を増やしても変わらない
+    - path:
+      - 1
+      - 1
+      name: √n
+      meaning: 精度は √n で効く。標準誤差を半分にするには n を4倍にする
+  principle: 標準偏差は1個1個の値のばらつき、標準誤差は推定値（平均や比率）のばらつき。手元の推定値と母数のずれは、たいてい標準誤差の数倍の中に収まるので、標準誤差は「1つの推定値をどれだけ当てにできるか」の物差しになる。標本平均の標準誤差は √V(X̄)＝σ÷√n で、σ が分からないときは標本の標準偏差で置き換えた値を使う。
+  conditions:
+    math:
+    - text: 推定量の分散が有限
+      kind: 要件
+      outside: 標準誤差が定まらない
+    - text: X₁, …, Xₙ は独立に同じ分布に従い、分散 σ² が有限
+      kind: 仮定
+      claim: CLM-41
+      outside: ④-41 は保証されない（σ÷√n は標本平均の標準誤差とは限らない。値どうしに正の相関があると、本当の標準誤差はこれより大きい）
+    data:
+    - 「標準誤差」と書いた数が、σ（分かっている）で計算したか、標本の標準偏差で置き換えたかを確かめる。グラフのひげが標準偏差か標準誤差かを確かめる
+  example: 購入額の標準偏差が 2000 円の客から独立に 16 人を選ぶと、平均購入額の標準誤差は 2000÷√16＝500 円。64 人なら 250 円で半分。
+  counterexample: 同じ日の来店客は天気やセールで購入額がそろって動く。1日の客 400 人を独立とみて 1200÷√400＝60 円を客単価の標準誤差にすると、日ごとの共通の動きの分が入らず、本当のばらつきより小さく見積もる。
+  misconceptions:
+  - misconception: 標準誤差は、データ1個1個の誤差（測り間違い）の大きさ
+    correction: 標準誤差は、平均や比率などの推定値が、標本を取り直したらどれだけ変わるかの大きさ。測り間違いがなくても、選び方の偶然で生じる
+  sources:
+  - source: 公式2級範囲表
+    locator: 標本分布（統計量と標本分布）
+  checks:
+  - 2000 / math.sqrt(16) == 500 and 2000 / math.sqrt(64) == 250 and 1200 / math.sqrt(400) == 60
 - id: TERM-lln
   name: 大数の法則
   en: law of large numbers
@@ -3223,6 +3342,109 @@
     text: 標本 X₁, …, Xₙ（n は1以上）から作る統計量 X̄＝(X₁＋…＋Xₙ)/n（観測したあとの値も同じ名前で呼ぶ）
     terms: [TERM-statistic]
   short: 標本のデータの値を足し、データの個数で割った値
+  definition: 標本の値 X₁, …, Xₙ を足して n で割った統計量 X̄。取り直すたびに値が変わり、その期待値は母平均 μ、分散は σ²÷n になる（独立に同じ分布から取るとき）。
+  version: 1
+  formulas:
+  - id: F-xbar-expect
+    label: 標本平均の期待値
+    symbols:
+    - symbol: E( )
+      meaning: 期待値（取り直したときの平均）
+      key: E
+      concept: TERM-expect
+    - symbol: X̄
+      meaning: 標本平均（n 個の値の平均）
+      key: Xbar
+      concept: TERM-sample-mean
+      kind: rv
+    - symbol: μ
+      meaning: 母平均（1個の値 Xᵢ の期待値）
+      key: mu
+      concept: TERM-expect
+      kind: param
+    tree:
+      op: eq
+      args:
+      - op: fn
+        name: E
+        args:
+        - sym: Xbar
+      - sym: mu
+  - id: F-xbar-var
+    label: 標本平均の分散
+    symbols:
+    - symbol: V( )
+      meaning: 分散（取り直したときのばらつき）
+      key: V
+      concept: TERM-var
+    - symbol: X̄
+      meaning: 標本平均（n 個の値の平均）
+      key: Xbar
+      concept: TERM-sample-mean
+      kind: rv
+    - symbol: σ
+      meaning: 母標準偏差（1個の値のばらつき）
+      key: sigma
+      concept: TERM-sd
+      kind: param
+    - symbol: n
+      meaning: 平均をとる個数（標本の大きさ）
+      key: n
+      kind: value
+      domain:
+        min: 1
+        integer: true
+    tree:
+      op: eq
+      args:
+      - op: fn
+        name: V
+        args:
+        - sym: Xbar
+      - op: div
+        args:
+        - op: pow
+          args:
+          - sym: sigma
+          - num: 2
+        - sym: n
+    parts:
+    - path:
+      - 1
+      - 0
+      name: 1個の分散
+      meaning: 1個の値のばらつき σ²。n を増やしても変わらない
+    - path:
+      - 1
+      - 1
+      name: 個数
+      meaning: n 個を平均すると、大きい値と小さい値が打ち消し合い、分散は n 分の1になる
+  principle: 平均すると、大きい値と小さい値が打ち消し合う。独立に取るなら、n 個の合計の分散は nσ² で、平均は合計を n で割るので分散は n² で割って σ²÷n。中心（期待値）は μ のまま動かず、幅だけが細くなる。n を4倍にしても幅（標準偏差）は半分にしかならない。
+  conditions:
+    math:
+    - text: n は1以上の整数
+      kind: 要件
+      outside: 標本平均が定義されない（0 で割る）
+    - text: X₁, …, Xₙ は、どれも期待値が μ
+      kind: 仮定
+      claim: CLM-20a
+      outside: ④-20a は保証されない（E(X̄) は各 Xᵢ の期待値の平均で、μ とは限らない）
+    - text: X₁, …, Xₙ は独立に同じ分布に従い、分散 σ² が有限
+      kind: 仮定
+      claim: CLM-41
+      outside: ④-41 は保証されない（値どうしに正の相関があると、x̄ の分散は σ²÷n より大きい）
+    data:
+    - 同じ日・同じ客・同じ機械の値のように、似た値どうしがまとまって入っていないかを確かめる（独立が崩れると、平均の散らばりは σ÷√n より大きい）
+  example: 商品1個の重さが平均 50g・標準偏差 12g なら、独立な 36 個の平均重量は期待値 50g、分散 144÷36＝4、標準偏差 2g。
+  counterexample: 同じ客の 10 回の購入額を「10個の値」として平均すると、同じ客の値どうしは似ていて独立でない。どの値も同じ値になる極端な場合（10回とも同じ額）、x̄ の分散は σ² のままで、σ²÷10 にならない。
+  misconceptions:
+  - misconception: n を増やすと、1個1個のばらつき（標準偏差）も小さくなる
+    correction: 小さくなるのは平均 x̄ のばらつきだけ。1個の重さのばらつき 12g は、何個集めても 12g のまま
+  sources:
+  - source: 公式2級範囲表
+    locator: 標本分布（統計量と標本分布）
+  checks:
+  - 144 / 36 == 4 and math.sqrt(4) == 2 and 12 ** 2 == 144
 - id: TERM-sample-prop
   name: 標本比率
   en: sample proportion
@@ -3232,6 +3454,31 @@
     text: 各個体が性質をもてば1、もたなければ0とした標本 X₁, …, Xₙ の標本平均 p̂＝(X₁＋…＋Xₙ)/n（性質をもつ個数÷n）
     terms: [TERM-sample-mean]
   short: 標本の中で、ある性質をもつものの割合
+  definition: 標本の中で、ある性質をもつもの（買った・不良など）の割合 p̂。性質をもてば1、もたなければ0とした値の標本平均で、取り直すたびに値が変わる。
+  version: 1
+  principle: 比率は 0 と 1 の値の平均なので、標本平均の決まりがそのまま使える。1人の値の平均は p、分散は p(1−p) なので、独立に n 人を選ぶと p̂ の期待値は p、分散は p(1−p)÷n、標準誤差は √(p(1−p)÷n)。p が 0.5 のとき p(1−p) が最大の 0.25 になるので、p が分からないときは 0.5 で見積もると、必要な人数を少なく見積もらずに済む。
+  conditions:
+    math:
+    - text: n は1以上の整数で、各 Xᵢ は 0 か 1
+      kind: 要件
+      outside: 標本比率が定義されない（0 と 1 以外の値の平均は割合ではない）
+    - text: X₁, …, Xₙ は独立に同じ分布（性質をもつ確率 p）に従う
+      kind: 仮定
+      claim: CLM-41
+      outside: ④-41 は保証されない（p̂ の分散は p(1−p)÷n とは限らない。同じ家族・同じ店の人をまとめて聞くと、似た答えが重なり、分散はこれより大きい）
+    data:
+    - 「割合」の分母が何か（聞いた人数か、答えた人数か）を確かめる。分母が違えば別の p̂
+  example: 来店客の購入率が p＝0.2 のとき、100人を調べた購入率 p̂ の分散は 0.2×0.8÷100＝0.0016、標準誤差は 0.04。
+  counterexample: 5段階の満足度（1〜5点）の平均 3.6 を「満足の比率」として扱い、√(p(1−p)÷n) に入れることはできない。値が 0 か 1 でないので、平均は割合ではなく、p(1−p) は1人の値の分散にならない。
+  misconceptions:
+  - misconception: 比率の標準誤差は、p がいくつでも同じ人数なら同じ
+    correction: p(1−p) は p＝0.5 で最大、0 や 1 に近いほど小さい。同じ 400 人でも、p＝0.5 なら標準誤差 0.025、p＝0.1 なら 0.015
+  sources:
+  - source: 公式2級範囲表
+    locator: 標本分布（統計量と標本分布）
+  checks:
+  - math.isclose(0.2*0.8/100, 0.0016) and math.isclose(math.sqrt(0.0016), 0.04)
+  - math.isclose(math.sqrt(0.25/400), 0.025) and math.isclose(math.sqrt(0.09/400), 0.015)
 - id: TERM-interval-est
   name: 区間推定
   en: interval estimation

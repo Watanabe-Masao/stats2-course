@@ -4367,6 +4367,103 @@
   }
  },
  {
+  "concept": "TERM-se",
+  "index": 0,
+  "id": "F-se-mean",
+  "label": "標本平均の標準誤差",
+  "tex": "\\mathrm{SE}(X̄)=\\dfrac{\\sigma}{\\sqrt{n}}",
+  "symbols": [
+   {
+    "symbol": "SE( )",
+    "meaning": "標準誤差（推定量の標本分布の標準偏差）",
+    "key": "SE",
+    "concept": "TERM-se"
+   },
+   {
+    "symbol": "X̄",
+    "meaning": "標本平均",
+    "key": "Xbar",
+    "concept": "TERM-sample-mean",
+    "kind": "rv"
+   },
+   {
+    "symbol": "σ",
+    "meaning": "母標準偏差（1個の値のばらつき）",
+    "key": "sigma",
+    "concept": "TERM-sd",
+    "kind": "param"
+   },
+   {
+    "symbol": "n",
+    "meaning": "平均をとる個数（標本の大きさ）",
+    "key": "n",
+    "kind": "value",
+    "domain": {
+     "min": 1,
+     "integer": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "SE",
+     "args": [
+      {
+       "sym": "Xbar"
+      }
+     ]
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "sym": "sigma"
+      },
+      {
+       "op": "sqrt",
+       "args": [
+        {
+         "sym": "n"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "1個のばらつき",
+    "meaning": "母標準偏差 σ。n を増やしても変わらない"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "√n",
+    "meaning": "精度は √n で効く。標準誤差を半分にするには n を4倍にする"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "単調",
+    "条件しだい"
+   ]
+  }
+ },
+ {
   "concept": "TERM-prob",
   "index": 0,
   "id": "F-complement",
@@ -4899,6 +4996,160 @@
    "properties": [
     "非負",
     "正規化"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-sample-mean",
+  "index": 0,
+  "id": "F-xbar-expect",
+  "label": "標本平均の期待値",
+  "tex": "E(X̄)=\\mu",
+  "symbols": [
+   {
+    "symbol": "E( )",
+    "meaning": "期待値（取り直したときの平均）",
+    "key": "E",
+    "concept": "TERM-expect"
+   },
+   {
+    "symbol": "X̄",
+    "meaning": "標本平均（n 個の値の平均）",
+    "key": "Xbar",
+    "concept": "TERM-sample-mean",
+    "kind": "rv"
+   },
+   {
+    "symbol": "μ",
+    "meaning": "母平均（1個の値 Xᵢ の期待値）",
+    "key": "mu",
+    "concept": "TERM-expect",
+    "kind": "param"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "E",
+     "args": [
+      {
+       "sym": "Xbar"
+      }
+     ]
+    },
+    {
+     "sym": "mu"
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-sample-mean",
+  "index": 1,
+  "id": "F-xbar-var",
+  "label": "標本平均の分散",
+  "tex": "V(X̄)=\\dfrac{\\sigma^{2}}{n}",
+  "symbols": [
+   {
+    "symbol": "V( )",
+    "meaning": "分散（取り直したときのばらつき）",
+    "key": "V",
+    "concept": "TERM-var"
+   },
+   {
+    "symbol": "X̄",
+    "meaning": "標本平均（n 個の値の平均）",
+    "key": "Xbar",
+    "concept": "TERM-sample-mean",
+    "kind": "rv"
+   },
+   {
+    "symbol": "σ",
+    "meaning": "母標準偏差（1個の値のばらつき）",
+    "key": "sigma",
+    "concept": "TERM-sd",
+    "kind": "param"
+   },
+   {
+    "symbol": "n",
+    "meaning": "平均をとる個数（標本の大きさ）",
+    "key": "n",
+    "kind": "value",
+    "domain": {
+     "min": 1,
+     "integer": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "V",
+     "args": [
+      {
+       "sym": "Xbar"
+      }
+     ]
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "sigma"
+        },
+        {
+         "num": 2
+        }
+       ]
+      },
+      {
+       "sym": "n"
+      }
+     ]
+    }
+   ]
+  },
+  "parts": [
+   {
+    "path": [
+     1,
+     0
+    ],
+    "name": "1個の分散",
+    "meaning": "1個の値のばらつき σ²。n を増やしても変わらない"
+   },
+   {
+    "path": [
+     1,
+     1
+    ],
+    "name": "個数",
+    "meaning": "n 個を平均すると、大きい値と小さい値が打ち消し合い、分散は n 分の1になる"
+   }
+  ],
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "単調",
+    "条件しだい"
    ]
   }
  }

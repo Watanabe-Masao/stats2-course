@@ -622,7 +622,10 @@ def dist(sp: dict) -> str:
         lo, hi, step = sp["ticks"]
         X = lambda v: left + (v - lo) / (hi - lo) * (right - left)  # noqa: E731
         xs = [lo + (hi - lo) * i / 240 for i in range(241)]
-        pmax = max(f(x) for x in xs)
+        # 正規分布の曲線を重ねる（#47 の U18 の概念図：1個の分布と、n 個の平均の分布を同じ縦の物差しで）
+        curve = sp.get("overlay") if (sp.get("overlay") or {}).get("family") == "normal" else None
+        g = _pdf(curve)[0] if curve else None
+        pmax = max([f(x) for x in xs] + ([g(x) for x in xs] if g else []))
         scale = (base - top - 18) / pmax
     k = sp.get("band")
     if k:   # 期待値±k標準偏差の帯（後ろに薄く）
@@ -673,6 +676,9 @@ def dist(sp: dict) -> str:
                           f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(sh["label"])}</text>')
         d = "M" + " L".join(f"{X(x):.1f},{base - f(x) * scale:.1f}" for x in xs)
         c.add(f'<path d="{d}" fill="none" stroke="{BLUE}" stroke-width="2.2"/>')
+        if g:
+            d = "M" + " L".join(f"{X(x):.1f},{base - g(x) * scale:.1f}" for x in xs)
+            c.add(f'<path d="{d}" fill="none" stroke="{INK}" stroke-width="1.6" stroke-dasharray="4 3"/>')
         t = lo
         while t <= hi + 1e-9:
             c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
@@ -687,7 +693,10 @@ def dist(sp: dict) -> str:
         c.text(mx, base + 46, f"{'期待値' if discrete else '平均'} {_num(round(mean, 2))}{unit}", 12, ORANGE, "middle", "bold")
     y = base + 58
     if sp.get("overlay") or sp.get("label"):   # 凡例・分散・差の最大（解説付き再生の静止図）
-        c.rect(8, y + 2, 12, 12, SOFT, rx=2)
+        if discrete:
+            c.rect(8, y + 2, 12, 12, SOFT, rx=2)
+        else:
+            c.line(8, y + 8, 20, y + 8, BLUE, 2.2)
         c.text(24, y + 12, sp.get("label", "棒"), 12, INK2)
         if sp.get("overlay"):
             ox = 190

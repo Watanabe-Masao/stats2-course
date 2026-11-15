@@ -1125,3 +1125,54 @@ claims:
       version: 15469f3
     external: なし
   version: 1
+- id: CLM-20a
+  label: ④-20a
+  kind: 等しい
+  statement:
+    text: n≧1 で、X₁, …, Xₙ のどれもが期待値 μ をもつとき、標本平均 X̄＝(X₁＋…＋Xₙ)/n の期待値は E(X̄)＝μ
+  premises:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-expect
+  conclusion:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-expect
+  grounds:
+  - source:
+      title: 期待値の線形性で E(X̄)＝(E(X₁)＋…＋E(Xₙ))/n＝nμ/n＝μ。独立も同じ分布も使わない（独立同分布は教材で置く十分条件）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  version: 1
+- id: CLM-41
+  label: ④-41
+  kind: 等しい
+  statement:
+    text: n≧1 で、X₁, …, Xₙ が独立に同じ分布に従い、分散 σ² が有限のとき、標本平均の分散は V(X̄)＝σ²/n（標準偏差は σ/√n）
+  premises:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-var
+  conclusion:
+    subjects:
+    - TERM-sample-mean
+    predicates:
+    - TERM-var
+    - TERM-se
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ分布に従う
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる）
+  grounds:
+  - source:
+      title: 独立なら分散は足せるので V(X₁＋…＋Xₙ)＝nσ²。X̄ は合計の 1/n 倍なので V(X̄)＝nσ²/n²＝σ²/n（根拠で使うのは、各 Xᵢ の分散が σ² で互いに無相関なこと）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  version: 1
