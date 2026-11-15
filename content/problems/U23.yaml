@@ -1,6 +1,7 @@
 # 単元U23の問題。id は変えない（個人の解答記録がこの id を指す）。
 # t・χ²・F の点は問題文に数表の値として書く
 - id: Q-U23-001
+  concepts: [TERM-chi2, TERM-ci, TERM-unbvar, TERM-df, CLM-10]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -23,6 +24,7 @@
     why: 135÷6.262≒21.56。下の端は約4.91。標準偏差なら平方根を取って約2.22〜4.64秒。
 
 - id: Q-U23-002
+  concepts: [TERM-paired-t, TERM-ci, TERM-t, TERM-se, TERM-df]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: 2−2.064≒−0.064 で、わずかに0未満。区間は0を含む。店を36にすると SE は約0.83 になり、0を含まなくなる。
 
 - id: Q-U23-003
+  concepts: [TERM-ci, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: 0.1−0.0843≒0.016。わずかに0より上。人数が各100人なら区間は0を含む。
 
 - id: Q-U23-004
+  concepts: [TERM-ci, TERM-t, TERM-unbvar, TERM-se, TERM-df, TERM-welch]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +81,7 @@
     why: t(30) の点約2.042×SE 2.5≒5.11。ウェルチに切り替えても SE は2.5、自由度が約27.8 になるだけ。
 
 - id: Q-U23-005
+  concepts: [TERM-f, TERM-ci, TERM-unbvar, TERM-df, CLM-42]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +100,7 @@
     why: 2×3.621≒7.24。下の端は約0.59。1を含むので、ばらつきの違いは言えない。
 
 - id: Q-U23-010
+  concepts: [TERM-chi2, TERM-ci, TERM-unbvar, TERM-df, CLM-10]
   stage: S2
   format: written
   powers: [P1, P2]
@@ -112,6 +118,7 @@
     why: 3000÷34.170≒87.8。上の端は約312.8で、s²＝150 は下寄り。
 
 - id: Q-U23-011
+  concepts: [TERM-paired-t, TERM-ci, TERM-t, TERM-se, TERM-df, TERM-welch]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -129,6 +136,7 @@
     why: 2−1.254≒0.746。差のばらつきが小さいので、8店でも0を含まない。
 
 - id: Q-U23-012
+  concepts: [TERM-ci, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S2
   format: written
   powers: [P1, P3]
@@ -147,6 +155,7 @@
     why: 区間は約 −0.027〜0.127。差0.05 は偶然のばらつきの範囲。各1200人にすると区間は0を含まなくなる。
 
 - id: Q-U23-020
+  concepts: [TERM-welch, TERM-ci, TERM-t, TERM-unbvar, TERM-se, TERM-df]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -165,6 +174,7 @@
     why: SE≒3.30、自由度≒8.05、t の点≒2.30 で、区間は約 −1.60〜13.60。「等分散を仮定」に切り替えると約0.17〜11.83 で0を含まなくなる。
 
 - id: Q-U23-021
+  concepts: [TERM-ci, TERM-normal, TERM-se]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -182,6 +192,7 @@
     why: z の区間を tanh で戻して約0.337。上の端は約0.634。n を400にすると約0.42〜0.57 に狭まる。
 
 - id: Q-U23-022
+  concepts: [TERM-paired-t, TERM-ci, TERM-t, TERM-se, TERM-df]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -199,6 +210,7 @@
     why: 区間は約 −0.23〜2.63。n を20にすると約0.26〜2.14 で、0を含まなくなる。
 
 - id: Q-U23-023
+  concepts: [TERM-ci, TERM-paired-t, TERM-chi2, TERM-t, TERM-df]
   stage: S3
   tag: 本番形式
   format: choice
@@ -229,6 +241,7 @@
     why: 36÷2.700≒13.33。下の端は約1.89 で、s²＝4 との距離が左右で大きく違う。
 
 - id: Q-U23-030
+  concepts: [TERM-ci, TERM-sample-prop, TERM-se, TERM-normal]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -246,6 +259,7 @@
     why: 0.06−0.044≒0.016。差は小さいが0は含まない。
 
 - id: Q-U23-031
+  concepts: [TERM-f, TERM-ci, TERM-unbvar, TERM-df, CLM-42]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -263,6 +277,7 @@
     why: 2.25÷3.621≒0.62。上の端は約7.59 で、1を含む。
 
 - id: Q-U23-032
+  concepts: [TERM-paired-t, TERM-ci, TERM-t, TERM-se, TERM-df]
   stage: S4
   format: written
   powers: [P1, P3]
@@ -280,6 +295,7 @@
     why: 2.201×1.732≒3.81。n を48にすると誤差幅は約1.74 で、0を含まなくなる。
 
 - id: Q-U23-040
+  concepts: [TERM-chi2, TERM-ci, TERM-df, CLM-10]
   stage: S3
   format: written
   powers: [P1, P3]
