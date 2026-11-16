@@ -47,7 +47,7 @@ checks:
   - 'Fraction(2,10) == Fraction(20,100) and Fraction(3,4) * 100 == 75 and Fraction(15, 3) == 5'
   # 応用：前年比
   - 'Fraction(120,100) - 1 == Fraction(20,100) and 1 - Fraction(80,100) == Fraction(20,100)'
-  # 発展：シンプソン（店A・B）
+  # 発展：シンプソン（C店・D店）
   - 'Fraction(18,100) > Fraction(50,300) and Fraction(10,200) > Fraction(2,50) and Fraction(18+10, 100+200) < Fraction(50+2, 300+50)'
   # 実験のラボなしで：25%上げて20%下げる
   - 'Fraction(125,100) * Fraction(4,5) == 1'
