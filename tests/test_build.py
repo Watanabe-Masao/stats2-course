@@ -365,7 +365,9 @@ class TestVisuals(unittest.TestCase):
     def test_term_links_to_network(self):
         r = NotionRenderer(course(), TARGET)
         self.assertEqual(r.term_ref("TERM-expect"), f"[期待値 🕸]({TARGET['network_url']}?c=stats2:TERM-expect)")
-        stub = next(t for t, v in r.c.terms.items() if not v.get("definition") and t in (TARGET.get("terms") or {}))
+        # 旧版の用語ページを持つ語は W5 でみな説明ありになったので、1語の説明をこのテストの中で外して「まだ説明のない用語」を作る
+        stub = next(t for t in (TARGET.get("terms") or {}) if t in r.c.terms)
+        as_skeleton(r.c, stub)
         self.assertIn("mention", r.term_ref(stub))       # まだ説明のない用語は旧版の用語ページ
         t2 = dict(TARGET, network_url="")
         self.assertNotIn("🕸", NotionRenderer(course(), t2).term_ref("TERM-expect"))   # 配布先（画面がない）
