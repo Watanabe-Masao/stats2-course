@@ -1,7 +1,7 @@
 # 単元U05Tの問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U05T-001
   stage: S1
-  concepts: [TERM-geomean]
+  concepts: [TERM-geomean, TERM-mean]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -63,7 +63,7 @@
 
 - id: Q-U05T-004
   stage: S1
-  concepts: [TERM-geomean, TERM-ratio]
+  concepts: [TERM-geomean, TERM-ratio, TERM-mean]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -245,7 +245,7 @@
 
 - id: Q-U05T-030
   stage: S4
-  concepts: [TERM-geomean]
+  concepts: [TERM-geomean, TERM-mean]
   tag: 投資
   format: written
   powers: [P2, P3]

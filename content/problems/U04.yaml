@@ -128,7 +128,7 @@
 
 - id: Q-U04-011
   stage: S2
-  concepts: [TERM-scale, TERM-qual, TERM-quant]
+  concepts: [TERM-scale, TERM-qual, TERM-quant, TERM-mean]
   label: 計算練習
   format: written
   powers: [P2, P1]
@@ -183,7 +183,7 @@
 
 - id: Q-U04-020
   stage: S3
-  concepts: [TERM-scale, TERM-qual, TERM-ratio]
+  concepts: [TERM-scale, TERM-qual, TERM-ratio, TERM-mean]
   tag: アンケート集計
   format: written
   powers: [P3]
@@ -314,7 +314,7 @@
 
 - id: Q-U04-025
   stage: S3
-  concepts: [TERM-scale, TERM-quant, TERM-qual]
+  concepts: [TERM-scale, TERM-quant, TERM-qual, TERM-mean]
   tag: 条件を判断する
   difficulty: 3
   format: written
@@ -351,7 +351,7 @@
 
 - id: Q-U04-031
   stage: S4
-  concepts: [TERM-scale, TERM-qual, TERM-quant]
+  concepts: [TERM-scale, TERM-qual, TERM-quant, TERM-mean]
   tag: スポーツ
   format: written
   powers: [P1]
@@ -411,7 +411,7 @@
 
 - id: Q-U04-040
   stage: S3
-  concepts: [TERM-scale, TERM-quant]
+  concepts: [TERM-scale, TERM-quant, TERM-mean]
   label: 確かめ問題
   format: written
   powers: [P2, P1]

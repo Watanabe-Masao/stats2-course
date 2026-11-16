@@ -138,7 +138,7 @@
     - 満足と答えた割合 p̂＝75%
 
 - id: Q-U03-011
-  concepts: [TERM-parameter, TERM-statistic, TERM-sample-mean]
+  concepts: [TERM-parameter, TERM-statistic, TERM-sample-mean, TERM-mean]
   stage: S2
   label: 計算練習
   format: written

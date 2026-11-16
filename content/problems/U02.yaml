@@ -1,6 +1,6 @@
 # 単元U02の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U02-001
-  concepts: [TERM-sigma, TERM-dev]
+  concepts: [TERM-sigma, TERM-dev, TERM-mean]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -61,7 +61,7 @@
     why: x に3を入れて 2×3＋1＝7。グラフでは x＝3 の真上の点の高さ。
 
 - id: Q-U02-004
-  concepts: [TERM-sigma]
+  concepts: [TERM-sigma, TERM-mean]
   stage: S1
   difficulty: 2
   format: written
@@ -80,7 +80,7 @@
     why: 1＋4＋9＋36＝50。(Σx)²＝144 との差94は、正方形の対角以外の長方形（異なる値どうしの積）。
 
 - id: Q-U02-005
-  concepts: [TERM-sigma, TERM-dev]
+  concepts: [TERM-sigma, TERM-dev, TERM-mean]
   stage: S1
   difficulty: 3
   format: written
@@ -156,7 +156,7 @@
     why: 4＋0＋4＝8。これを3で割ると分散、2で割ると不偏分散。
 
 - id: Q-U02-020
-  concepts: [TERM-sigma, TERM-dev]
+  concepts: [TERM-sigma, TERM-dev, TERM-mean]
   stage: S3
   tag: 計算の近道
   format: written

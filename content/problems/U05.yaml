@@ -195,7 +195,7 @@
 
 - id: Q-U05-022
   stage: S3
-  concepts: [TERM-hist, TERM-boxplot, TERM-median]
+  concepts: [TERM-hist, TERM-boxplot, TERM-median, TERM-mean]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -226,7 +226,7 @@
 
 - id: Q-U05-023
   stage: S3
-  concepts: [TERM-median]
+  concepts: [TERM-median, TERM-mean]
   tag: 平均か中央値か
   difficulty: 3
   format: written
@@ -267,7 +267,7 @@
 
 - id: Q-U05-030
   stage: S4
-  concepts: [TERM-freqtable, TERM-hist]
+  concepts: [TERM-freqtable, TERM-hist, TERM-mean]
   tag: 客単価
   format: written
   powers: [P3]
