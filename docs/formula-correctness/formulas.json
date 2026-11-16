@@ -4572,7 +4572,7 @@
   "index": 0,
   "id": "F-ols-intercept",
   "label": "単回帰の切片",
-  "tex": "a=ȳ-bx̄",
+  "tex": "a=ȳ-bx̄",
   "symbols": [
    {
     "symbol": "a",
@@ -4581,10 +4581,11 @@
     "kind": "value"
    },
    {
-    "symbol": "ȳ",
+    "symbol": "ȳ",
     "meaning": "目的変数 y の平均",
     "key": "ybar",
-    "kind": "value"
+    "kind": "value",
+    "concept": "TERM-mean"
    },
    {
     "symbol": "b",
@@ -4597,7 +4598,8 @@
     "symbol": "x̄",
     "meaning": "説明変数 x の平均",
     "key": "xbar",
-    "kind": "value"
+    "kind": "value",
+    "concept": "TERM-mean"
    }
   ],
   "tree": {
@@ -4629,7 +4631,7 @@
   },
   "contract": {
    "kinds": [
-    "定義"
+    "恒等式"
    ],
    "properties": [
     "再現"
@@ -4689,7 +4691,7 @@
   },
   "contract": {
    "kinds": [
-    "定義"
+    "恒等式"
    ],
    "properties": [
     "単位の整合",
@@ -4703,13 +4705,18 @@
   "index": 0,
   "id": "F-r2-def",
   "label": "決定係数",
-  "tex": "R^{2}=1-\\dfrac{SSE}{SST}",
+  "tex": "R²=1-\\dfrac{SSE}{SST}",
   "symbols": [
    {
-    "symbol": "R",
-    "meaning": "決定係数を R² と書くときの R（R² で1つの記号）",
-    "key": "R",
-    "kind": "value"
+    "symbol": "R²",
+    "meaning": "決定係数",
+    "range": "1以下（切片を含む最小二乗では0以上1以下）",
+    "key": "R2",
+    "kind": "value",
+    "concept": "TERM-r2",
+    "domain": {
+     "max": 1
+    }
    },
    {
     "symbol": "SSE",
@@ -4728,6 +4735,7 @@
     "range": "0より大きい（y が全部同じではない）",
     "key": "SST",
     "kind": "value",
+    "concept": "TERM-dev",
     "domain": {
      "min": 0,
      "minOpen": true
@@ -4738,15 +4746,7 @@
    "op": "eq",
    "args": [
     {
-     "op": "pow",
-     "args": [
-      {
-       "sym": "R"
-      },
-      {
-       "num": 2
-      }
-     ]
+     "sym": "R2"
     },
     {
      "op": "sub",

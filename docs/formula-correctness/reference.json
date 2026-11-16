@@ -3,7 +3,7 @@
  "status": "check_all が --check で古くないかを確かめ、math-lab のテストが写して engine と照らす",
  "generated_by": {
   "script": "build/oracle.py",
-  "script_sha256": "f160b0ffa7779570a0e145bd56abf1fc508eb6c60f69c1ffa5dafbb92c7fe96b",
+  "script_sha256": "c3ee6647d7e8d9e7d632d7538ccd7892c7376e2437219571335975078c1e9d02",
   "libraries": [
    "math",
    "fractions",
@@ -1806,6 +1806,19 @@
    "expect": "計算しない",
    "reason": "n−(N−M) ≦ k（外れは2個しかないので、5個引けば当たりは3個以上）",
    "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"
+  },
+  {
+   "id": "r2-sst-zero",
+   "formula_ids": [
+    "F-r2-def"
+   ],
+   "inputs": {
+    "SSE": 0,
+    "SST": 0
+   },
+   "expect": "計算しない",
+   "reason": "y が全部同じ（x＝1,2,3・y＝4,4,4。傾きは0 に決まるが、決定係数は決まらない）",
+   "domain_ref": "F-r2-def の SST の domain（min 0・minOpen）"
   },
   {
    "id": "ols-sxx-zero",

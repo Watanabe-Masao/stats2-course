@@ -4291,10 +4291,11 @@
       meaning: 単回帰の切片（x＝0 のときの見込みの値。直線を (x̄, ȳ) に通す位置合わせ）
       key: a
       kind: value
-    - symbol: ȳ
+    - symbol: ȳ
       meaning: 目的変数 y の平均
       key: ybar
       kind: value
+      concept: TERM-mean
     - symbol: b
       meaning: 単回帰の傾き
       key: b
@@ -4304,6 +4305,7 @@
       meaning: 説明変数 x の平均
       key: xbar
       kind: value
+      concept: TERM-mean
     tree: {"op": "eq", "args": [{"sym": "a"}, {"op": "sub", "args": [{"sym": "ybar"}, {"op": "mul", "args": [{"sym": "b"}, {"sym": "xbar"}]}]}]}
 - id: TERM-regcoef
   name: 回帰係数
@@ -4324,6 +4326,7 @@
       outside: 係数が1つに決まらない
     data:
     - 単位を変えると傾きも変わる（x を回から十回にすると10倍）。2つの傾きを比べるときは単位をそろえる
+    - 傾きが言うのは、観測した x の範囲の中の見込み。範囲の外に延ばすのは外挿で、データからは保証されない
   example: 店P の5週 (1,1)(2,5)(3,3)(4,7)(5,9) では、偏差の積の和18、x の偏差平方和10 で、b＝1.8（百人／回）。相関係数は0.9、標準偏差の比は √40÷√10＝2 で、0.9×2＝1.8 と同じ。例題Aの5週（r も0.9）の傾き0.9 の2倍。
   counterexample: 5日の広告回数がどの日も3回で、来店者数が 2, 4, 6, 4, 4（百人）なら、x の偏差平方和が0 で b の式の分母が0 になり、傾きは決まらない。広告回数を変えていないデータからは、広告回数の係数は出せない。
   misconceptions:
@@ -4423,10 +4426,13 @@
   - id: F-r2-def
     label: 決定係数
     symbols:
-    - symbol: R
-      meaning: 決定係数を R² と書くときの R（R² で1つの記号）
-      key: R
+    - symbol: R²
+      meaning: 決定係数
+      range: 1以下（切片を含む最小二乗では0以上1以下）
+      key: R2
       kind: value
+      concept: TERM-r2
+      domain: {max: 1}
     - symbol: SSE
       meaning: 残差の2乗の和 Σeᵢ²
       range: 0以上
@@ -4439,8 +4445,9 @@
       range: 0より大きい（y が全部同じではない）
       key: SST
       kind: value
+      concept: TERM-dev
       domain: {min: 0, minOpen: true}
-    tree: {"op": "eq", "args": [{"op": "pow", "args": [{"sym": "R"}, {"num": 2}]}, {"op": "sub", "args": [{"num": 1}, {"op": "div", "args": [{"sym": "SSE"}, {"sym": "SST"}]}]}]}
+    tree: {"op": "eq", "args": [{"sym": "R2"}, {"op": "sub", "args": [{"num": 1}, {"op": "div", "args": [{"sym": "SSE"}, {"sym": "SST"}]}]}]}
 - id: TERM-extrap
   name: 外挿
   en: extrapolation

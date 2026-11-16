@@ -259,6 +259,8 @@ def precondition_cases() -> list[dict]:
          "expect": "計算しない", "reason": "k ≦ M（当たりは3個しかない）", "domain_ref": "F-hyper-pmf の契約の conditions（k ≦ M）"},
         {"id": "hyper-k-too-small", "formula_ids": ["F-hyper-pmf"], "inputs": {"N": 10, "M": 8, "n": 5, "k": 2},
          "expect": "計算しない", "reason": "n−(N−M) ≦ k（外れは2個しかないので、5個引けば当たりは3個以上）", "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"},
+        {"id": "r2-sst-zero", "formula_ids": ["F-r2-def"], "inputs": {"SSE": 0, "SST": 0},
+         "expect": "計算しない", "reason": "y が全部同じ（x＝1,2,3・y＝4,4,4。傾きは0 に決まるが、決定係数は決まらない）", "domain_ref": "F-r2-def の SST の domain（min 0・minOpen）"},
         {"id": "ols-sxx-zero", "formula_ids": ["F-ols-slope"], "inputs": {"x": [2, 2, 2], "y": [1, 2, 3]},
          "expect": "計算しない", "reason": "x のばらつきが0（傾きが決まらない）", "domain_ref": "F-ols-slope の Sxx の domain（min 0・minOpen）"},
     ]
