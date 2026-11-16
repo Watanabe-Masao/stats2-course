@@ -66,7 +66,6 @@ skeleton_required: true
 # 旧版の確認問題・本番形式問題は、問題を原本へ取り込んだら refs から外す。
 refs:
   REF-PQ-DB: 本番形式問題（5択）
-  REF-CONFUSION: 混同しやすい点を図で比べる
 
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}
