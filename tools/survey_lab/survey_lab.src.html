@@ -104,7 +104,7 @@ LK.register("strat",{name:"層化と重み",
 
 // ---- 抽出法を比べる（10地域×10店）
 const AREA=[3,-7,9,-1,-9,5,1,-5,7,-3];
-const NOISE=(j,k)=>((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5;   // 店ごとの差のもと（固定の並び）
+const NOISE=(j,k)=>((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5;   // 店ごとの差のもと（固定の並び。地域の差0・並び順の差0 で4つの方法がほぼ同じ精度になるもの）
 const MNAME={srs:"単純無作為",strat:"層化",clus:"集落",sys:"系統"};
 function popY(d,p,s){const Y=[];for(let j=0;j<10;j++){const r=[];for(let k=0;k<10;k++)r.push(50+d*AREA[j]+p*(k-4.5)+s*NOISE(j,k));Y.push(r);}return Y;}
 function dVals(){const d=+$("dd").value,p=+$("dp").value,s=+$("ds").value,Y=popY(d,p,s),all=Y.flat(),M=sum(all)/100;
@@ -113,7 +113,8 @@ function dVals(){const d=+$("dd").value,p=+$("dp").value,s=+$("ds").value,Y=popY
  const am=Y.map(r=>sum(r)/10),clus=Math.sqrt(0.9*sum(am.map(a=>(a-M)**2))/9);
  const mk=[...Array(10).keys()].map(k=>sum(Y.map(r=>r[k]))/10),sys=Math.sqrt(sum(mk.map(m=>(m-M)**2))/10);
  const se={srs,strat,clus,sys},best=Object.keys(se).reduce((a,b)=>se[b]<se[a]-1e-9?b:a,"srs");
- return {d,p,s,Y,M,am,mk,srs,strat,clus,sys,best:MNAME[best],rClus:clus/srs,rSys:sys/srs,rStrat:strat/srs};}
+ const cmp=r=>r>1.1?"大きい":r<0.9?"小さい":"ほぼ同じ";
+ return {d,p,s,Y,M,am,mk,srs,strat,clus,sys,best:MNAME[best],rClus:clus/srs,rSys:sys/srs,rStrat:strat/srs,cClus:cmp(clus/srs),cSys:cmp(sys/srs),cStrat:cmp(strat/srs)};}
 let dPick=null,dSeed=31;
 function dSample(D,how,r){const pick=[];if(how==="srs"){const idx=[...Array(100).keys()];for(let i=0;i<10;i++){const t=i+Math.floor(r()*(100-i));[idx[i],idx[t]]=[idx[t],idx[i]];pick.push(idx[i]);}}
  else if(how==="strat"){for(let j=0;j<10;j++)pick.push(j*10+Math.floor(r()*10));}

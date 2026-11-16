@@ -767,6 +767,50 @@ def scatter(sp: dict) -> str:
     return c.done(y + 6)
 
 
+def _grid_pick(kind: str, rows: int, cols: int) -> set:
+    """選び方の名前から、塗る升を決める（位置は固定の並びで、図ごとに同じ。数を原本に書かない）。"""
+    if kind == "strat":                     # 各行から1つずつ（行ごとに位置をずらす）
+        return {(r, (r * 7 + 3) % cols) for r in range(rows)}
+    if kind == "cluster":                   # 1行を丸ごと
+        return {(rows // 2, q) for q in range(cols)}
+    if kind == "systematic":                # 名簿の同じ位置（各行の同じ列）
+        return {(r, cols // 3) for r in range(rows)}
+    if kind == "srs":                       # 全体からばらばらに（固定の並び）
+        return {((i * 37 + 11) % (rows * cols) // cols, (i * 37 + 11) % cols) for i in range(rows)}
+    raise ValueError(f"grid の pick が分からない：{kind}")
+
+
+# ---- 格子で抽出の選び方を並べる（行＝地域などのまとまり、塗った升＝選んだ要素）。層化と集落を見比べる ----
+def grid(sp: dict) -> str:
+    c = Canvas()
+    rows, cols = sp["rows"], sp["cols"]
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    panels = sp["panels"]                   # [{label, pick: [[行, 列], …]}]
+    gap = 16; cell = min(14, (W - 16 - gap * (len(panels) - 1)) / len(panels) / cols)
+    pw = cell * cols
+    x0 = (W - (pw * len(panels) + gap * (len(panels) - 1))) / 2
+    top = y + 30
+    cols_c = [BLUE, ORANGE, VIOLET]
+    for k, pn in enumerate(panels):
+        px = x0 + k * (pw + gap)
+        c.text(px + pw / 2, top - 8, pn["label"], 12.5, INK, "middle", "bold")
+        picked = _grid_pick(pn["pick"], rows, cols)
+        col = cols_c[k % 3]
+        for r in range(rows):
+            for q in range(cols):
+                on = (r, q) in picked
+                c.add(f'<rect x="{px + q * cell:.1f}" y="{top + r * cell:.1f}" width="{cell - 1.5:.1f}" height="{cell - 1.5:.1f}" rx="2" '
+                      f'fill="{col if on else SURFACE}" stroke="{GRID}" stroke-width="0.8"/>')
+    y = top + rows * cell + 18
+    if sp.get("row_label"):
+        y = c.para(8, y, sp["row_label"], 344, 12, INK2) + 2
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 # ---- 確率分布の概念図（棒か曲線。期待値の▲・±標準偏差・確率の面積） ----
 def _pmf(sp: dict):
     import math
@@ -1382,7 +1426,7 @@ def sqsplit(sp: dict) -> str:
     return c.done(y + 6)
 
 TYPES = {"sqsplit": sqsplit, "bands": bands, "popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "centers": centers, "zscale": zscale, "scatter": scatter, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
+         "centers": centers, "zscale": zscale, "scatter": scatter, "grid": grid, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
 def specs(course: Course) -> dict[str, dict]:
