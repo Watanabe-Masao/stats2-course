@@ -74,7 +74,10 @@ const DATA={
  ry:{name:"Y（0, 0, 5, 10, 10）",v:[0,0,5,10,10],unit:""},
  temp:{name:"3日の気温（18, 20, 22℃）",v:[18,20,22],unit:""},
  visit:{name:"5日の来店数（20〜28人）",v:[20,22,24,26,28],unit:"人"},
- fundB:{name:"投信Bの年リターン（−4, 4, 12%）",v:[-4,4,12],unit:"%"}};
+ fundB:{name:"投信Bの年リターン（−4, 4, 12%）",v:[-4,4,12],unit:"%"},
+ C:{name:"売場C（18〜22個）",v:[18,19,20,21,22],unit:"個"},
+ AC:{name:"売場AとCを合わせた10日",v:[8,9,10,11,12,18,19,20,21,22],unit:"個"},
+ wk:{name:"平日4日と土日4日（個）",v:[9,10,10,11,19,20,20,21],unit:"個"}};
 function dVals(){const D=DATA[$("ddata").value],b=+$("db").value,a=+$("da").value,x=D.v.map(v=>+(b*v+a).toFixed(6));return {D,b,a,x,...stats(x)};}
 function dRender(){const R=dVals(),x=R.x,lo=Math.min(...x,R.m)-1,hi=Math.max(...x,R.m)+1,X=v=>20+(v-lo)/(hi-lo)*(W-40),n=x.length,H=40+n*18;
  let s=`<svg viewBox="0 0 ${W} ${H+20}" width="${W}" role="img" aria-label="偏差の図">`;
