@@ -11,10 +11,12 @@ const {chromium}=require('playwright');const path=require('path');
    ev:[L.median(v('ev9')),L.median(v('ev9b')),L.mean(v('ev9')),L.mean(v('ev9b'))],
    // 創造：配達時間20件の平均と中央値（43.6・39）
    dl:[L.mean(v('deliv20')),L.median(v('deliv20'))],
+   // 発展の Q-U06-040：10日の日販の平均と10%トリム平均（65.7・57.125）
+   e10:[L.mean(v('ev10')),L.trim(v('ev10'),0.1)],
    right:shape(8),left:shape(-8),sym:shape(0)};});
  console.log(JSON.stringify(r));
  const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b),near=(a,b)=>Math.abs(a-b)<0.005;
  const ok=eq(r.b.slice(0,3),[4,2.5,[2]])&&eq(r.b[3],{q1:2,q3:4})&&r.b[4]===2.75
   &&eq(r.five,[6,5,[5]])&&eq(r.q06,[4,3,{q1:2,q3:6.5}])&&eq(r.sk,[6,2,[2]])&&eq(r.six,[20,16.5,[15]])
-  &&near(r.inc[0],5150/9)&&r.inc[1]===450&&r.ev[0]===24&&r.ev[1]===60&&near(r.ev[2],356/9)&&near(r.ev[3],393/9)&&near(r.dl[0],43.6)&&r.dl[1]===39&&r.right==='最頻値＜中央値＜平均'&&r.left==='平均＜中央値＜最頻値'&&r.sym==='ほぼ等しい';
+  &&near(r.inc[0],5150/9)&&r.inc[1]===450&&r.ev[0]===24&&r.ev[1]===60&&near(r.ev[2],356/9)&&near(r.ev[3],393/9)&&near(r.dl[0],43.6)&&r.dl[1]===39&&near(r.e10[0],65.7)&&near(r.e10[1],57.125)&&r.right==='最頻値＜中央値＜平均'&&r.left==='平均＜中央値＜最頻値'&&r.sym==='ほぼ等しい';
  console.log(ok?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok?0:1);})();

@@ -393,8 +393,9 @@ def centers(sp: dict) -> str:
     marks = [("平均", float(mean), BLUE, None)]
     if sp.get("median", True):
         marks.append(("中央値", float(med), ORANGE, "6 4"))
-    if sp.get("mode", True) and len(modes) == 1:
-        marks.append(("最頻値", float(modes[0]), VIOLET, "2 3"))
+    if sp.get("mode", True):                                 # 最頻値が2つ以上なら、全部に線を引く
+        for mv in sorted(modes):
+            marks.append(("最頻値", float(mv), VIOLET, "2 3"))
     base = y + 30 + 12 * top
     seen = {}
     for v in d:

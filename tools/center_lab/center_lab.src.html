@@ -75,6 +75,7 @@ const DATA={
  income:{name:"9人の年収（万円）",v:[300,350,400,400,450,500,550,700,1500],unit:"万円"},
  ev9:{name:"9日の売上（万円）",v:[20,21,22,23,24,60,61,62,63],unit:"万円"},
  ev9b:{name:"9日の売上・イベントが1日多い（万円）",v:[20,21,22,24,60,60,61,62,63],unit:"万円"},
+ ev10:{name:"10日の日販（万円）",v:[50,52,53,55,56,58,60,61,62,150],unit:"万円"},
  deliv20:{name:"20件の配達時間（分）",v:[25,28,30,30,32,33,35,35,36,38,40,40,42,45,48,50,55,60,75,95],unit:"分"}};
 function mVals(){const D=DATA[$("mdata").value],v=[...D.v].sort((x,y)=>x-y);v[v.length-1]=+$("mtop").value;
  const s=[...v].sort((x,y)=>x-y);return {D,v:s,mean:mean(s),median:median(s),modes:modes(s),...quart(s),trim:trim(s,0.1),sum:s.reduce((a,b)=>a+b,0)};}
