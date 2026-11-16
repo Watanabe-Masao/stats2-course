@@ -1,6 +1,7 @@
 # 単元U07の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U07-001
   stage: S1
+  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-sd, TERM-cv]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -24,6 +25,7 @@
 
 - id: Q-U07-002
   stage: S1
+  concepts: [TERM-cv]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -43,6 +45,7 @@
 
 - id: Q-U07-003
   stage: S1
+  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-data-var, TERM-sd]
   difficulty: 1
   format: written
   powers: [P1]
@@ -61,6 +64,7 @@
 
 - id: Q-U07-004
   stage: S1
+  concepts: [TERM-dev, TERM-data-var, TERM-unbvar]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -79,6 +83,7 @@
 
 - id: Q-U07-005
   stage: S1
+  concepts: [TERM-range, TERM-dev, TERM-unbvar]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -97,6 +102,7 @@
 
 - id: Q-U07-010
   stage: S2
+  concepts: [TERM-sigma, TERM-dev]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -115,6 +121,7 @@
 
 - id: Q-U07-011
   stage: S2
+  concepts: [TERM-mean, TERM-unbvar, TERM-sd]
   label: 計算練習
   format: written
   powers: [P1, P2]
@@ -134,6 +141,7 @@
 
 - id: Q-U07-012
   stage: S2
+  concepts: [TERM-mean, TERM-unbvar, TERM-sample, TERM-statistic]
   label: 約1か月後の問
   format: written
   powers: [P3, P1]
@@ -152,6 +160,7 @@
 
 - id: Q-U07-020
   stage: S3
+  concepts: [TERM-sd, TERM-cv]
   tag: 変動係数
   format: written
   powers: [P3, P1]
@@ -170,6 +179,7 @@
 
 - id: Q-U07-021
   stage: S3
+  concepts: [TERM-unbvar, TERM-dev]
   tag: 本番形式
   format: choice
   powers: [P3, P1]
@@ -200,6 +210,7 @@
 
 - id: Q-U07-022
   stage: S3
+  concepts: [TERM-ratio]
   tag: ジニ係数
   format: written
   powers: [P1, P2]
@@ -224,6 +235,7 @@
 
 - id: Q-U07-023
   stage: S3
+  concepts: [TERM-data-var, TERM-unbvar, TERM-unbiased]
   tag: n か n−1 か
   format: written
   powers: [P3]
@@ -242,6 +254,7 @@
 
 - id: Q-U07-030
   stage: S4
+  concepts: [TERM-mean, TERM-unbvar, TERM-sd]
   tag: 投資のリスク
   format: written
   powers: [P3, P1]
@@ -260,6 +273,7 @@
 
 - id: Q-U07-031
   stage: S4
+  concepts: [TERM-cv, TERM-scale]
   tag: CVが使えない例
   format: written
   powers: [P3]
@@ -278,6 +292,7 @@
 
 - id: Q-U07-032
   stage: S4
+  concepts: [TERM-mean, TERM-sd]
   tag: 安全在庫
   format: written
   powers: [P3, P1]
@@ -296,6 +311,7 @@
 
 - id: Q-U07-040
   stage: S3
+  concepts: [TERM-data-var, TERM-unbvar, TERM-unbiased, TERM-population, TERM-sample]
   label: 確かめ問題
   format: written
   powers: [P1, P2]
