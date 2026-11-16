@@ -5,6 +5,9 @@
 /*@LABKIT_CSS@*/
 .legend span{margin-right:10px;font-size:12px;white-space:nowrap}
 .sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+.gfig{touch-action:none;user-select:none;-webkit-user-select:none}
+.gfig .hit{cursor:ns-resize}
+.glab{font-size:12px;font-weight:700;color:var(--mut);margin:6px 0 0}
 </style></head><body>
 <h1>🧪 ばらつきラボ</h1>
 <div id="lk-task"></div>
@@ -42,7 +45,7 @@
 </div>
 
 <div id="m-gini" class="mode">
- <p class="mut" style="margin:0">4店の売上を小さい順に並べ、累積の店の割合（横）と累積の売上の割合（縦）を結ぶ（ローレンツ曲線）。対角線との間が広いほど偏っている。</p>
+ <p class="mut" style="margin:0">4店の売上を小さい順に並べ、累積の店の割合（横）と累積の売上の割合（縦）を結ぶ（ローレンツ曲線）。対角線との間が広いほど偏っている。棒の上を指で上下に動かすと、曲線とジニ係数がいっしょに変わる。</p>
  <input type="range" id="g1" min="0" max="20" step="1" value="1" data-name="1店目">
  <input type="range" id="g2" min="0" max="20" step="1" value="1" data-name="2店目">
  <input type="range" id="g3" min="0" max="20" step="1" value="2" data-name="3店目">
@@ -137,8 +140,18 @@ LK.register("unb",{name:"n か n−1 か",
 function gVals(){const x=[1,2,3,4].map(i=>+$("g"+i).value).sort((a,b)=>a-b),t=x.reduce((a,b)=>a+b,0),n=x.length;let c=0;const pts=[[0,0]];
  x.forEach((v,i)=>{c+=v;pts.push([(i+1)/n,t?c/t:(i+1)/n]);});let area=0;for(let i=1;i<pts.length;i++)area+=(pts[i][0]-pts[i-1][0])*(pts[i][1]+pts[i-1][1])/2;
  return {x,t,pts,area,gini:2*(0.5-area)};}
+// 4店の売上の棒（入れた順）。棒の上を上下に引くと、その店の売上が変わる
+const GB={H:112,T:14,max:20};
+function gBars(){const v=[1,2,3,4].map(i=>+$("g"+i).value),{H,T,max}=GB,bw=56,gap=(W-40-4*bw)/3;let s=`<div class="glab">4店の売上（棒の上を指で上下に動かす）</div><svg class="gfig" id="gbars" viewBox="0 0 ${W} ${H+22}" width="${W}" role="img" aria-label="4店の売上の棒">`;
+ v.forEach((x,i)=>{const h=x/max*(H-T),xx=20+i*(bw+gap);s+=`<rect x="${xx}" y="${H-h}" width="${bw}" height="${h}" rx="3" fill="var(--acc)" fill-opacity=".75"/><text x="${xx+bw/2}" y="${H-h-4}" font-size="11" text-anchor="middle" fill="var(--fg)">${x}</text><text x="${xx+bw/2}" y="${H+15}" font-size="11" text-anchor="middle" fill="var(--mut)">${i+1}店目</text><rect class="hit" data-i="${i+1}" x="${xx-4}" y="0" width="${bw+8}" height="${H+4}" fill="transparent"/>`;});
+ return s+`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/></svg>`;}
+let GD=null;
+function gDragInit(){const box=$("gplot"),val=ev=>{const svg=$("gbars"),r=svg.getBoundingClientRect(),y=(ev.clientY-r.top)/r.height*(GB.H+22);return Math.max(0,Math.min(GB.max,Math.round((GB.H-y)/(GB.H-GB.T)*GB.max)));};
+ box.addEventListener("pointerdown",ev=>{const t=ev.target.closest&&ev.target.closest("#gbars .hit");if(!t)return;GD=+t.dataset.i;box.setPointerCapture(ev.pointerId);ev.preventDefault();LK.setRange("g"+GD,val(ev));gRender();});
+ box.addEventListener("pointermove",ev=>{if(GD===null)return;const v=val(ev);if(v!==+$("g"+GD).value){LK.setRange("g"+GD,v);gRender();}});
+ const end=()=>{GD=null;};box.addEventListener("pointerup",end);box.addEventListener("pointercancel",end);}
 function gRender(){const G=gVals(),S=200,O=20,X=v=>O+v*S,Y=v=>O+S-v*S;
- let s=`<svg viewBox="0 0 ${W} ${S+50}" width="${W}" role="img" aria-label="ローレンツ曲線"><rect x="${O}" y="${O}" width="${S}" height="${S}" fill="none" stroke="var(--line)"/>`;
+ let s=gBars()+`<div class="glab">ローレンツ曲線（小さい順に積み上げる）</div><svg viewBox="0 0 ${W} ${S+50}" width="${W}" role="img" aria-label="ローレンツ曲線"><rect x="${O}" y="${O}" width="${S}" height="${S}" fill="none" stroke="var(--line)"/>`;
  s+=`<polygon points="${[[0,0],[1,1],...G.pts.slice().reverse()].map(p=>X(p[0])+","+Y(p[1])).join(" ")}" fill="var(--acc2)" fill-opacity=".18"/>`;
  s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--mut)" stroke-dasharray="5 4"/>`;
  s+=`<polyline points="${G.pts.map(p=>X(p[0])+","+Y(p[1])).join(" ")}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`;
@@ -149,7 +162,7 @@ function gRender(){const G=gVals(),S=200,O=20,X=v=>O+v*S,Y=v=>O+S-v*S;
  $("gsum").innerHTML=G.t?`<div>ジニ係数＝2×(0.5−${f(r2(G.area))})＝<b>${f(r2(G.gini))}</b></div><div class="mut">0に近いほど均等、1に近いほど一部の店に偏る。全店同じ売上なら曲線は対角線に重なり0。</div>`:`<div>売上の合計が0なので計算できない。</div>`;
  $("gform").innerHTML=LK.formula([`小さい順：${G.x.join(", ")}（合計${G.t}）`,`累積の売上の割合：${G.pts.slice(1).map(p=>f(r2(p[1]))).join(", ")}`,`曲線の下の面積（台形）＝${f(+G.area.toFixed(4))}`]);}
 LK.register("gini",{name:"ジニ係数",
- init(){[1,2,3,4].forEach(i=>LK.stepper($("g"+i),gRender));gRender();},
+ init(){[1,2,3,4].forEach(i=>LK.stepper($("g"+i),gRender));gDragInit();gRender();},
  apply(s){if(s.sales!==undefined)String(s.sales).split(",").forEach((v,i)=>LK.setRange("g"+(i+1),+v));gRender();},
  render:gRender,
  value(key){const G=gVals();const v=key==="area"?G.area:G.gini;return {v,text:f(r2(v))};}});
