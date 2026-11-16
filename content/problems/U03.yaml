@@ -1,5 +1,6 @@
 # 単元U03の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U03-001
+  concepts: [TERM-population, TERM-sample, TERM-parameter, TERM-statistic]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -27,6 +28,7 @@
     - 平均 x̄＝8,200円
 
 - id: Q-U03-002
+  concepts: [TERM-parameter, TERM-statistic]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -49,6 +51,7 @@
     - ③ 30人の年齢の標準偏差
 
 - id: Q-U03-003
+  concepts: [TERM-population, TERM-sample]
   stage: S1
   difficulty: 1
   format: written
@@ -69,6 +72,7 @@
     - 500世帯の平均食費
 
 - id: Q-U03-004
+  concepts: [TERM-population, TERM-parameter]
   stage: S1
   difficulty: 2
   format: written
@@ -87,6 +91,7 @@
     note: 知りたいのが「来月の客単価」なら、先月のデータは推測の材料（標本のような役割）になる。
 
 - id: Q-U03-005
+  concepts: [TERM-population, TERM-sample, TERM-statistic, TERM-bias]
   stage: S1
   difficulty: 3
   format: written
@@ -111,6 +116,7 @@
     - 20人の平均残業時間
 
 - id: Q-U03-010
+  concepts: [TERM-population, TERM-sample, TERM-statistic, TERM-bias]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -132,6 +138,7 @@
     - 満足と答えた割合 p̂＝75%
 
 - id: Q-U03-011
+  concepts: [TERM-parameter, TERM-statistic, TERM-random-sampling]
   stage: S2
   label: 計算練習
   format: written
@@ -161,6 +168,7 @@
     note: 平均 2.5% は5店から計算した統計量 x̄。全店の本当の平均 μ とは限らない。
 
 - id: Q-U03-012
+  concepts: [TERM-random-sampling, TERM-statistic, TERM-comb, CLM-40]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -184,6 +192,7 @@
     note: (b) 選んだ2店の中央値も標本から計算するので統計量。(c) サイコロの標本空間 {1, 2, 3, 4, 5, 6} は、統計の「標本」とは別の言葉。
 
 - id: Q-U03-020
+  concepts: [TERM-population, TERM-frame, TERM-bias]
   stage: S3
   format: written
   powers: [P3]
@@ -199,6 +208,7 @@
     why: 名簿にいない店（廃棄率が高め）は選ばれないので、n を増やしても x̄ は名簿内の平均に集まり、μ には近づかない。
 
 - id: Q-U03-021
+  concepts: [TERM-statistic, TERM-bias]
   stage: S3
   format: written
   powers: [P3]
@@ -214,6 +224,7 @@
     why: 返事をする店が偏っていると、何回集めてもずれは消えない（口コミの件数を増やしても同じ）。偏りの強さを0にすると μ のまわりに集まる。
 
 - id: Q-U03-022
+  concepts: [TERM-random-sampling, TERM-statistic, TERM-parameter]
   stage: S3
   tag: 本番形式
   format: choice
@@ -248,6 +259,7 @@
     - 「満足」と答えた割合 62%
 
 - id: Q-U03-023
+  concepts: [TERM-statistic, TERM-parameter]
   stage: S3
   tag: 記号を読む
   format: written
@@ -270,6 +282,7 @@
     - s＝1.1（標本の標準偏差）
 
 - id: Q-U03-024
+  concepts: [TERM-sample-space, TERM-event]
   stage: S3
   tag: 確率へ
   format: written
@@ -288,6 +301,7 @@
     why: 4以上＝{4, 5, 6} の3通り。「偶数」を押すと {2, 4, 6} も3通りで、同じ 1/2 になる。
 
 - id: Q-U03-030
+  concepts: [TERM-population, TERM-sample, TERM-parameter, TERM-statistic]
   stage: S4
   format: written
   powers: [P1]
@@ -310,6 +324,7 @@
     - 標本の不良率 1/20＝5%
 
 - id: Q-U03-031
+  concepts: [TERM-sample, TERM-random-sampling, TERM-ratio]
   stage: S4
   format: written
   powers: [P2, P3]
@@ -326,6 +341,7 @@
     note: 印の付いた魚と付いていない魚が同じように捕まる（よく混ざる）ことが前提。
 
 - id: Q-U03-032
+  concepts: [TERM-population, TERM-sample, TERM-bias]
   stage: S4
   tag: 仕事へ
   format: written
@@ -347,6 +363,7 @@
     - 20品目の値入率
 
 - id: Q-U03-040
+  concepts: [TERM-population, TERM-sample, TERM-random-sampling]
   stage: S3
   label: 確かめ問題
   format: written
