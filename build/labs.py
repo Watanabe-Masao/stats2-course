@@ -242,6 +242,25 @@ def validate_labs(course: Course) -> list[str]:
             if not lab.get("task"):
                 err.append(f"{qid}: lab.task（課題の文）がない")
             err += _check_spec(qid, lab, course.labs.get(lab.get("id")))
+    err += _check_open_stages(course)
+    return err
+
+
+def _check_open_stages(course: Course) -> list[str]:
+    """発展・創造（S5・S6）には、答えの決まった予測→照合を置かない（CLAUDE.md「段階の定義」。#49）。
+    想定する故障：発展・創造の問題の lab か、本文から呼ぶラボの版に predict・steps が残り、自由に動かす場が当てっこになる。
+    見つけ方：S5・S6 の問題の lab と、S5.md・S6.md の {{lab:…@版}} が指す版の predict・steps を見る。"""
+    err = []
+    for uid, u in course.units.items():
+        for qid, q in u["problems"].items():
+            lab = q.get("lab") or {}
+            if q.get("stage") in ("S5", "S6") and not q.get("retired") and (lab.get("predict") or lab.get("steps")):
+                err.append(f"{qid}: 発展・創造の問題の lab に predict・steps は書かない（自由に動かして説明させる）")
+        for sid in ("S5", "S6"):
+            for m in re.finditer(r"\{\{lab:(LAB-[\w-]+)@([\w-]+)\}\}", (u.get("bodies") or {}).get(sid) or ""):
+                pre = ((course.labs.get(m.group(1)) or {}).get("presets") or {}).get(m.group(2)) or {}
+                if pre.get("predict") or pre.get("steps"):
+                    err.append(f"{uid}/{sid}: {m.group(1)}@{m.group(2)} は predict・steps を持つ版（発展・創造では task だけの版を使う）")
     return err
 
 
