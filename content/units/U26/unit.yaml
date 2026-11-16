@@ -2,7 +2,7 @@ id: U26
 number: "26"
 title: 割合・分散の検定
 domain: D6
-reference_section: ⑥ 検定
+recall_group: 検定
 prev: U25
 next: U27
 prereq: [U14, U20, U24]

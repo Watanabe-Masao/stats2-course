@@ -253,6 +253,8 @@ def _validate_unit(c: Course, uid: str, u: dict, texts: list) -> list[str]:
             err.append(f"{uid}: labs の {lid} がない")
     if u.get("domain") not in c.shared["domains"]:
         err.append(f"{uid}: domain {u.get('domain')} が未定義")
+    if u.get("recall_group") and u["recall_group"] not in c.shared.get("concept_categories", []):   # 忘れたら開く分類（#53）
+        err.append(f"{uid}: recall_group {u['recall_group']} が concept_categories にない")
     texts.append((f"{uid}.goal", u.get("goal", "")))
     for sid in c.stage_ids:
         if u["bodies"].get(sid) is None:

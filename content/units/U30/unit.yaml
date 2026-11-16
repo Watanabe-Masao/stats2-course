@@ -2,7 +2,7 @@ id: U30
 number: "30"
 title: 重回帰・係数の検定・決定係数
 domain: D7
-reference_section: ⑦ 相関・回帰
+recall_group: 相関・回帰
 prev: U29
 next: U31
 prereq: [U20, U24, U29]

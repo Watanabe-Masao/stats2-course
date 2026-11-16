@@ -2,7 +2,7 @@ id: U19
 number: "19"
 title: 大数の法則・中心極限定理
 domain: D4
-reference_section: ④ 標本分布
+recall_group: 標本分布・極限
 prev: U18
 next: U20
 prereq: [U14, U16, U18]

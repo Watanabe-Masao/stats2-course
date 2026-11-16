@@ -2,7 +2,7 @@ id: U10
 number: "10"
 title: 事象・確率の公理・加法則
 domain: D2
-reference_section: ② 確率
+recall_group: 確率
 prev: U09
 next: U11
 prereq: [U09, U01]

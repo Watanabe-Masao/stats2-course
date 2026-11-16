@@ -6,6 +6,7 @@ Notion のページIDは publish/notion.yaml から読み、本文には ID で�
 from __future__ import annotations
 
 import re
+from urllib.parse import quote
 from pathlib import Path
 
 from labs import fig_url, lab_url
@@ -37,13 +38,12 @@ class NotionRenderer:
         return f"教科書{self.c.index[uid]['number']}"
 
     def term_ref(self, tid: str) -> str:
-        """用語のリンク。説明のある概念は知識ネットワークの画面へ、まだのものは旧版の用語ページへ。"""
+        """用語のリンク。説明のある概念は知識ネットワークの画面へ。説明がまだの語と、画面のない配布先では名前だけ（旧版の用語ページは指さない。#53）。"""
         t = self.c.terms[tid]
         if t.get("definition") and self.t.get("network_url"):
             from network import course_id
             return f"[{t['name']} 🕸]({self.t['network_url']}?c={course_id(self.c)}:{tid})"
-        pid = (self.t.get("terms") or {}).get(tid)
-        return mention(pid) if pid else t["name"]
+        return t["name"]
 
     def lab_src(self, aid: str) -> str:
         """公開サイトがあれば URL、なければアップロードの差し込み口（publish_prep が置き換える）。"""
@@ -196,9 +196,9 @@ class NotionRenderer:
         lab = COMP["labels"]
         home = mention(self.t["root_page"])
         ref = ""
-        if self.t.get("legacy_reference") and u.get("reference_section"):
-            ref = (f'\n\n<span color="gray">忘れたら：</span>{mention(self.t["legacy_reference"])}'
-                   f'<span color="gray"> の「{u["reference_section"]}」</span>')
+        if self.t.get("network_url") and u.get("recall_group"):   # 忘れたら、その分類の概念を知識ネットワークで開く（#53）
+            g = u["recall_group"]
+            ref = (f'\n\n<span color="gray">忘れたら：</span>[{g} 🕸]({self.t["network_url"]}?g={quote(g)})')
         prev = f"◀ {self.unit_ref(u['prev'])}" if u.get("prev") else "（最初）"
         nxt = f"{self.unit_ref(u['next'])} ▶" if u.get("next") else "（最後）"
         out = [

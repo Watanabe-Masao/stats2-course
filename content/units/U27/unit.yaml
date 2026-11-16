@@ -2,7 +2,7 @@ id: U27
 number: "27"
 title: 適合度・独立性のカイ二乗検定
 domain: D6
-reference_section: ⑥ 検定
+recall_group: 検定
 prev: U26
 next: U28
 prereq: [U20, U24, U26]

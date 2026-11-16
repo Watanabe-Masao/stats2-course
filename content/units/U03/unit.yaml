@@ -2,7 +2,7 @@ id: U03
 number: "03"
 title: 母集団と標本・母数と統計量
 domain: D1
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 prev: U02
 next: U04
 prereq: [U01, U02]

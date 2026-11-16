@@ -2,7 +2,7 @@ id: U02
 number: "02"
 title: 関数・総和記号・階乗
 domain: D0
-reference_section: ② 確率
+recall_group: 確率
 prev: U01
 next: U03
 prereq: [U01]

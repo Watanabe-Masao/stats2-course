@@ -2,7 +2,7 @@ id: U25
 number: "25"
 title: 平均の t 検定
 domain: D6
-reference_section: ⑥ 検定
+recall_group: 検定
 prev: U24
 next: U26
 prereq: [U20, U23, U24]

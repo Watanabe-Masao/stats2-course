@@ -2,7 +2,7 @@ id: U18
 number: "18"
 title: 標本平均・標本分散の性質
 domain: D4
-reference_section: ④ 標本分布
+recall_group: 標本分布・極限
 prev: U17
 next: U19
 prereq: [U13, U17, U07]

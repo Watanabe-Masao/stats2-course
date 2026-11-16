@@ -2,7 +2,7 @@ id: U15
 number: "15"
 title: ポアソン分布・離散分布の判断
 domain: D3
-reference_section: ③ 確率分布
+recall_group: 確率分布
 prev: U14
 next: U16
 prereq: [U14, U02, U09]

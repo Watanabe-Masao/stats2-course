@@ -2,7 +2,7 @@ id: U07
 number: "07"
 title: 分散・標準偏差・変動係数
 domain: D1
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 prev: U06
 next: U08
 prereq: [U06, U02]

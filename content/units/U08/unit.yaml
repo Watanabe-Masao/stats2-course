@@ -2,7 +2,7 @@ id: U08
 number: "08"
 title: 標準化・外れ値・歪度
 domain: D1
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 prev: U07
 next: U09
 prereq: [U07, U05]
