@@ -1,6 +1,7 @@
 # 単元U06の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U06-001
   stage: S1
+  concepts: [TERM-mean]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -23,6 +24,7 @@
 
 - id: Q-U06-002
   stage: S1
+  concepts: [TERM-mean, TERM-median, TERM-mode]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -42,6 +44,7 @@
 
 - id: Q-U06-003
   stage: S1
+  concepts: [TERM-mean, TERM-median, TERM-mode]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U06-004
   stage: S1
+  concepts: [TERM-mean, TERM-median]
   difficulty: 2
   format: written
   powers: [P1, P3]
@@ -78,6 +82,7 @@
 
 - id: Q-U06-005
   stage: S1
+  concepts: [TERM-mean, TERM-median, TERM-mode]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -96,6 +101,7 @@
 
 - id: Q-U06-010
   stage: S2
+  concepts: [TERM-mean]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -114,6 +120,7 @@
 
 - id: Q-U06-011
   stage: S2
+  concepts: [TERM-quartile, TERM-iqr, TERM-outlier, TERM-median]
   label: 計算練習
   format: written
   powers: [P1, P2]
@@ -133,6 +140,7 @@
 
 - id: Q-U06-012
   stage: S2
+  concepts: [TERM-mean, TERM-median, TERM-sample, TERM-statistic]
   label: 約1か月後の問
   format: written
   powers: [P3, P1]
@@ -151,6 +159,7 @@
 
 - id: Q-U06-020
   stage: S3
+  concepts: [TERM-mean, TERM-freqtable]
   tag: 度数表
   format: written
   powers: [P1, P2]
@@ -169,6 +178,7 @@
 
 - id: Q-U06-021
   stage: S3
+  concepts: [TERM-mean]
   tag: 店舗の平均
   format: written
   powers: [P3, P1]
@@ -187,6 +197,7 @@
 
 - id: Q-U06-022
   stage: S3
+  concepts: [TERM-mean, TERM-median, TERM-mode]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -216,6 +227,7 @@
 
 - id: Q-U06-023
   stage: S3
+  concepts: [TERM-mode, TERM-mean, TERM-median]
   tag: 売れ筋
   format: written
   powers: [P3, P1]
@@ -233,6 +245,7 @@
 
 - id: Q-U06-030
   stage: S4
+  concepts: [TERM-geomean, TERM-ratio]
   tag: 成長率の平均
   format: written
   powers: [P3, P1]
@@ -252,6 +265,7 @@
 
 - id: Q-U06-031
   stage: S4
+  concepts: [TERM-mean, TERM-median, TERM-mode, TERM-outlier]
   tag: 待ち時間
   format: written
   powers: [P3, P1]
@@ -271,6 +285,7 @@
 
 - id: Q-U06-032
   stage: S4
+  concepts: [TERM-mean]
   tag: 速さの平均
   format: written
   powers: [P3, P1]
@@ -287,17 +302,25 @@
     note: 平均の速さ＝全体の距離÷全体の時間。時間の長い帰りの速さに引き寄せられる。
 
 - id: Q-U06-040
-  stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
-  label: 確かめ問題
+  stage: S5   # 2級の範囲外の発展。予測を外し、説明する形（#373 の F・#46）
+  concepts: [TERM-mean, TERM-median]
+  label: 説明してみる
   format: written
-  powers: [P1, P2]
-  prompt: 例題Aの10人の購入額 1, 1, 2, 2, 2, 3, 3, 4, 5, 17（千円）で、両端から10%ずつ（1人ずつ）除いた10%トリム平均を求めよ。平均・中央値と比べよ。
-  answer: 1と17を除いた 1, 2, 2, 2, 3, 3, 4, 5 の平均＝22÷8＝**2.75千円**。平均4千円より中央値2.5千円に近く、17千円の影響をほとんど受けない。
+  powers: [P2, P3]
+  prompt: 両端を除いてから平均する考え方を、2つの場面に当てる。(a) 5人の審査員が同じ商品の試食を 7, 8, 8, 8, 2 点と採点した（2点は1人の審査員の好みの強い採点）。(b) 10人の客の購入額が 1, 1, 2, 2, 2, 3, 3, 4, 5, 17 千円だった。どちらの場面なら、いちばん大きい値と小さい値を除く平均が向くか、何を基準に決めるかを説明する。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: |-
+    **統計で言えること（記録された値をそのまま使って）**：(a) は 2点と8点の1つを除くと、8, 8, 7 の平均で約7.67点。全員の平均は 33÷5＝6.6点で、2点の1人に大きく引っ張られる。(b) は 1と17を除くと 22÷8＝2.75千円で、全員の平均は4千円。どちらも、除くと端の1つの値に引っ張られにくくなる。
+
+    **解釈の例（端の値をどう読むか）**：
+    - (a) の2点は、商品の出来ではなく、その審査員の好みの偏り。知りたいのは商品の評価なので、除いてよい「ぶれ」とみる
+    - (b) の17千円は、本当にそれだけ買った客。売上や仕入れを考えるなら、除いてはいけない「中身」とみる
+
+    **統計の外で決めること**：端の値が、知りたいことの「ぶれ」か「中身」か。それはデータの数字ではなく、データがどう生まれたか（審査員の好み・本当の購入）と、何に使うか（商品の評価・売上の見込み）で決まる。
   checks:
-    - 'sum([1,2,2,2,3,3,4,5]) == 22 and Fraction(22, 8) == Fraction(275, 100)'
+    - 'abs((8+8+7)/3 - 7.67) < 0.005 and Fraction(7+8+8+8+2, 5) == Fraction(33, 5) and sum([1,2,2,2,3,3,4,5]) == 22 and Fraction(22, 8) == Fraction(275, 100)'
   lab:
     id: LAB-center
     mode: mm
     set: {data: buy10}
-    task: 最大の17を大きくしたり小さくしたりして、平均・中央値・トリム平均の動き方を比べる。両端を除くと何に強くなり、何が見えなくなるか。
-    why: 最大の17を大きくしても、トリム平均は除かれる側なので変わらない（くわしくの式で確かめる）。平均は動き、中央値は動かない。
+    task: 10人の購入額で、平均と10%トリム平均（くわしくの式）を読み、最大の17を動かしたときに、どちらが動くかを見る。

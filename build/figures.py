@@ -375,6 +375,48 @@ def _axis(c, lo, hi, y, step, X):
         t += step
 
 
+# ---- 代表値の位置（点を数直線に積み、平均・中央値・最頻値に縦線。数は図を作るときに計算する） ----
+def centers(sp: dict) -> str:
+    c = Canvas()
+    d = sorted(sp["data"]); n = len(d)
+    lo, hi = sp.get("lo", min(d)), sp.get("hi", max(d))
+    X = lambda v: 24 + (v - lo) / (hi - lo) * (W - 48)  # noqa: E731
+    mean = Fraction(sum(Fraction(str(v)) for v in d), n)
+    med = (Fraction(str(d[(n - 1) // 2])) + Fraction(str(d[n // 2]))) / 2
+    cnt = {}
+    for v in d:
+        cnt[v] = cnt.get(v, 0) + 1
+    top = max(cnt.values()); modes = [v for v in cnt if cnt[v] == top]
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    marks = [("平均", float(mean), BLUE, None)]
+    if sp.get("median", True):
+        marks.append(("中央値", float(med), ORANGE, "6 4"))
+    if sp.get("mode", True) and len(modes) == 1:
+        marks.append(("最頻値", float(modes[0]), VIOLET, "2 3"))
+    base = y + 30 + 12 * top
+    seen = {}
+    for v in d:
+        seen[v] = seen.get(v, 0) + 1
+        c.circle(X(v), base - 8 - (seen[v] - 1) * 12, 5, INK2)
+    for name, v, col, dash in marks:                          # 線は点の上に重ね、名前は下の凡例に置く
+        c.line(X(v), y + 14, X(v), base, col, 2.5, dash)
+    c.line(16, base, W - 16, base, INK2, 1)
+    for t in sp.get("ticks", []):
+        c.text(X(t), base + 15, _num(t), 11, INK2, "middle")
+    y = base + 22
+    for name, v, col, dash in marks:
+        c.line(10, y + 10, 30, y + 10, col, 2.5, dash)
+        c.text(36, y + 14, f"{name} {_num(round(v, 2))}", 12, INK2)
+        y += 18
+    if sp.get("axis_label"):
+        y = c.para(8, y + 4, sp["axis_label"], 344, 12, INK2)
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 # ---- ヒストグラム（階級・度数。幅が違えば度数密度。箱ひげ図を下に付けられる） ----
 def hist(sp: dict) -> str:
     c = Canvas()
@@ -1167,7 +1209,7 @@ def sqsplit(sp: dict) -> str:
     return c.done(y + 6)
 
 TYPES = {"sqsplit": sqsplit, "bands": bands, "popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
+         "centers": centers, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
 def specs(course: Course) -> dict[str, dict]:
