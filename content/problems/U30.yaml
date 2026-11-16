@@ -1,6 +1,7 @@
 # 単元U30の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U30-001
   stage: S1
+  concepts: [TERM-r2, TERM-adjr2, TERM-ms, TERM-f]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -24,6 +25,7 @@
 
 - id: Q-U30-002
   stage: S1
+  concepts: [TERM-mreg, TERM-se, TERM-t, TERM-df, TERM-ci]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -42,6 +44,7 @@
 
 - id: Q-U30-003
   stage: S1
+  concepts: [TERM-mreg, TERM-resid, TERM-dummy]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U30-004
   stage: S1
+  concepts: [TERM-adjr2, REL-r2-adjr2-contrast]
   difficulty: 2
   format: written
   powers: [P1, P3]
@@ -78,6 +82,7 @@
 
 - id: Q-U30-005
   stage: S1
+  concepts: [TERM-multicol, TERM-se]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -96,6 +101,7 @@
 
 - id: Q-U30-010
   stage: S2
+  concepts: [TERM-mreg, TERM-regcoef, REL-slr-mreg]
   format: written
   powers: [P1, P3]
   prompt: 例題Aの8店で、売価 x₁ だけで販売数 y を回帰すると傾きは＋1.38、客数 x₂ も入れた重回帰では売価の係数は −1 だった。「売価の効果はプラスかマイナスか」と聞かれたら、どう答えるか。
@@ -113,6 +119,7 @@
 
 - id: Q-U30-011
   stage: S2
+  concepts: [TERM-ms, TERM-f, TERM-r2]
   format: written
   powers: [P1, P3]
   prompt: 25日のデータで3つの説明変数の重回帰をした。R²＝0.4 だった（SST＝100、SSR＝40、SSE＝60）。F を求め、「係数はすべて0」を5%で検定せよ。（F(3, 21) の上側5%点は3.072）
@@ -130,6 +137,7 @@
 
 - id: Q-U30-012
   stage: S2
+  concepts: [TERM-mreg, TERM-se, TERM-t, TERM-ci]
   format: written
   powers: [P1, P3]
   prompt: 12日のデータで2つの説明変数の重回帰をした。ある係数は −1.2、標準誤差は0.4。95%信頼区間を求め、「係数＝0」を両側5%で判断せよ（{{unit:U25}} の t 検定と同じ考え方）。（t(9) の0.975点は2.262）
@@ -147,6 +155,7 @@
 
 - id: Q-U30-020
   stage: S3
+  concepts: [TERM-dummy, TERM-mreg]
   format: written
   powers: [P1, P3]
   prompt: 平日4日・週末4日の客数 x と販売数 y を、週末ダミー D（週末＝1）を入れて重回帰すると ŷ＝14＋2x＋4D だった。週末の販売数の平均は平日より8 多い。① D の係数4 と平均の差8 の違いを説明せよ。② 平日・土曜・日曜の3つに分けたいとき、ダミー変数はいくつ入れるか。
@@ -164,6 +173,7 @@
 
 - id: Q-U30-021
   stage: S3
+  concepts: [TERM-multicol, TERM-f, TERM-t]
   format: written
   powers: [P1, P3]
   prompt: 客数とレシート件数（相関0.95）を両方入れた重回帰で、F 検定は有意なのに、どちらの係数も t 検定で有意にならなかった。VIF を求め、何が起きているかを説明せよ。どうすればよいか。
@@ -181,6 +191,7 @@
 
 - id: Q-U30-022
   stage: S3
+  concepts: [TERM-adjr2, REL-r2-adjr2-contrast]
   format: written
   powers: [P1, P3]
   prompt: 20日のデータで、モデル A（説明変数2つ）は R²＝0.60、モデル B（説明変数5つ）は R²＝0.65 だった。どちらを選ぶか、自由度調整済み R² で答えよ。
@@ -198,6 +209,7 @@
 
 - id: Q-U30-023
   stage: S3
+  concepts: [TERM-r2, TERM-adjr2, TERM-mreg]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -228,6 +240,7 @@
 
 - id: Q-U30-030
   stage: S4
+  concepts: [TERM-mreg, TERM-t, TERM-se]
   format: written
   powers: [P1, P3]
   prompt: 8店の売場面積 x₁（百㎡）・駐車台数 x₂（台）で売上 y（百万円）を重回帰した。結果は ŷ＝10＋3x₁＋0.5x₂、標準誤差は x₁ が1.0、x₂ が0.553、R²＝0.942。① 各係数の t を t(5) の0.975点2.571 と比べよ。② 面積7・駐車10台 の新店の予測は？ ③ 報告の文を書け。
@@ -245,6 +258,7 @@
 
 - id: Q-U30-031
   stage: S4
+  concepts: [TERM-mreg, TERM-extrap]
   format: written
   powers: [P1, P3]
   prompt: 例題Aの8店（売価8〜13、客数3〜7）で作った ŷ＝40−x₁＋3x₂ を使い、売価20・客数5 の新商品の販売数を予測した。予測値は？　この予測をそのまま使ってよいか。
@@ -262,6 +276,7 @@
 
 - id: Q-U30-032
   stage: S4
+  concepts: [TERM-r2, TERM-adjr2, TERM-ms, TERM-f]
   format: written
   powers: [P1, P3]
   prompt: 40店のデータで、来店客数・客単価・売場面積の3つで月の利益を重回帰した。SSR＝120、SSE＝180。R²・自由度調整済み R²・F を求め、報告の文を書け。（F(3, 36) の上側5%点は2.866）
@@ -279,10 +294,12 @@
 
 - id: Q-U30-040
   stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
+  concepts: [TERM-dummy, TERM-mreg]
   format: written
   powers: [P1, P3]
-  prompt: 平日5日・週末5日の客数 x と販売数 y。平日は ŷ＝9＋2x、週末は ŷ＝10＋3x の直線にそれぞれぴったり並ぶ。交互作用を入れた重回帰で、週末の傾きはいくつか。客数4 と客数6 で、週末と平日の差はそれぞれいくつか。「週末の効果」を1つの数で言えるか。
-  answer: 週末の傾きは **3**（平日2、交互作用の係数1）。客数4：(10＋12)−(9＋8)＝**5**、客数6：(10＋18)−(9＋12)＝**7**。差が客数によって変わるので、「週末の効果は◯」と1つの数では言えない。交互作用を入れない式の D の係数は、こうした差を1つにならした値にすぎない。
+  prompt: 平日5日・週末5日の客数 x と販売数 y。平日は ŷ＝9＋2x、週末は ŷ＝10＋3x の直線にそれぞれぴったり並ぶ。担当者は、交互作用を入れない式で「週末の効果は D の係数」と報告した。ラボで交互作用を入れたり外したりして、「週末の効果」を1つの数で言えるかを説明する。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: 交互作用を入れると、週末の傾きは3（平日2、交互作用の係数1）。週末と平日の差は、客数4 で (10＋12)−(9＋8)＝5、客数6 で (10＋18)−(9＋12)＝7 と、客数によって変わる。この10日では、「週末の効果」は客数ごとに違い、1つの数では言えない。交互作用を入れない式の D の係数は、こうした差を1つにならした値で、どの客数での差でもない。報告するなら、「客数が多い日ほど週末の差が大きい」と、客数ごとの差を並べて書く。
   checks:
     - '(10+3*4)-(9+2*4) == 5 and (10+3*6)-(9+2*6) == 7 and 3-2 == 1'
   lab:

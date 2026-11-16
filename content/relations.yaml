@@ -1186,6 +1186,7 @@ relations:
       units:
       - U29
       - U30
+    figures: [FIG-U30-concept]
     version: 2
   - id: REL-qual-dummy
     from: TERM-qual
@@ -2017,6 +2018,7 @@ relations:
   - id: REL-r2-adjr2-contrast
     from: TERM-r2
     to: TERM-adjr2
+    figures: [FIG-U30-adjr2]
     version: 1
     type: 比べる
     axis: 説明変数を足したときに下がりうるか（説明変数の数で補正するか）
