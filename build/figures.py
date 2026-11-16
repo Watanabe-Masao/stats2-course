@@ -375,6 +375,52 @@ def _axis(c, lo, hi, y, step, X):
         t += step
 
 
+# ---- 標準化の物差し（集団ごとの数直線を、z の数直線にそろえる。目盛りの数は marks に書いた z の所だけ） ----
+def zscale(sp: dict) -> str:
+    c = Canvas()
+    rows = sp["rows"]                         # [{label, mean, sd, x}]
+    zs = sp.get("marks", [0, 2])              # 数を書く z
+    zlo, zhi = int(sp.get("zlo", -3)), int(sp.get("zhi", 3))
+    X = lambda z: 24 + (z - zlo) / (zhi - zlo) * (W - 48)  # noqa: E731
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    top = y + 14
+    colors = [BLUE, ORANGE]
+    ys = []
+    for k, r in enumerate(rows):
+        yy = top + 26 + k * 52
+        ys.append(yy)
+        col = colors[k % len(colors)]
+        unit = sp.get("unit", "")
+        c.text(8, yy - 12, f'{r["label"]}（{unit}平均{_num(r["mean"])}・標準偏差{_num(r["sd"])}）', 12, INK, weight="bold")
+        c.line(16, yy, W - 16, yy, INK2, 1)
+        for z in range(zlo, zhi + 1):
+            c.line(X(z), yy - 4, X(z), yy + 4, INK2, 1)
+        for z in zs:
+            c.text(X(z), yy + 17, _num(r["mean"] + z * r["sd"]), 11.5, INK2, "middle")
+        if "x" in r:
+            zx = (r["x"] - r["mean"]) / r["sd"]
+            c.circle(X(zx), yy, 6, col)
+    zy = top + 26 + len(rows) * 52
+    c.text(8, zy - 12, "z（平均から標準偏差いくつ分か）", 12, INK, weight="bold")
+    c.line(16, zy, W - 16, zy, INK2, 1.5)
+    for z in range(zlo, zhi + 1):
+        c.line(X(z), zy - 5, X(z), zy + 5, INK2, 1.5)
+        if z in zs:
+            c.text(X(z), zy + 18, _num(z), 12, INK, "middle", "bold")
+    for z in zs:
+        c.line(X(z), top + 22, X(z), zy, INK2, 1, "4 3")
+    for k, r in enumerate(rows):                              # z の目盛りの上にも、各集団の値の点を重ねて打つ
+        if "x" in r:
+            zx = (r["x"] - r["mean"]) / r["sd"]
+            c.circle(X(zx), zy - 9 * k, 6, colors[k % len(colors)])
+    y = zy + 30
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 # ---- 代表値の位置（点を数直線に積み、平均・中央値・最頻値に縦線。数は図を作るときに計算する） ----
 def centers(sp: dict) -> str:
     c = Canvas()
@@ -1210,7 +1256,7 @@ def sqsplit(sp: dict) -> str:
     return c.done(y + 6)
 
 TYPES = {"sqsplit": sqsplit, "bands": bands, "popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "centers": centers, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
+         "centers": centers, "zscale": zscale, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
 def specs(course: Course) -> dict[str, dict]:

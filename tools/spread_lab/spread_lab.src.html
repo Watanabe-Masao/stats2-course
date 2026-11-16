@@ -80,7 +80,9 @@ const DATA={
  X5:{name:"商品X（9〜14個）",v:[9,9,9,9,14],unit:"個"},
  Y5:{name:"商品Y（6〜11個）",v:[6,11,11,11,11],unit:"個"},
  sumS:{name:"合計（同じ向き）",v:[26,28,30,32,34],unit:"個"},
- sumO:{name:"合計（逆の向き）",v:[30,30,30,30,30],unit:"個"}};
+ sumO:{name:"合計（逆の向き）",v:[30,30,30,30,30],unit:"個"},
+ o20:{name:"5日（最後が20）",v:[10,10,10,10,20],unit:"個"},
+ o110:{name:"5日（最後が110）",v:[10,10,10,10,110],unit:"個"}};
 function dVals(){const D=DATA[$("ddata").value],b=+$("db").value,a=+$("da").value,x=D.v.map(v=>+(b*v+a).toFixed(6));return {D,b,a,x,...stats(x)};}
 function dRender(){const R=dVals(),x=R.x,lo=Math.min(...x,R.m)-1,hi=Math.max(...x,R.m)+1,X=v=>20+(v-lo)/(hi-lo)*(W-40),n=x.length,H=40+n*18;
  let s=`<svg viewBox="0 0 ${W} ${H+20}" width="${W}" role="img" aria-label="偏差の図">`;
