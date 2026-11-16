@@ -641,6 +641,66 @@ def dev(sp: dict) -> str:
     return c.done(y + 6)
 
 
+# ---- 散布図（cov：平均の点からの偏差の積を長方形で。resid：平均の線からの偏差と、回帰直線からの残差） ----
+def scatter(sp: dict) -> str:
+    c = Canvas()
+    pts = [(Fraction(str(a)), Fraction(str(b))) for a, b in sp["points"]]
+    n = len(pts)
+    mx = sum(p[0] for p in pts) / n; my = sum(p[1] for p in pts) / n
+    sxy = sum((a - mx) * (b - my) for a, b in pts); sxx = sum((a - mx) ** 2 for a, _ in pts)
+    xs, ys = sp["x"], sp["y"]               # {label, lo, hi, step}
+    L, R, T, B = 40, W - 14, 0, 0
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    T = y + 20; B = T + 210
+    P = 12                                  # 端の点が枠に重ならないよう、内側に余白を取る
+    X = lambda v: L + P + (float(v) - xs["lo"]) / (xs["hi"] - xs["lo"]) * (R - L - 2 * P)  # noqa: E731
+    Y = lambda v: B - P - (float(v) - ys["lo"]) / (ys["hi"] - ys["lo"]) * (B - T - 2 * P)  # noqa: E731
+    for t in range(int(ys["lo"]), int(ys["hi"]) + 1, ys.get("step", 1)):
+        c.line(L, Y(t), R, Y(t), GRID, 1)
+        c.text(L - 6, Y(t) + 4, _num(t), 11, INK2, "end")
+    for t in range(int(xs["lo"]), int(xs["hi"]) + 1, xs.get("step", 1)):
+        c.text(X(t), B + 15, _num(t), 11, INK2, "middle")
+    c.line(L, B, R, B, INK2, 1)
+    mode = sp.get("show", "cov")
+    lines = []
+    if mode == "cov":
+        for a, b in pts:                    # 偏差の積の長方形：同じ向き（積が正）は青、逆の向き（負）は橙
+            pr = (a - mx) * (b - my)
+            if pr == 0:
+                continue
+            col = BLUE if pr > 0 else ORANGE
+            x0, x1 = sorted([X(mx), X(a)]); y0, y1 = sorted([Y(my), Y(b)])
+            c.add(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{x1 - x0:.1f}" height="{y1 - y0:.1f}" fill="{col}" fill-opacity="0.18" stroke="{col}" stroke-width="1"/>')
+        c.line(X(mx), T, X(mx), B, INK2, 1.5, "5 4"); c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")  # 平均の点を通る縦・横の線
+        lines.append(f"平均の点（{_num(float(mx))}, {_num(float(my))}）・偏差の積の平均（共分散）{_num(float(sxy / n))}")
+        lines.append("青の長方形は同じ向き（偏差の積が正）、橙は逆の向き（負）")
+    else:
+        b1 = sxy / sxx; a1 = my - b1 * mx
+        c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")
+        c.line(X(xs["lo"]), Y(a1 + b1 * xs["lo"]), X(xs["hi"]), Y(a1 + b1 * xs["hi"]), BLUE, 2)
+        sst = sse = Fraction(0)
+        for a, b in pts:
+            f = a1 + b1 * a
+            sst += (b - my) ** 2; sse += (b - f) ** 2
+            c.line(X(a) - 4, Y(b), X(a) - 4, Y(my), INK3, 2, "3 3")
+            c.line(X(a) + 4, Y(b), X(a) + 4, Y(f), ORANGE, 2.5)
+        lines.append(f"点線（左）：平均 {_num(float(my))} からの偏差。2乗の和 {_num(float(sst))}")
+        lines.append(f"実線（右）：直線からの残差。2乗の和 {_num(round(float(sse), 4))}")
+    for a, b in pts:
+        c.circle(X(a), Y(b), 4.5, INK)
+    y = B + 34
+    c.text(R, y, xs["label"], 11.5, INK2, "end")
+    c.text(L, T - 4, ys["label"], 11.5, INK2)
+    y += 12
+    for t in lines:
+        y = c.para(8, y + 8, t, 344, 12.5, INK) + 2
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 # ---- 確率分布の概念図（棒か曲線。期待値の▲・±標準偏差・確率の面積） ----
 def _pmf(sp: dict):
     import math
@@ -1256,7 +1316,7 @@ def sqsplit(sp: dict) -> str:
     return c.done(y + 6)
 
 TYPES = {"sqsplit": sqsplit, "bands": bands, "popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
-         "centers": centers, "zscale": zscale, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
+         "centers": centers, "zscale": zscale, "scatter": scatter, "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
 def specs(course: Course) -> dict[str, dict]:

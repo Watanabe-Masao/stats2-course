@@ -28,6 +28,16 @@ concepts_linked: true
 status: drafted
 version: 1
 figures:
+  - id: FIG-U07-cov
+    caption: 売場A（横）と売場C（縦）の同じ日の販売数。平均の点からの偏差の積を長方形にした。同じ向きに動く5日では、長方形がみな正の側に来る
+    spec:
+      type: scatter
+      show: cov
+      title: 2つの量が一緒に動く分は、偏差の積の平均（共分散）で測る
+      points: [[8, 18], [9, 19], [10, 20], [11, 21], [12, 22]]
+      x: {label: 売場A（個）, lo: 8, hi: 12, step: 2}
+      y: {label: 売場C（個）, lo: 18, hi: 22, step: 2}
+      note: 売場A を A 自身と組にすると、偏差の積の平均は A の分散になる
   - id: FIG-U07-spread
     caption: 売場A・Bの5日間の販売数。点線の長さが偏差（値−平均）。平均は同じ10個でも、Bは点線が長く、偏差平方和は9倍
     spec:

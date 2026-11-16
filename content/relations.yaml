@@ -918,6 +918,7 @@ relations:
     basis:
       units:
       - U04
+    figures: [FIG-U04-scale]
     version: 2
   - id: REL-median-mean-contrast
     from: TERM-median
@@ -931,6 +932,7 @@ relations:
     basis:
       units:
       - U06
+    figures: [FIG-U06-concept]
     version: 2
   - id: REL-mode-mean-contrast
     from: TERM-mode
@@ -944,6 +946,7 @@ relations:
     basis:
       units:
       - U06
+    figures: [FIG-U06-concept]
     version: 1
   - id: REL-mean-dev
     from: TERM-mean
@@ -975,6 +978,7 @@ relations:
     basis:
       units:
       - U06
+    figures: [FIG-U05-exA]
     version: 2
   - id: REL-quantile-quartile
     from: TERM-quantile
@@ -989,6 +993,7 @@ relations:
       units:
       - U05
       - U06
+    figures: [FIG-U05-exA]
     version: 2
   - id: REL-quartile-iqr
     from: TERM-quartile
@@ -1031,6 +1036,7 @@ relations:
     basis:
       units:
       - U07
+    figures: [FIG-U05-exA]
     version: 2
   - id: REL-freqtable-hist
     from: TERM-freqtable
@@ -1082,6 +1088,7 @@ relations:
       units:
       - U05T
       - U06
+    figures: [FIG-U05T-concept]
     version: 2
   - id: REL-mean-ma
     from: TERM-mean
@@ -1156,6 +1163,7 @@ relations:
       units:
       - U07
       - U29
+    figures: [FIG-U29-resid]
     version: 2
   - id: REL-resid-r2
     from: TERM-resid
@@ -2018,6 +2026,7 @@ relations:
   - id: REL-datavar-datacov
     from: TERM-data-var
     to: TERM-data-cov
+    figures: [FIG-U07-cov]
     version: 1
     type: 特別な場合
     fix: equal
