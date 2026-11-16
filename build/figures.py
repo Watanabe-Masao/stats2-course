@@ -672,14 +672,18 @@ def _scatter_fit(sp: dict) -> str:
             else:
                 c.circle(X(a), Y(b), 4.5, col)
         ratio = (float(syy) / float(sxx)) ** 0.5
-        lines.append((col, dashes[k % 3], f"{st['label']}：相関係数 {_num(round(r, 2))}×標準偏差の比 {_num(round(ratio, 2))}＝傾き {_num(float(b1))}"))
+        lines.append((col, dashes[k % 3], k % 2, f"{st['label']}：相関係数 {_num(round(r, 2))}×標準偏差の比 {_num(round(ratio, 2))}＝傾き {_num(float(b1))}"))
     y = B + 34
     c.text(R, y, xs["label"], 11.5, INK2, "end")
     c.text(L, T - 4, ys["label"], 11.5, INK2)
     y += 12
-    for col, dash, t in lines:
+    for col, dash, sq, t in lines:            # 凡例は線の見本と点の印（丸・四角）の両方
         c.line(10, y + 4, 30, y + 4, col, 2.5, dash)
-        y = c.para(36, y + 8, t, 316, 12.5, INK) + 2
+        if sq:
+            c.add(f'<rect x="{36:.1f}" y="{y:.1f}" width="8" height="8" fill="{col}"/>')
+        else:
+            c.circle(40, y + 4, 4.5, col)
+        y = c.para(50, y + 8, t, 302, 12.5, INK) + 2
     if sp.get("note"):
         y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
     return c.done(y + 6)
