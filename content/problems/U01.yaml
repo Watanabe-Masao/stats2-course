@@ -101,6 +101,7 @@
 
 - id: Q-U01-010
   stage: S2
+  concepts: [TERM-eqtransform]
   label: 約1週間後の問
   format: written
   powers: [P1]
