@@ -671,7 +671,8 @@ def _scatter_fit(sp: dict) -> str:
                 c.add(f'<rect x="{X(a) - 4:.1f}" y="{Y(b) - 4:.1f}" width="8" height="8" fill="{col}"/>')
             else:
                 c.circle(X(a), Y(b), 4.5, col)
-        lines.append((col, dashes[k % 3], f"{st['label']}：傾き {_num(float(b1))}・相関係数 {_num(round(r, 2))}"))
+        ratio = (float(syy) / float(sxx)) ** 0.5
+        lines.append((col, dashes[k % 3], f"{st['label']}：相関係数 {_num(round(r, 2))}×標準偏差の比 {_num(round(ratio, 2))}＝傾き {_num(float(b1))}"))
     y = B + 34
     c.text(R, y, xs["label"], 11.5, INK2, "end")
     c.text(L, T - 4, ys["label"], 11.5, INK2)
@@ -733,8 +734,15 @@ def scatter(sp: dict) -> str:
             sst += (b - my) ** 2; sse += (b - f) ** 2
             c.line(X(a) - 4, Y(b), X(a) - 4, Y(my), INK3, 2, "3 3")
             c.line(X(a) + 4, Y(b), X(a) + 4, Y(f), ORANGE, 2.5)
-        lines.append(f"点線（左）：平均 {_num(float(my))} からの偏差。2乗の和 {_num(float(sst))}")
-        lines.append(f"実線（右）：直線からの残差。2乗の和 {_num(round(float(sse), 4))}")
+        if sp.get("values", True):          # values: false で2乗の和を出さない（概念図で、例題の答えを先に見せない）
+            lines.append(f"点線（各点の左）：平均 {_num(float(my))} からの偏差。2乗の和 {_num(float(sst))}")
+            lines.append(f"実線（各点の右）：直線からの残差。2乗の和 {_num(round(float(sse), 4))}")
+        else:
+            lines.append("点線（各点の左）：平均からの偏差。2乗の和が SST")
+            lines.append("実線（各点の右）：直線からの残差。2乗の和が SSE")
+        if sp.get("r2"):                    # 決定係数と相関係数の2乗を並べる（REL-corr-r2）
+            syy = sum((b - my) ** 2 for _, b in pts); r = float(sxy) / (float(sxx) * float(syy)) ** 0.5
+            lines.append(f"R²＝1−SSE÷SST＝{_num(round(1 - float(sse) / float(sst), 4))}、相関係数 r＝{_num(round(r, 4))} の2乗と同じ")
     for a, b in pts:
         c.circle(X(a), Y(b), 4.5, INK)
     y = B + 34

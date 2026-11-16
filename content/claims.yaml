@@ -1007,7 +1007,7 @@ claims:
   label: ④-37
   kind: 等しい
   statement:
-    text: 単回帰 ŷ＝a＋bx の傾き b は、相関係数 r に x・y の標準偏差の比 s_y/s_x を掛けたものに等しい
+    text: 単回帰 ŷ＝a＋bx の傾き b は、S_xx＞0 かつ S_yy＞0 のとき、相関係数 r に x・y の標準偏差の比 s_y/s_x を掛けたものに等しい
   premises:
     subjects:
     - TERM-slr
