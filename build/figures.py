@@ -653,9 +653,10 @@ def scatter(sp: dict) -> str:
     y = 8
     if sp.get("title"):
         y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
-    T = y + 14; B = T + 210
-    X = lambda v: L + (float(v) - xs["lo"]) / (xs["hi"] - xs["lo"]) * (R - L)  # noqa: E731
-    Y = lambda v: B - (float(v) - ys["lo"]) / (ys["hi"] - ys["lo"]) * (B - T)  # noqa: E731
+    T = y + 20; B = T + 210
+    P = 12                                  # 端の点が枠に重ならないよう、内側に余白を取る
+    X = lambda v: L + P + (float(v) - xs["lo"]) / (xs["hi"] - xs["lo"]) * (R - L - 2 * P)  # noqa: E731
+    Y = lambda v: B - P - (float(v) - ys["lo"]) / (ys["hi"] - ys["lo"]) * (B - T - 2 * P)  # noqa: E731
     for t in range(int(ys["lo"]), int(ys["hi"]) + 1, ys.get("step", 1)):
         c.line(L, Y(t), R, Y(t), GRID, 1)
         c.text(L - 6, Y(t) + 4, _num(t), 11, INK2, "end")
@@ -672,7 +673,7 @@ def scatter(sp: dict) -> str:
             col = BLUE if pr > 0 else ORANGE
             x0, x1 = sorted([X(mx), X(a)]); y0, y1 = sorted([Y(my), Y(b)])
             c.add(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{x1 - x0:.1f}" height="{y1 - y0:.1f}" fill="{col}" fill-opacity="0.18" stroke="{col}" stroke-width="1"/>')
-        c.line(X(mx), T, X(mx), B, INK2, 1.5, "5 4"); c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")
+        c.line(X(mx), T, X(mx), B, INK2, 1.5, "5 4"); c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")  # 平均の点を通る縦・横の線
         lines.append(f"平均の点（{_num(float(mx))}, {_num(float(my))}）・偏差の積の平均（共分散）{_num(float(sxy / n))}")
         lines.append("青の長方形は同じ向き（偏差の積が正）、橙は逆の向き（負）")
     else:
@@ -689,9 +690,10 @@ def scatter(sp: dict) -> str:
         lines.append(f"実線（右）：直線からの残差。2乗の和 {_num(round(float(sse), 4))}")
     for a, b in pts:
         c.circle(X(a), Y(b), 4.5, INK)
-    y = B + 22
+    y = B + 34
     c.text(R, y, xs["label"], 11.5, INK2, "end")
     c.text(L, T - 4, ys["label"], 11.5, INK2)
+    y += 12
     for t in lines:
         y = c.para(8, y + 8, t, 344, 12.5, INK) + 2
     if sp.get("note"):
