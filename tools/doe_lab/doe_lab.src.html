@@ -13,11 +13,11 @@
 <div class="tabs" id="tabs"></div>
 
 <div id="m-anova" class="mode">
- <p class="mut" style="margin:0">全体の変動を「群の平均のずれ（群間）」と「群の中のばらつき（群内）」に分ける。F＝群間の平均平方÷群内の平均平方。群の平均を離すと F は大きく、群の中を散らすと F は小さくなる。</p>
+ <p class="mut" style="margin:0">全体の変動を「群の平均のずれ（群間）」と「群の中のばらつき（群内）」に分ける。F＝群間の平均平方÷群内の平均平方。つまみで、群の平均のずれ・群の中のばらつき・値の写し（くり返し）を変えられる。</p>
  <div class="row ctl"><label>データ <select id="adata" data-key="data"></select></label></div>
  <input type="range" id="akb" min="0" max="3" step="0.25" value="1" data-name="平均のずれ" data-unit="倍">
  <input type="range" id="akw" min="0.25" max="3" step="0.25" value="1" data-name="群内のばらつき" data-unit="倍">
- <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="くり返し" data-unit="回">
+ <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="値の写し（くり返し）" data-unit="回">
  <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="aplot"></div>
  <div class="card res key" id="asum"></div>
@@ -85,7 +85,10 @@ const DATA={
  flyer:{name:"チラシ3案（各4店）",g:[[10,12,11,13],[14,15,13,16],[12,11,13,12]]},
  promo:{name:"陳列3案（各3店）",g:[[20,22,24],[24,26,28],[26,28,30]]},
  four:{name:"4つの売場（各6店）",g:[[6,7.5,8,9,9.5,11],[7,8.5,9,10,10.5,12],[8,9.5,10,11,11.5,13],[9,10.5,11,12,12.5,14]]},
- five:{name:"3案（各5店）",g:[[7,8,9,10,11],[7,8,9,10,11],[10,11,12,13,14]]}};
+ five:{name:"3案（各5店）",g:[[7,8,9,10,11],[7,8,9,10,11],[10,11,12,13,14]]},
+ block:{name:"陳列3案（規模の組4つ）",g:[[10,20,30,40],[12,21,33,42],[13,24,34,45]]},
+ even:{name:"実験1（各3店・平均が等間隔）",g:[[3,4,5],[6,7,8],[9,10,11]]},
+ one:{name:"実験2（各3店・1案だけ離れる）",g:[[2,4,6],[4,4,4],[10,10,10]]}};
 function aGroups(){const d=DATA[$("adata").value],kb=+$("akb").value,kw=+$("akw").value,rep=+$("arep").value;
  const base=d.g.map(g=>{let x=[];for(let i=0;i<rep;i++)x=x.concat(g);return x;});
  const all=base.flat(),m=all.reduce((s,x)=>s+x,0)/all.length;
@@ -93,7 +96,7 @@ function aGroups(){const d=DATA[$("adata").value],kb=+$("akb").value,kw=+$("akw"
 function aVals(){const G=aGroups(),all=G.flat(),N=all.length,a=G.length,m=all.reduce((s,x)=>s+x,0)/N,gm=G.map(g=>g.reduce((s,x)=>s+x,0)/g.length);
  const ssb=G.reduce((s,g,i)=>s+g.length*(gm[i]-m)**2,0),ssw=G.reduce((s,g,i)=>s+g.reduce((t,x)=>t+(x-gm[i])**2,0),0),dfb=a-1,dfw=N-a;
  const msb=ssb/dfb,msw=ssw/dfw,F=msw>0?msb/msw:Infinity,p=isFinite(F)?1-fCdf(F,dfb,dfw):0,crit=r3(inv(x=>fCdf(x,dfb,dfw),0.95,0,1e4));
- return {G,N,a,m,gm,ssb,ssw,sst:ssb+ssw,dfb,dfw,msb,msw,F,p,crit,decision:F>crit?"棄却する":"棄却しない"};}
+ return {G,N,a,m,gm,ssb,ssw,sst:all.reduce((t,x)=>t+(x-m)**2,0),dfb,dfw,msb,msw,F,p,crit,decision:F>crit?"棄却する":"棄却しない"};}
 function aRender(){const A=aVals(),all=A.G.flat(),lo0=Math.min(...all),hi0=Math.max(...all),pad=Math.max(1,(hi0-lo0)*0.08),lo=Math.floor(lo0-pad),hi=Math.ceil(hi0+pad),X=v=>40+(v-lo)/(hi-lo)*(W-56),rh=40;
  let s=`<svg viewBox="0 0 ${W} ${A.a*rh+34}" width="${W}" role="img" aria-label="群ごとの点と平均">`;
  s+=`<line x1="${X(A.m)}" y1="6" x2="${X(A.m)}" y2="${A.a*rh+12}" stroke="var(--fg)" stroke-dasharray="4 3" stroke-opacity=".7"/><text x="${X(A.m)}" y="${A.a*rh+26}" font-size="10.5" text-anchor="middle" fill="var(--fg)">全体の平均 ${f(A.m,2)}</text>`;
@@ -104,7 +107,7 @@ function aRender(){const A=aVals(),all=A.G.flat(),lo0=Math.min(...all),hi0=Math.
   s+=`<line x1="${gx}" y1="${y-14}" x2="${gx}" y2="${y+10}" stroke="${c}" stroke-width="3"/>`;});
  s+=`</svg><div class="legend mut"><span>太い横線＝群の平均のずれ（群間）</span><span>細い線＝群の中のずれ（群内）</span></div>`;
  $("aplot").innerHTML=s;
- $("asum").innerHTML=`<div>群間の平方和 ${f(A.ssb,3)}（自由度 ${A.dfb}）　群内の平方和 ${f(A.ssw,3)}（自由度 ${A.dfw}）</div><div>F＝(${f(A.ssb,3)}÷${A.dfb})÷(${f(A.ssw,3)}÷${A.dfw})＝<b>${f(A.F,3)}</b>　境目 F(${A.dfb}, ${A.dfw})＝${A.crit.toFixed(3)}</div><div>p 値 ${f(A.p)} → 「平均はすべて同じ」を <b>${A.decision}</b></div><div class="mut">平均のずれを2倍にすると群間の平方和は4倍。群の中のばらつきを2倍にすると群内の平方和は4倍。店舗をくり返すと群内の自由度が増え、境目が下がる。</div>`;
+ $("asum").innerHTML=`<div>群間の平方和 ${f(A.ssb,3)}（自由度 ${A.dfb}）　群内の平方和 ${f(A.ssw,3)}（自由度 ${A.dfw}）</div><div>F＝(${f(A.ssb,3)}÷${A.dfb})÷(${f(A.ssw,3)}÷${A.dfw})＝<b>${f(A.F,3)}</b>　境目 F(${A.dfb}, ${A.dfw})＝${A.crit.toFixed(3)}</div><div>p 値 ${f(A.p)} → 「平均はすべて同じ」を <b>${A.decision}</b></div>`;
  $("atab").innerHTML=`<table><tr><th>変動</th><th>平方和</th><th>自由度</th><th>平均平方</th></tr><tr><td>群間</td><td>${f(A.ssb,3)}</td><td>${A.dfb}</td><td>${f(A.msb,3)}</td></tr><tr><td>群内</td><td>${f(A.ssw,3)}</td><td>${A.dfw}</td><td>${f(A.msw,3)}</td></tr><tr><td>全体</td><td>${f(A.sst,3)}</td><td>${A.N-1}</td><td>—</td></tr></table>`;}
 LK.register("anova",{name:"分散分析",
  init(){$("adata").innerHTML=Object.entries(DATA).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join("");$("adata").onchange=aRender;["akb","akw","arep"].forEach(id=>LK.stepper($(id),aRender));aRender();},
@@ -135,7 +138,7 @@ function sRender(){const S=sVals(),lo=Math.floor(Math.min(-6,...S.est)),hi=Math.
  s+=`<line x1="${X(S.mean)}" y1="4" x2="${X(S.mean)}" y2="${H}" stroke="var(--acc2)" stroke-dasharray="4 3" stroke-width="2"/><text x="${X(S.mean)}" y="${H+28}" font-size="10.5" text-anchor="middle" fill="var(--acc2)">推定の平均 ${f(S.mean,1)}</text>`;
  s+=`<line x1="16" y1="${H}" x2="${W-16}" y2="${H}" stroke="var(--line)"/></svg>`;
  $("splot").innerHTML=s;
- $("ssum").innerHTML=`<div>500回の推定の平均 <b>${f(S.mean,2)}</b>（本当は ${S.tau}）→ 偏り ${f(S.bias,2)}：<b>${S.biased}</b></div><div>推定のばらつき（標準偏差）<b>${f(S.sd,2)}</b>（くじで半分なら ${f(S.sdRandom,2)}）→ <b>${S.spread}</b></div><div class="mut">大きい店を選ぶと、店の規模の差が効果に混ざる（交絡）。くじで割り当てると偏りは消えるが、規模の差がばらつきとして残る。規模の近い店どうしでくじを引く（ブロック化）と、そのばらつきも小さくなる。</div>`;}
+ $("ssum").innerHTML=`<div>500回の推定の平均 <b>${f(S.mean,2)}</b>（本当は ${S.tau}）→ 偏り ${f(S.bias,2)}：<b>${S.biased}</b></div><div>推定のばらつき（標準偏差）<b>${f(S.sd,2)}</b>（くじで半分なら ${f(S.sdRandom,2)}）→ <b>${S.spread}</b></div>`;}
 LK.register("assign",{name:"割り当て方",
  init(){$("smethod").onchange=sRender;LK.stepper($("stau"),sRender);sRender();},
  apply(s){if(s.method)$("smethod").value=s.method;if(s.tau!==undefined)LK.setRange("stau",s.tau);sRender();},
@@ -170,7 +173,7 @@ function iRender(){const I=iVals(),base={s:20,l:30},lo=Math.min(14,base.s+Math.m
  [["小型店",base.s,I.es,"var(--acc)"],["大型店",base.l,I.el,"var(--acc2)"]].forEach(([n,b,e,c])=>{s+=`<line x1="${x0}" y1="${Y(b)}" x2="${x1}" y2="${Y(b+e)}" stroke="${c}" stroke-width="3"/><circle cx="${x0}" cy="${Y(b)}" r="5" fill="${c}"/><circle cx="${x1}" cy="${Y(b+e)}" r="5" fill="${c}"/><text x="${x1+8}" y="${Y(b+e)+4}" font-size="11.5" fill="${c}">${n}</text><text x="${x0-8}" y="${Y(b)+4}" font-size="11" text-anchor="end" fill="${c}">${b}</text>`;});
  s+=`<text x="${x0}" y="${H+16}" font-size="11.5" text-anchor="middle" fill="var(--fg)">施策なし</text><text x="${x1}" y="${H+16}" font-size="11.5" text-anchor="middle" fill="var(--fg)">施策あり</text></svg><div class="mut" style="font-size:12px">線が平行なら交互作用なし。傾きが違えば、効果が店の型で違う。</div>`;
  $("iplot").innerHTML=s;
- $("isum").innerHTML=`<div>小型店の効果 ${f(I.es,1)}、大型店の効果 ${f(I.el,1)}、小型店の割合 ${f(I.p,1)}</div><div>平均の効果＝${f(I.p,1)}×${f(I.es,1)}＋${f(1-I.p,1)}×${f(I.el,1)}＝<b>${f(I.avg,2)}</b>　効果の違い（交互作用）＝<b>${f(I.inter,1)}</b></div><div class="mut">平均の効果1つにまとめると、「どの店で効くか」が消える。店の割合が変われば、平均の効果も変わる。</div>`;}
+ $("isum").innerHTML=`<div>小型店の効果 ${f(I.es,1)}、大型店の効果 ${f(I.el,1)}、小型店の割合 ${f(I.p,1)}</div><div>平均の効果＝${f(I.p,1)}×${f(I.es,1)}＋${f(1-I.p,1)}×${f(I.el,1)}＝<b>${f(I.avg,2)}</b>　効果の違い（交互作用）＝<b>${f(I.inter,1)}</b></div>`;}
 LK.register("inter",{name:"効果が店で違う",
  init(){["ies","iel","ip"].forEach(id=>LK.stepper($(id),iRender));iRender();},
  apply(s){if(s.es!==undefined)LK.setRange("ies",s.es);if(s.el!==undefined)LK.setRange("iel",s.el);if(s.p!==undefined)LK.setRange("ip",s.p);iRender();},
