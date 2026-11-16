@@ -10,6 +10,6 @@ const {chromium}=require('playwright');const path=require('path');
   &&near(r.A.ss,10)&&near(r.A.s2,2.5)&&near(r.t3.s2,4)&&near(r.t4.ss,20)&&near(r.t4.v,5)&&near(r.rx.ss,50)&&near(r.ry.ss,100)
   &&r.u.every(([av,as2,c],i)=>{const n=i+2;return near(av,8*(n-1)/n)&&near(as2,8)&&c===5**n;})&&near(r.gini,0.4)&&near(r.area,0.3)
   // 発展：2乗の和の分かれ方（A と C は10ずつ、合わせて270）、向きの違う X・Y（平均10・分散4）、2店の合計（同じ向き8・逆の向き0）
-  &&near(r.C.ss,10)&&near(r.AC.ss,270)&&near(r.AC.mean,15)&&near(r.X5.mean,10)&&near(r.Y5.mean,10)&&near(r.X5.v,4)&&near(r.Y5.v,4)&&near(r.sS.v,8)&&near(r.sO.v,0);
+  &&near(r.C.ss,10)&&near(r.AC.ss,270)&&near(r.AC.m,15)&&near(r.X5.m,10)&&near(r.Y5.m,10)&&near(r.X5.v,4)&&near(r.Y5.v,4)&&near(r.sS.v,8)&&near(r.sO.v,0);
  console.log(JSON.stringify({gini:r.gini,u:r.u.map(x=>x.map(v=>+v.toFixed(4)))}));
  console.log(ok?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok?0:1);})();
