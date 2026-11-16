@@ -199,7 +199,7 @@ relations:
     from_form: number
     description: 無相関は、2つの確率変数の共分散が0であること。共分散で定める性質。
     basis: {units: [U13]}
-    version: 2
+    version: 1
   - id: REL-indep-cov
     from: TERM-indep
     to: TERM-uncorr
