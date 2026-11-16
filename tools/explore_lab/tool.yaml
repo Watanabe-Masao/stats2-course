@@ -31,8 +31,12 @@ presets:
     task: 客数から売上を1本の直線で予測してよいか。店・前半／後半で分け、特別な日を除いて、点の並び方を比べる。
   s6-adjust:
     mode: sandbox
-    set: {value: sales, group: camp, filter: weekday, chart: box}
-    task: キャンペーンのある日とない日の売上の平均を、全部の日・平日だけ・週末だけで読む。見る値を客数・客単価に替えても読む。
+    set: {value: sales, group: camp, filter: all, chart: box}
+    task: キャンペーンのある日とない日の売上の平均を、全部の日・平日だけ・週末だけ・特別な日を除くで読む。見る値を客数・客単価に替えても読む。
+  s6-cust:
+    mode: sandbox
+    set: {value: sales, group: camp, filter: noevent, chart: scatter, second: cust}
+    task: 横軸を客数、縦軸を売上にして、キャンペーンのある日・ない日を色で分ける。同じくらいの客数の日どうしで、キャンペーンの日の点は上か下かを見る。
   s6-design:
     mode: sandbox
     set: {value: sales, group: camp, filter: all, chart: cross, second: week}
