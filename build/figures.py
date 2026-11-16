@@ -621,21 +621,35 @@ def dev(sp: dict) -> str:
         y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
     y += 14
     colors = [BLUE, ORANGE, RED]
+    grand = sp.get("grand")                 # 群に分けたデータ：全体の平均の線と、群の平均から全体の平均までの太い線（群間）を足す
+    G = Fraction(sum(Fraction(str(v)) for v in allv), len(allv))
+    top0 = y
+    ssb = ssw = Fraction(0)
     for k, r in enumerate(rows):
         d = r["data"]; n = len(d); m = Fraction(sum(Fraction(str(v)) for v in d), n)
         ss = sum((Fraction(str(v)) - m) ** 2 for v in d)
+        ssb += n * (m - G) ** 2; ssw += ss
         col = colors[k % len(colors)]
         c.text(8, y + 4, r["label"], 12.5, INK, weight="bold")
         y0 = y + 14
         c.line(X(float(m)), y0 - 4, X(float(m)), y0 + 12 * n, INK2, 1.5)
+        if grand:
+            c.add(f'<line x1="{X(float(G)):.1f}" y1="{y0 - 6}" x2="{X(float(m)):.1f}" y2="{y0 - 6}" stroke="{INK}" stroke-width="4"/>')
         for i, v in enumerate(d):
             yy = y0 + 4 + i * 12
             c.add(f'<line x1="{X(float(m)):.1f}" y1="{yy}" x2="{X(v):.1f}" y2="{yy}" stroke="{col}" stroke-width="2" stroke-dasharray="4 3"/>')
             c.circle(X(v), yy, 4, col)
         y = y0 + 12 * n + 6
-        y = c.para(8, y + 8, f"平均 {_num(float(m))}・偏差平方和 {_num(float(ss))}・分散（n）{_num(float(ss / n))}・不偏分散 {_num(float(ss / (n - 1)))}", 344, 12.5, INK) + 4
+        if grand:
+            y = c.para(8, y + 8, f"平均 {_num(float(m))}", 344, 12.5, INK) + 4
+        else:
+            y = c.para(8, y + 8, f"平均 {_num(float(m))}・偏差平方和 {_num(float(ss))}・分散（n）{_num(float(ss / n))}・不偏分散 {_num(float(ss / (n - 1)))}", 344, 12.5, INK) + 4
+    if grand:
+        c.add(f'<line x1="{X(float(G)):.1f}" y1="{top0}" x2="{X(float(G)):.1f}" y2="{y}" stroke="{INK}" stroke-width="1.5" stroke-dasharray="6 4"/>')
     _axis(c, lo, hi, y + 2, step, X)
     y += 26
+    if grand:
+        y = c.para(8, y + 4, f"点線の縦線は全体の平均 {_num(float(G))}。太い線（群の平均と全体の平均のずれ）から群間の平方和 {_num(float(ssb))}、細い点線（各値と群の平均のずれ）から群内の平方和 {_num(float(ssw))}", 344, 12.5, INK) + 2
     if sp.get("note"):
         y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
     return c.done(y + 6)
@@ -775,6 +789,8 @@ def _grid_pick(kind: str, rows: int, cols: int) -> set:
         return {(rows // 2, q) for q in range(cols)}
     if kind == "systematic":                # 名簿の同じ位置（各行の同じ列）
         return {(r, cols // 3) for r in range(rows)}
+    if kind == "half":                      # 全体の半分（くじで2群に分けた形。固定の並び）
+        return {((i * 37 + 11) % (rows * cols) // cols, (i * 37 + 11) % cols) for i in range(rows * cols // 2)}
     if kind == "srs":                       # 全体からばらばらに（固定の並び）
         return {((i * 37 + 11) % (rows * cols) // cols, (i * 37 + 11) % cols) for i in range(rows)}
     raise ValueError(f"grid の pick が分からない：{kind}")
@@ -801,8 +817,10 @@ def grid(sp: dict) -> str:
         for r in range(rows):
             for q in range(cols):
                 on = (r, q) in picked
+                fill = col if on else (cols_c[(k + 1) % 3] if pn.get("rest") else SURFACE)
+                op = ' fill-opacity="0.45"' if (not on and pn.get("rest")) else ""
                 c.add(f'<rect x="{px + q * cell:.1f}" y="{top + r * cell:.1f}" width="{cell - 1.5:.1f}" height="{cell - 1.5:.1f}" rx="2" '
-                      f'fill="{col if on else SURFACE}" stroke="{GRID}" stroke-width="0.8"/>')
+                      f'fill="{fill}"{op} stroke="{GRID}" stroke-width="0.8"/>')
     y = top + rows * cell + 18
     if sp.get("row_label"):
         y = c.para(8, y, sp["row_label"], 344, 12, INK2) + 2
