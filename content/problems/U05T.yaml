@@ -1,6 +1,7 @@
 # 単元U05Tの問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U05T-001
   stage: S1
+  concepts: [TERM-geomean]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -23,6 +24,7 @@
 
 - id: Q-U05T-002
   stage: S1
+  concepts: [TERM-ma]
   label: 例題C（自力）
   format: written
   powers: [P1, P2]
@@ -42,6 +44,7 @@
 
 - id: Q-U05T-003
   stage: S1
+  concepts: [TERM-ratio]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U05T-004
   stage: S1
+  concepts: [TERM-geomean, TERM-ratio]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -78,6 +82,7 @@
 
 - id: Q-U05T-005
   stage: S1
+  concepts: [TERM-ma]
   difficulty: 3
   format: written
   powers: [P1, P2]
@@ -96,6 +101,7 @@
 
 - id: Q-U05T-010
   stage: S2
+  concepts: [TERM-geomean]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -114,6 +120,7 @@
 
 - id: Q-U05T-011
   stage: S2
+  concepts: [TERM-ratio, TERM-point]
   label: 計算練習
   format: written
   powers: [P2, P1]
@@ -133,6 +140,7 @@
 
 - id: Q-U05T-012
   stage: S2
+  concepts: [TERM-ratio, TERM-point, TERM-sample, TERM-statistic]
   label: 約1か月後の問
   format: written
   powers: [P2, P3]
@@ -150,6 +158,7 @@
 
 - id: Q-U05T-020
   stage: S3
+  concepts: [TERM-ratio, TERM-point]
   tag: 寄与度
   format: written
   powers: [P2, P3]
@@ -168,6 +177,7 @@
 
 - id: Q-U05T-021
   stage: S3
+  concepts: [TERM-ratio]
   tag: 比べる相手
   format: written
   powers: [P3]
@@ -185,6 +195,7 @@
 
 - id: Q-U05T-022
   stage: S3
+  concepts: [TERM-geomean, TERM-ratio]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -215,6 +226,7 @@
 
 - id: Q-U05T-023
   stage: S3
+  concepts: [TERM-acf, TERM-corr]
   tag: 繰り返しを探す
   difficulty: 3
   format: written
@@ -233,6 +245,7 @@
 
 - id: Q-U05T-030
   stage: S4
+  concepts: [TERM-geomean]
   tag: 投資
   format: written
   powers: [P2, P3]
@@ -251,6 +264,7 @@
 
 - id: Q-U05T-031
   stage: S4
+  concepts: [TERM-ratio, TERM-point]
   tag: 物価指数
   format: written
   powers: [P1, P3]
@@ -270,6 +284,7 @@
 
 - id: Q-U05T-032
   stage: S4
+  concepts: [TERM-ma]
   tag: 仕事へ
   difficulty: 3
   format: written
@@ -288,19 +303,30 @@
     why: 中央に切り替えても22日分だが、計算できない日が「最初の6日」から「最初と最後の3日ずつ」に変わる。毎朝最新日まで見たいなら後方。
 
 - id: Q-U05T-040
-  stage: S5
-  label: 確かめ問題
+  stage: S5   # 2級の範囲外の発展。予測を外し、説明する形（#373 の F・#46）
+  concepts: [TERM-ma]
+  label: 説明してみる
   format: written
-  powers: [P2, P1]
-  prompt: 系列 10, 14, 12 に、α＝0.5 の指数平滑 Sₜ＝αxₜ＋(1−α)Sₜ₋₁（S₁＝10）を当てはめる。S₂ と S₃ を求めよ。
-  answer: S₂＝0.5×14＋0.5×10＝**12**、S₃＝0.5×12＋0.5×12＝**12**。2期目の急な増加（14）は半分だけ取り込まれ、3期目の減少（12）でも平滑値は動かない。
+  powers: [P2, P3]
+  prompt: ある商品を、3期目から入口の目立つ棚に移した。棚を移す前の2期は10個ずつ、移してからは20個ずつ売れ、売れ方は 10, 10, 20, 20, 20（個）になった。発注担当は、後方3点移動平均か、新しい値ほど重く見る指数平滑 Sₜ＝αxₜ＋(1−α)Sₜ₋₁（α＝0.5、S₁＝10）で需要を見る。どちらが急な変化にどう追いつくかを説明し、どちらを使うかが何で決まるかを書く。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: |-
+    **統計で言えること（売れ方が記録どおりで、品切れがなかったとみて）**：後方3点移動平均は、3期目から 約13.33、約16.67、20 で、変化から3期目にちょうど20に追いつく（窓の3つが全部新しい値になるまで、古い値を同じ重さで持ち続ける）。指数平滑は 10, 10, 15, 17.5, 18.75 で、変わった期にすぐ半分（15）まで動くが、20 には少しずつ近づくだけで届かない（古い値の重さが半分ずつ残る）。この先も20個が続くのか、一時的なのかは、3期分の数字だけからは決められない。
+
+    **解釈の例（20個に増えたことについて）**：
+    - 目立つ棚で多くの客の目に留まるようになり、この先もずっと20個前後で売れる
+    - 棚を移した直後は物めずらしさで手に取る客が多く、見慣れるとしばらくして元に近づく
+
+    **統計の外で決めること**：変わった直後の反応は、指数平滑の方が速い（3期目 15＞約13.33、4期目 17.5＞約16.67）。変化が続くと見るなら、直後は指数平滑で早く気づき、3期たてば移動平均が20にちょうど追いつくことも知っておく。一時的と見るなら、急な変化を半分まですぐ取り込む指数平滑より、古い値を同じ重さで持ち続ける移動平均の方が振り回されにくい（どちらも、窓を長く・α を小さくするほど、さらに振り回されにくくなる）。どちらを選んでも、品切れで売れ方が頭打ちになっていないかを先に確かめる。
   checks:
-    - '0.5*14 + 0.5*10 == 12 and 0.5*12 + 0.5*12 == 12'
+    - 'abs((10+10+20)/3 - 13.33) < 0.01 and abs((10+20+20)/3 - 16.67) < 0.01 and (20+20+20)/3 == 20'
+    - '0.5*20 + 0.5*10 == 15 and 0.5*20 + 0.5*15 == 17.5 and 0.5*20 + 0.5*17.5 == 18.75'
   figure:
     type: line
-    caption: 元の系列 10, 14, 12 と、α＝0.5 の指数平滑 10, 12, 12
-    title: 指数平滑（α＝0.5）
+    caption: 売れ方 10, 10, 20, 20, 20 と、α＝0.5 の指数平滑 10, 10, 15, 17.5, 18.75（後方3点移動平均は3期目から 13.33, 16.67, 20）
+    title: 指数平滑（α＝0.5）は、変化にすぐ動くが届かない
     series:
-      - {label: 元の値, values: [10, 14, 12]}
-    labels: [1期, 2期, 3期]
+      - {label: 売れた個数, values: [10, 10, 20, 20, 20]}
+    labels: [1期, 2期, 3期, 4期, 5期]
     smooth: 0.5
+    note: 後方3点移動平均は、3期目から 13.33、16.67、20 で、変わってから3つ目の期（5期）にちょうど20に追いつく。指数平滑はすぐ動くが、20には届かない。
