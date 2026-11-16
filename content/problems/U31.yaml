@@ -2,6 +2,7 @@
 # 偏りのある回答：集まった割合＝p×r1÷(p×r1＋(1−p)×r0)（p＝本当の割合、r1・r0＝回答率）
 - id: Q-U31-001
   stage: S1
+  concepts: [TERM-strat-sampling]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -24,6 +25,7 @@
 
 - id: Q-U31-002
   stage: S1
+  concepts: [TERM-nonsampling-error, TERM-sampling-error]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -42,6 +44,7 @@
 
 - id: Q-U31-003
   stage: S1
+  concepts: [TERM-multistage-sampling]
   difficulty: 1
   format: written
   powers: [P1]
@@ -60,6 +63,7 @@
 
 - id: Q-U31-004
   stage: S1
+  concepts: [TERM-strat-sampling, TERM-cluster-sampling, REL-strat-cluster-contrast]
   difficulty: 2
   format: written
   powers: [P1, P3]
@@ -77,6 +81,7 @@
 
 - id: Q-U31-005
   stage: S1
+  concepts: [TERM-systematic-sampling]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -95,6 +100,7 @@
 
 - id: Q-U31-010
   stage: S2
+  concepts: [TERM-strat-sampling]
   format: written
   powers: [P1, P3]
   prompt: 層1（全体の20%、標準偏差30）と層2（80%、標準偏差5）に、合わせて100人を振り分ける。① 比例配分 ② ネイマン配分（層の割合×層の標準偏差に比例）で、層1に何人を配るか。
@@ -112,6 +118,7 @@
 
 - id: Q-U31-011
   stage: S2
+  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-ci]
   format: written
   powers: [P1, P3]
   prompt: 例題C の調査（本当の賛成率0.5、賛成者の回答率0.6・反対者の回答率0.3）で、回答を1万人集めた。集まった賛成率は約0.667、95%信頼区間（{{unit:U22}}）は約0.657〜0.676 になる。この区間は本当の賛成率0.5 を含むか。区間の幅が狭いことは、何を保証して何を保証しないか。
@@ -129,6 +136,7 @@
 
 - id: Q-U31-012
   stage: S2
+  concepts: [TERM-nonsampling-error, TERM-ci, TERM-bias]
   format: written
   powers: [P1, P3]
   prompt: 400人の回答で賛成率は0.6、比率の95%信頼区間（{{unit:U22}}）は 0.6±1.96×√(0.6×0.4÷400)＝約0.552〜0.648。ところが本当の賛成率は0.5 で、賛成者の回答率は0.6、反対者は0.4 だった。偏り（集まった値−本当の値）はいくつか。区間の作り方のどこに、この偏りが入っていないか。
@@ -146,6 +154,7 @@
 
 - id: Q-U31-020
   stage: S3
+  concepts: [TERM-strat-sampling]
   format: written
   powers: [P1, P3]
   prompt: 2店で満足度を調べる。A店の客は100人、B店は400人。各店から20人ずつ選ぶと、満足と答えた割合はA店80%、B店50%だった。① この選び方の名前は何か。② 2店全体の満足の割合を推定せよ。③ 40人の回答をそのまま集計すると何%になり、どこがずれるか。
@@ -163,6 +172,7 @@
 
 - id: Q-U31-021
   stage: S3
+  concepts: [TERM-strat-sampling, TERM-sampling-error, TERM-se]
   format: written
   powers: [P1, P3]
   prompt: Q-U31-010 の2つの層（割合0.2・標準偏差30 と 割合0.8・標準偏差5、層の平均の差40）で、100人を調べる。標準誤差を ① 単純無作為 ② 比例配分の層化 ③ ネイマン配分の層化 で比べよ。①は √((0.2×30²＋0.8×5²＋0.2×0.8×40²)÷100) で求める。
@@ -180,6 +190,7 @@
 
 - id: Q-U31-022
   stage: S3
+  concepts: [TERM-nonsampling-error]
   format: written
   powers: [P1, P3]
   prompt: 回答率がちょうど50%の調査があった。本当の賛成率は0.4 で、賛成の人も反対の人も同じく半分が答えた。集まった答えの賛成率は偏るか。「回答率が低いから信用できない」という意見に、どう答えるか。
@@ -197,6 +208,7 @@
 
 - id: Q-U31-023
   stage: S3
+  concepts: [TERM-strat-sampling, TERM-cluster-sampling, TERM-sampling-error]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -227,6 +239,7 @@
 
 - id: Q-U31-030
   stage: S4
+  concepts: [TERM-strat-sampling]
   format: written
   powers: [P1, P3]
   prompt: チェーンの客単価を調べる。全店の25%を占める大型店と75%の小型店から、同じ8店ずつ調べると、客単価の平均は大型店120百円、小型店60百円だった。チェーン全体の客単価を推定し、報告の文を書け。
@@ -244,6 +257,7 @@
 
 - id: Q-U31-031
   stage: S4
+  concepts: [TERM-nonsampling-error]
   format: written
   powers: [P1, P3]
   prompt: 店内アンケートで「不満がある」と答えた人の割合を調べる。本当は客の30%が不満を持っているが、不満のある人の回答率は0.2、ない人の回答率は0.5 だった。① 集まった答えの「不満」の割合はいくつか。② この結果を「不満は少ない」と報告するのは何が問題か。
@@ -261,6 +275,7 @@
 
 - id: Q-U31-032
   stage: S4
+  concepts: [TERM-multistage-sampling]
   format: written
   powers: [P1, P3]
   prompt: 本部が客の声を集める。12地域から3地域、選んだ地域の8店から2店、選んだ店の100人の客から10人を選ぶ。ある客が選ばれる確率と重みを求めよ。店によって客が100人と300人に違う場合、各店10人ずつ選ぶと何が起きるか。
@@ -278,10 +293,12 @@
 
 - id: Q-U31-040
   stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
+  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-bias, REL-sampling-nonsampling-contrast]
   format: written
   powers: [P1, P3]
-  prompt: 例題C の調査（本当の賛成率0.5、回答率は賛成0.6・反対0.3）で、偏りは約0.167。総合誤差 √(偏り²＋標準誤差²) を、回答数400人のときに求めよ（標準誤差は √(p̂(1−p̂)÷n)、p̂≒0.667）。n をいくら増やしても、総合誤差はいくつより小さくならないか。
-  answer: 標準誤差＝√(0.667×0.333÷400)≒0.0236。総合誤差＝√(0.1667²＋0.0236²)≒**0.168**。n を増やすと標準誤差は0 に近づくが、総合誤差は偏りの**0.167 より小さくならない**。n を増やすより、回答率の差を小さくする（答えやすくする・追加で聞く）ほうが効く。
+  prompt: 例題C の調査（本当の賛成率0.5、回答率は賛成0.6・反対0.3）で、偏りは約0.167。調査の担当者は「回答を400人から1万人に増やせば、誤差はほとんどなくなる」と予算を求めた。ラボで回答数を増やしながら、偏り・標準誤差・総合誤差 √(偏り²＋標準誤差²) の動きを読み、担当者の考えのどこに無理があるかを説明する。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: 回答数400人では、標準誤差は √(0.667×0.333÷400)≒0.0236、総合誤差は √(0.1667²＋0.0236²)≒0.168。1万人にすると標準誤差は約0.005 まで縮むが、総合誤差は0.1667 までしか下がらない。総合誤差のほとんどは、賛成の人ほど答えやすいことから来る偏りで、回答数を増やしても同じ向きに残る。予算を回答数に使うより、答えにくい人に追加で聞く・答えやすい聞き方にするなど、回答率の差を小さくする方に使う方が、誤差は小さくなる。
   checks:
     - 'abs(math.sqrt((2/3)*(1/3)/400) - 0.0236) < 0.00005 and abs(math.sqrt((1/6)**2+(2/3)*(1/3)/400) - 0.168) < 0.0005 and abs(1/6 - 0.167) < 0.0005'
   lab:

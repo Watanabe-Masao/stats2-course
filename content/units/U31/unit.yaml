@@ -24,6 +24,20 @@ evidence:
   S4: 職場の調査を、選ばれ方と偏りに分けて読めた
   S5: 1つ選んで理解を確かめた（任意）
   S6: 課題を1つ作り、検証まで行った（任意）
+figures:
+  - id: FIG-U31-concept
+    caption: 10地域×10店（1行が1地域）から10店を選ぶ。層化はどの地域からも1店ずつ、集落は1つの地域の10店を全部選ぶ
+    spec:
+      type: grid
+      title: 層化はどの地域からも少しずつ、集落は選んだ地域を全部
+      rows: 10
+      cols: 10
+      panels:
+        - {label: 層化抽出, pick: strat}
+        - {label: 集落抽出, pick: cluster}
+      row_label: 1行が1地域、1升が1店。塗った升が調べる店
+      note: 層化では地域の違いが推定値のばらつきに入らず、集落ではどの地域を引いたかがそのまま推定値に出る
+concepts_linked: true
 status: drafted
 version: 1
 checks:

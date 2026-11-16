@@ -1300,6 +1300,7 @@ relations:
     basis:
       units:
       - U31
+    figures: [FIG-U31-concept]
     version: 2
   - id: REL-sampling-nonsampling-contrast
     from: TERM-sampling-error
