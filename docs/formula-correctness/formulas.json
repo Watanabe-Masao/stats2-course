@@ -4568,6 +4568,220 @@
   }
  },
  {
+  "concept": "TERM-ols",
+  "index": 0,
+  "id": "F-ols-intercept",
+  "label": "単回帰の切片",
+  "tex": "a=ȳ-bx̄",
+  "symbols": [
+   {
+    "symbol": "a",
+    "meaning": "単回帰の切片（x＝0 のときの見込みの値。直線を (x̄, ȳ) に通す位置合わせ）",
+    "key": "a",
+    "kind": "value"
+   },
+   {
+    "symbol": "ȳ",
+    "meaning": "目的変数 y の平均",
+    "key": "ybar",
+    "kind": "value",
+    "concept": "TERM-mean"
+   },
+   {
+    "symbol": "b",
+    "meaning": "単回帰の傾き",
+    "key": "b",
+    "kind": "value",
+    "concept": "TERM-regcoef"
+   },
+   {
+    "symbol": "x̄",
+    "meaning": "説明変数 x の平均",
+    "key": "xbar",
+    "kind": "value",
+    "concept": "TERM-mean"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "a"
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "sym": "ybar"
+      },
+      {
+       "op": "mul",
+       "args": [
+        {
+         "sym": "b"
+        },
+        {
+         "sym": "xbar"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "再現"
+   ],
+   "representative": true
+  }
+ },
+ {
+  "concept": "TERM-regcoef",
+  "index": 0,
+  "id": "F-ols-slope",
+  "label": "単回帰の傾き",
+  "tex": "b=\\dfrac{S_{xy}}{S_{xx}}",
+  "symbols": [
+   {
+    "symbol": "b",
+    "meaning": "単回帰の傾き（説明変数 x の回帰係数）",
+    "key": "b",
+    "kind": "value"
+   },
+   {
+    "symbol": "S_xy",
+    "meaning": "x と y の偏差の積の和 Σ(xᵢ−x̄)(yᵢ−ȳ)",
+    "key": "Sxy",
+    "kind": "value"
+   },
+   {
+    "symbol": "S_xx",
+    "meaning": "x の偏差の2乗の和 Σ(xᵢ−x̄)²",
+    "range": "0より大きい（x が全部同じではない）",
+    "key": "Sxx",
+    "kind": "value",
+    "domain": {
+     "min": 0,
+     "minOpen": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "b"
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "sym": "Sxy"
+      },
+      {
+       "sym": "Sxx"
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "単位の整合",
+    "条件しだい"
+   ],
+   "representative": true
+  }
+ },
+ {
+  "concept": "TERM-r2",
+  "index": 0,
+  "id": "F-r2-def",
+  "label": "決定係数",
+  "tex": "R²=1-\\dfrac{SSE}{SST}",
+  "symbols": [
+   {
+    "symbol": "R²",
+    "meaning": "決定係数",
+    "range": "1以下（切片を含む最小二乗では0以上1以下）",
+    "key": "R2",
+    "kind": "value",
+    "concept": "TERM-r2",
+    "domain": {
+     "max": 1
+    }
+   },
+   {
+    "symbol": "SSE",
+    "meaning": "残差の2乗の和 Σeᵢ²",
+    "range": "0以上",
+    "key": "SSE",
+    "kind": "value",
+    "concept": "TERM-resid",
+    "domain": {
+     "min": 0
+    }
+   },
+   {
+    "symbol": "SST",
+    "meaning": "目的変数の偏差の2乗の和 Σ(yᵢ−ȳ)²",
+    "range": "0より大きい（y が全部同じではない）",
+    "key": "SST",
+    "kind": "value",
+    "concept": "TERM-dev",
+    "domain": {
+     "min": 0,
+     "minOpen": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "R2"
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "num": 1
+      },
+      {
+       "op": "div",
+       "args": [
+        {
+         "sym": "SSE"
+        },
+        {
+         "sym": "SST"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "定義"
+   ],
+   "properties": [
+    "有界",
+    "同値",
+    "条件しだい"
+   ],
+   "representative": true
+  }
+ },
+ {
   "concept": "TERM-prob",
   "index": 0,
   "id": "F-complement",

@@ -3,7 +3,7 @@
  "status": "check_all が --check で古くないかを確かめ、math-lab のテストが写して engine と照らす",
  "generated_by": {
   "script": "build/oracle.py",
-  "script_sha256": "ae22793f5c814a08880aea0bcd9549781e0485057e0f5af0bba1a0ab129ea538",
+  "script_sha256": "c3ee6647d7e8d9e7d632d7538ccd7892c7376e2437219571335975078c1e9d02",
   "libraries": [
    "math",
    "fractions",
@@ -1462,8 +1462,11 @@
   },
   {
    "id": "ols-tiny",
-   "formula_ids": [],
-   "formula_ids_note": "教材に回帰の式の原本がまだない（TERM-ols・TERM-regcoef・TERM-slr・TERM-resid・TERM-r2 は骨格）。式を足したら ID を書く",
+   "formula_ids": [
+    "F-ols-slope",
+    "F-ols-intercept",
+    "F-r2-def"
+   ],
    "representative": "回帰",
    "method": "正規方程式を Fraction で解く（偏差の積和 Sxy/Sxx の式は使わない）。決定係数は 1−SSE/SST と相関係数の2乗の2通りで照らす",
    "inputs": {
@@ -1534,8 +1537,11 @@
   },
   {
    "id": "ols-exact-line",
-   "formula_ids": [],
-   "formula_ids_note": "教材に回帰の式の原本がまだない（TERM-ols・TERM-regcoef・TERM-slr・TERM-resid・TERM-r2 は骨格）。式を足したら ID を書く",
+   "formula_ids": [
+    "F-ols-slope",
+    "F-ols-intercept",
+    "F-r2-def"
+   ],
    "representative": "回帰",
    "method": "正規方程式を Fraction で解く（偏差の積和 Sxy/Sxx の式は使わない）。決定係数は 1−SSE/SST と相関係数の2乗の2通りで照らす",
    "inputs": {
@@ -1604,8 +1610,11 @@
   },
   {
    "id": "ols-negative",
-   "formula_ids": [],
-   "formula_ids_note": "教材に回帰の式の原本がまだない（TERM-ols・TERM-regcoef・TERM-slr・TERM-resid・TERM-r2 は骨格）。式を足したら ID を書く",
+   "formula_ids": [
+    "F-ols-slope",
+    "F-ols-intercept",
+    "F-r2-def"
+   ],
    "representative": "回帰",
    "method": "正規方程式を Fraction で解く（偏差の積和 Sxy/Sxx の式は使わない）。決定係数は 1−SSE/SST と相関係数の2乗の2通りで照らす",
    "inputs": {
@@ -1799,8 +1808,23 @@
    "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"
   },
   {
+   "id": "r2-sst-zero",
+   "formula_ids": [
+    "F-r2-def"
+   ],
+   "inputs": {
+    "SSE": 0,
+    "SST": 0
+   },
+   "expect": "計算しない",
+   "reason": "y が全部同じ（x＝1,2,3・y＝4,4,4。傾きは0 に決まるが、決定係数は決まらない）",
+   "domain_ref": "F-r2-def の SST の domain（min 0・minOpen）"
+  },
+  {
    "id": "ols-sxx-zero",
-   "formula_ids": [],
+   "formula_ids": [
+    "F-ols-slope"
+   ],
    "inputs": {
     "x": [
      2,
@@ -1815,7 +1839,7 @@
    },
    "expect": "計算しない",
    "reason": "x のばらつきが0（傾きが決まらない）",
-   "domain_ref": "まだない（回帰の式と条件が原本にない）"
+   "domain_ref": "F-ols-slope の Sxx の domain（min 0・minOpen）"
   }
  ]
 }

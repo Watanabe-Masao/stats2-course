@@ -58,7 +58,7 @@ function symbolTex(key, symbols = []) {
 			const t = GREEK[c] ?? c;
 			out += /\\[A-Za-z]+$/.test(out) && /^[A-Za-z]/.test(t) ? ` ${t}` : t;
 		}
-		return out;
+		return out.replace(/_([A-Za-z0-9]{2,})/g, "_{$1}");
 	}
 	const m = /^([a-z]+)([A-Z0-9]*)$/.exec(key);
 	if (m && NAMES[m[1]]) return NAMES[m[1]] + (m[2] ? `_{${m[2]}}` : "");

@@ -217,8 +217,7 @@ def reg_cases() -> list[dict]:
             assert sum((y - (b0 + d0 + (b1 + d1) * x)) ** 2 for x, y in zip(xs, ys)) > sse
         out.append({
             "id": f"ols-{r['id']}",
-            "formula_ids": [],
-            "formula_ids_note": "教材に回帰の式の原本がまだない（TERM-ols・TERM-regcoef・TERM-slr・TERM-resid・TERM-r2 は骨格）。式を足したら ID を書く",
+            "formula_ids": ["F-ols-slope", "F-ols-intercept", "F-r2-def"],
             "representative": "回帰",
             "method": "正規方程式を Fraction で解く（偏差の積和 Sxy/Sxx の式は使わない）。決定係数は 1−SSE/SST と相関係数の2乗の2通りで照らす",
             "inputs": {"x": r["x"], "y": r["y"]},
@@ -260,8 +259,10 @@ def precondition_cases() -> list[dict]:
          "expect": "計算しない", "reason": "k ≦ M（当たりは3個しかない）", "domain_ref": "F-hyper-pmf の契約の conditions（k ≦ M）"},
         {"id": "hyper-k-too-small", "formula_ids": ["F-hyper-pmf"], "inputs": {"N": 10, "M": 8, "n": 5, "k": 2},
          "expect": "計算しない", "reason": "n−(N−M) ≦ k（外れは2個しかないので、5個引けば当たりは3個以上）", "domain_ref": "F-hyper-pmf の契約の conditions（n−(N−M) ≦ k）"},
-        {"id": "ols-sxx-zero", "formula_ids": [], "inputs": {"x": [2, 2, 2], "y": [1, 2, 3]},
-         "expect": "計算しない", "reason": "x のばらつきが0（傾きが決まらない）", "domain_ref": "まだない（回帰の式と条件が原本にない）"},
+        {"id": "r2-sst-zero", "formula_ids": ["F-r2-def"], "inputs": {"SSE": 0, "SST": 0},
+         "expect": "計算しない", "reason": "y が全部同じ（x＝1,2,3・y＝4,4,4。傾きは0 に決まるが、決定係数は決まらない）", "domain_ref": "F-r2-def の SST の domain（min 0・minOpen）"},
+        {"id": "ols-sxx-zero", "formula_ids": ["F-ols-slope"], "inputs": {"x": [2, 2, 2], "y": [1, 2, 3]},
+         "expect": "計算しない", "reason": "x のばらつきが0（傾きが決まらない）", "domain_ref": "F-ols-slope の Sxx の domain（min 0・minOpen）"},
     ]
 
 

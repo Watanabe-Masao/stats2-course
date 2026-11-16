@@ -209,3 +209,17 @@ contracts:
 - formula: F-uniform-var
   kinds: [恒等式]
   properties: [非負, 不変, 同値]
+- formula: F-ols-slope
+  kinds: [恒等式]
+  properties: [単位の整合, 条件しだい]
+  representative: true
+  review: [外挿（観測した x の範囲の外の見込みには使えない）, 因果（傾きは x を動かしたときの効果とは限らない）]
+- formula: F-ols-intercept
+  kinds: [恒等式]
+  properties: [再現]
+  representative: true
+- formula: F-r2-def
+  kinds: [定義]
+  properties: [有界, 同値, 条件しだい]
+  representative: true
+  review: [有界（0〜1 が保証されるのは、切片を含む最小二乗で当てはめたときだけ）]
