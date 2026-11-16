@@ -138,7 +138,7 @@
     why: 1÷1.25−1＝−0.2 で20%下げる。1,000×1.25＝1,250、1,250×0.8＝1,000 で元に戻る。
 
 - id: Q-U01-012
-  concepts: [TERM-eqtransform, TERM-std]
+  concepts: [TERM-eqtransform, TERM-data-std]
   stage: S2
   label: 約1か月後の問
   format: written

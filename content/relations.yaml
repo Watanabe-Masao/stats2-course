@@ -1938,6 +1938,13 @@ relations:
     basis:
       units:
       - U28
+  - id: REL-datasd-datastd
+    from: TERM-data-sd
+    to: TERM-data-std
+    type: 定める
+    description: データの標準化は、データの各値から平均を引き、データの標準偏差で割ること。データの標準偏差で定める操作。
+    basis: {units: [U08]}
+    version: 1
   - id: REL-datasd-corr
     from: TERM-data-sd
     to: TERM-corr
