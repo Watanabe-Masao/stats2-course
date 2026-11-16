@@ -1247,7 +1247,7 @@ relations:
     from: TERM-anova
     to: TERM-test
     type: 一種
-    description: 分散分析は、仮説検定の手順を3つ以上の群の平均に当てはめたもの。
+    description: 分散分析は、仮説検定の手順を2つ以上（主に3つ以上）の群の平均に当てはめたもの。
     basis:
       units:
       - U32

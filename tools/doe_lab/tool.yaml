@@ -55,30 +55,24 @@ presets:
     mode: anova
     set: {data: ex, kb: 1, kw: 1, rep: 1}
     steps:
-      - label: そのまま
-        set: {kb: 1, kw: 1, rep: 1}
-        task: 例題A（各2店）。F の値は？
+      - label: 平均のずれ3倍
+        set: {kb: 3, kw: 1, rep: 1}
+        task: 例題A（各2店、F＝4）から、群の平均のずれだけを3倍にする（群の中のばらつきは同じ）。F は？
         predict: {type: number, key: F, label: "F"}
-        expect: 4
-        why: 群間の平均平方8 ÷ 群内の平均平方2。
-      - label: 平均のずれ2倍
-        set: {kb: 2}
-        task: 群の平均のずれだけを2倍にする。F は？
-        predict: {type: number, key: F, label: "F"}
-        expect: 16
-        why: 群間の平方和は 2²＝4倍の64。群内は変わらない。
+        expect: 36
+        why: 群間の平方和は 3²＝9倍の144。群内は変わらないので、F も9倍。
       - label: 群内のばらつき2倍
         set: {kb: 1, kw: 2}
         task: 平均のずれを元に戻し、群の中のばらつきだけを2倍にする。F は？
         predict: {type: number, key: F, label: "F"}
         expect: 1
-        why: 群内の平方和が4倍の24。F は4分の1。
-      - label: 店舗を2倍
-        set: {kw: 1, rep: 2}
-        task: ばらつきを元に戻し、同じ値の店をもう1組ずつ足す（各4店）。F は？
+        why: 群内の平方和が 2²＝4倍の24。F は4分の1。
+      - label: 別の店を足す
+        set: {kw: 1, rep: 3}
+        task: ばらつきを元に戻し、別の店で同じ散らばりの値が出たとして、各群を6店にする（A 1,3,1,3,1,3 など）。F は？
         predict: {type: number, key: F, label: "F"}
-        expect: 12
-        why: 群間の平方和は2倍の32、群内は2倍の12 だが、群内の自由度が3から9 に増える。
+        expect: 20
+        why: 群間の平方和は3倍の48、群内も3倍の18 だが、群内の自由度が3から15 に増える。(48÷2)÷(18÷15)＝20。
     law:
       title: 式で説明する
       lines:
