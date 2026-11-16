@@ -1064,7 +1064,7 @@ relations:
     from: TERM-data-sd
     to: TERM-kurt
     type: 定める
-    description: 尖度は、偏差を標準偏差で割った値の4乗の平均（から3を引くこともある）。
+    description: 尖度は、偏差を標準偏差で割った値の4乗の平均。
     basis:
       units:
       - U08

@@ -380,7 +380,7 @@ def zscale(sp: dict) -> str:
     c = Canvas()
     rows = sp["rows"]                         # [{label, mean, sd, x}]
     zs = sp.get("marks", [0, 2])              # 数を書く z
-    zlo, zhi = sp.get("zlo", -3), sp.get("zhi", 3)
+    zlo, zhi = int(sp.get("zlo", -3)), int(sp.get("zhi", 3))
     X = lambda z: 24 + (z - zlo) / (zhi - zlo) * (W - 48)  # noqa: E731
     y = 8
     if sp.get("title"):
@@ -392,7 +392,8 @@ def zscale(sp: dict) -> str:
         yy = top + 26 + k * 52
         ys.append(yy)
         col = colors[k % len(colors)]
-        c.text(8, yy - 12, f'{r["label"]}（平均{_num(r["mean"])}・標準偏差{_num(r["sd"])}）', 12, INK, weight="bold")
+        unit = sp.get("unit", "")
+        c.text(8, yy - 12, f'{r["label"]}（{unit}平均{_num(r["mean"])}・標準偏差{_num(r["sd"])}）', 12, INK, weight="bold")
         c.line(16, yy, W - 16, yy, INK2, 1)
         for z in range(zlo, zhi + 1):
             c.line(X(z), yy - 4, X(z), yy + 4, INK2, 1)
@@ -410,6 +411,10 @@ def zscale(sp: dict) -> str:
             c.text(X(z), zy + 18, _num(z), 12, INK, "middle", "bold")
     for z in zs:
         c.line(X(z), top + 22, X(z), zy, INK2, 1, "4 3")
+    for k, r in enumerate(rows):                              # z の目盛りの上にも、各集団の値の点を重ねて打つ
+        if "x" in r:
+            zx = (r["x"] - r["mean"]) / r["sd"]
+            c.circle(X(zx), zy - 9 * k, 6, colors[k % len(colors)])
     y = zy + 30
     if sp.get("note"):
         y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
