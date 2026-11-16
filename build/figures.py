@@ -191,6 +191,9 @@ def bars(sp: dict) -> str:
     bw = min(44, slot * 0.6)
     c.line(left, base, right, base, INK2, 1)
     vals = [v for _, v in data]
+    if sp.get("ref"):   # 基準の値の点線（#46 の U01：元の売価）。棒と数より先に描き、数の白い縁取りで線が隠れるようにする
+        ry = base - sp["ref"]["value"] * scale
+        c.line(left, ry, right, ry, INK, 1.4, "5 4")   # 何の線かは note に書く（線には文字を置かない）
     hi, lo = max(vals), min(vals)
     for i, (lab, v) in enumerate(data):
         cx = left + slot * (i + 0.5)
@@ -206,10 +209,6 @@ def bars(sp: dict) -> str:
             yv = base - max(data[i][1], data[i + 1][1]) * scale - 26
             c.add(f'<text x="{x:.1f}" y="{yv:.1f}" font-size="12.5" fill="{ORANGE}" text-anchor="middle" font-weight="bold" '
                   f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(lab)}</text>')
-    if sp.get("ref"):   # 基準の値の点線（#46 の U01：元の売価）
-        rv = sp["ref"]["value"]
-        ry = base - rv * scale
-        c.line(left, ry, right, ry, INK, 1.4, "5 4")   # 何の線かは note に書く（棒の数と重ならないように、線には文字を置かない）
     if "mean" in sp:
         m = Fraction(str(sum(Fraction(str(v)) for v in vals))) / n
         my = base - float(m) * scale
