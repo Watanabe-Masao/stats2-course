@@ -54,12 +54,12 @@ README の 0「テストの有効性と最小十分性」に従う。各テス�
 | σ＝0 で計算しない | domain の minOpen を消しても通る（M4） | 前提の崩れ：std-sigma-zero で `checkDomain` が空でない | **足す**。correctness.test.ts「σ＝0 の標準化は 0 で割るので止まる」は stopReason だけで、domain が消えても通る | 中×高 |
 | 別の集団の μ・σ で割らない | conditions.data の誤用 | レビュー | 数では見えない | 中×中 |
 
-### 2.5 回帰（式の原本なし。D3）
+### 2.5 回帰（D3。式の原本は #148 で足した：F-ols-slope・F-ols-intercept・F-r2-def）
 
 | 検証対象 | 想定する故障 | 検出方法 | 既存テストとの差分 | リスク |
 | --- | --- | --- | --- | --- |
-| b₀・b₁・R² の値 | x と y の取り違え（Sxy/Syy）、平均の取り違え | 見本：ols-*（正規方程式を Fraction で解いた値、mutants.b1_swapped_xy） | 今は式も engine の関数もないので**原本に式を足すときに一緒に**入れる | —（式が入るまで） |
-| Sxx＝0 で計算しない | 傾きが ∞・NaN のまま表示 | 前提の崩れ：ols-sxx-zero | 同上 | — |
+| a・b・R² の値 | x と y の取り違え（Sxy/Syy）、平均の取り違え | 見本：ols-*（正規方程式を Fraction で解いた値、mutants.b1_swapped_xy）。math-lab の oracle.test.ts が、式の木をデータから求めた S_xx・S_xy・平均で計算して照らす | 式の木を正規方程式の解（見本）と照らす。取り違えた木（Sxy/Syy）が見本で落ちることも確かめる | 中×高 |
+| Sxx＝0 で計算しない | 傾きが ∞・NaN のまま表示 | 前提の崩れ：ols-sxx-zero（F-ols-slope の Sxx の domain で止まる） | 式の定義域で止まるかを見る | 中×高 |
 | 外挿・因果の主張 | 回帰の言い分の誤り | レビュー | 数では見えない | 中×高 |
 
 ## 3. わざと入れた誤り（M1〜M9）と、止める所
