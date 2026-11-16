@@ -876,10 +876,25 @@ def basis_gaps(c: Course, rels: list[dict]) -> list[tuple[str, str]]:
     """定めるの候補のうち、材料（⑤ の定める）も、種類の親（⑤ の一種）も、除外（basis_excludes）もないもの：(候補の概念, 定義される概念)"""
     linked = {(r["from"], r["to"]) for r in rels if r.get("type") in DEFINES}
     linked |= {(a, k) for k in {x for r in rels for x in (r["from"], r["to"])} for a in inclusion_ancestors(k, rels)}   # 包含の親（⑤ の包含。#290）
+    # ⑤ の構成：ほかの直接の構成要素の構成要素としてたどって着くものは書かない。止めの側（v2_checks.py。#295）と同じく、
+    # 直接に扱った概念（定める・包含の親）から、定める・包含をさかのぼって着く概念は扱ったと数える（#312）
+    into: dict[str, set[str]] = {}
+    for a, b in linked:
+        into.setdefault(b, set()).add(a)
+
+    def reach(start: set[str]) -> set[str]:
+        seen, todo = set(start), list(start)
+        while todo:
+            for x in into.get(todo.pop(), ()):
+                if x not in seen:
+                    seen.add(x)
+                    todo.append(x)
+        return seen
     out = []
     for tid, t in c.terms.items():
         ex = {x.get("concept") for x in t.get("basis_excludes") or []}
-        out += [(k, tid) for k in sorted(basis_candidates(t, tid)) if (k, tid) not in linked and k not in ex]
+        handled = reach(into.get(tid, set()))
+        out += [(k, tid) for k in sorted(basis_candidates(t, tid)) if k not in handled and k not in ex]
     return out
 
 
