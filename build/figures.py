@@ -1133,11 +1133,13 @@ def sqsplit(sp: dict) -> str:
     """(Σx)² の正方形を x₁, x₂, … で区切り、対角の小さな正方形（Σx²）に色を塗る（#46 の U02）。
     values: [x₁, …]。和・2乗・合計は図を作るときに計算する。"""
     vals = sp["values"]
+    if not vals or any(v <= 0 for v in vals):
+        raise ValueError("sqsplit の values は正の数だけ（負の値・0 では正方形を区切れない）")
     tot = sum(vals)
     c = Canvas()
     side, ox, oy = 220, 70, 16
     k = side / tot
-    c.rect(ox, oy, side, side, LIGHT, stroke=INK2)
+    c.rect(ox, oy, side, side, GRID, stroke=INK2)   # 対角以外の長方形（組の積）はラボと同じ中立の色
     acc = 0
     for v in vals[:-1]:
         acc += v
@@ -1146,16 +1148,17 @@ def sqsplit(sp: dict) -> str:
     acc = 0
     for v in vals:
         x = ox + acc * k
-        c.rect(x, oy + acc * k, v * k, v * k, ORANGE, opacity=0.75)
-        c.add(f'<text x="{x + v * k / 2:.1f}" y="{oy + acc * k + v * k / 2 + 5:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
-              f'stroke="{BG}" stroke-width="3" paint-order="stroke">{esc(_num(v * v))}</text>')
+        c.rect(x, oy + acc * k, v * k, v * k, BLUE, opacity=0.85)   # 対角（Σx²）はラボの --acc と同じ色
+        if v * k >= 22:   # 小さい四角には数を置かない（ラボと同じ）
+            c.add(f'<text x="{x + v * k / 2:.1f}" y="{oy + acc * k + v * k / 2 + 5:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
+                  f'stroke="{BG}" stroke-width="3" paint-order="stroke">{esc(_num(v * v))}</text>')
         c.text(x + v * k / 2, oy - 4, _num(v), 11.5, INK2, "middle")
         acc += v
     c.text(ox - 6, oy + side / 2 + 4, f"{_num(tot)}", 11.5, INK2, "end")
     y = oy + side + 22
     c.text(8, y, f"正方形の全体＝(Σx)²＝{_num(tot)}²＝{_num(tot * tot)}", 12.5, INK)
     y += 20
-    c.text(8, y, f"色の部分＝Σx²＝{'＋'.join(_num(v * v) for v in vals)}＝{_num(sum(v * v for v in vals))}", 12.5, ORANGE, weight="bold")
+    c.text(8, y, f"対角の正方形＝Σx²＝{'＋'.join(_num(v * v) for v in vals)}＝{_num(sum(v * v for v in vals))}", 12.5, BLUE, weight="bold")
     y += 22
     for ln in sp.get("lines") or []:
         y = c.para(8, y, ln, 344, 12.5, INK2)

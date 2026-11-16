@@ -77,7 +77,7 @@
     task: 1, 2, 3, 6 の Σx² はいくつか。
     predict: {type: number, key: sumsq, label: "Σx²"}
     expect: 50
-    why: 1＋4＋9＋36＝50。(Σx)²＝144 との差94は、正方形の灰色の部分（異なる値どうしの積）。
+    why: 1＋4＋9＋36＝50。(Σx)²＝144 との差94は、正方形の対角以外の長方形（異なる値どうしの積）。
 
 - id: Q-U02-005
   concepts: [TERM-sigma, TERM-dev]
@@ -194,7 +194,7 @@
     why: 3×Σx＝3×12＝36。全部に掛かる3は Σ の外に出せる。c を1にすると Σ(3x＋1)＝36＋3＝39。
 
 - id: Q-U02-022
-  concepts: [TERM-perm, TERM-comb]
+  concepts: [TERM-perm, TERM-comb, TERM-fact]
   stage: S3
   tag: 順列と組合せ
   format: written
