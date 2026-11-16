@@ -1080,7 +1080,46 @@ def ci_bar(sp: dict) -> str:
     return c.done(yy + 6)
 
 
-TYPES = {"popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
+
+def bands(sp: dict) -> str:
+    """クロス集計表の帯グラフ（行ごとの割合を100%の横帯に。#48 の U27）。最後に全体の帯を足し、全体の区切りを点線で全部の帯に通す。
+    rows: [[名前, [度数, …]], …]、cats: [列の名前, …]。割合は図を作るときに度数から計算する。"""
+    rows, cats = sp["rows"], sp["cats"]
+    tot = [sum(r[1][j] for r in rows) for j in range(len(cats))]
+    allrows = [*rows, [sp.get("total_label", "全体"), tot]]
+    c = Canvas()
+    left, right, top, bh, gap = 64, 344, 34, 30, 14
+    cols = [BLUE, SOFT, ORANGE, VIOLET]
+    for j, name in enumerate(cats):   # 凡例
+        x = left + j * 92
+        c.rect(x, 10, 14, 14, cols[j % len(cols)], rx=2)
+        c.text(x + 19, 22, name, 12, INK)
+    cut, acc = [], 0
+    for v in tot[:-1]:
+        acc += v
+        cut.append(acc / sum(tot))
+    for i, (name, vals) in enumerate(allrows):
+        y = top + i * (bh + gap) + (gap if i == len(rows) else 0)
+        n = sum(vals)
+        c.text(left - 8, y + bh / 2 + 5, name, 12.5, INK, "end", "bold" if i == len(rows) else None)
+        x = left
+        for j, v in enumerate(vals):
+            w = (right - left) * v / n
+            c.rect(x, y, w, bh, cols[j % len(cols)], opacity=0.85)
+            if w > 30:
+                c.add(f'<text x="{x + w / 2:.1f}" y="{y + bh / 2 + 5:.1f}" font-size="12.5" fill="{INK}" text-anchor="middle" font-weight="bold" '
+                      f'stroke="{BG}" stroke-width="3" paint-order="stroke">{esc(_num(round(v / n * 100, 1)) + "%")}</text>')
+            x += w
+    ybot = top + len(allrows) * (bh + gap) + gap
+    for q in cut:
+        x = left + (right - left) * q
+        c.line(x, top - 4, x, ybot - gap, INK, 1.4, "4 3")
+    y = ybot + 4
+    for ln in sp.get("lines") or []:
+        y = c.para(8, y, ln, 344, 12.5, INK)
+    return c.done(y + 4)
+
+TYPES = {"bands": bands, "popsample": popsample, "frame": frame, "targets": targets, "intervals": intervals, "ci_bar": ci_bar, "ladder": ladder, "bars": bars, "pairs": pairs, "product": product,
          "capture": capture, "fpc": fpc, "hist": hist, "boxplot": boxplot, "line": line, "dev": dev, "dist": dist, "paths": paths, "joint": joint, "arrange": arrange, "sets": sets, "tree": tree, "count_tree": count_tree}
 
 
