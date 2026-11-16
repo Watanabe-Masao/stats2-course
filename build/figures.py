@@ -475,7 +475,9 @@ def line(sp: dict) -> str:
     if sp.get("geom"):                                    # 最初と最後を同じ倍率で結ぶ（平均成長率の線）
         m = len(first) - 1
         g = (first[-1] / first[0]) ** (1 / m)
-        extra.append({"label": f"毎期 {_num(round((g - 1) * 100, 2))}%（幾何平均）", "values": [first[0] * g ** i for i in range(m + 1)], "dash": "6 4"})
+        r = round((g - 1) * 100, 2)
+        rate = ("＋" if r > 0 else "−" if r < 0 else "") + _num(abs(r))
+        extra.append({"label": f"毎期 {_num(round(g, 4))}倍（{rate}%）の線（倍率の幾何平均）", "values": [first[0] * g ** i for i in range(m + 1)], "dash": "6 4"})
     if sp.get("smooth") is not None:                      # 指数平滑 S_t＝αx_t＋(1−α)S_{t−1}
         a, sm = sp["smooth"], [first[0]]
         for x in first[1:]:

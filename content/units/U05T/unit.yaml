@@ -33,7 +33,7 @@ figures:
       series:
         - {label: 実際の値, values: [100, 150, 81]}
         - {label: 率を足して2で割った＋2%で増やした線, values: [100, 102, 104.04]}
-      labels: [1期, 2期, 3期]
+      labels: [基準, 1期後, 2期後]
       geom: true
       note: ＋50%・−46% の平均は＋2%に見えるが、実際は81に減った。毎期 0.9倍（−10%）なら、2回で81に届く。
 concepts_linked: true
