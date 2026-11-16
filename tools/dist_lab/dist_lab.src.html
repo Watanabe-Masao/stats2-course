@@ -16,7 +16,7 @@
 <div id="m-hist" class="mode">
  <p class="mut" style="margin:0">データを階級に分けて数える。階級の幅を変えると、表とヒストグラムの見え方が変わる。</p>
  <div class="row ctl"><label>データ <select id="hdata" data-key="data"></select></label>
-  <label>階級の幅 <select id="hw" data-key="w"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label></div>
+  <label>階級の幅 <select id="hw" data-key="w"><option value="1">1</option><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select></label></div>
  <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="hplot"></div>
  <div class="card res det"><table id="htab"></table></div>
@@ -66,6 +66,10 @@ const DATA={
  sales:{name:"20日の売上（万円）",v:[12,15,18,19,21,22,22,24,25,26,27,28,29,30,31,33,35,38,42,55],lo:10},
  nine:{name:"9個のデータ",v:[3,5,6,7,8,9,10,12,30],lo:0},
  visits:{name:"8日の来店客数（人）",v:[47,49,51,52,55,58,60,120],lo:40}};
+// 待ち時間（分）：値→件数の表から並べる。手書きは5の倍数に集まる（創造の探究）。自動計測は秒まで測って分に切り捨てた値
+const expand=t=>Object.entries(t).flatMap(([k,n])=>Array(n).fill(+k));
+DATA.wait={name:"手書きの待ち時間140件（分）",v:expand({1:6,2:9,3:11,4:10,5:30,6:8,7:7,8:6,9:4,10:24,11:3,12:2,13:2,14:1,15:12,16:1,20:4}),lo:0};
+DATA.waitauto={name:"自動計測の待ち時間60件（分）",v:expand({1:6,2:8,3:9,4:8,5:6,6:5,7:4,8:3,9:3,10:2,11:2,12:1,13:1,14:1,15:1}),lo:0};
 const STORES={A:[40,42,44,45,46,47,48,49,50,52],B:[38,41,43,45,47,48,50,51,53,55],C:[30,34,38,44,48,55,62,70,78,90],D:[42,44,45,46,47,48,49,50,51,52],E:[36,40,43,46,48,49,51,53,56,58]};
 const SHAPE={X:[10,13,13,14,18,19,21,22,26,27,29,30],Y:[10,12,13,14,15,16,24,25,26,27,28,30]};
 const sum=a=>a.reduce((s,x)=>s+x,0),mean=a=>sum(a)/a.length;

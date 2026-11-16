@@ -1,6 +1,7 @@
 # 単元U05の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U05-001
   stage: S1
+  concepts: [TERM-freqtable, TERM-ratio]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1]
@@ -25,6 +26,7 @@
 
 - id: Q-U05-002
   stage: S1
+  concepts: [TERM-median, TERM-quartile, TERM-iqr, TERM-outlier]
   label: 例題C（自力）
   format: written
   powers: [P1, P2]
@@ -45,6 +47,7 @@
 
 - id: Q-U05-003
   stage: S1
+  concepts: [TERM-freqtable, TERM-ratio]
   difficulty: 1
   format: written
   powers: [P1]
@@ -63,6 +66,7 @@
 
 - id: Q-U05-004
   stage: S1
+  concepts: [TERM-median, TERM-quartile, TERM-iqr, TERM-outlier]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -82,6 +86,7 @@
 
 - id: Q-U05-005
   stage: S1
+  concepts: [TERM-hist, TERM-median, TERM-boxplot]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -101,6 +106,7 @@
 
 - id: Q-U05-010
   stage: S2
+  concepts: [TERM-hist]
   label: 約1週間後の問
   format: written
   powers: [P1]
@@ -119,6 +125,7 @@
 
 - id: Q-U05-011
   stage: S2
+  concepts: [TERM-freqtable, TERM-ratio]
   label: 計算練習
   format: written
   powers: [P2, P1]
@@ -136,6 +143,7 @@
 
 - id: Q-U05-012
   stage: S2
+  concepts: [TERM-freqtable, TERM-median, TERM-scale, TERM-sample, TERM-statistic]
   label: 約1か月後の問
   format: written
   powers: [P2, P3]
@@ -153,6 +161,7 @@
 
 - id: Q-U05-020
   stage: S3
+  concepts: [TERM-boxplot, TERM-iqr]
   tag: 店舗の比較
   format: written
   powers: [P3]
@@ -168,6 +177,7 @@
 
 - id: Q-U05-021
   stage: S3
+  concepts: [TERM-boxplot, TERM-hist]
   tag: 図の限界
   format: written
   powers: [P3]
@@ -185,6 +195,7 @@
 
 - id: Q-U05-022
   stage: S3
+  concepts: [TERM-hist, TERM-boxplot, TERM-median]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -215,6 +226,7 @@
 
 - id: Q-U05-023
   stage: S3
+  concepts: [TERM-median]
   tag: 平均か中央値か
   difficulty: 3
   format: written
@@ -234,6 +246,7 @@
 
 - id: Q-U05-024
   stage: S3
+  concepts: [TERM-hist, TERM-freqtable]
   tag: 階級の幅
   format: written
   powers: [P1, P3]
@@ -254,6 +267,7 @@
 
 - id: Q-U05-030
   stage: S4
+  concepts: [TERM-freqtable, TERM-hist]
   tag: 客単価
   format: written
   powers: [P3]
@@ -269,6 +283,7 @@
 
 - id: Q-U05-031
   stage: S4
+  concepts: [TERM-median, TERM-quartile, TERM-iqr, TERM-outlier]
   tag: 品質管理
   format: written
   powers: [P1, P3]
@@ -288,6 +303,7 @@
 
 - id: Q-U05-032
   stage: S4
+  concepts: [TERM-hist]
   tag: 仕事へ
   difficulty: 3
   format: written
@@ -304,25 +320,31 @@
   no_checks: 答えに新しい数はない（図の注の日数は問題文の値から数えたもの）
 
 - id: Q-U05-040
-  stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
-  label: 確かめ問題
+  stage: S5   # 2級の範囲外の発展。予測を外し、説明する形（#373 の F・#46。渡辺さん 2026-11-12）
+  concepts: [TERM-hist, TERM-freqtable]
+  label: 説明してみる
   format: written
-  powers: [P2, P1]
-  prompt: スタージェスの公式 k≒1＋log₂n で、例題Aの20日分（n＝20）の階級の数の目安を求めよ。データの範囲（55−12）から、階級の幅をいくつにするとよいか。
-  answer: 1＋log₂20≒1＋4.32＝**5.32**なので、階級は**5個**前後。範囲は 55−12＝43 で、43÷5≒8.6 なので、切りのよい**10万円**幅にする（10〜60で5個の階級）。
+  powers: [P2, P3]
+  prompt: 階級の数の目安にスタージェスの公式 k≒1＋log₂n がある。20日分（n＝20）なら約5.3個、1年分（n＝365）でも約9.5個で、個数が18倍を超えても、階級の数は2倍に届かない。この目安は、値が1つの山で左右対称に近い形に並ぶとみて作られている。山が2つあるデータで、この目安どおりに階級を少なくすると、何を見落としうるかを説明する。目安をどう使えばよいかも書く。
+  answer_title: 1つの考え方の例（自分で書いてから開く）
+  answer: |-
+    **計算で言えること**：1＋log₂20≒5.3、1＋log₂365≒9.5。目安は個数の対数で増えるので、データを増やしても階級はあまり増えない。
+
+    **見落としうること（目安の前提が崩れるとき）**：山が2つあるデータでは、階級が少ないと、2つの山と間の谷が1つの柱にまとめられ、1つの山に見えることがある（客単価の、単身客と家族客の山など）。目安の前提（1つの山）が、まさに確かめたいことと食い違っている。
+
+    **使い方の例**：目安は描き始めの出発点にして、幅を2通り以上に変えて描く。山の数や谷の位置が幅で変わるなら、そのことを図に添える。
   checks:
-    - 'abs(math.log2(20) - 4.32) < 0.01 and abs(1 + math.log2(20) - 5.32) < 0.01'
-    - '55 - 12 == 43 and abs(43/5 - 8.6) < 1e-9 and len(range(10, 60, 10)) == 5'
+    - 'abs(1 + math.log2(20) - 5.3) < 0.05 and abs(1 + math.log2(365) - 9.5) < 0.05 and 365/20 > 18 and (1 + math.log2(365)) / (1 + math.log2(20)) < 2'
   lab:
     id: LAB-dist
     mode: hist
     set: {data: sales, w: 10}
     unlock: [w]
-    task: 階級の幅を5・10・20と切り替えて、山の形の見え方がどう変わるかを見る。階級の数の目安（スタージェス）だけで幅を決めると、何を見落とすか。
-    why: スタージェスの目安（約5個）と合う。幅5なら10個、幅20なら3個になる。切り替えて形の見え方を比べる。
+    task: 20日の売上で、階級の幅を5・10・20と切り替え、階級の数（5個前後になるのはどの幅か）と、柱の並び方の見え方がどう変わるかを見る。
 
 - id: Q-U05-006
   stage: S1
+  concepts: [TERM-median, TERM-hist]
   difficulty: 3
   format: written
   powers: [P1, P2]
@@ -342,6 +364,7 @@
 
 - id: Q-U05-013
   stage: S2
+  concepts: [TERM-freqtable, TERM-median]
   format: written
   powers: [P1, P3]
   prompt: 20日の売上の度数分布（10〜20：4日、20〜30：9日、30〜40：5日、40〜50：1日、50〜60：1日）から累積相対度数の折れ線を描き、累積0.5 に当たる値を読め。本当の中央値26.5 とずれるのはなぜか。
