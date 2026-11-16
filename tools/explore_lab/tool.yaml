@@ -24,7 +24,7 @@ presets:
   s6-scatter:
     mode: sandbox
     set: {value: sales, group: store, filter: all, chart: scatter, second: cust}
-    task: 売上と客数・客単価・日付の散布図を、店で色分けして見る。全体の相関と店ごとの相関、特別な日の点の効き方を比べる。
+    task: 売上と客数・客単価の散布図を、店で色分けして見る。全部の日・店ごと・特別な日を除くで、売上との r がどう変わるかを比べる。
   s6-reg:
     mode: sandbox
     set: {value: sales, group: half, filter: B, chart: scatter, second: cust}

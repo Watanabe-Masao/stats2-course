@@ -15,7 +15,7 @@ stage_goals:
   S2: 資料を見ずに、共分散と相関係数を計算し、単位を変えたときの変化を言える。間違えた所だけ初学に戻る。
   S3: 問題文に「擬相関」とは書いていない。**散布図の形を確かめ、r を計算し、外れ値・層・範囲・共通の原因を疑い、因果と書かずに結論を書く**。
   S4: 広告費と売上・客数と客単価・気温と売上のように、場面が違っても「散布図 → r → 落とし穴を確かめる」形は同じ。
-  S5: 統計検定の枠の外。r が −1〜1 に収まる理由（z の積の平均）、点の単位で r が変わること、x の選び方で r が変わること。興味のあるものを1つ選べばよい。
+  S5: 統計検定の枠の外。r が −1〜1 に収まる理由（z の積の平均）、点の単位で r が変わること、目盛りの付け方（対数）で r が変わること。興味のあるものを1つ選べばよい。
   S6: 答えが1つに決まらない課題。売上＝客数×客単価のように式で結ばれた量の r を、**問いを立てる→仮定を置く→方法を組む→小さな例で検証する→統計で言えること・言えないことを切り分ける**の順に読む。
 evidence:
   S1: 例題の共分散と r を計算し、点を動かして r の変わり方を説明できた
@@ -56,10 +56,10 @@ checks:
   # 発展：r は z の積の平均（例題A。n で割る標準偏差は √2）
   - 'sum(((x-3)/math.sqrt(2))*((y-5)/math.sqrt(2)) for x,y in [(1,3),(2,5),(3,4),(4,6),(5,7)])/5 - 0.9 < 1e-9 and abs(sum(((x-3)/math.sqrt(2))*((y-5)/math.sqrt(2)) for x,y in [(1,3),(2,5),(3,4),(4,6),(5,7)])/5 - 0.9) < 1e-9 and Fraction(9, 2) / 5 == Fraction(9, 10)'
   # 発展：点の単位（9日・店1・店の平均）
-  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,1),(3,2),(4,6),(5,4),(6,5),(7,9),(8,7),(9,8)]) - 0.85) < 1e-9 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,1),(3,2)]) + 0.5) < 1e-9 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(2,2),(5,5),(8,8)]) - 1) < 1e-9'
-  # 発展：両端・真ん中の店
-  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,15),(2,8),(3,16),(10,27),(11,35),(12,31)]) - 0.94) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(4,24),(5,17),(6,25),(7,18),(8,26),(9,34)]) - 0.61) < 0.005'
-  # 説明してみる：6月の5週の寄与
-  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,6),(3,5),(4,4),(5,7)]) - 0.6) < 1e-9 and [Fraction((x-3)*(y-5), 2*5) for x,y in [(1,3),(2,6),(3,5),(4,4),(5,7)]] == [Fraction(2,5), Fraction(-1,10), 0, Fraction(-1,10), Fraction(2,5)]'
-  # 創造：変動係数と1% の増加
-  - 'abs(130/608 - 0.21) < 0.005 and abs(28/524 - 0.05) < 0.005 and abs((130/608)/(28/524) - 4) < 0.05 and abs(1.01*1.0 - 1.01) < 1e-12'
+  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,2),(2,1),(3,3),(4,5),(5,4),(6,6),(7,8),(8,7),(9,9)]) - 0.95) < 1e-9 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,2),(2,1),(3,3)]) - 0.5) < 1e-9 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(2,2),(5,5),(8,8)]) - 1) < 1e-9'
+  # 発展：倍々の売上と対数
+  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,1),(2,2),(3,4),(4,8),(5,16)]) - 0.93) < 0.005 and abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,0),(2,1),(3,2),(4,3),(5,4)]) - 1) < 1e-9 and [math.log2(v) for v in [1,2,4,8,16]] == [0,1,2,3,4]'
+  # 説明してみる：5店の z と 2−2r
+  - 'abs((lambda P:(lambda xb,yb:sum((x-xb)*(y-yb) for x,y in P)/math.sqrt(sum((x-xb)**2 for x,y in P)*sum((y-yb)**2 for x,y in P)))(sum(p[0] for p in P)/len(P),sum(p[1] for p in P)/len(P)))([(1,3),(2,6),(3,5),(4,4),(5,7)]) - 0.6) < 1e-9 and abs(sum(((x-3)/math.sqrt(2)-(y-5)/math.sqrt(2))**2 for x,y in [(1,3),(2,6),(3,5),(4,4),(5,7)])/5 - 0.8) < 1e-9 and abs(1/math.sqrt(2) - 0.71) < 0.005 and abs(2/math.sqrt(2) - 1.41) < 0.005'
+  # 創造：店ごとの変動係数（ラボの表の値）と1% の増加
+  - 'abs(120/664 - 0.18) < 0.005 and abs(116/551 - 0.21) < 0.005 and abs(29/518 - 0.06) < 0.005 and abs(27/531 - 0.05) < 0.005 and 3 <= (120/664)/(29/518) <= 4 and 3 <= (116/551)/(27/531) <= 4.2 and abs(1.01*1.0 - 1.01) < 1e-12'

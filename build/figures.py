@@ -666,11 +666,11 @@ def scatter(sp: dict) -> str:
     mode = sp.get("show", "cov")
     lines = []
     if mode == "cov":
-        for a, b in pts:                    # 偏差の積の長方形：同じ向き（積が正）は青、逆の向き（負）は橙
+        for a, b in pts:                    # 偏差の積の長方形：積が正は data-hi、負は data-1（相関ラボの --pos・--neg と同じ色）
             pr = (a - mx) * (b - my)
             if pr == 0:
                 continue
-            col = BLUE if pr > 0 else ORANGE
+            col = ORANGE if pr > 0 else BLUE
             x0, x1 = sorted([X(mx), X(a)]); y0, y1 = sorted([Y(my), Y(b)])
             c.add(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{x1 - x0:.1f}" height="{y1 - y0:.1f}" fill="{col}" fill-opacity="0.18" stroke="{col}" stroke-width="1"/>')
         c.line(X(mx), T, X(mx), B, INK2, 1.5, "5 4"); c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")  # 平均の点を通る縦・横の線
@@ -678,7 +678,7 @@ def scatter(sp: dict) -> str:
             lines.append(f"平均の点（{_num(float(mx))}, {_num(float(my))}）・偏差の積の和 {_num(float(sxy))}・共分散（n−1 で割る）{_num(float(sxy / (n - 1)))}")
         else:
             lines.append(f"平均の点（{_num(float(mx))}, {_num(float(my))}）・偏差の積の平均（共分散）{_num(float(sxy / n))}")
-        lines.append("青の長方形は同じ向き（偏差の積が正）、橙は逆の向き（負）")
+        lines.append("右上・左下の長方形は偏差の積が正（同じ向き）、左上・右下は負（逆の向き）")
     else:
         b1 = sxy / sxx; a1 = my - b1 * mx
         c.line(L, Y(my), R, Y(my), INK2, 1.5, "5 4")
