@@ -660,7 +660,11 @@ def _scatter_fit(sp: dict) -> str:
     c.line(L, B, R, B, INK2, 1)
     cols = [BLUE, ORANGE, VIOLET]; dashes = [None, "6 4", "2 3"]; lines = []
     for k, st in enumerate(sp["sets"]):
-        pts = [(Fraction(str(a)), Fraction(str(b))) for a, b in st["points"]]
+        if st.get("adjust") is not None:     # 点が (x, z, y) の組なら、y から adjust×z を引いた値を縦にとる（重回帰で、もう1つの変数の分を除いた見え方）
+            c_adj = Fraction(str(st["adjust"]))
+            pts = [(Fraction(str(a)), Fraction(str(v)) - c_adj * Fraction(str(z))) for a, z, v in st["points"]]
+        else:
+            pts = [(Fraction(str(a)), Fraction(str(b))) for a, b in st["points"]]
         n = len(pts); mx = sum(p[0] for p in pts) / n; my = sum(p[1] for p in pts) / n
         sxy = sum((a - mx) * (b - my) for a, b in pts); sxx = sum((a - mx) ** 2 for a, _ in pts); syy = sum((b - my) ** 2 for _, b in pts)
         b1 = sxy / sxx; a1 = my - b1 * mx; r = float(sxy) / (float(sxx) * float(syy)) ** 0.5
@@ -672,7 +676,10 @@ def _scatter_fit(sp: dict) -> str:
             else:
                 c.circle(X(a), Y(b), 4.5, col)
         ratio = (float(syy) / float(sxx)) ** 0.5
-        lines.append((col, dashes[k % 3], k % 2, f"{st['label']}：相関係数 {_num(round(r, 2))}×標準偏差の比 {_num(round(ratio, 2))}＝傾き {_num(float(b1))}"))
+        if sp.get("slope_only"):
+            lines.append((col, dashes[k % 3], k % 2, f"{st['label']}：傾き {_num(round(float(b1), 2))}"))
+        else:
+            lines.append((col, dashes[k % 3], k % 2, f"{st['label']}：相関係数 {_num(round(r, 2))}×標準偏差の比 {_num(round(ratio, 2))}＝傾き {_num(float(b1))}"))
     y = B + 34
     c.text(R, y, xs["label"], 11.5, INK2, "end")
     c.text(L, T - 4, ys["label"], 11.5, INK2)
