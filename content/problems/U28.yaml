@@ -1,6 +1,7 @@
 # 単元U28の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U28-001
   stage: S1
+  concepts: [TERM-dev, TERM-data-cov, TERM-corr]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -23,6 +24,7 @@
 
 - id: Q-U28-002
   stage: S1
+  concepts: [TERM-data-cov, TERM-data-sd, TERM-corr]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -41,6 +43,7 @@
 
 - id: Q-U28-003
   stage: S1
+  concepts: [TERM-corr]
   difficulty: 1
   format: written
   powers: [P1]
@@ -59,6 +62,7 @@
 
 - id: Q-U28-004
   stage: S1
+  concepts: [TERM-dev, TERM-corr, TERM-scatter]
   difficulty: 2
   format: written
   powers: [P1, P3]
@@ -77,6 +81,7 @@
 
 - id: Q-U28-005
   stage: S1
+  concepts: [TERM-corr, TERM-outlier, TERM-scatter]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -95,6 +100,7 @@
 
 - id: Q-U28-010
   stage: S2
+  concepts: [TERM-dev, TERM-data-cov, TERM-corr]
   format: written
   powers: [P1, P2]
   prompt: 4店の売場面積 x（十m²）と売上 y（百万円）は (2,1)(4,3)(6,2)(8,6)。偏差の積の和・共分散・相関係数を求めよ。
@@ -112,6 +118,7 @@
 
 - id: Q-U28-011
   stage: S2
+  concepts: [TERM-data-cov, TERM-corr]
   format: written
   powers: [P1, P3]
   prompt: 例題Aの来店者数 y の単位を「百人」から「十人」に変える（y を10倍）。共分散と相関係数はそれぞれいくつになるか。
@@ -129,6 +136,7 @@
 
 - id: Q-U28-012
   stage: S2
+  concepts: [TERM-unbvar, TERM-data-cov, TERM-cov]
   format: written
   powers: [P1, P3]
   prompt: 例題Aで、x の不偏分散は2.5、y の不偏分散は2.5、共分散は2.25。広告回数と来店者数の和 x＋y の分散を、{{unit:U13}} の式で求めよ。x と y が無相関だったらいくつか。
@@ -146,6 +154,7 @@
 
 - id: Q-U28-020
   stage: S3
+  concepts: [TERM-spurious, TERM-corr, TERM-partial-corr]
   format: written
   powers: [P1, P3]
   prompt: 冬の6日と夏の6日について、ある2つの売上 x・y を点に打つと、冬だけ・夏だけではどちらも r＝0 だが、12日を合わせると r≒0.69 になった。この r をどう読むか。どう分析し直すか。
@@ -163,6 +172,7 @@
 
 - id: Q-U28-021
   stage: S3
+  concepts: [TERM-partial-corr, TERM-corr]
   format: written
   powers: [P1, P3]
   prompt: 気温 z、アイスの売上 x、飲料の売上 y について、r_xy＝0.8、r_xz＝0.8、r_yz＝0.8 だった。気温の影響を取り除いた x と y の偏相関係数を求めよ。
@@ -180,6 +190,7 @@
 
 - id: Q-U28-022
   stage: S3
+  concepts: [TERM-corr]
   format: written
   powers: [P1, P3]
   prompt: 12店の広告費 x と売上 y の相関は r≒0.86。広告費が8以上の大型の5店だけで見ると r≒0.43 だった。「大型店では広告の効果が小さい」と言ってよいか。
@@ -197,6 +208,7 @@
 
 - id: Q-U28-023
   stage: S3
+  concepts: [TERM-corr, TERM-data-cov, TERM-data-sd]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -227,6 +239,7 @@
 
 - id: Q-U28-030
   stage: S4
+  concepts: [TERM-partial-corr, TERM-corr]
   format: written
   powers: [P1, P3]
   prompt: 20店のデータで、広告費 x と売上 y の相関は0.6、売場面積 z と広告費の相関は0.5、売場面積と売上の相関は0.7。売場面積の影響を取り除いた広告費と売上の偏相関を求め、報告の文を書け。
@@ -244,6 +257,7 @@
 
 - id: Q-U28-031
   stage: S4
+  concepts: [TERM-dev, TERM-corr]
   format: written
   powers: [P1, P3]
   prompt: 5店の1日の客数 x（人）と客単価 y（円）は (100,1200)(120,1150)(150,1000)(180,1050)(200,900)。相関係数を求め、店長に伝える文を書け。
@@ -261,6 +275,7 @@
 
 - id: Q-U28-032
   stage: S4
+  concepts: [TERM-corr, REL-corr-regcoef-contrast]
   format: written
   powers: [P1, P3]
   prompt: 店A の (1,3)(2,5)(3,4)(4,6)(5,7) と、店B の (1,1)(2,5)(3,3)(4,7)(5,9)。どちらも r＝0.9 になることを確かめ、「2店は広告回数の効き方が同じ」と言えるか答えよ。
@@ -278,6 +293,7 @@
 
 - id: Q-U28-040
   stage: S3
+  concepts: [TERM-corr, TERM-test, TERM-t, TERM-h0]
   format: written
   powers: [P1, P3]
   prompt: 20店で相関係数 r＝0.5 だった。母相関が0（無相関）という仮説を両側5%で検定せよ。t＝r√(n−2)÷√(1−r²)、t(18) の上側2.5%点は2.101。
