@@ -2,7 +2,7 @@ id: U21
 number: "21"
 title: 点推定・不偏性・一致性
 domain: D5
-reference_section: ⑤ 推定
+recall_group: 推定
 prev: U20
 next: U22
 prereq: [U07, U17, U18]

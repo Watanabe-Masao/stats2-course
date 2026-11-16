@@ -46,6 +46,6 @@ items:
   - id: LEG-reference
     name: 公式・用語リファレンス
     notion: [{id: 405b7cd539a1818f9198f683d487c86d, type: page, title: 公式・用語リファレンス}]
-    replaced_by: 単元の「忘れたら」をネットワークの画面へ
+    replaced_by: 単元の「忘れたら」をネットワークの画面の分類（unit.yaml の recall_group）へ
     absent: ["legacy_reference"]
     when: W5 の終わり

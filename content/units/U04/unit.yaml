@@ -2,7 +2,7 @@ id: U04
 number: "04"
 title: データの種類・測定尺度
 domain: D1
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 prev: U03
 next: U05
 prereq: [U03]

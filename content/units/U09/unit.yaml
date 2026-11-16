@@ -2,7 +2,7 @@ id: U09
 number: "09"
 title: 場合の数・順列・組合せ
 domain: D0
-reference_section: ② 確率
+recall_group: 確率
 prev: U08
 next: U10
 prereq: [U02]

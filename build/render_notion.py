@@ -6,6 +6,7 @@ Notion のページIDは publish/notion.yaml から読み、本文には ID で�
 from __future__ import annotations
 
 import re
+from urllib.parse import quote
 from pathlib import Path
 
 from labs import fig_url, lab_url
@@ -196,9 +197,9 @@ class NotionRenderer:
         lab = COMP["labels"]
         home = mention(self.t["root_page"])
         ref = ""
-        if self.t.get("legacy_reference") and u.get("reference_section"):
-            ref = (f'\n\n<span color="gray">忘れたら：</span>{mention(self.t["legacy_reference"])}'
-                   f'<span color="gray"> の「{u["reference_section"]}」</span>')
+        if self.t.get("network_url") and u.get("recall_group"):   # 忘れたら、その分類の概念を知識ネットワークで開く（#53）
+            g = u["recall_group"]
+            ref = (f'\n\n<span color="gray">忘れたら：</span>[{g} 🕸]({self.t["network_url"]}?g={quote(g)})')
         prev = f"◀ {self.unit_ref(u['prev'])}" if u.get("prev") else "（最初）"
         nxt = f"{self.unit_ref(u['next'])} ▶" if u.get("next") else "（最後）"
         out = [

@@ -2,7 +2,7 @@ id: U23
 number: "23"
 title: 分散・2群の推定
 domain: D5
-reference_section: ⑤ 推定
+recall_group: 推定
 prev: U22
 next: U24
 prereq: [U20, U22]

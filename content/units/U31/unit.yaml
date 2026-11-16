@@ -2,7 +2,7 @@ id: U31
 number: "31"
 title: 標本調査・調査誤差・偏り
 domain: D8
-reference_section: ⑧ 調査・実験
+recall_group: 調査・実験
 prev: U30
 next: U32
 prereq: [U17, U18, U22]

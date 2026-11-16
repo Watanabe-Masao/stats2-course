@@ -2,7 +2,7 @@ id: U14
 number: "14"
 title: 二項分布・ベルヌーイ分布
 domain: D3
-reference_section: ③ 確率分布
+recall_group: 確率分布
 prev: U13
 next: U15
 prereq: [U09, U11, U13]

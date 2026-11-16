@@ -2,7 +2,7 @@ id: U24
 number: "24"
 title: 仮説検定の考え方
 domain: D6
-reference_section: ⑥ 検定
+recall_group: 検定
 prev: U23
 next: U25
 prereq: [U16, U18, U22]

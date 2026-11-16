@@ -2,7 +2,7 @@ id: U05
 number: "05"
 title: 度数分布・ヒストグラム・箱ひげ図
 domain: D1
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 prev: U04
 next: U06
 prereq: [U04, U03]

@@ -2,7 +2,7 @@ id: U12
 number: "12"
 title: 全確率・ベイズの定理
 domain: D2
-reference_section: ② 確率
+recall_group: 確率
 prev: U11
 next: U13
 prereq: [U11, U10]

@@ -2,7 +2,7 @@ id: U17
 number: "17"
 title: 母集団・標本・無作為抽出
 domain: D4
-reference_section: ④ 標本分布
+recall_group: 標本分布・極限
 prev: U16
 next: U18
 prereq: [U03, U09, U10]

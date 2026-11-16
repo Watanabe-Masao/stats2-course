@@ -2,7 +2,7 @@ id: U13
 number: "13"
 title: 確率変数・期待値・分散
 domain: D2
-reference_section: ② 確率
+recall_group: 確率
 prev: U12
 next: U14
 prereq: [U06, U07, U02]

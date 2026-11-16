@@ -2,7 +2,7 @@ id: U20
 number: "20"
 title: 標準誤差・t分布・カイ二乗分布・F分布
 domain: D4
-reference_section: ④ 標本分布
+recall_group: 標本分布・極限
 prev: U19
 next: U21
 prereq: [U16, U18, U19]

@@ -2,7 +2,7 @@ id: U29
 number: "29"
 title: 単回帰・最小二乗・残差
 domain: D7
-reference_section: ⑦ 相関・回帰
+recall_group: 相関・回帰
 prev: U28
 next: U30
 prereq: [U02, U07, U28]

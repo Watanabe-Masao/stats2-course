@@ -2,7 +2,7 @@ id: U01
 number: "01"
 title: 割合・分数・式の変形
 domain: D0
-reference_section: ① データの記述
+recall_group: 要約（代表値・ばらつき）
 next: U02
 prereq: []
 used_by: [U02, U03, U05T, U06, U07, U08, U10]

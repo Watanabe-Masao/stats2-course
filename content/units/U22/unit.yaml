@@ -2,7 +2,7 @@ id: U22
 number: "22"
 title: 平均・割合の信頼区間
 domain: D5
-reference_section: ⑤ 推定
+recall_group: 推定
 prev: U21
 next: U23
 prereq: [U16, U18, U20, U21]

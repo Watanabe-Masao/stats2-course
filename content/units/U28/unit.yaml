@@ -2,7 +2,7 @@ id: U28
 number: "28"
 title: 共分散・相関係数と散布図
 domain: D7
-reference_section: ⑦ 相関・回帰
+recall_group: 相関・回帰
 prev: U27
 next: U29
 prereq: [U07, U13]
