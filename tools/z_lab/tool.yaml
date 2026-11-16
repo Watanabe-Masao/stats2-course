@@ -51,13 +51,9 @@ presets:
     mode: normal
     modes: [normal, inv]
     task: z を動かし、正規分布で z 以上になる割合と、±z の内側の割合を見る。次に「z から値へ」で、平均・標準偏差と z から元の値と偏差値を出す。
-  s5-norm2:
-    mode: normal
-    set: {z: 2}
-    task: 標準正規分布で、z が2以上になる割合を読む。
   s5-drift:
     mode: z
-    set: {mA: 100, sA: 10, xA: 115, mB: 100, sB: 10, xB: 100, nameA: 今月のある日, nameB: 先月のふだんの日}
+    set: {mA: 100, sA: 10, xA: 115, mB: 100, sB: 10, xB: 100, nameA: 今月のある日, nameB: 今月の別の日}
     task: 先月の日販（平均100万円・標準偏差10万円）を物差しにして、今月のある日の115万円の z を読む。B の値を動かして、先月の物差しで z が2を超えるのは何万円からかを確かめる。
   s6-ac:
     mode: z

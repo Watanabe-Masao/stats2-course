@@ -47,14 +47,14 @@ checks:
   # 発展：上限 √(n−1)、n−1 で割ると (n−1)/√n
   - 'abs(statistics.stdev([10,10,10,10,20]) - 20**0.5) < 1e-9 and abs((20-12)/statistics.stdev([10,10,10,10,20]) - 4/5**0.5) < 1e-9 and abs(4/5**0.5 - 1.79) < 0.005'
   # 発展：2つの値のデータ（特売日の割合 p）で z＝√((1−p)/p)
-  - 'statistics.mean([45]*16 + [75]*4) == 51 and statistics.pstdev([45]*16 + [75]*4) == 12 and Fraction(75-51, 12) == 2 and abs((0.8/0.2)**0.5 - 2) < 1e-9 and abs((0.9/0.1)**0.5 - 3) < 1e-9 and abs((0.5/0.5)**0.5 - 1) < 1e-9'
+  - 'statistics.mean([45]*16 + [75]*4) == 51 and statistics.pstdev([45]*16 + [75]*4) == 12 and Fraction(75-51, 12) == 2 and statistics.mean([45]*16 + [105]*4) == 57 and statistics.pstdev([45]*16 + [105]*4) == 24 and Fraction(105-57, 24) == 2 and statistics.mean([45]*18 + [75]*2) == 48 and statistics.pstdev([45]*18 + [75]*2) == 9 and Fraction(75-48, 9) == 3 and abs((0.8/0.2)**0.5 - 2) < 1e-9 and abs((0.9/0.1)**0.5 - 3) < 1e-9 and abs((0.5/0.5)**0.5 - 1) < 1e-9'
   # 発展：先月の物差し（100・10）で今月の115
   - 'Fraction(115-100, 10) == Fraction(3, 2) and 100 + 2*10 == 120'
   # 説明してみる：開店5日
   - 'statistics.mean([30,31,29,30,60]) == 36 and abs(statistics.pstdev([30,31,29,30,60]) - 12) < 0.05 and abs((60-36)/statistics.pstdev([30,31,29,30,60]) - 2.0) < 0.005'
   - 'statistics.mean([30,31,29,30]) == 30 and abs(statistics.pstdev([30,31,29,30]) - 0.71) < 0.005 and abs((60-30)/statistics.pstdev([30,31,29,30]) - 42) < 0.5'
   # 創造：4店の z と金額の差
-  - 'Fraction(330-250, 40) == 2 and Fraction(190-150, 20) == 2 and Fraction(50-40, 5) == 2 and abs((153-120)/15 - 2.2) < 1e-9 and 80+40+10+33 == 163 and abs(80/163 - 0.49) < 0.005 and Fraction(80, 10) == 8 and 40+20+5+15 == 80'
+  - 'Fraction(330-250, 40) == 2 and Fraction(190-150, 20) == 2 and Fraction(50-40, 5) == 2 and abs((153-120)/15 - 2.2) < 1e-9 and 80+40+10+33 == 163 and abs(80/163 - 0.49) < 0.005 and Fraction(80, 10) == 8 and 40+20+5+15 == 80 and Fraction(80,250) == Fraction(32,100) and abs(40/150 - 0.27) < 0.005 and Fraction(10,40) == Fraction(1,4) and Fraction(33,120) == Fraction(275,1000)'
   # 例題A：店舗A・B
   - 'Fraction(70-50, 10) == 2 and Fraction(90-80, 5) == 2 and 70-50 == 20 and 90-80 == 10'
   # 実験：標準偏差20で z＝1、ラボなしで平均80・標準偏差5 で 85
@@ -64,5 +64,3 @@ checks:
   # 正規分布の目安（発展・応用）
   - 'abs((1 + math.erf(2/2**0.5))/2 - 0.9772) < 0.0001 and abs(math.erf(1/2**0.5) - 0.6827) < 0.0001 and abs(math.erf(2/2**0.5) - 0.9545) < 0.0001 and abs(math.erf(3/2**0.5) - 0.9973) < 0.0001'
   - 'abs(1/(1 - (1 + math.erf(2/2**0.5))/2) - 44) < 0.5'
-  # 発展1：チェビシェフ
-  - '1 - Fraction(1, 2**2) == Fraction(3,4)'
