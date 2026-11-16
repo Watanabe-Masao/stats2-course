@@ -1,5 +1,6 @@
 # 単元U02の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U02-001
+  concepts: [TERM-sigma, TERM-dev]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -22,6 +23,7 @@
     why: 1＋9＋25＝35。足してから2乗すると 9²＝81。正方形の全体81のうち、色の3つが35。
 
 - id: Q-U02-002
+  concepts: [TERM-fact, TERM-comb]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -59,6 +61,7 @@
     why: x に3を入れて 2×3＋1＝7。グラフでは x＝3 の真上の点の高さ。
 
 - id: Q-U02-004
+  concepts: [TERM-sigma]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +80,7 @@
     why: 1＋4＋9＋36＝50。(Σx)²＝144 との差94は、正方形の灰色の部分（異なる値どうしの積）。
 
 - id: Q-U02-005
+  concepts: [TERM-sigma, TERM-dev]
   stage: S1
   difficulty: 3
   format: written
@@ -95,6 +99,7 @@
     why: 平均5、偏差 −3, 0, 3 を2乗して 9＋0＋9＝18。偏差の合計はくわしくの表のとおり0。
 
 - id: Q-U02-010
+  concepts: [TERM-fact]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -113,6 +118,7 @@
     why: 5×4×3×2×1＝120。5個を全部並べる並べ方の数と同じ（1つ目5通り、2つ目4通り…）。
 
 - id: Q-U02-011
+  concepts: [TERM-sigma]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -131,6 +137,7 @@
     why: 5＋7＋9＋11＝32。2×Σx＋n×3＝2×10＋4×3＝32 と同じ。
 
 - id: Q-U02-012
+  concepts: [TERM-sigma, TERM-dev, TERM-unbvar]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -149,6 +156,7 @@
     why: 4＋0＋4＝8。これを3で割ると分散、2で割ると不偏分散。
 
 - id: Q-U02-020
+  concepts: [TERM-sigma, TERM-dev]
   stage: S3
   tag: 計算の近道
   format: written
@@ -167,6 +175,7 @@
     why: Σx²＝114、n×x̄²＝4×5²＝100、差が14。偏差を2乗して足した値と一致する。
 
 - id: Q-U02-021
+  concepts: [TERM-sigma]
   stage: S3
   tag: 定数を外に出す
   format: written
@@ -185,6 +194,7 @@
     why: 3×Σx＝3×12＝36。全部に掛かる3は Σ の外に出せる。c を1にすると Σ(3x＋1)＝36＋3＝39。
 
 - id: Q-U02-022
+  concepts: [TERM-perm, TERM-comb]
   stage: S3
   tag: 順列と組合せ
   format: written
@@ -203,6 +213,7 @@
     why: 並べ方 6×5×4＝120 を、同じ組の並べ方 3!＝6 で割って20。
 
 - id: Q-U02-023
+  concepts: [TERM-sigma, TERM-dev]
   stage: S3
   tag: 本番形式
   format: choice
@@ -233,6 +244,7 @@
     why: 12²＝144。Σx²＝56 とは違う。Σx²−3×4²＝8 が偏差平方和。
 
 - id: Q-U02-030
+  concepts: [TERM-sigma]
   stage: S4
   tag: 表計算の関数
   format: written
@@ -251,6 +263,7 @@
     why: 1＋4＋9＋16＝30。SUM(…)^2 は 10²＝100 で、正方形の全体。
 
 - id: Q-U02-031
+  concepts: [TERM-comb]
   stage: S4
   tag: 当番の選び方
   format: written
@@ -287,6 +300,7 @@
     why: 2×4＋5＝13。x を1増やすと点は2上がる（a＝2）。
 
 - id: Q-U02-040
+  concepts: [TERM-sigma]
   stage: S3
   tag: 1から n までの和
   format: written
