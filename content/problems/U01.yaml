@@ -1,6 +1,6 @@
 # 単元U01の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U01-001
-  concepts: [TERM-ratio]
+  concepts: [TERM-eqtransform, TERM-ratio]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -138,7 +138,7 @@
     why: 1÷1.25−1＝−0.2 で20%下げる。1,000×1.25＝1,250、1,250×0.8＝1,000 で元に戻る。
 
 - id: Q-U01-012
-  concepts: [TERM-std]
+  concepts: [TERM-eqtransform, TERM-std]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -176,7 +176,7 @@
     why: 値入額300円を売価1,000円で割って30%。原価率70%と足すと100%。原価700円で割ると約42.9%（マークアップ率）。分母を書き添えないと、どちらの率か分からない。
 
 - id: Q-U01-021
-  concepts: [TERM-ratio]
+  concepts: [TERM-eqtransform, TERM-ratio]
   stage: S3
   tag: 必要な売上
   format: written
