@@ -756,6 +756,31 @@ claims:
       version: 60d6f01
     external: 未照合
   version: 1
+- id: CLM-28c
+  label: ④-28c
+  kind: 極限
+  statement:
+    text: 行の合計 n₁, …, n_r をデータを取る前に決め、各行 i で nᵢ 個の観測が独立に c 個の列の区分に入り（行どうしも独立。r 個の独立な多項の標本。区分の境目はデータを見る前に決め、どの区分の確率も正）、H₀：どの行でも列の区分の確率が等しい（p₁ⱼ＝…＝p_rⱼ、j＝1, …, c）が正しく、共通の確率を列の合計の割合 n・ⱼ÷n で推定するとき、期待度数 Eᵢⱼ＝nᵢ×n・ⱼ÷n で求めた Σ(O−E)²/E の分布は、どの nᵢ も大きくなり nᵢ÷n が0でない値に収束するとき、χ²((r−1)(c−1)) に近づく（r≧2・c≧2。同質性の検定。1つの集団から総数を取る ④-28b と同じ統計量・同じ自由度だが、取り方と H₀ が違う別の主張）
+  premises:
+    subjects:
+    - TERM-expected
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-chi2
+  grounds:
+  - source:
+      title: 独立な多項の標本（積多項）でのピアソンのカイ二乗統計量の極限（Agresti『Categorical Data Analysis』の同質性の検定。原典は未照合）
+    external: true
+  - source:
+      title: 自由度の数え方：r 個の行それぞれが c−1 個の自由な確率をもつので r(c−1)、H₀ のもとで推定する共通の確率が c−1 個、差は (r−1)(c−1)
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    external: 未照合
+  version: 1
 - id: CLM-29
   label: ④-29
   kind: 手続きの保証
