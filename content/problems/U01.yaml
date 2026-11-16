@@ -1,5 +1,6 @@
 # 単元U01の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U01-001
+  concepts: [TERM-ratio]
   stage: S1
   label: 例題B（穴埋め）
   format: fill
@@ -22,6 +23,7 @@
     why: 「売価の75%」なので基準量は売価。売価＝900÷0.75＝1,200円。帯の全体が売価、色の部分が原価900円。
 
 - id: Q-U01-002
+  concepts: [TERM-ratio, TERM-point]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -41,6 +43,7 @@
     why: 差は2ポイント。それを前の10で割ると 2÷10＝0.2 で20%増。差（ポイント）と変化（%）は別の数になる。
 
 - id: Q-U01-003
+  concepts: [TERM-ratio]
   stage: S1
   difficulty: 1
   format: written
@@ -59,6 +62,7 @@
     why: 基準量は来店客200人、部分は購入した50人。50÷200＝0.25＝25%。
 
 - id: Q-U01-004
+  concepts: [TERM-ratio]
   stage: S1
   difficulty: 2
   format: written
@@ -77,6 +81,7 @@
     why: 1,000×1.2＝1,200、1,200×0.9＝1,080。倍率 1.2×0.9＝1.08 で8%増。率を足した10%にはならない。
 
 - id: Q-U01-005
+  concepts: [TERM-ratio]
   stage: S1
   difficulty: 3
   format: written
@@ -113,6 +118,7 @@
     why: 両辺から6を引いて 3x＝15、両辺を3で割って x＝5。元の式に戻すと 3×5＋6＝21 で合う。
 
 - id: Q-U01-011
+  concepts: [TERM-ratio]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -131,6 +137,7 @@
     why: 1÷1.25−1＝−0.2 で20%下げる。1,000×1.25＝1,250、1,250×0.8＝1,000 で元に戻る。
 
 - id: Q-U01-012
+  concepts: [TERM-std]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -149,6 +156,7 @@
     why: x＝μ＋zσ＝50＋(−0.5)×10＝45。z が負なので平均より下。式の変形は割合の逆算と同じ手順。
 
 - id: Q-U01-020
+  concepts: [TERM-ratio]
   stage: S3
   tag: 原価率と値入率
   format: written
@@ -167,6 +175,7 @@
     why: 値入額300円を売価1,000円で割って30%。原価率70%と足すと100%。原価700円で割ると約42.9%（マークアップ率）。分母を書き添えないと、どちらの率か分からない。
 
 - id: Q-U01-021
+  concepts: [TERM-ratio]
   stage: S3
   tag: 必要な売上
   format: written
@@ -185,6 +194,7 @@
     why: 「売上の25%が粗利」なので基準量は売上。300÷0.25＝1,200万円。
 
 - id: Q-U01-022
+  concepts: [TERM-ratio]
   stage: S3
   tag: 割引の重ね
   format: written
@@ -203,6 +213,7 @@
     why: 1,000×0.8＝800円、800×0.9＝720円。倍率 0.72 で28%引き。
 
 - id: Q-U01-023
+  concepts: [TERM-ratio, TERM-point]
   stage: S3
   tag: 本番形式
   format: choice
@@ -233,6 +244,7 @@
     why: 25−20＝5ポイント。前の20で割ると25%増。同じ変化でも、差と相対的な変化で数が違う。
 
 - id: Q-U01-030
+  concepts: [TERM-ratio]
   stage: S4
   tag: 売上の前年比
   format: written
@@ -251,6 +263,7 @@
     why: 売上＝客数×客単価なので倍率を掛ける。1.1×0.95＝1.045 で4.5%増。
 
 - id: Q-U01-031
+  concepts: [TERM-ratio]
   stage: S4
   tag: 変動係数
   format: written
@@ -269,6 +282,7 @@
     why: 基準量は平均200、部分は標準偏差30。30÷200＝15%。変動係数も割合の1つ。
 
 - id: Q-U01-032
+  concepts: [TERM-ratio]
   stage: S4
   tag: 原価率から粗利
   format: written
@@ -287,6 +301,7 @@
     why: 部分＝基準量×割合＝500×0.35＝175万円。原価は 500×0.65＝325万円。
   
 - id: Q-U01-040
+  concepts: [TERM-ratio]
   stage: S3
   tag: 元に戻す率
   format: written
