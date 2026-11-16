@@ -71,14 +71,14 @@ function sVals(){const x=data(),n=x.length,sum=x.reduce((a,b)=>a+b,0),mean=sum/n
  return {x,n,sum,mean,sumsq,sqsum:sum*sum,ss,devsum:Math.abs(devsum)<1e-9?0:devsum,cross:sum*sum-sumsq};}
 function sRender(){const S=sVals();
  [1,2,3,4,5].forEach(i=>{const w=$("sx"+i).closest(".lk-step");if(w)w.style.display=i<=S.n?"":"none";});
- // (Σx)² の正方形を x ごとに区切る：対角の色つき＝Σx²、灰色＝それ以外（交差の項）
+ // (Σx)² の正方形を x ごとに区切る：対角の色つき＝Σx²、対角以外の長方形＝組の積（交差の項）
  const H=200,side=Math.max(S.sum,1),k=(H-20)/side,ox=(W-side*k)/2,oy=10;
  let s=`<svg viewBox="0 0 ${W} ${H+18}" width="${W}" role="img" aria-label="(Σx)² の正方形と Σx²">`;
  s+=`<rect x="${ox}" y="${oy}" width="${side*k}" height="${side*k}" fill="var(--line)" fill-opacity=".35" stroke="var(--line)"/>`;
  let px=0;S.x.forEach((xi,i)=>{let py=0;S.x.forEach((xj,j)=>{if(i===j&&xi>0)s+=`<rect x="${ox+px*k}" y="${oy+py*k}" width="${xi*k}" height="${xi*k}" fill="var(--acc)" fill-opacity=".75" stroke="var(--bg)" stroke-width="2"/>`+(xi*k>22?`<text x="${ox+(px+xi/2)*k}" y="${oy+(py+xi/2)*k+4}" font-size="11" text-anchor="middle" fill="var(--fg)" font-weight="700">${xi*xi}</text>`:"");py+=xj;});px+=xi;});
  s+=`<text x="${W/2}" y="${H+14}" font-size="11" text-anchor="middle" fill="var(--mut)">全体＝(Σx)²＝${S.sqsum}、色の正方形の合計＝Σx²＝${S.sumsq}</text></svg>`;
  $("splot").innerHTML=s;
- $("ssum").innerHTML=`<div>Σx＝${S.x.join("＋")}＝<b>${S.sum}</b>　平均＝${S.sum}÷${S.n}＝<b>${f(r3(S.mean))}</b></div><div>Σx²＝${S.x.map(v=>v*v).join("＋")}＝<b>${S.sumsq}</b>　(Σx)²＝${S.sum}²＝<b>${S.sqsum}</b></div><div>偏差平方和 Σ(x−x̄)²＝<b>${f(r3(S.ss))}</b>　偏差の合計 Σ(x−x̄)＝<b>${f(r3(S.devsum))}</b></div><div class="mut">灰色の部分（${S.cross}）が (Σx)² と Σx² の差。Σx²−n×x̄²＝${S.sumsq}−${S.n}×${f(r3(S.mean))}²＝${f(r3(S.sumsq-S.n*S.mean*S.mean))} は偏差平方和と同じ。</div>`;
+ $("ssum").innerHTML=`<div>Σx＝${S.x.join("＋")}＝<b>${S.sum}</b>　平均＝${S.sum}÷${S.n}＝<b>${f(r3(S.mean))}</b></div><div>Σx²＝${S.x.map(v=>v*v).join("＋")}＝<b>${S.sumsq}</b>　(Σx)²＝${S.sum}²＝<b>${S.sqsum}</b></div><div>偏差平方和 Σ(x−x̄)²＝<b>${f(r3(S.ss))}</b>　偏差の合計 Σ(x−x̄)＝<b>${f(r3(S.devsum))}</b></div><div class="mut">対角以外の長方形（${S.cross}）が (Σx)² と Σx² の差。Σx²−n×x̄²＝${S.sumsq}−${S.n}×${f(r3(S.mean))}²＝${f(r3(S.sumsq-S.n*S.mean*S.mean))} は偏差平方和と同じ。</div>`;
  $("stab").innerHTML=`<table class="t"><tr><th>xᵢ</th><th>xᵢ²</th><th>(xᵢ−x̄)²</th></tr>${S.x.map(v=>`<tr><td>${v}</td><td>${v*v}</td><td>${f(r3((v-S.mean)**2))}</td></tr>`).join("")}<tr class="sum"><td>${S.sum}</td><td>${S.sumsq}</td><td>${f(r3(S.ss))}</td></tr></table>`;
 }
 LK.register("sum",{name:"Σを書き下す",
