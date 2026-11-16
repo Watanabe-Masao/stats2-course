@@ -6,8 +6,12 @@ const {chromium}=require('playwright');const path=require('path');
   const x=L.daily(6,2),r=Array.from({length:14},(_,i)=>L.acf(x,i+1));const y=L.daily(0,0),r0=Array.from({length:14},(_,i)=>L.acf(y,i+1));
   const big=L.daily(0,10),rb=Array.from({length:14},(_,i)=>L.acf(big,i+1));
   return {ma,ma2,tr,peak:r.indexOf(Math.max(...r))+1,r7:r[6],r1:r[0],peak0:Math.max(...r0.map(Math.abs)),trendPos:rb.every(v=>v>0)};});
+ // 棒を押すとそのラグの散布図に替わるか（想定する故障：再描画で押した場所が外れる、k の取り違えで組の数がずれる。数の検算とは別に、画面の上の操作で確かめる）
+ await p.evaluate(()=>{window.__LAB__.LK.show('acf');});await p.click('#aplot .lagbar[data-k="3"]');
+ const lag=await p.evaluate(()=>({k:window.__LAB__.getLag(),n:document.querySelectorAll('#aplot svg:last-of-type circle').length}));
+ r.lag=lag;
  console.log(JSON.stringify(r));
  const near=(a,b)=>Math.abs(a-b)<0.005;
  const ok=r.ma[0]===null&&near(r.ma[1],12)&&near(r.ma[2],44/3)&&near(r.ma[3],46/3)&&r.ma[4]===null&&near(r.ma2[1],23)&&near(r.ma2[2],26)&&near(r.ma2[3],28)
-  &&r.tr[0]===null&&r.tr[1]===null&&near(r.tr[4],46/3)&&r.peak===7&&r.r7>0.5&&r.peak0<0.35&&r.trendPos;
+  &&r.tr[0]===null&&r.tr[1]===null&&near(r.tr[4],46/3)&&r.lag.k===3&&r.lag.n===53&&r.peak===7&&r.r7>0.5&&r.peak0<0.35&&r.trendPos;
  console.log(ok?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok?0:1);})();

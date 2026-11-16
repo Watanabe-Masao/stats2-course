@@ -8,6 +8,8 @@
 .seg button.on{border-color:var(--acc);box-shadow:inset 0 0 0 2px var(--acc)}
 .legend span{margin-right:10px;font-size:12px;white-space:nowrap}
 .sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}
+.lagbar{cursor:pointer}
+.glab{font-size:12px;font-weight:700;color:var(--mut);margin:6px 0 0}
 </style></head><body>
 <h1>🧪 時系列ラボ</h1>
 <div id="lk-task"></div>
@@ -49,7 +51,7 @@
 </div>
 
 <div id="m-acf" class="mode">
- <p class="mut" style="margin:0">8週間（56日）の日販。同じ系列を k 日ずらして自分自身との相関（自己相関）をとる。曜日の波とトレンドを動かすと、どのラグの棒が高くなるか。</p>
+ <p class="mut" style="margin:0">8週間（56日）の日販。同じ系列を k 日ずらして自分自身との相関（自己相関）をとる。曜日の波とトレンドを動かすと、どのラグの棒が高くなるか。棒を押すと、そのラグの組（その日と k 日後）の散布図が出る。</p>
  <input type="range" id="aw" min="0" max="10" step="1" value="6" data-name="曜日の波">
  <input type="range" id="at" min="0" max="10" step="1" value="2" data-name="トレンド">
  <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
@@ -148,20 +150,27 @@ LK.register("ma",{name:"移動平均",
 
 // ---- 自己相関
 function acf(x,k){const n=x.length,mu=x.reduce((a,b)=>a+b,0)/n;let num=0,den=0;for(let t=0;t<n;t++)den+=(x[t]-mu)**2;for(let t=0;t<n-k;t++)num+=(x[t]-mu)*(x[t+k]-mu);return num/den;}
+let aK=7;
 function aVals(){const x=daily(+$("aw").value,+$("at").value);return {x,r:Array.from({length:14},(_,i)=>acf(x,i+1))};}
 function aRender(){const A=aVals();
  let s=lineSvg([{v:A.x,color:"var(--acc)",w:1.8}],{aria:"56日の日販",h:110})+'<div class="mut">日販（56日）</div>';
  const H=130,bw=(W-40)/14,Y=v=>H/2-v*(H/2-12);
  s+=`<svg viewBox="0 0 ${W} ${H+18}" width="${W}" role="img" aria-label="自己相関"><line x1="24" y1="${H/2}" x2="${W-8}" y2="${H/2}" stroke="var(--line)"/>`;
  [1,0.5,-0.5,-1].forEach(t=>{s+=`<text x="18" y="${Y(t)+4}" font-size="10" text-anchor="end" fill="var(--mut)">${t}</text>`;});
- A.r.forEach((r,i)=>{const x=28+i*bw,top=Math.min(Y(r),H/2),h=Math.abs(Y(r)-H/2);s+=`<rect x="${x}" y="${top}" width="${bw-4}" height="${Math.max(1,h)}" rx="2" fill="${(i+1)%7===0?"var(--acc2)":"var(--acc)"}" fill-opacity=".85"/><text x="${x+(bw-4)/2}" y="${H+14}" font-size="10" text-anchor="middle" fill="var(--mut)">${i+1}</text>`;});
- $("aplot").innerHTML=s+"</svg>"+'<div class="mut">棒＝ラグ k（日）の自己相関。ラグ7・14（色付き）は1週・2週ずらしたもの。</div>';
+ A.r.forEach((r,i)=>{const x=28+i*bw,top=Math.min(Y(r),H/2),h=Math.abs(Y(r)-H/2),on=i+1===aK;s+=`<g class="lagbar" data-k="${i+1}" role="button" aria-label="ラグ${i+1}の散布図"><rect x="${x-2}" y="0" width="${bw}" height="${H+18}" fill="transparent"/><rect x="${x}" y="${top}" width="${bw-4}" height="${Math.max(1,h)}" rx="2" fill="${(i+1)%7===0?"var(--acc2)":"var(--acc)"}" fill-opacity="${on?1:.6}"${on?' stroke="var(--fg)" stroke-width="2"':""}/><text x="${x+(bw-4)/2}" y="${H+14}" font-size="10" text-anchor="middle" fill="${on?"var(--fg)":"var(--mut)"}"${on?' font-weight="700"':""}>${i+1}</text></g>`;});
+ s+="</svg>"+'<div class="mut">棒＝ラグ k（日）の自己相関。ラグ7・14（色付き）は1週・2週ずらしたもの。</div>';
+ // 選んだラグの組（その日 xₜ と k 日後 xₜ₊ₖ）の散布図。点が右上がりに並ぶほど、棒が高い
+ const k=aK,xs=A.x.slice(0,A.x.length-k),ys=A.x.slice(k),lo=Math.min(...A.x),hi=Math.max(...A.x),S=180,O=34,P=v=>(v-lo)/((hi-lo)||1)*S;
+ s+=`<div class="glab">ラグ${k}：その日（横）と ${k}日後（縦）の組 ${xs.length}個</div><svg viewBox="0 0 ${W} ${S+40}" width="${W}" role="img" aria-label="ラグ${k}の散布図"><rect x="${O}" y="8" width="${S}" height="${S}" fill="none" stroke="var(--line)"/>`;
+ xs.forEach((v,t)=>{s+=`<circle cx="${(O+P(v)).toFixed(1)}" cy="${(8+S-P(ys[t])).toFixed(1)}" r="3.2" fill="var(--acc)" fill-opacity=".7"/>`;});
+ s+=`<text x="${O+S/2}" y="${S+24}" font-size="11" text-anchor="middle" fill="var(--mut)">その日の日販</text><text x="${O+S+10}" y="24" font-size="11" fill="var(--mut)">${k}日後の日販</text><text x="${O+S+10}" y="44" font-size="12" fill="var(--fg)">自己相関 ${A.r[k-1].toFixed(2)}</text></svg>`;
+ $("aplot").innerHTML=s;
  $("asum").innerHTML=`<div>ラグ1：<b>${A.r[0].toFixed(2)}</b>　ラグ7：<b>${A.r[6].toFixed(2)}</b>　ラグ14：<b>${A.r[13].toFixed(2)}</b></div><div class="mut">曜日の波を0にするとラグ7の山が消え、トレンドを大きくすると全部のラグが正に寄る。棒が高くても原因（曜日）が確定したわけではない。</div>`;}
 LK.register("acf",{name:"自己相関",
- init(){LK.stepper($("aw"),aRender);LK.stepper($("at"),aRender);aRender();},
- apply(s){if(s.wave!==undefined)LK.setRange("aw",s.wave);if(s.trend!==undefined)LK.setRange("at",s.trend);aRender();},
+ init(){LK.stepper($("aw"),aRender);LK.stepper($("at"),aRender);$("aplot").addEventListener("click",ev=>{const g=ev.target.closest&&ev.target.closest(".lagbar");if(!g)return;aK=+g.dataset.k;aRender();});aRender();},
+ apply(s){if(s.wave!==undefined)LK.setRange("aw",s.wave);if(s.trend!==undefined)LK.setRange("at",s.trend);if(s.lag!==undefined)aK=+s.lag;aRender();},
  render:aRender,
- value(key){const A=aVals();if(key==="peak"){let b=0;A.r.forEach((r,i)=>{if(r>A.r[b])b=i;});return {v:b+1,text:"ラグ"+(b+1)};}const r=A.r[+key.split(":")[1]-1];return {v:r,text:r.toFixed(2)};}});
+ value(key){const A=aVals();if(key==="lag")return {v:aK,text:"ラグ"+aK};if(key==="peak"){let b=0;A.r.forEach((r,i)=>{if(r>A.r[b])b=i;});return {v:b+1,text:"ラグ"+(b+1)};}const r=A.r[+key.split(":")[1]-1];return {v:r,text:r.toFixed(2)};}});
 
 // ---- 寄与度
 function cVals(){const a0=+$("ca0").value,a1=+$("ca1").value,b0=+$("cb0").value,b1=+$("cb1").value,t0=a0+b0,t1=a1+b1;
@@ -180,6 +189,6 @@ LK.register("contrib",{name:"寄与度",
  value(key){const C=cVals(),v={total:C.tot,cA:C.cA,cB:C.cB,rateA:C.rA}[key];return {v,text:(v>=0?"＋":"−")+f(Math.abs(+v.toFixed(2)))};}});
 
 LK.start("ratio");
-window.__LAB__={LK,rVals,gVals,maOf,acf,daily,SERIES,cVals};
+window.__LAB__={LK,rVals,gVals,maOf,acf,daily,SERIES,cVals,aVals,getLag:()=>aK};
 </script>
 </body></html>
