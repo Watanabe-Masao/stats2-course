@@ -252,9 +252,9 @@
     id: LAB-chisq
     mode: indep
     set: {alpha: 0.05, r: 2, c: 3, t: [[60, 30, 10], [45, 35, 20]]}
-    task: A店 60・30・10、B店 45・35・20。p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0534
+    task: A店 60・30・10、B店 45・35・20。5%で H₀（独立）をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
     why: χ²≒5.86、p≒0.053。わずかに5%を超える。いちばん効いているのは「不満」の列。
 
 - id: Q-U27-031
