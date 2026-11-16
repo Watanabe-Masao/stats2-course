@@ -51,7 +51,7 @@
     - ③ 30人の年齢の標準偏差
 
 - id: Q-U03-003
-  concepts: [TERM-population, TERM-sample]
+  concepts: [TERM-population, TERM-sample, TERM-statistic]
   stage: S1
   difficulty: 1
   format: written
@@ -72,7 +72,7 @@
     - 500世帯の平均食費
 
 - id: Q-U03-004
-  concepts: [TERM-population, TERM-parameter]
+  concepts: [TERM-population, TERM-parameter, TERM-statistic]
   stage: S1
   difficulty: 2
   format: written
@@ -116,7 +116,7 @@
     - 20人の平均残業時間
 
 - id: Q-U03-010
-  concepts: [TERM-population, TERM-sample, TERM-statistic, TERM-bias]
+  concepts: [TERM-population, TERM-sample, TERM-parameter, TERM-statistic, TERM-bias]
   stage: S2
   label: 約1週間後の問
   format: written
@@ -138,7 +138,7 @@
     - 満足と答えた割合 p̂＝75%
 
 - id: Q-U03-011
-  concepts: [TERM-parameter, TERM-statistic, TERM-random-sampling]
+  concepts: [TERM-parameter, TERM-statistic, TERM-sample-mean]
   stage: S2
   label: 計算練習
   format: written
@@ -168,7 +168,7 @@
     note: 平均 2.5% は5店から計算した統計量 x̄。全店の本当の平均 μ とは限らない。
 
 - id: Q-U03-012
-  concepts: [TERM-random-sampling, TERM-statistic, TERM-comb, CLM-40]
+  concepts: [TERM-random-sampling, TERM-statistic, TERM-comb, TERM-sample-space, CLM-40]
   stage: S2
   label: 約1か月後の問
   format: written
@@ -208,7 +208,7 @@
     why: 名簿にいない店（廃棄率が高め）は選ばれないので、n を増やしても x̄ は名簿内の平均に集まり、μ には近づかない。
 
 - id: Q-U03-021
-  concepts: [TERM-statistic, TERM-bias]
+  concepts: [TERM-parameter, TERM-statistic, TERM-bias]
   stage: S3
   format: written
   powers: [P3]
@@ -224,7 +224,7 @@
     why: 返事をする店が偏っていると、何回集めてもずれは消えない（口コミの件数を増やしても同じ）。偏りの強さを0にすると μ のまわりに集まる。
 
 - id: Q-U03-022
-  concepts: [TERM-random-sampling, TERM-statistic, TERM-parameter]
+  concepts: [TERM-population, TERM-sample, TERM-random-sampling, TERM-statistic, TERM-parameter]
   stage: S3
   tag: 本番形式
   format: choice
@@ -259,7 +259,7 @@
     - 「満足」と答えた割合 62%
 
 - id: Q-U03-023
-  concepts: [TERM-statistic, TERM-parameter]
+  concepts: [TERM-statistic, TERM-parameter, TERM-h0]
   stage: S3
   tag: 記号を読む
   format: written
@@ -282,7 +282,7 @@
     - s＝1.1（標本の標準偏差）
 
 - id: Q-U03-024
-  concepts: [TERM-sample-space, TERM-event]
+  concepts: [TERM-sample-space, TERM-event, TERM-prob]
   stage: S3
   tag: 確率へ
   format: written
@@ -324,7 +324,7 @@
     - 標本の不良率 1/20＝5%
 
 - id: Q-U03-031
-  concepts: [TERM-sample, TERM-random-sampling, TERM-ratio]
+  concepts: [TERM-population, TERM-sample, TERM-random-sampling, TERM-ratio]
   stage: S4
   format: written
   powers: [P2, P3]
@@ -363,7 +363,7 @@
     - 20品目の値入率
 
 - id: Q-U03-040
-  concepts: [TERM-population, TERM-sample, TERM-random-sampling]
+  concepts: [TERM-population, TERM-sample, TERM-random-sampling, TERM-sample-mean, TERM-var]
   stage: S3
   label: 確かめ問題
   format: written
