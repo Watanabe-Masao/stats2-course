@@ -1163,7 +1163,7 @@ relations:
       units:
       - U07
       - U29
-    figures: [FIG-U29-resid]
+    figures: [FIG-U29-r2]
     version: 2
   - id: REL-resid-r2
     from: TERM-resid
@@ -1975,6 +1975,7 @@ relations:
   - id: REL-corr-r2
     from: TERM-corr
     to: TERM-r2
+    figures: [FIG-U29-r2]
     version: 1
     type: 移る
     mode: exact
@@ -1988,6 +1989,7 @@ relations:
   - id: REL-corr-regcoef
     from: TERM-corr
     to: TERM-regcoef
+    figures: [FIG-U29-slope]
     version: 1
     type: 移る
     mode: exact
@@ -2001,11 +2003,12 @@ relations:
   - id: REL-corr-regcoef-contrast
     from: TERM-corr
     to: TERM-regcoef
+    figures: [FIG-U29-slope]
     version: 1
     type: 比べる
     axis: 単位のない対称な強さか、単位つきの向きのある傾きか（単回帰の傾き）
     same: どちらも同じデータの x と y の直線的な関係を1つの数で表す。単回帰の傾きは r と同じく偏差の積の和 S_xy から作り、符号が r と同じ
-    differ: 相関係数は −1〜1 で単位によらず、x と y を入れ替えても変わらない（直線へのそろい方）。単回帰の傾きは「y の単位 ÷ x の単位」を持ち、大きさに上限がなく、x と y を入れ替えると変わる（y を x で回帰した傾きと x を y で回帰した傾きの積が r²）。r が大きくても傾きが小さいことも、その逆もある。重回帰の係数は、ほかの説明変数を固定したときの傾きで、r と符号が逆になることもある
+    differ: 相関係数は −1〜1 で単位によらず、x と y を入れ替えても変わらない（直線へのそろい方）。単回帰の傾きは「y の単位 ÷ x の単位」を持ち、大きさに上限がなく、x と y を入れ替えると変わる（y を x で回帰した傾きと x を y で回帰した傾きの積が r²）。r が大きくても傾きが小さいことも、その逆もある。重回帰の係数は、ほかの説明変数と直線的に一緒に動く分を除いたあとの傾きで、r と符号が逆になることもある
     description: 相関係数は単位のない対称な強さ、単回帰の傾き（回帰係数）は単位つきの向きのある傾き。
     gist: どちらも x と y の直線的な関係を表すが、相関係数は単位によらない「そろい方」、単回帰の傾きは単位つきの「傾き」。そろい方が同じでも、傾きは違うことがある。
     basis:
