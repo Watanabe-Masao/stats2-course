@@ -1975,6 +1975,7 @@ relations:
   - id: REL-corr-r2
     from: TERM-corr
     to: TERM-r2
+    figures: [FIG-U29-resid]
     version: 1
     type: 移る
     mode: exact
@@ -1988,6 +1989,7 @@ relations:
   - id: REL-corr-regcoef
     from: TERM-corr
     to: TERM-regcoef
+    figures: [FIG-U29-slope]
     version: 1
     type: 移る
     mode: exact
@@ -2001,6 +2003,7 @@ relations:
   - id: REL-corr-regcoef-contrast
     from: TERM-corr
     to: TERM-regcoef
+    figures: [FIG-U29-slope]
     version: 1
     type: 比べる
     axis: 単位のない対称な強さか、単位つきの向きのある傾きか（単回帰の傾き）

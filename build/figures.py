@@ -642,8 +642,52 @@ def dev(sp: dict) -> str:
 
 
 # ---- 散布図（cov：平均の点からの偏差の積を長方形で。resid：平均の線からの偏差と、回帰直線からの残差） ----
+def _scatter_fit(sp: dict) -> str:
+    c = Canvas()
+    xs, ys = sp["x"], sp["y"]
+    L, R = 40, W - 14
+    y = 8
+    if sp.get("title"):
+        y = c.para(8, 22, sp["title"], 344, 13.5, INK, "bold") - 8
+    T = y + 20; B = T + 210; P = 12
+    X = lambda v: L + P + (float(v) - xs["lo"]) / (xs["hi"] - xs["lo"]) * (R - L - 2 * P)  # noqa: E731
+    Y = lambda v: B - P - (float(v) - ys["lo"]) / (ys["hi"] - ys["lo"]) * (B - T - 2 * P)  # noqa: E731
+    for t in range(int(ys["lo"]), int(ys["hi"]) + 1, ys.get("step", 1)):
+        c.line(L, Y(t), R, Y(t), GRID, 1)
+        c.text(L - 6, Y(t) + 4, _num(t), 11, INK2, "end")
+    for t in range(int(xs["lo"]), int(xs["hi"]) + 1, xs.get("step", 1)):
+        c.text(X(t), B + 15, _num(t), 11, INK2, "middle")
+    c.line(L, B, R, B, INK2, 1)
+    cols = [BLUE, ORANGE, VIOLET]; dashes = [None, "6 4", "2 3"]; lines = []
+    for k, st in enumerate(sp["sets"]):
+        pts = [(Fraction(str(a)), Fraction(str(b))) for a, b in st["points"]]
+        n = len(pts); mx = sum(p[0] for p in pts) / n; my = sum(p[1] for p in pts) / n
+        sxy = sum((a - mx) * (b - my) for a, b in pts); sxx = sum((a - mx) ** 2 for a, _ in pts); syy = sum((b - my) ** 2 for _, b in pts)
+        b1 = sxy / sxx; a1 = my - b1 * mx; r = float(sxy) / (float(sxx) * float(syy)) ** 0.5
+        col = cols[k % 3]
+        c.line(X(xs["lo"]), Y(a1 + b1 * xs["lo"]), X(xs["hi"]), Y(a1 + b1 * xs["hi"]), col, 2, dashes[k % 3])
+        for a, b in pts:
+            if k % 2:
+                c.add(f'<rect x="{X(a) - 4:.1f}" y="{Y(b) - 4:.1f}" width="8" height="8" fill="{col}"/>')
+            else:
+                c.circle(X(a), Y(b), 4.5, col)
+        lines.append((col, dashes[k % 3], f"{st['label']}：傾き {_num(float(b1))}・相関係数 {_num(round(r, 2))}"))
+    y = B + 34
+    c.text(R, y, xs["label"], 11.5, INK2, "end")
+    c.text(L, T - 4, ys["label"], 11.5, INK2)
+    y += 12
+    for col, dash, t in lines:
+        c.line(10, y + 4, 30, y + 4, col, 2.5, dash)
+        y = c.para(36, y + 8, t, 316, 12.5, INK) + 2
+    if sp.get("note"):
+        y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
+    return c.done(y + 6)
+
+
 def scatter(sp: dict) -> str:
     c = Canvas()
+    if sp.get("show") == "fit":             # 2つ以上の組を重ね、組ごとの回帰直線を引く（傾きと相関係数を下に出す）
+        return _scatter_fit(sp)
     pts = [(Fraction(str(a)), Fraction(str(b))) for a, b in sp["points"]]
     n = len(pts)
     mx = sum(p[0] for p in pts) / n; my = sum(p[1] for p in pts) / n
