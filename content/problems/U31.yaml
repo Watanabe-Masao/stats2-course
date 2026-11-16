@@ -25,7 +25,7 @@
 
 - id: Q-U31-002
   stage: S1
-  concepts: [TERM-nonsampling-error, TERM-sampling-error]
+  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-se, TERM-bias]
   label: 例題C（自力）
   format: written
   powers: [P1, P3]
@@ -73,34 +73,34 @@
   lab:
     id: LAB-survey
     mode: design
-    set: {d: 2, p: 0, s: 1, show: clus}
-    task: 地域の差2（地域ごとの違いが大きい）。4つの方法のうち、推定値のばらつきがいちばん小さいのは？
+    set: {d: 2, p: 1, s: 1, show: clus}
+    task: 地域ごとの売上の水準の違いが大きく、名簿の中の並びにも少し違いがある。4つの方法のうち、推定値のばらつきがいちばん小さいのは？
     predict: {type: choice, key: best, label: "いちばん小さい", options: [単純無作為, 層化, 集落, 系統]}
     expect: 層化
-    why: 層化の標準誤差は単純無作為の約0.3倍、集落は約3.2倍。同じ「地域で分ける」でも結果は正反対になる。
+    why: 層化の標準誤差は単純無作為の約0.34倍、集落は約3.1倍。同じ「地域で分ける」でも結果は正反対になる。
 
 - id: Q-U31-005
   stage: S1
-  concepts: [TERM-systematic-sampling]
+  concepts: [TERM-systematic-sampling, TERM-random-sampling, TERM-strat-sampling]
   difficulty: 3
   format: written
   powers: [P1, P3]
   prompt: 100店の名簿が、地域ごとに「売上の高い順」に10店ずつ並んでいる。無作為な開始点から10店おきに選ぶ系統抽出をすると、どんな標本になりやすいか。単純無作為抽出と比べて推定値のばらつきはどうなるか。どう直せばよいか。
-  answer: 10店おきに選ぶと、どの地域でも**名簿の同じ順位**（全部1位、全部10位など）の店ばかりになる。名簿の周期（10店）と間隔が重なるので、推定値は「どの順位を引いたか」で大きく変わり、ばらつきは単純無作為より**大きくなる**（ラボの設定で約2.9倍）。並び順を無作為に混ぜてから選ぶ、間隔を周期とずらす、層化（地域ごと）にして各層の中で無作為に選ぶ、などで直す。
+  answer: 10店おきに選ぶと、どの地域でも**名簿の同じ順位**（全部1位、全部10位など）の店ばかりになる。名簿の周期（10店）と間隔が重なるので、推定値は「どの順位を引いたか」で大きく変わり、ばらつきは単純無作為より**大きくなる**（ラボの設定で約3倍）。並び順を無作為に混ぜてから選ぶ、間隔を周期とずらす、層化（地域ごと）にして各層の中で無作為に選ぶ、などで直す。
   checks:
-    - 'abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[3] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[0] - 2.93) < 0.005 and abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[2] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[0] - 0.311) < 0.005'
+    - 'abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[3] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[0] - 2.98) < 0.005 and abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[2] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(0,2,1)[0] - 0.46) < 0.005'
   lab:
     id: LAB-survey
     mode: design
     set: {d: 0, p: 2, s: 1, show: sys}
-    task: 地域の差0、並び順の差2（名簿が地域ごとに売上順）。系統抽出の標準誤差は単純無作為の何倍か（小数で）？
-    predict: {type: number, key: rSys, label: "系統÷単純無作為", unit: "倍"}
-    expect: 2.9302
+    task: 地域による違いはなく、名簿は地域ごとに売上の高い順に並んでいる。系統抽出（10店おき）の標準誤差は、単純無作為と比べてどうなるか。
+    predict: {type: choice, key: cSys, label: "単純無作為と比べて", options: [大きい, ほぼ同じ, 小さい]}
+    expect: 大きい
     why: 系統抽出で選べる標本は「1位の10店」「2位の10店」…の10通りしかない。並び順の差がそのまま推定値のばらつきになる。
 
 - id: Q-U31-010
   stage: S2
-  concepts: [TERM-strat-sampling]
+  concepts: [TERM-strat-sampling, TERM-se]
   format: written
   powers: [P1, P3]
   prompt: 層1（全体の20%、標準偏差30）と層2（80%、標準偏差5）に、合わせて100人を振り分ける。① 比例配分 ② ネイマン配分（層の割合×層の標準偏差に比例）で、層1に何人を配るか。
@@ -118,11 +118,11 @@
 
 - id: Q-U31-011
   stage: S2
-  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-ci]
+  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-ci, TERM-bias]
   format: written
   powers: [P1, P3]
-  prompt: 例題C の調査（本当の賛成率0.5、賛成者の回答率0.6・反対者の回答率0.3）で、回答を1万人集めた。集まった賛成率は約0.667、95%信頼区間（{{unit:U22}}）は約0.657〜0.676 になる。この区間は本当の賛成率0.5 を含むか。区間の幅が狭いことは、何を保証して何を保証しないか。
-  answer: '**含まない**。区間の幅（標本誤差）は n が大きいので狭いが、回答率の違いによる偏り（約0.167）は区間に入っていない。区間は「たまたまの選ばれ方によるばらつき」の大きさだけを表し、調べ方の偏りがないことは保証しない。'
+  prompt: 例題C の調査（本当の賛成率0.5、賛成者の回答率0.6・反対者の回答率0.3）で、回答を1万人集め、集まった答えから比率の95%信頼区間（{{unit:U22}}）を作った。この区間は本当の賛成率0.5 を含むか。区間の幅が狭いことは、何を保証して何を保証しないか。
+  answer: '**含まない**。集まった賛成率は約0.667 で、区間は約0.657〜0.676。区間の幅（標本誤差）は n が大きいので狭いが、回答率の違いによる偏り（約0.167）は区間に入っていない。区間は「たまたまの選ばれ方によるばらつき」の大きさだけを表し、調べ方の偏りがないことは保証しない。'
   checks:
     - 'abs(2/3 - 1.96*math.sqrt((2/3)*(1/3)/10000) - 0.657) < 0.0005 and abs(2/3 + 1.96*math.sqrt((2/3)*(1/3)/10000) - 0.676) < 0.0005 and abs(2/3-0.5 - 0.167) < 0.0005'
   lab:
@@ -139,7 +139,7 @@
   concepts: [TERM-nonsampling-error, TERM-ci, TERM-bias]
   format: written
   powers: [P1, P3]
-  prompt: 400人の回答で賛成率は0.6、比率の95%信頼区間（{{unit:U22}}）は 0.6±1.96×√(0.6×0.4÷400)＝約0.552〜0.648。ところが本当の賛成率は0.5 で、賛成者の回答率は0.6、反対者は0.4 だった。偏り（集まった値−本当の値）はいくつか。区間の作り方のどこに、この偏りが入っていないか。
+  prompt: 本当の賛成率は0.5 で、賛成者の回答率は0.6、反対者は0.4 だった。集まった400人の回答から、比率の95%信頼区間（{{unit:U22}}）を作った。偏り（集まった値−本当の値）はいくつか。区間の作り方のどこに、この偏りが入っていないか。
   answer: 集まった賛成率は 0.5×0.6÷(0.5×0.6＋0.5×0.4)＝0.6 で、偏りは **0.1**。区間の式 √(p̂(1−p̂)÷n) は、無作為に選ばれた標本のばらつきだけを表す。回答率が賛否で違うこと（非標本誤差）は式に入っていないので、区間は本当の0.5 を含まない。
   checks:
     - 'abs(0.5*0.6/(0.5*0.6+0.5*0.4) - 0.6) < 1e-12 and abs(0.6-1.96*math.sqrt(0.6*0.4/400) - 0.552) < 0.0005 and abs(0.6+1.96*math.sqrt(0.6*0.4/400) - 0.648) < 0.0005 and abs(0.6-0.5 - 0.1) < 1e-12'
@@ -172,7 +172,7 @@
 
 - id: Q-U31-021
   stage: S3
-  concepts: [TERM-strat-sampling, TERM-sampling-error, TERM-se]
+  concepts: [TERM-strat-sampling, TERM-sampling-error, TERM-se, TERM-random-sampling]
   format: written
   powers: [P1, P3]
   prompt: Q-U31-010 の2つの層（割合0.2・標準偏差30 と 割合0.8・標準偏差5、層の平均の差40）で、100人を調べる。標準誤差を ① 単純無作為 ② 比例配分の層化 ③ ネイマン配分の層化 で比べよ。①は √((0.2×30²＋0.8×5²＋0.2×0.8×40²)÷100) で求める。
@@ -190,7 +190,7 @@
 
 - id: Q-U31-022
   stage: S3
-  concepts: [TERM-nonsampling-error]
+  concepts: [TERM-nonsampling-error, TERM-bias]
   format: written
   powers: [P1, P3]
   prompt: 回答率がちょうど50%の調査があった。本当の賛成率は0.4 で、賛成の人も反対の人も同じく半分が答えた。集まった答えの賛成率は偏るか。「回答率が低いから信用できない」という意見に、どう答えるか。
@@ -208,7 +208,7 @@
 
 - id: Q-U31-023
   stage: S3
-  concepts: [TERM-strat-sampling, TERM-cluster-sampling, TERM-sampling-error]
+  concepts: [TERM-strat-sampling, TERM-cluster-sampling, TERM-sampling-error, TERM-systematic-sampling, TERM-nonsampling-error]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -220,21 +220,21 @@
     - 系統抽出は、名簿の並びにどんな周期があっても単純無作為抽出と同じ精度になる。
     - 各層から同じ数を選んだ層化抽出では、集めた値をそのまま平均すれば母平均の推定になる。
   correct: 2
-  answer: 層化は全部の層から選ぶので、層の間の違いは推定値のばらつきに入らず、層の中のばらつきだけが残る。ラボの設定では、地域の差を大きくすると層化の標準誤差は単純無作為の約0.3倍まで小さくなる。
+  answer: 層化は全部の層から選ぶので、層の間の違いは推定値のばらつきに入らず、層の中のばらつきだけが残る。ラボの設定では、地域の差を大きくすると層化の標準誤差は単純無作為の約0.25倍まで小さくなる。
   misconceptions:
     1: n を増やして小さくなるのは標本誤差だけ。回答率の違いによる偏り（非標本誤差）は残る
     3: 集落の中が似ていると、集落を丸ごと調べても情報が増えず、精度は下がる
     4: 名簿の周期と間隔が重なると、同じ位置の個体ばかり選ばれ、ばらつきが大きくなる
     5: 母集団での層の割合で重み付けし直す。そのまま平均すると、小さい層を重く見すぎる
   checks:
-    - 'abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[1] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[0] - 0.295) < 0.0005 and abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[2] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((7*j*j+3*k*k+5*j*k+2*j+k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[0] - 3.18) < 0.005'
+    - 'abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[1] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[0] - 0.25) < 0.005 and abs((lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[2] / (lambda d,p,s: (lambda Y: (lambda M,am,mk: (math.sqrt(0.9*sum((v-M)**2 for r in Y for v in r)/99/10), math.sqrt(sum(0.009*sum((v-sum(r)/10)**2 for v in r)/9 for r in Y)), math.sqrt(0.9*sum((a-M)**2 for a in am)/9), math.sqrt(sum((m-M)**2 for m in mk)/10)))(sum(v for r in Y for v in r)/100, [sum(r)/10 for r in Y], [sum(Y[j][k] for j in range(10))/10 for k in range(10)]))([[50+d*[3,-7,9,-1,-9,5,1,-5,7,-3][j]+p*(k-4.5)+s*(((3*j*j+4*k*k+7*j*k+2*j+4*k)%11)-5) for k in range(10)] for j in range(10)]))(2,0,1)[0] - 3.22) < 0.005'
   lab:
     id: LAB-survey
     mode: design
     set: {d: 2, p: 0, s: 1, show: strat}
-    task: 地域の差2。層化の標準誤差は単純無作為の何倍か（小数で）？
-    predict: {type: number, key: rStrat, label: "層化÷単純無作為", unit: "倍"}
-    expect: 0.295
+    task: 地域ごとの売上の水準の違いが大きいとき、層化（地域ごとに1店）の標準誤差は、単純無作為と比べてどうなるか。
+    predict: {type: choice, key: cStrat, label: "単純無作為と比べて", options: [大きい, ほぼ同じ, 小さい]}
+    expect: 小さい
     why: 層の間の違いが大きいほど層化は得をする。集落（約3.2倍）とは正反対。
 
 - id: Q-U31-030
@@ -257,7 +257,7 @@
 
 - id: Q-U31-031
   stage: S4
-  concepts: [TERM-nonsampling-error]
+  concepts: [TERM-nonsampling-error, TERM-bias]
   format: written
   powers: [P1, P3]
   prompt: 店内アンケートで「不満がある」と答えた人の割合を調べる。本当は客の30%が不満を持っているが、不満のある人の回答率は0.2、ない人の回答率は0.5 だった。① 集まった答えの「不満」の割合はいくつか。② この結果を「不満は少ない」と報告するのは何が問題か。
@@ -268,7 +268,7 @@
     id: LAB-survey
     mode: bias
     set: {p: 0.3, r1: 0.2, r0: 0.5, n: 400}
-    task: 本当の「不満」の割合0.3、不満のある人の回答率0.2・ない人の回答率0.5。集まった「不満」の割合は（小数で）？
+    task: ラボの「賛成」を「不満」と読みかえる。本当の「不満」の割合0.3、不満のある人の回答率0.2・ない人の回答率0.5。集まった「不満」の割合は（小数で）？
     predict: {type: number, key: est, label: "集まった不満の割合"}
     expect: 0.1463
     why: 不満のある人ほど答えないので、集まった答えは半分以下に。区間（約0.11〜0.18）も本当の0.3 を含まない。
@@ -292,18 +292,18 @@
     why: 0.25×0.25×0.1 の逆数。1店の客を300 にすると重みは480 に変わる。
 
 - id: Q-U31-040
-  stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして「何が消えるか」を見る（#373 の F。渡辺さん 2026-11-12）
-  concepts: [TERM-nonsampling-error, TERM-sampling-error, TERM-bias, REL-sampling-nonsampling-contrast]
+  stage: S5   # 2級の範囲外の発展。予測を外し、自由に動かして前提が崩れたときを見る（#373 の F。渡辺さん 2026-11-12）
+  concepts: [TERM-strat-sampling, TERM-nonsampling-error, TERM-frame, TERM-bias, REL-sampling-nonsampling-contrast]
   format: written
   powers: [P1, P3]
-  prompt: 例題C の調査（本当の賛成率0.5、回答率は賛成0.6・反対0.3）で、偏りは約0.167。調査の担当者は「回答を400人から1万人に増やせば、誤差はほとんどなくなる」と予算を求めた。ラボで回答数を増やしながら、偏り・標準誤差・総合誤差 √(偏り²＋標準誤差²) の動きを読み、担当者の考えのどこに無理があるかを説明する。
+  prompt: あるチェーンで、3年前に作った店の一覧では大規模店が25%・小規模店が75%。この一覧で層に分け、各層から10店ずつ調べると、平均売上は大規模180万円・小規模60万円だった。一覧の割合で重みを付けて全店の平均を推定した。ところがこの3年で大規模店への建て替えが進み、今は大規模店が40% になっている。担当者は「各層を100店ずつに増やせば、推定はもっと確かになる」と言う。ラボで層1の割合を一覧の0.25 から今の0.4 に動かして推定値の動きを読み、層化の推定が何を前提にしていて、それが崩れると何が起き、担当者の考えのどこに無理があるかを説明する。
   answer_title: 1つの考え方の例（自分で書いてから開く）
-  answer: 回答数400人では、標準誤差は √(0.667×0.333÷400)≒0.0236、総合誤差は √(0.1667²＋0.0236²)≒0.168。1万人にすると標準誤差は約0.005 まで縮むが、総合誤差は0.1667 までしか下がらない。総合誤差のほとんどは、賛成の人ほど答えやすいことから来る偏りで、回答数を増やしても同じ向きに残る。予算を回答数に使うより、答えにくい人に追加で聞く・答えやすい聞き方にするなど、回答率の差を小さくする方に使う方が、誤差は小さくなる。
+  answer: 一覧の割合で重みを付けた推定は 0.25×180＋0.75×60＝90万円。今の割合なら 0.4×180＋0.6×60＝108万円で、18万円低く見積もっている。層化の推定は「層の平均」と「層の割合 N_h/N」の2つでできていて、各層の店を増やして確かになるのは層の平均（標本誤差）の方だけ。重みに使う層の割合は調べた店からではなく一覧から来るので、一覧が古いと、層の平均がどれだけ確かでも、ずれ（非標本誤差のうち抽出枠と母集団のずれ）は18万円のまま残る。層の平均の差（180−60＝120万円）が大きいほど、割合のずれ（0.15）が推定に効く（0.15×120＝18）。層化は層の間の違いを取り除くのが強みだが、その分、層の割合を正しく知っていることに頼る。
   checks:
-    - 'abs(math.sqrt((2/3)*(1/3)/400) - 0.0236) < 0.00005 and abs(math.sqrt((1/6)**2+(2/3)*(1/3)/400) - 0.168) < 0.0005 and abs(1/6 - 0.167) < 0.0005'
-    - 'abs(math.sqrt((2/3)*(1/3)/10000) - 0.005) < 0.0005 and abs(math.sqrt((1/6)**2+(2/3)*(1/3)/10000) - 0.1667) < 0.0001'
+    - '0.25*180 + 0.75*60 == 90 and abs(0.4*180 + 0.6*60 - 108) < 1e-9 and abs(108 - 90 - 18) < 1e-9 and 180 - 60 == 120 and abs(0.4 - 0.25 - 0.15) < 1e-12 and abs(0.15*120 - 18) < 1e-9'
   lab:
     id: LAB-survey
-    mode: bias
-    set: {p: 0.5, r1: 0.6, r0: 0.3, n: 400}
-    task: n を増やしていき、総合誤差と標準誤差の動きを比べる。n をいくら増やしても小さくならない部分は何か。
+    mode: strat
+    set: {w: 0.25, m1: 180, m2: 60}
+    task: 層1（大規模店）の割合を、3年前の一覧の0.25 から今の0.4 まで動かし、重みを付けた推定値がどれだけ動くかを読む。層の平均（180・60）は同じまま。
+
