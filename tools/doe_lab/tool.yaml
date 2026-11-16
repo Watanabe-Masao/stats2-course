@@ -9,7 +9,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
   - key: anova
     name: 分散分析
     purpose: 群ごとの点・群の平均・全体の平均を並べ、群間の平方和（太い横線）と群内の平方和（細い線）、F と p 値、F の境目（3桁）を出す。平均のずれ・群内のばらつきを何倍かにし、店舗をくり返して自由度を増やす
-    set: [data, kb, kw, rep]        # data：ex／b／rep／two／uneq／flyer／promo／four／five／block。kb・kw は倍率、rep はくり返しの回数
+    set: [data, kb, kw, rep]        # data：ex／b／rep／two／uneq／flyer／promo／four／five／block／even／one。kb・kw は倍率、rep はくり返しの回数
     values: [ssb, ssw, sst, msb, msw, F, p, crit, decision, dfb, dfw]
   - key: assign
     name: 割り当て方
@@ -72,7 +72,7 @@ presets:
         task: ばらつきを元に戻し、別の店で同じ散らばりの値が出たとして、各群を6店にする（A 1,3,1,3,1,3 など）。F は？
         predict: {type: number, key: F, label: "F"}
         expect: 20
-        why: 群間の平方和は3倍の48、群内も3倍の18 だが、群内の自由度が3から15 に増える。(48÷2)÷(18÷15)＝20。
+        why: 群間の平方和は3倍の48、群内も3倍の18 だが、群内の自由度が3から15 に増える。(48÷2)÷(18÷15)＝20。ラボの「値の写し」は同じ値を写すだけで、それが別の店か、同じ店の別の日かは F には区別がつかない。どちらかはデータの取り方で決まる（同じ店の日なら独立でない）。
     law:
       title: 式で説明する
       lines:

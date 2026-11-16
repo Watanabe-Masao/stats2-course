@@ -13,11 +13,11 @@
 <div class="tabs" id="tabs"></div>
 
 <div id="m-anova" class="mode">
- <p class="mut" style="margin:0">全体の変動を「群の平均のずれ（群間）」と「群の中のばらつき（群内）」に分ける。F＝群間の平均平方÷群内の平均平方。群の平均を離すと F は大きく、群の中を散らすと F は小さくなる。</p>
+ <p class="mut" style="margin:0">全体の変動を「群の平均のずれ（群間）」と「群の中のばらつき（群内）」に分ける。F＝群間の平均平方÷群内の平均平方。つまみで、群の平均のずれ・群の中のばらつき・値の写し（くり返し）を変えられる。</p>
  <div class="row ctl"><label>データ <select id="adata" data-key="data"></select></label></div>
  <input type="range" id="akb" min="0" max="3" step="0.25" value="1" data-name="平均のずれ" data-unit="倍">
  <input type="range" id="akw" min="0.25" max="3" step="0.25" value="1" data-name="群内のばらつき" data-unit="倍">
- <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="くり返し" data-unit="回">
+ <input type="range" id="arep" min="1" max="5" step="1" value="1" data-name="値の写し（くり返し）" data-unit="回">
  <div class="lk-wait card mut">予測を決めると、ここに結果が出る。</div>
  <div class="res key" id="aplot"></div>
  <div class="card res key" id="asum"></div>
@@ -86,7 +86,9 @@ const DATA={
  promo:{name:"陳列3案（各3店）",g:[[20,22,24],[24,26,28],[26,28,30]]},
  four:{name:"4つの売場（各6店）",g:[[6,7.5,8,9,9.5,11],[7,8.5,9,10,10.5,12],[8,9.5,10,11,11.5,13],[9,10.5,11,12,12.5,14]]},
  five:{name:"3案（各5店）",g:[[7,8,9,10,11],[7,8,9,10,11],[10,11,12,13,14]]},
- block:{name:"陳列3案（規模の組4つ）",g:[[10,20,30,40],[12,21,33,42],[13,24,34,45]]}};
+ block:{name:"陳列3案（規模の組4つ）",g:[[10,20,30,40],[12,21,33,42],[13,24,34,45]]},
+ even:{name:"実験1（各3店・平均が等間隔）",g:[[3,4,5],[6,7,8],[9,10,11]]},
+ one:{name:"実験2（各3店・1案だけ離れる）",g:[[2,4,6],[4,4,4],[10,10,10]]}};
 function aGroups(){const d=DATA[$("adata").value],kb=+$("akb").value,kw=+$("akw").value,rep=+$("arep").value;
  const base=d.g.map(g=>{let x=[];for(let i=0;i<rep;i++)x=x.concat(g);return x;});
  const all=base.flat(),m=all.reduce((s,x)=>s+x,0)/all.length;
