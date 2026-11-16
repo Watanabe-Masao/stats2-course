@@ -44,6 +44,7 @@
 
 - id: Q-U02-003
   stage: S1
+  concepts: [TERM-function]
   difficulty: 1
   format: written
   powers: [P1]
@@ -283,6 +284,7 @@
 
 - id: Q-U02-032
   stage: S4
+  concepts: [TERM-function]
   tag: 送料の関数
   format: written
   powers: [P1]

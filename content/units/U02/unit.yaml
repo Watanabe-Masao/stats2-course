@@ -7,7 +7,7 @@ prev: U01
 next: U03
 prereq: [U01]
 used_by: [U03, U06, U07, U09, U13, U15, U29]
-terms: [TERM-sigma, TERM-fact, TERM-dev]
+terms: [TERM-sigma, TERM-fact, TERM-dev, TERM-function]
 labs: [LAB-sigma]
 goal: 統計の式に出てくる関数 f(x)・添字 xᵢ・Σ（全部足す）・n!（階乗）を、**具体的な足し算・掛け算に書き下して計算できる**。
 stage_goals:
@@ -57,3 +57,4 @@ checks:
   - '(-100)*10+0*0+100*(-10) == -2000 and 10000-12000 == -2000 and 100*30+200*20+300*10 == 10000 and (100+200+300)/3*(30+20+10) == 12000 and abs(10000/60 - 167) < 0.5'
   # 創造
   - 'fact(7) == 5040 and 5040/12 == 420 and comb(7,3) == 35 and 7 < 12 < 35 and 3*4 == 12 and 12-7 == 5 and perm(7,2) == 42 and 6-1 == 5 and abs((7+5)/42 - 0.29) < 0.005 and 6 > 5 and 5*2 == 10'
+concepts_linked: true
