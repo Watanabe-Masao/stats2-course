@@ -1,7 +1,7 @@
 # 単元U08の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U08-001
   stage: S1
-  concepts: [TERM-std, TERM-mean, TERM-sd]
+  concepts: [TERM-data-std, TERM-mean, TERM-sd]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -44,7 +44,7 @@
 
 - id: Q-U08-003
   stage: S1
-  concepts: [TERM-std]
+  concepts: [TERM-data-std]
   difficulty: 1
   format: written
   powers: [P1]
@@ -63,7 +63,7 @@
 
 - id: Q-U08-004
   stage: S1
-  concepts: [TERM-std]
+  concepts: [TERM-data-std]
   difficulty: 2
   format: written
   powers: [P1, P2]
@@ -82,7 +82,7 @@
 
 - id: Q-U08-005
   stage: S1
-  concepts: [TERM-std, TERM-sd]
+  concepts: [TERM-data-std, TERM-sd]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -101,7 +101,7 @@
 
 - id: Q-U08-010
   stage: S2
-  concepts: [TERM-std]
+  concepts: [TERM-data-std]
   label: 約1週間後の問
   format: written
   powers: [P1, P2]
@@ -141,7 +141,7 @@
 
 - id: Q-U08-012
   stage: S2
-  concepts: [TERM-std, TERM-mean, TERM-sd]
+  concepts: [TERM-data-std, TERM-mean, TERM-sd]
   label: 約1か月後の問
   format: written
   powers: [P3, P1]
@@ -160,7 +160,7 @@
 
 - id: Q-U08-020
   stage: S3
-  concepts: [TERM-std]
+  concepts: [TERM-data-std]
   tag: 偏差値
   format: written
   powers: [P1, P2]
@@ -179,7 +179,7 @@
 
 - id: Q-U08-021
   stage: S3
-  concepts: [TERM-std, TERM-skew, TERM-kurt]
+  concepts: [TERM-data-std, TERM-skew, TERM-kurt]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -228,7 +228,7 @@
 
 - id: Q-U08-023
   stage: S3
-  concepts: [TERM-std, TERM-outlier, TERM-data-sd, TERM-iqr]
+  concepts: [TERM-data-std, TERM-outlier, TERM-data-sd, TERM-iqr]
   tag: 外れ値が隠れる
   format: written
   powers: [P3, P1]
@@ -267,7 +267,7 @@
 
 - id: Q-U08-031
   stage: S4
-  concepts: [TERM-std, TERM-sd]
+  concepts: [TERM-data-std, TERM-sd]
   tag: 異常日の検知
   format: written
   powers: [P3]
@@ -286,7 +286,7 @@
 
 - id: Q-U08-032
   stage: S4
-  concepts: [TERM-std]
+  concepts: [TERM-data-std]
   tag: 偏差値から点へ
   format: written
   powers: [P1, P2]
@@ -356,7 +356,7 @@
 
 - id: Q-U08-025
   stage: S3
-  concepts: [TERM-std, TERM-mean, TERM-data-sd]
+  concepts: [TERM-data-std, TERM-mean, TERM-data-sd]
   tag: 本番形式
   format: choice
   powers: [P3]
