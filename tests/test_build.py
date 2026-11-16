@@ -1435,6 +1435,10 @@ class TestNetwork(unittest.TestCase):
         self.assertEqual(self.n.basis_exclude_errors(c, rels), [])
         c2 = course()
         self.assertEqual(gaps(c2, rels + [{"id": "REL-x", "type": "一種", "from": "TERM-binom", "to": "TERM-dist"}]), set())
+        # ⑤ の構成：直接の材料をさかのぼって着く概念は扱ったと数える（止めの側 v2_checks と同じ。#312）。
+        # 標準化の基準の定義に出る期待値は、標準偏差 → 分散 → 期待値 とたどって着くので警告に出さない。
+        # 検出の確かめ：さかのぼる所（reach）を外し、直接の組だけで数えると、この行が落ちる
+        self.assertNotIn(("TERM-expect", "TERM-std"), self.n.basis_gaps(course(), self.n.load_network()[0]))
         bad = [
             ({"concept": "TERM-dist", "kind": "一種の親", "text": "x"}, "kind は ⑤"),
             ({"concept": "TERM-dist", "kind": "使われる場"}, "理由の1文"),
