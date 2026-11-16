@@ -9,6 +9,16 @@ prereq: [U02, U07, U28]
 used_by: [U30, U32]
 terms: [TERM-ols, TERM-regcoef, TERM-resid, TERM-r2, TERM-extrap, TERM-slr]
 labs: [LAB-reg]
+figures:
+  - id: FIG-U29-resid
+    caption: 例題A の5週。点線は平均 ȳ からの偏差（y のばらつき SST のもと）、実線は回帰直線からの残差（SSE のもと）。直線で見込むと、平均で見込むより縦のずれが小さくなる
+    spec:
+      type: scatter
+      show: resid
+      title: 偏差は平均からのずれ、残差は直線の見込みからのずれ
+      points: [[1, 3], [2, 5], [3, 4], [4, 6], [5, 7]]
+      x: {label: 広告回数 x, lo: 1, hi: 5, step: 1}
+      y: {label: 来店者数 y（百人）, lo: 3, hi: 7, step: 1}
 goal: 散布図に最小二乗で回帰直線を引き（残差の2乗の合計を最小にする）、傾き・切片・予測値・残差・決定係数 R² を求めて読み、外挿・残差の形・回帰の向きの落とし穴を、点を動かして確かめながら説明できる。
 stage_goals:
   S1: 「最小二乗の直線は残差の〜を最小にする」「R²＝0.81 は予測が当たる割合ではなく〜」を自分の言葉で言えれば完了。
