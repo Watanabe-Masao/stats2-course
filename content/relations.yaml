@@ -192,6 +192,14 @@ relations:
       - {id: LAB-expect, preset: s5-free, purpose: 同時確率を自分で動かし、共分散の符号と大きさを見る}
     figures: [FIG-LAB-expect-rel-varcov-tour-1, FIG-LAB-expect-rel-varcov-tour-2]
     basis: {units: [U13]}
+  - id: REL-cov-uncorr
+    from: TERM-cov
+    to: TERM-uncorr
+    type: 定める
+    from_form: number
+    description: 無相関は、2つの確率変数の共分散が0であること。共分散で定める性質。
+    basis: {units: [U13]}
+    version: 1
   - id: REL-indep-cov
     from: TERM-indep
     to: TERM-uncorr

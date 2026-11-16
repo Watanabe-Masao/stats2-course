@@ -5577,14 +5577,70 @@
   category: 確率分布
   group: GRP-dist-cont
   forms: [distribution]
+  basis:
+    text: 正規分布 N(μ, σ²) で μ＝0・σ＝1 としたもの N(0, 1)。確率密度は φ(z)＝e^(−z²/2)÷√(2π)（z は実数全体）
+    terms: [TERM-normal]
   short: 平均0・標準偏差1の正規分布 N(0, 1) で、正規分布に従う量を標準化するとこの分布に従う
+  definition: 平均0・標準偏差1の正規分布 N(0, 1)。正規分布に従う確率変数を標準化した Z はこの分布に従うので、1つの表でどの正規分布の確率も読める。
+  version: 1
+  figures: [FIG-U16-stdnormal]
+  principle: 0を中心に左右対称な釣鐘の形で、−1〜1 に約68.3%、−1.96〜1.96 に95%が入る。P(Z≦z) を1つの表（標準正規分布表）にしておけば、標準化 (X−μ)÷σ を通して、どの N(μ, σ²) の確率もこの表で読める。二項分布の正規近似・中心極限定理・自由度を大きくした t 分布が近づく先もこの分布で、カイ二乗分布・t 分布はこの分布から作る。
+  conditions:
+    math:
+    - text: X が正規分布 N(μ, σ²)（σ＞0）に従う
+      kind: 仮定
+      claim: CLM-2
+      outside: 標準化しても平均0・標準偏差1になるだけで、分布の形は元のまま（右に裾の長い分布は、標準化しても右に裾が長い）。標準正規分布表の確率は当てはまらない
+    data:
+    - 標準正規分布表で確率を読むのは、標準化した量がこの分布に従う（元が正規分布）か、近づく（中心極限定理・正規近似の目安を満たす）と言えるときだけ
+  example: X が N(60, 10²) に従うとき、P(X≧80)＝P(Z≧(80−60)÷10)＝P(Z≧2)≒0.0228。上側5%の点は 1.645、両側5%の点は ±1.96。
+  counterexample: 平均1・標準偏差1の指数分布に従う X を標準化した Z＝(X−1)÷1＝X−1 は、平均0・標準偏差1だが標準正規分布ではない。P(Z≦−1)＝P(X≦0)＝0（標準正規分布なら約0.159）、P(Z＞2)＝P(X＞3)＝e⁻³≒0.0498（標準正規分布なら約0.0228）。
+  misconceptions:
+  - misconception: N(60, 100) に従う X を標準化するときは、(X−60)÷100 とする
+    correction: N(μ, σ²) の2つ目は分散 σ²。割るのは標準偏差 σ＝√100＝10 で、Z＝(X−60)÷10。100 で割ると、Z の標準偏差は 0.1 になり、標準正規分布表で読めない
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - abs(2*statistics.NormalDist().cdf(1)-1-0.683)<0.0005 and abs(2*statistics.NormalDist().cdf(1.96)-1-0.95)<0.0005
+  - round(1-statistics.NormalDist(60, 10).cdf(80), 4) == 0.0228 and round(1-statistics.NormalDist().cdf(2), 4) == 0.0228
+  - abs(statistics.NormalDist().inv_cdf(0.95)-1.645)<0.0005
+  - abs(statistics.NormalDist().cdf(-1)-0.159)<0.0005 and abs(math.exp(-3)-0.0498)<0.00005
+  - math.sqrt(100) == 10 and abs(10/100 - 0.1) < 1e-12
 - id: TERM-uncorr
   name: 無相関
   en: uncorrelated
   category: 確率分布
   group: GRP-dist-base
   forms: [property]
+  basis:
+    text: 分散が有限の2つの確率変数 X・Y で、共分散 Cov(X, Y)＝0 であること
+    terms: [TERM-cov]
   short: 2つの確率変数の共分散が0で、直線的に一緒に増える・減る傾向がないこと
+  definition: 2つの確率変数の共分散が0であること。
+  version: 1
+  principle: 共分散は、期待値から同じ向きにずれるか逆向きにずれるかの、直線的な傾向だけを測る。だから無相関は「直線的に一緒に動く傾向がない」ことで、関係がないことではない。独立なら無相関（④-13）だが、逆は一般には成り立たない。無相関なら和の分散の共分散の項が消え、V(X＋Y)＝V(X)＋V(Y)。
+  conditions:
+    math:
+    - text: X・Y の分散が有限
+      kind: 要件
+      terms: [TERM-var]
+      outside: この教材の共分散（分散が有限を前提にした定義）が定まらないので、この定義の無相関として扱えない
+    data:
+    - データの相関係数が0に近いことは、直線的な傾向が弱い手掛かりで、関係がないことの証拠ではない。散布図で、曲がった関係や群の混ざりがないかを見る
+  example: 2枚の硬貨を別々に投げ、表なら1・裏なら0とする X・Y は、4通りの (X, Y) が 1/4 ずつ。E(XY)＝P(X＝1, Y＝1)＝1/4、E(X)E(Y)＝1/2×1/2＝1/4 なので、Cov(X, Y)＝0 で無相関。
+  counterexample: X が −2・−1・1・2 を確率 1/4 ずつとり Y＝X² のとき、値が0について対称なので E(X)＝0・E(X³)＝0 で、Cov(X, Y)＝E(X³)−E(X)E(X²)＝0。無相関だが、Y は X で決まる。P(X＝1, Y＝4)＝0 なのに P(X＝1)P(Y＝4)＝1/4×1/2＝1/8 で、独立ではない。それでも V(X)＝5/2・V(Y)＝9/4・V(X＋Y)＝19/4 で、和の分散は分散の和になる。
+  misconceptions:
+  - misconception: 和の分散が分散の和 V(X)＋V(Y) になるには、独立が要る
+    correction: V(X＋Y)＝V(X)＋V(Y)＋2Cov(X, Y) なので、要るのは無相関（共分散0）だけ。独立はその十分条件の1つ
+  sources:
+  - source: 公式2級範囲表
+    locator: 確率モデルの導入（確率変数・確率分布）
+  checks:
+  - sum(Fraction(1,4)*x*y for x in (0,1) for y in (0,1)) == Fraction(1,4) and sum(Fraction(1,4)*x for x in (0,1) for y in (0,1))*sum(Fraction(1,4)*y for x in (0,1) for y in (0,1)) == Fraction(1,4)
+  - sum(Fraction(1,4)*x*x*x for x in [-2,-1,1,2]) == 0 and sum(Fraction(1,4)*x for x in [-2,-1,1,2]) == 0 and sum(Fraction(1,4)*x*(x*x) for x in [-2,-1,1,2]) - sum(Fraction(1,4)*x for x in [-2,-1,1,2])*sum(Fraction(1,4)*x*x for x in [-2,-1,1,2]) == 0
+  - sum(Fraction(1,4) for x in [-2,-1,1,2] if x == 1 and x*x == 4) == 0 and sum(Fraction(1,4) for x in [-2,-1,1,2] if x == 1)*sum(Fraction(1,4) for x in [-2,-1,1,2] if x*x == 4) == Fraction(1,8)
+  - '(lambda v: v([x for x in [-2,-1,1,2]]) == Fraction(5,2) and v([x*x for x in [-2,-1,1,2]]) == Fraction(9,4) and v([x+x*x for x in [-2,-1,1,2]]) == Fraction(19,4))(lambda zs: sum(Fraction(1,4)*z*z for z in zs) - sum(Fraction(1,4)*z for z in zs)**2)'
 - id: TERM-data-var
   name: データの分散
   en: variance of data
