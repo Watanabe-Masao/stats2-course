@@ -32,7 +32,7 @@ presets:
   s6-adjust:
     mode: sandbox
     set: {value: sales, group: camp, filter: weekday, chart: box}
-    task: キャンペーンの効果は、何をそろえれば言えるか。平日だけ・週末だけ・店だけに絞り、分け方や図を変えて、そろえる条件で差がどう変わるかを見る。
+    task: キャンペーンのある日とない日の売上の平均を、全部の日・平日だけ・週末だけで読む。見る値を客数・客単価に替えても読む。
   s6-design:
     mode: sandbox
     set: {value: sales, group: camp, filter: all, chart: cross, second: week}
