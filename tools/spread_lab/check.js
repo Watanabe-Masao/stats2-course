@@ -13,5 +13,10 @@ const {chromium}=require('playwright');const path=require('path');
   &&near(r.C.ss,10)&&near(r.AC.ss,270)&&near(r.AC.m,15)&&near(r.X5.m,10)&&near(r.Y5.m,10)&&near(r.X5.v,4)&&near(r.Y5.v,4)&&near(r.sS.v,8)&&near(r.sO.v,0)
   // U08 の発展：5日のうち1日だけ大きい値の z は、どれだけ大きくても2（平均12・√v＝4、平均30・√v＝40）
   &&near(r.o20.m,12)&&near(r.o20.sdn,4)&&near(r.o110.m,30)&&near(r.o110.sdn,40);
+ // 棒を引くと売上・曲線・係数がいっしょに変わるか（想定する故障：引いた位置と値の向きの取り違え、指の動きが拾われない。数の検算とは別に、画面の上の操作で確かめる）
+ await p.evaluate(()=>{const L=window.__LAB__.LK;L.show('gini');['g1','g2','g3','g4'].forEach((id,i)=>L.setRange(id,[1,1,2,6][i]));L.show('gini');});
+ const hb=await (await p.$('#gbars .hit[data-i="1"]')).boundingBox();await p.mouse.move(hb.x+hb.width/2,hb.y+hb.height-6);await p.mouse.down();await p.mouse.move(hb.x+hb.width/2,hb.y+2,{steps:6});await p.mouse.up();
+ const dg=await p.evaluate(()=>({g1:+document.getElementById('g1').value,gini:window.__LAB__.gVals().gini}));
+ console.log(JSON.stringify(dg));
  console.log(JSON.stringify({gini:r.gini,u:r.u.map(x=>x.map(v=>+v.toFixed(4)))}));
- console.log(ok?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok?0:1);})();
+ const ok2=ok&&dg.g1===20&&near(dg.gini,0.5259,1e-3);console.log(ok2?'✅ 数値の検算 OK':'❌ 数値が想定と違う');await b.close();process.exit(ok2?0:1);})();
