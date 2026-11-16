@@ -1,7 +1,7 @@
 # 単元U08の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U08-001
   stage: S1
-  concepts: [TERM-data-std, TERM-mean, TERM-sd]
+  concepts: [TERM-data-std, TERM-mean, TERM-data-sd]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -82,7 +82,7 @@
 
 - id: Q-U08-005
   stage: S1
-  concepts: [TERM-data-std, TERM-sd]
+  concepts: [TERM-data-std, TERM-data-sd]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -141,7 +141,7 @@
 
 - id: Q-U08-012
   stage: S2
-  concepts: [TERM-data-std, TERM-mean, TERM-sd]
+  concepts: [TERM-data-std, TERM-mean, TERM-data-sd]
   label: 約1か月後の問
   format: written
   powers: [P3, P1]
@@ -267,7 +267,7 @@
 
 - id: Q-U08-031
   stage: S4
-  concepts: [TERM-data-std, TERM-sd]
+  concepts: [TERM-data-std, TERM-data-sd]
   tag: 異常日の検知
   format: written
   powers: [P3]
