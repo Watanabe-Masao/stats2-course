@@ -47,6 +47,5 @@ network_url: https://watanabe-masao.github.io/knowledge-net/
 site_base_url: https://watanabe-masao.github.io/stats2-labs
 
 # 旧版へのリンク（新しい構造に取り込むまで残す。削除の条件は publish/legacy.yaml）
-refs:
-  REF-PQ-DB: da3b5947153c4ae59304e308a9b1e9e2
+refs: {}   # 旧版へのリンク。全部を新しい構造に移したので空（#51・#52）
 terms: {}   # 旧版の用語ページへの対応。全部の概念に説明があり、用語はネットワークを指すので空（#53）
