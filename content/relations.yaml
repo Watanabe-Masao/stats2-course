@@ -1013,7 +1013,7 @@ relations:
     from: TERM-iqr
     to: TERM-outlier
     type: 定める
-    description: 箱ひげ図では、箱から四分位範囲の1.5倍より外の値を外れ値の目安にする。
+    description: この教材では、箱から四分位範囲の1.5倍より外の値を外れ値とする（確かめる前は「外れ値候補」とも呼ぶ）。
     basis:
       units:
       - U05
