@@ -64,8 +64,7 @@ skeleton_required: true
 
 # 原本の外にある参照先（表示名）。リンク先は公開先ごとに publish/*.yaml の refs で決める。
 # 旧版の確認問題・本番形式問題は、問題を原本へ取り込んだら refs から外す。
-refs:
-  REF-PQ-DB: 本番形式問題（5択）
+refs: {}   # 旧版へのリンク。全部を新しい構造に移したので空（#51・#52）
 
 sources:
   - {name: 公式2級範囲表, url: "https://www.toukei-kentei.jp/hubfs/files/grade_range/grade2_hani_20181214.pdf"}
