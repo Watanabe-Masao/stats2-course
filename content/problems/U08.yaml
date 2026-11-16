@@ -343,20 +343,20 @@
     4: 真ん中に集まった左右対称（とがった山）
     5: 両端に多い形（山が2つ・U字）
   checks:
-    - '(17-14) < (25-17) and (50-25) > (14-10)'
-    - '(43-35) > (46-43) and (35-10) > (50-46)'
+    - '[Fraction(q3+q1-2*q2, q3-q1) for q1, q2, q3 in [(20,30,40), (14,17,25), (35,43,46), (28,30,32), (12,30,48)]] == [0, Fraction(5,11), Fraction(-5,11), 0, 0]'
+    - '(50-25) > (14-10) and (35-10) > (50-46)'
   lab:
     id: LAB-dist
-    mode: shape
-    set: {dots: false}
-    task: 五数要約がまったく同じX店とY店。箱ひげ図だけで、2店の分布の形（山の数）が同じと言えるか。
-    predict: {type: choice, key: sameDist, label: "同じ分布と", options: [言える, 言えない]}
-    expect: 言えない
-    why: 「中身を見る」で1つ1つの値を出すと、Y店は真ん中に1日もなく2つのかたまりに分かれている。箱ひげ図から読めるのは、5つの数の間隔（どちらに裾が長いか）まで。
+    mode: box
+    set: {data: sales}
+    task: 右に裾が長い20日の売上（12〜55万円。Q₁ 21.5・中央値 26.5）の箱ひげ図。Q₃ はいくつか。
+    predict: {type: number, key: q3, label: "Q₃", unit: "万円"}
+    expect: 32
+    why: Q₁→中央値は5、中央値→Q₃は5.5で箱はほぼ同じ幅だが、上のひげは32から55まで長く伸びる。右に裾が長いと、上側（大きい値の側）が長くなる。
 
 - id: Q-U08-025
   stage: S3
-  concepts: [TERM-std, TERM-mean, TERM-sd]
+  concepts: [TERM-std, TERM-mean, TERM-data-sd]
   tag: 本番形式
   format: choice
   powers: [P3]
