@@ -4644,7 +4644,7 @@
   "index": 0,
   "id": "F-ols-slope",
   "label": "単回帰の傾き",
-  "tex": "b=\\dfrac{S_xy}{S_xx}",
+  "tex": "b=\\dfrac{S_{xy}}{S_{xx}}",
   "symbols": [
    {
     "symbol": "b",
