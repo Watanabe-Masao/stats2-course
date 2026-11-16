@@ -34,7 +34,7 @@ checks:
   - '50*40//8 == 250'
   - 'abs(0.7*0.6 + 0.3*0.8 - 0.66) < 1e-12 and abs(0.5*0.6 + 0.5*0.8 - 0.70) < 1e-12'
   - 'abs((1000-100)/(1000-1) - 0.901) < 0.001'
-  - 'Fraction(10,100) == Fraction(1,10) and 30*30 == 900 and Fraction(900,30000) == Fraction(3,100) and abs((100*2.54-10*3.5)/90 - 2.43) < 0.005'
+  - 'Fraction(10,100) == Fraction(1,10) and 30*30 == 900 and Fraction(900,30000) == Fraction(3,100) and abs((100*2.542-10*3.45)/90 - 2.44) < 0.005'
   - 'Fraction(3, 6) == Fraction(1, 2) and Fraction(len({4,5,6}), 6) == Fraction(1, 2)'
 # 例題の図（本文で {{fig:ID}}）。図の中の数は本文にある数だけを使う（build/figures.py）
 figures:

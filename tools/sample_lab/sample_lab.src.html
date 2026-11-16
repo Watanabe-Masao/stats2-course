@@ -115,7 +115,7 @@ function fRender(){const inF=new Set(frameIdx());const st={};POP.forEach((_,i)=>
  $("fgrid").innerHTML=grid(st)+'<div class="legend mut"><span><i class="dot" style="background:var(--off)"></i>名簿に載っていない店</span><span><i class="dot" style="background:var(--acc)"></i>選ばれた店</span></div>';
  const fm=frameMean();
  let t=`<div>μ（全100店）＝ <b>${fmt(MU)}</b>　名簿内の平均 ＝ <b>${fmt(fm)}</b></div>`;
- if(fHist.length)t+=`<div class="big">${fHist.length} 回の x̄ の平均 ＝ ${fmt(mean(fHist))}</div><div class="mut">ずれ（x̄ の平均 − μ）＝ ${(mean(fHist)-MU>=0?"+":"")}${(mean(fHist)-MU).toFixed(2)}。n を増やしても、名簿内の平均の近くに集まるだけで μ には近づかない。</div>`;
+ if(fHist.length)t+=`<div class="big">${fHist.length} 回の x̄ の平均 ＝ ${fmt(mean(fHist))}</div><div class="mut">ずれ（x̄ の平均 − μ）＝ ${(mean(fHist)-MU>=0?"+":"")}${(mean(fHist)-MU).toFixed(2)}。n を増やしても、名簿内の平均の近くに集まるだけで μ には近づかない。</div>${+$("fn").value>=frameIdx().length?`<div class="mut">n は名簿の全部（${frameIdx().length} 店）。x̄ は毎回、名簿内の平均 ${fmt(frameMean())} と一致する（名簿の全部を調べても μ には届かない）。</div>`:""}`;
  else t+='<span class="mut">「20回取り直す」を押す。</span>';
  $("fsum").innerHTML=t;$("fstrip").innerHTML=strip(fHist,MU,true,"x̄ の履歴");}
 LK.register("frame",{name:"名簿の漏れ",
