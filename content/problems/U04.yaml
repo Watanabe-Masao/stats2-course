@@ -1,6 +1,7 @@
 # 単元U04の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U04-001
   stage: S1
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1]
@@ -30,6 +31,7 @@
 
 - id: Q-U04-002
   stage: S1
+  concepts: [TERM-scale, TERM-quant]
   label: 例題C（自力）
   format: written
   powers: [P3]
@@ -49,6 +51,7 @@
 
 - id: Q-U04-003
   stage: S1
+  concepts: [TERM-scale, TERM-qual]
   difficulty: 1
   format: written
   powers: [P1]
@@ -62,6 +65,7 @@
 
 - id: Q-U04-004
   stage: S1
+  concepts: [TERM-scale, TERM-qual]
   difficulty: 2
   format: written
   powers: [P3]
@@ -75,6 +79,7 @@
 
 - id: Q-U04-005
   stage: S1
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   difficulty: 3
   format: written
   powers: [P1, P3]
@@ -104,6 +109,7 @@
 
 - id: Q-U04-010
   stage: S2
+  concepts: [TERM-scale, TERM-quant]
   label: 約1週間後の問
   format: written
   powers: [P3]
@@ -122,6 +128,7 @@
 
 - id: Q-U04-011
   stage: S2
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   label: 計算練習
   format: written
   powers: [P2, P1]
@@ -153,6 +160,7 @@
 
 - id: Q-U04-012
   stage: S2
+  concepts: [TERM-population, TERM-sample, TERM-scale, TERM-qual, TERM-median, TERM-mode]
   label: 約1か月後の問
   format: written
   powers: [P2, P3]
@@ -175,6 +183,7 @@
 
 - id: Q-U04-020
   stage: S3
+  concepts: [TERM-scale, TERM-qual, TERM-ratio]
   tag: アンケート集計
   format: written
   powers: [P3]
@@ -192,6 +201,7 @@
 
 - id: Q-U04-021
   stage: S3
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   tag: 逆向きの問い
   format: written
   powers: [P1, P3]
@@ -221,6 +231,7 @@
 
 - id: Q-U04-022
   stage: S3
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   tag: 本番形式
   format: choice
   powers: [P3]
@@ -261,6 +272,7 @@
 
 - id: Q-U04-023
   stage: S3
+  concepts: [TERM-scale, TERM-qual, TERM-ratio]
   tag: 集計表を読む
   difficulty: 3
   format: written
@@ -280,6 +292,7 @@
 
 - id: Q-U04-024
   stage: S3
+  concepts: [TERM-scale, TERM-qual, TERM-quant, TERM-mode, TERM-median]
   tag: グラフへ
   format: written
   powers: [P3]
@@ -301,6 +314,7 @@
 
 - id: Q-U04-025
   stage: S3
+  concepts: [TERM-scale, TERM-quant, TERM-qual]
   tag: 条件を判断する
   difficulty: 3
   format: written
@@ -320,6 +334,7 @@
 
 - id: Q-U04-030
   stage: S4
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   tag: 医療
   format: written
   powers: [P3]
@@ -336,6 +351,7 @@
 
 - id: Q-U04-031
   stage: S4
+  concepts: [TERM-scale, TERM-qual, TERM-quant]
   tag: スポーツ
   format: written
   powers: [P1]
@@ -359,6 +375,7 @@
 
 - id: Q-U04-032
   stage: S4
+  concepts: [TERM-scale, TERM-qual, TERM-quant, TERM-median]
   tag: 仕事へ
   difficulty: 3
   format: written
@@ -394,6 +411,7 @@
 
 - id: Q-U04-040
   stage: S3
+  concepts: [TERM-scale, TERM-quant]
   label: 確かめ問題
   format: written
   powers: [P2, P1]
@@ -414,6 +432,7 @@
 
 - id: Q-U04-013
   stage: S2
+  concepts: [TERM-qual, TERM-quant, TERM-ratio]
   format: written
   powers: [P1, P3]
   prompt: ある日に売れた100件を部門で分けると、食品45・日用品25・衣料15・家電10・その他5 件だった。部門は名義尺度。① 円グラフにすると、食品の中心角は何度か。② 多い順に並べたパレート図で、上位2部門は全体の何%か。③ この部門の度数をヒストグラムで描いてはいけない理由を述べよ。
