@@ -20,6 +20,60 @@ LONG_CHOICE = 12   # これより長い選択肢があれば、選択肢を1行�
 CHECK = re.compile(r"^- \[[ xX]\] ")   # 教材のチェック欄（□ の箇条書きにする）
 
 
+# ---- スマホで読める形にする（#489）------------------------------------
+# 原本の書き方（```txt の式のまとめ・x̄_st のような下付き）はそのままにし、Notion に書き出すときだけ変える。
+# ① コードの欄は iPhone の Notion で折り返さず、長い行が切れる → 1行ずつの段落にした灰色の枠にする
+# ② 「_」の下付きは Notion で文字のまま出る → Unicode の下付き文字にする。下付き文字のない字（b・y・大文字・漢字など）を
+#    含む行は、その行の下付きを全部 Notion の数式（$s_{xy}$）にする（1つの行で2つの書き方を混ぜない）
+SUB = dict(zip("aehijklmnoprstuvx0123456789", "ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ₀₁₂₃₄₅₆₇₈₉"))
+TEX_BASE = {"σ": r"\sigma", "π": r"\pi", "μ": r"\mu"}
+TEX_MARK = {"\u0304": r"\bar", "\u0302": r"\hat"}
+TEX_SUP = {"²": "2", "³": "3"}
+# 前が英字でない1〜2字の記号（結合文字の上線・ハットを含む）＋「_」＋下付き（英数字の並び。偏相関の「r_xy・z」の「・z」。z_a・z_b のような並びは含めない。漢字1字も）
+SUBSCRIPT = re.compile(r"(?<![A-Za-z])((?:[A-Za-z][\u0302\u0304]?){1,2}|[σπμ])_([A-Za-z0-9]+(?:・[A-Za-z](?![A-Za-z_]))?|[\u4e00-\u9fff])([²³]?)")
+PROTECT = re.compile(r"(<[^>]*>|\]\([^)]*\)|https?://\S+|\$[^$\n]+\$)")
+FENCE = re.compile(r"^```[a-z]*\n(.*?)\n```$", re.M | re.S)
+CODE_ESCAPE = re.compile(r"([\\`*~\[\]<>|])")   # 「_」は下付きにするので除く
+
+
+def _tex(base: str, sub: str, sup: str) -> str:
+    mark = TEX_MARK.get(base[-1]) if len(base) == 2 else None
+    b = f"{mark}{{{base[0]}}}" if mark else TEX_BASE.get(base, base)
+    sub = sub.replace("・", r"\cdot ")
+    sub = rf"\text{{{sub}}}" if re.fullmatch(r"[\u4e00-\u9fff]", sub) else f"{{{sub}}}"   # 漢字は \text（「{{」を作らない。lint が部品の残りと見る）
+    return f"${b}_{sub}" + (f"^{{{TEX_SUP[sup]}}}" if sup else "") + "$"
+
+
+def subscripts(line: str) -> str:
+    """1行の「_」の下付きを、Unicode の下付き文字か Notion の数式にする。タグ・リンク・数式の中は変えない。"""
+    parts = PROTECT.split(line)
+    plain = [re.sub(r"_([A-Za-z0-9])([A-Za-z])_", "_\\1\x00\\2_", seg) for seg in parts[0::2]]   # b_kx_k は b_k と x_k
+    unicode_ok = all(all(ch in SUB for ch in m.group(2)) for seg in plain for m in SUBSCRIPT.finditer(seg))
+    def one(m):
+        base, sub, sup = m.groups()
+        return base + "".join(SUB[ch] for ch in sub) + sup if unicode_ok else _tex(base, sub, sup)
+    parts[0::2] = [SUBSCRIPT.sub(one, seg) for seg in plain]
+    return "".join(parts).replace("\x00", "")
+
+
+def code_to_callout(m: re.Match) -> str:
+    """コードの欄 → 1行ずつの段落にした灰色の枠。中の記号は文字のまま出す（下付きは for_phone がこのあと変える）。"""
+    spec = COMP["code_block"]
+    lines = [CODE_ESCAPE.sub(r"\\\1", line) for line in m.group(1).split("\n")]
+    return f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n' + "\n".join(lines) + "\n</callout>"
+
+
+def for_phone(md: str) -> str:
+    """ページ全体をスマホで読める形にする（#489）。表示の数式（$$ の行）の中は変えない。"""
+    md = FENCE.sub(code_to_callout, md)
+    out, in_math = [], False
+    for line in md.split("\n"):
+        if line.strip() == "$$":
+            in_math = not in_math
+        out.append(line if in_math or line.strip() == "$$" else subscripts(line))
+    return "\n".join(out)
+
+
 def mention(page_id: str) -> str:
     return f'<mention url="https://app.notion.com/p/{page_id.replace("-", "")}" />'
 
@@ -234,7 +288,7 @@ class NotionRenderer:
         out.append(f"<toggle>\n{lab['meta_title']}\n\n単元ID：{uid}　版：{u['version']}　原本：stats2-course/content/units/{uid}/"
                    f"（このページは生成物。直すときは原本を直して作り直す）\n\n{self.c.shared['content_note']}\n\n"
                    f"出典：{src} を内容照合の基準とし、説明・例題・問題は独自に構成。\n</toggle>")
-        return self.checklists("\n\n".join(out)) + "\n"
+        return for_phone(self.checklists("\n\n".join(out))) + "\n"
 
     def root_page(self) -> str:
         lines = [
