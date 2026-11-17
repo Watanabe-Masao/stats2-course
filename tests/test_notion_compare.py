@@ -1,6 +1,6 @@
 """Notion の読み戻しと生成物の照合（build/notion_compare.py。#483 の D）。
 
-確かめる対象：Notion が自動で直す書き方（メンション・画像・<br>・span の区切り・エスケープ）を同じとみて、
+確かめる対象：Notion が自動で直す書き方（メンション・画像・<br>・span の区切り・エスケープ・表のセルの改行。#492）を同じとみて、
   中身の違い（概念 ID・ラボの版＝問題 ID・図・参照先・見出し・文）を見落とさないこと。
 想定する故障：①許すべき書き直しを違いと数え、毎回「不一致」になって照合が使われなくなる
   ②正規化しすぎて、リンク先の概念・問題 ID の取り違えや文の書き換えを見落とす。
@@ -29,6 +29,12 @@ GEN = f"""## 例題
 SUM(B2:B5)^2 と {{1, 2}}
 [相関係数 🕸](https://watanabe-masao.github.io/knowledge-net/?c=stats2:TERM-corr)
 <embed source="https://watanabe-masao.github.io/stats2-labs/corr/?p=Q-U28-012" />
+<table fit-page-width="true" header-row="true">
+<tr>
+<td>方法</td>
+<td>選び方</td>
+</tr>
+</table>
 """
 BACK = f"""## 例題
 
@@ -47,6 +53,17 @@ SUM(B2:B5)\\^2 と \\{{1, 2\\}}
 [相関係数 🕸](https://watanabe-masao.github.io/knowledge-net/?c=stats2:TERM-corr)
 
 <embed source="https://watanabe-masao.github.io/stats2-labs/corr/?p=Q-U28-012" />
+
+<table fit-page-width="true" header-row="true">
+<tr>
+<td>
+方法
+</td>
+<td>
+選び方
+</td>
+</tr>
+</table>
 """
 
 
@@ -62,6 +79,7 @@ class TestNotionCompare(unittest.TestCase):
             (PID, "407b7cd539a181d0a56dd2a7f54875b0", "ページへの参照"),
             ("## 例題", "## 問題", "見出し"),
             ("② 誤り。", "② 正しい。", "本文"),
+            ("\n選び方\n", "\n選ぶ量\n", "本文"),   # 表のセルの中の文の違い（セルの改行をそろえても見落とさない）
         ]
         for old, new, want in cases:
             diffs = nc.compare(GEN, BACK.replace(old, new))

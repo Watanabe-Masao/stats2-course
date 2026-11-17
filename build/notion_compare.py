@@ -39,6 +39,8 @@ def normalize(t: str) -> str:
     t = re.sub(r'</span><span color="([^"]+)">', "", t)
     # データベースの子：Notion は data-source-url と inline を足して返す
     t = re.sub(r'(<database url="[^"]+")[^>]*>', r"\1>", t)
+    # 表のセル：生成物は <td>文</td> の1行、Notion は <td> と文と </td> を別の行で返す（#492）
+    t = re.sub(r"<(td|th)>\s*(.*?)\s*</\1>", r"<\1>\2</\1>", t, flags=re.S)
     t = re.sub(r"<br\s*/?>", "\n", t)   # 段落の中の改行：生成物は改行、Notion は <br> でつなぐ
     t = re.sub(r"[ \t\u3000]+", " ", t)
     t = re.sub(r" *\n *", "\n", t)
