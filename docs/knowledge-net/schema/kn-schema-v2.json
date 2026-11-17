@@ -1561,6 +1561,45 @@
               },
               "context_diff": {
                 "$ref": "#/$defs/text"
+              },
+              "context": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sampling",
+                  "null_hypothesis"
+                ],
+                "description": "文脈ごとの構造（型 v2 の改訂7。stats2-course #475）：同じ手続きを共有する見出しが、文脈ごとに違う取り方・H₀・成立条件（主張の参照つき）を持つとき（独立性検定と同質性の検定）。説明の文だけでなく構造で持つ（渡辺さん 2026-11-17）",
+                "properties": {
+                  "sampling": {
+                    "$ref": "#/$defs/text",
+                    "description": "取り方（標本設計）：何を先に決め、どこから取るか"
+                  },
+                  "null_hypothesis": {
+                    "type": "object",
+                    "required": [
+                      "text"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "text": {
+                        "$ref": "#/$defs/text"
+                      },
+                      "terms": {
+                        "$ref": "#/$defs/gids"
+                      }
+                    },
+                    "description": "この文脈の帰無仮説 H₀（文と、文に出る概念）"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/conditionDetail"
+                    },
+                    "description": "この文脈の成立条件の行（③ の区分。仮定は保証する主張つき）。共有する概念の行に足して読む"
+                  }
+                }
               }
             },
             "description": "文脈の見出し（製本 ① の 2）：共有する概念の id・対応・対象の違い・文脈の違い。見出しは自分の定義を持たない"
@@ -2545,5 +2584,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 6
+  "x-revision": 7
 }

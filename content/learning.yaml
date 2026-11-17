@@ -261,6 +261,27 @@ learning:
     version: 1
     reason: 母分散の対応の文は、母集団から無作為に1つ取り出した要素の値の分散として読む（⑥ の 5 の 4：説明が実際に使う概念。#302）。
     units: [U17, U18]
+  - id: LRN-indeptest-indepctx
+    op: add
+    from: TERM-indep-test
+    to: TERM-indep-ctx
+    version: 1
+    reason: 独立性検定はクロス集計表のカイ二乗検定の文脈の見出しで、手続き（期待度数・統計量・自由度）は共有する概念から読む（① の 2・6 の 20。#475）。
+    units: [U27]
+  - id: LRN-indeptest-homogctx
+    op: add
+    from: TERM-indep-test
+    to: TERM-homog-ctx
+    version: 1
+    reason: 同質性の検定はクロス集計表のカイ二乗検定の文脈の見出しで、手続き（期待度数・統計量・自由度）は共有する概念から読む（① の 2・6 の 20。#475）。
+    units: [U27]
+  - id: LRN-indep-indepctx
+    op: add
+    from: TERM-indep
+    to: TERM-indep-ctx
+    version: 1
+    reason: 独立性検定の H₀ は「2つの変数は独立」で、独立の定義（セルの確率が行の確率×列の確率）で読む（⑥ の 5 の 4。共有する概念の基準の定義から独立が外れたので、定めるの代わり。#475）。
+    units: [U27]
   # ---- 足す：特別な場合の組（⑥ の 3：候補にしない。教材で向きを決めて前提知識に書く。#345）
   - id: LRN-var-cov
     op: add
