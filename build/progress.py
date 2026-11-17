@@ -55,6 +55,11 @@ def unit_row(c, uid: str, target: dict) -> dict:
     }
 
 
+def own_terms(c) -> list:
+    """数える語：文脈の見出し（heading_of。① の 2・#302・#475）は自分の定義・定義1文を持たないので、骨格・説明の分母に入れない"""
+    return [t for t in c.terms.values() if not t.get("heading_of")]
+
+
 def legacy_term_count(c, target) -> int:
     """旧版の用語ページを指している用語の数（説明のある概念はネットワークを指すので数えない）。"""
     return sum(1 for t in (target.get("terms") or {}) if not c.terms.get(t, {}).get("definition"))
@@ -100,8 +105,8 @@ def notion_page(c=None, target: dict | None = None) -> str:
     lines = ['<callout icon="📊" color="gray_bg">\n原本から自動で数えた進み具合（公開のたびに入れ直す）。'
              "作業の一覧は GitHub の issue（最終ゴール #55）。\n</callout>", "",
              "## 最終ゴールごと", "",
-             f"- 骨格（定義1文と分類）：{sum(1 for t in c.terms.values() if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(c.terms)} 語",
-             f"- 概念の説明：{sum(1 for t in c.terms.values() if t.get('definition'))}/{len(c.terms)} 語",
+             f"- 骨格（定義1文と分類）：{sum(1 for t in own_terms(c) if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(own_terms(c))} 語",
+             f"- 概念の説明：{sum(1 for t in own_terms(c) if t.get('definition'))}/{len(own_terms(c))} 語（ほかに文脈の見出し {len(c.terms) - len(own_terms(c))} 語。自分の定義を持たないので数えない）",
              f"- 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
              f"- 旧版を指す用語リンク：{legacy_term_count(c, target)}（0 で完了）",
              f"- 概念図 {sum(r['figure'] for r in rows.values())}/{len(rows)}・発展 {sum(r['hatten'] for r in rows.values())}/{len(rows)}"
@@ -132,11 +137,11 @@ def report() -> str:
         lines.append(f"| {r['unit']} | {mark(r['skeleton'])} | {mark(r['concepts'])} | {mark(r['problems'])} | {mark(r['figure'])} | "
                      f"{mark(r['model'])} | {mark(r['hatten'])} | {mark(r['sozo'])} | {mark(r['legacy_terms'])} |")
     n = len(rows)
-    filled = sum(1 for t in c.terms.values() if t.get("definition"))
+    filled = sum(1 for t in own_terms(c) if t.get("definition"))
     probs = [p for u in c.units.values() for p in u["problems"].values()]
     lines += ["", "## 最終ゴールごと（#55）", "",
-              f"- 0 骨格（P1）：定義1文と分類 {sum(1 for t in c.terms.values() if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(c.terms)} 語",
-              f"- 1 概念の説明：{filled}/{len(c.terms)} 語",
+              f"- 0 骨格（P1）：定義1文と分類 {sum(1 for t in own_terms(c) if (t.get('short') or t.get('definition')) and t.get('category'))}/{len(own_terms(c))} 語",
+              f"- 1 概念の説明：{filled}/{len(own_terms(c))} 語（ほかに文脈の見出し {len(c.terms) - len(own_terms(c))} 語）",
               f"- 3 問題→概念：{sum(1 for p in probs if p.get('concepts'))}/{len(probs)} 問",
               f"- 4 用語リンクの切り替え：旧版を指す用語 {legacy_term_count(c, target)}（0 で完了）",
               f"- 5 概念図 {sum(r['figure'] for r in rows)}/{n}・手本 {sum(1 for r in rows if r['model'])}/{sum(1 for r in rows if r['model'] is not None)}"
