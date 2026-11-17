@@ -59,36 +59,36 @@ items:
     replaced_by: 関係データの「対比」と、そこから生成する比較
     absent: ["REF-CONFUSION"]
     when: 該当する単元の段階が終わったとき（遅くとも W5）
-    checks:
-      content: {state: 未確認}
-      refs: {state: 未確認}
-      readback: {state: 未確認}
-      function: {state: 未確認}
-      backup: {state: 未確認}
-      deps: {state: 未確認}
+    checks:   # 2026-11-18（#52）
+      content: {state: 確認済み, evidence: "独立な照合（2026-11-18）で13組のうち12組は比べるの関係・概念の誤解・単元の本文で追え、抜け（8 観察研究と実験研究・1・3・7・10 の要点）は #500 で原本に足した。足した後の独立な再確認で抜け0・数学の誤り0。比べるの関係になっているのは 2・9・11（ほかは ⑤ の判定どおり誤解と本文で受ける）"}
+      refs: {state: 確認済み, evidence: "Notion の被リンクは 公式・用語リファレンス（同じく削除予定の旧版）の1件だけ。原本・生成物の参照0（build の absent）。migration/old は移行の記録"}
+      readback: {state: 確認済み, evidence: "受け先の単元（U18・U21・U22・U24・U28・U30・U32 ほか全単元）と学び方ガイドを Notion から読み戻し、生成物と一致（2026-11-17〜18。U30・U32・ガイドは足した後に入れ直して読み戻し）"}
+      function: {state: 確認済み, evidence: "見比べる：公開サイトの関係（比べる）と概念のページの誤解。図：比べるの関係の図・ラボ（2・9・11）と単元の図"}
+      backup: {state: 確認済み, evidence: "publish/legacy-backup/LEG-confusion/page.json（本文）と、図の SVG 13枚は assets/figures/confusion/（2026-11-18）"}
+      deps: {state: 確認済み, evidence: "ページ ID をコード・CI・3つのリポジトリで検索して処理からの参照0。ページなので DB の自動化はない（2026-11-18）"}
   - id: LEG-term-db
     name: 統計用語辞典（114行）
     notion: [{id: da48813bf8b74e69824967eb3c68399c, type: database, title: 統計用語辞典}]
     replaced_by: 原本の概念データ（terms.yaml を広げたもの）と、ネットワークの画面
     require: [terms_defined, term_pages_unlinked]
     when: W5 の終わり
-    checks:
-      content: {state: 未確認}
-      refs: {state: 未確認}
-      readback: {state: 未確認}
-      function: {state: 未確認}
-      backup: {state: 未確認}
-      deps: {state: 未確認}
+    checks:   # 2026-11-18（#53）
+      content: {state: 確認済み, evidence: "独立な照合（2026-11-18）で114行すべてに新しい語がある。内容の抜け12行（主に誤解しやすい点）は #500 で原本に足し、独立な再確認で抜け0・数学の誤り0"}
+      refs: {state: 確認済み, evidence: "Notion の被リンクは 混同しやすい概念・公式・用語リファレンス（どちらも削除予定の旧版）だけ。原本・生成物の参照0（require: terms_defined・term_pages_unlinked も通る）"}
+      readback: {state: 確認済み, evidence: "概念は公開サイト（net の JSON）で出す。公開サイトを #502 の main から更新し（2026-11-18、deploy_site.sh の確認が通った）、Notion の単元・ガイドは読み戻して生成物と一致"}
+      function: {state: 確認済み, evidence: "引く・読む：公開サイトのライブラリ・検索・概念のページ（定義・式・条件・例・反例・誤解）。導入状態の記録：114行すべて未導入で、記録は個人用の学習記録（#54）へ"}
+      backup: {state: 確認済み, evidence: "publish/legacy-backup/LEG-term-db/（DB の型・114行の属性。各行のページ本文は空であることを確かめた。2026-11-18）"}
+      deps: {state: 未確認, note: "DB とデータソースの ID をコード・CI・3つのリポジトリで検索して処理からの参照0（2026-11-18）。残り：Notion の DB の自動化（⚡）と接続を渡辺さんが画面で確かめる"}
   - id: LEG-reference
     name: 公式・用語リファレンス
     notion: [{id: 405b7cd539a1818f9198f683d487c86d, type: page, title: 公式・用語リファレンス}]
     replaced_by: 単元の「忘れたら」をネットワークの画面の分類（unit.yaml の recall_group）へ
     absent: ["legacy_reference"]
     when: W5 の終わり
-    checks:
-      content: {state: 未確認}
-      refs: {state: 未確認}
-      readback: {state: 未確認}
-      function: {state: 未確認}
-      backup: {state: 未確認}
-      deps: {state: 未確認}
+    checks:   # 2026-11-18（#53）
+      content: {state: 確認済み, evidence: "独立な照合（2026-11-18）で数式約52本のうち48本はそろい、抜け（有限母集団修正・2.326・ベルヌーイの平均と分散・チェビシェフの kσ の形・V(X−Y)・観察研究と実験研究・手法の一覧・回帰の出力を読む順）は #500・#501・#502 で原本に足した。独立な再確認で抜け0・数学の誤り0"}
+      refs: {state: 確認済み, evidence: "Notion の被リンクは 混同しやすい概念・本番形式問題の ①-01（どちらも旧版）だけ。原本・生成物の参照0（build の absent）"}
+      readback: {state: 確認済み, evidence: "受け先（学び方ガイドの手法の一覧・U30・U32・全単元）を Notion から読み戻し、生成物と一致（2026-11-17〜18）。公式は公開サイトの概念のページで、#502 の main から更新した"}
+      function: {state: 確認済み, evidence: "選ぶ：学び方ガイドの「何を知りたいか → どの手法か」。公式：概念のページの式と単元の「式の構造」。動かす：各単元のラボ（33種。旧版のタブの24種より多い）。混同：比べるの関係と誤解。忘れたら：単元の「忘れたら」の分類のリンク"}
+      backup: {state: 未確認, note: "本文は publish/legacy-backup/LEG-reference/page.json（2026-11-18）。埋め込みの HTML 9件（旧シミュレーター。今はラボで代わる）は、この環境から Notion のファイルを取り出せない。残すなら渡辺さんが Notion のエクスポートで控えるか、残さないと決めるか"}
+      deps: {state: 確認済み, evidence: "ページ ID をコード・CI・3つのリポジトリで検索して処理からの参照0。ページなので DB の自動化はない（2026-11-18）"}
