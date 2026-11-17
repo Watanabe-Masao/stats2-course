@@ -9,6 +9,8 @@ callouts:
   warn:    {icon: "⚠️", color: red_bg}
   info:    {icon: "💡", color: blue_bg}
 
+code_block: {icon: "🧮", color: gray_bg}   # 原本の ```txt（式のまとめ）の出し先。Notion のコードの欄は iPhone で折り返さないので枠にする（#489。::: の枠とは別）
+
 tones:   # 段階や領域の tone → Notion の色
   green: green_bg
   purple: purple_bg

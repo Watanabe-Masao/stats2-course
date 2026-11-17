@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -17,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "build"))
 from labs import squeeze, validate_labs, variants  # noqa: E402
 from lint import lint_page  # noqa: E402
 from model import load_course, load_yaml, numbers, parse_blocks, run_check, run_checks, validate  # noqa: E402
-from render_notion import COMP, NotionRenderer  # noqa: E402
+from render_notion import COMP, NotionRenderer, for_phone, subscripts  # noqa: E402
 
 COURSE = load_course()
 TARGET = load_yaml(Path(__file__).resolve().parent.parent / "publish" / "notion.yaml")
@@ -184,6 +185,53 @@ class TestRender(unittest.TestCase):
         pages.update({u: self.r.unit_page(u) for u in COURSE.units})
         for name, md in pages.items():
             self.assertEqual(lint_page(name, md, assets), [], name)
+
+
+class TestForPhone(unittest.TestCase):
+    """確かめる対象：Notion に書き出すときの、スマホで読める形（#489）。
+    想定する故障：①コードの欄が残り、iPhone で長い行が切れる ②「_」の下付きが文字のまま出る
+    ③下付きにしてはいけない所（タグ・リンクの URL・表示の数式・ふつうの語の「_」）まで変える ④b_kx_k・z_a・z_b を1つの下付きに読む。
+    見つけ方：実際に出た形（U31・U28・U16・U30 の行）を入れ、出力の文字列を見る。全ページで「_」が平文に残らないことは test_no_underscore_left で見る。
+    既存との違い：既存の描画のテストは問題・ラボの埋め込みだけで、ページ全体の書き換えを通らない"""
+
+    def test_unicode_when_every_char_has_one(self):
+        self.assertEqual(subscripts("x̄_st＝Σ(N_h/N)×x̄_h"), "x̄ₛₜ＝Σ(Nₕ/N)×x̄ₕ")
+        self.assertEqual(subscripts("t＝b_j÷SE(b_j)"), "t＝bⱼ÷SE(bⱼ)")
+        self.assertEqual(subscripts("b₁x₁＋…＋b_kx_k"), "b₁x₁＋…＋bₖxₖ")
+
+    def test_math_for_the_whole_line_when_one_char_has_none(self):
+        self.assertEqual(subscripts("Φ(z_b)−Φ(z_a)"), "Φ($z_{b}$)−Φ($z_{a}$)")
+        self.assertEqual(subscripts("| z_a・z_b |"), "| $z_{a}$・$z_{b}$ |")
+        self.assertEqual(subscripts("r_xy・z＝(r_xy−r_xz r_yz)"), r"$r_{xy\cdot z}$＝($r_{xy}$−$r_{xz}$ $r_{yz}$)")
+        self.assertEqual(subscripts("p̂_A−p̂_B と σ_A²"), r"$\hat{p}_{A}$−$\hat{p}_{B}$ と $\sigma_{A}^{2}$")
+        self.assertEqual(subscripts("σ_旧²＞σ_新²"), r"$\sigma_\text{旧}^{2}$＞$\sigma_\text{新}^{2}$")
+
+    def test_leaves_tags_links_display_math_and_words(self):
+        line = '<embed source="https://x.io/a_b?p=s_x" /> [z](https://y.io/c_d) $s_{xy}$ recall_group'
+        self.assertEqual(subscripts(line), line)
+        md = "$$\nx_i\n$$\nN_h"
+        self.assertEqual(for_phone(md), "$$\nx_i\n$$\nNₕ")
+
+    def test_code_block_becomes_callout(self):
+        out = for_phone("前\n\n```txt\n層化：x̄_st＝Σ(N_h/N)\nZ ~ N(0, 1)、P(棄却 | H₀)\n```\n\n後")
+        spec = COMP["code_block"]
+        self.assertNotIn("```", out)
+        self.assertIn(f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n層化：x̄ₛₜ＝Σ(Nₕ/N)\n'
+                      "Z \\~ N(0, 1)、P(棄却 \\| H₀)\n</callout>", out)
+
+    def test_no_underscore_left(self):
+        r = NotionRenderer(course(), TARGET)
+        for uid in COURSE.units:
+            md = r.unit_page(uid)
+            self.assertNotIn("```", md, uid)
+            plain, in_math = [], False
+            for line in md.split("\n"):
+                if line.strip() == "$$":
+                    in_math = not in_math
+                elif not in_math:
+                    plain.append(re.sub(r"<[^>]*>|\]\([^)]*\)|https?://\S+|\$[^$\n]+\$", "", line))
+            left = [x for x in plain if "_" in x]
+            self.assertEqual(left, [], uid)
 
 
 class TestLint(unittest.TestCase):
