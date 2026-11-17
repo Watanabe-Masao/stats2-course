@@ -259,7 +259,7 @@
     - 「満足」と答えた割合 62%
 
 - id: Q-U03-023
-  concepts: [TERM-sample, TERM-sample-mean, TERM-sd, TERM-statistic, TERM-parameter, TERM-h0]
+  concepts: [TERM-sample, TERM-sample-mean, TERM-data-sd, TERM-statistic, TERM-parameter, TERM-h0]
   stage: S3
   tag: 記号を読む
   format: written
