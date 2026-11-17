@@ -43,9 +43,9 @@ def unit_row(c, uid: str, target: dict) -> dict:
     legacy_terms = target.get("terms") or {}
     return {
         "unit": uid,
-        "concepts": (sum(1 for t in terms if c.terms.get(t, {}).get("definition")), len(terms)),
+        "concepts": (sum(1 for t in terms if c.terms.get(t, {}).get("definition") or c.terms.get(t, {}).get("heading_of")), len(terms)),   # 文脈の見出しは定義を持たないが、それで書き終えた形（#302）
         # 骨格（#105）：定義1文か説明があり、分類がある語
-        "skeleton": (sum(1 for t in terms if (c.terms.get(t, {}).get("short") or c.terms.get(t, {}).get("definition")) and c.terms.get(t, {}).get("category")), len(terms)),
+        "skeleton": (sum(1 for t in terms if (c.terms.get(t, {}).get("short") or c.terms.get(t, {}).get("definition") or c.terms.get(t, {}).get("heading_of")) and c.terms.get(t, {}).get("category")), len(terms)),
         "problems": (sum(1 for p in probs.values() if p.get("concepts")), len(probs)),
         "figure": "{{fig:" in s1,
         "model": model,

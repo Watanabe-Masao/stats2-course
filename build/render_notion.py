@@ -40,7 +40,7 @@ class NotionRenderer:
     def term_ref(self, tid: str) -> str:
         """用語のリンク。説明のある概念は知識ネットワークの画面へ。説明がまだの語と、画面のない配布先では名前だけ（旧版の用語ページは指さない。#53）。"""
         t = self.c.terms[tid]
-        if t.get("definition") and self.t.get("network_url"):
+        if (t.get("definition") or t.get("heading_of")) and self.t.get("network_url"):   # 文脈の見出しも画面にページがある（#302）
             from network import course_id
             return f"[{t['name']} 🕸]({self.t['network_url']}?c={course_id(self.c)}:{tid})"
         return t["name"]
