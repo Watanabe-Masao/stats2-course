@@ -191,6 +191,7 @@
 - **ブランチの途中のコミット**：`python3 build/check_changed.py` で、変えたものに合わせた範囲だけ確かめる（origin/main からの差分を見て、下の表のとおりに選ぶ）。
 - **依存の固定**：npm は package-lock.json と `npm ci`（playwright の版を変えるときは lock も直す）。CI は pip・npm・ブラウザをキャッシュし、段ごとの時間を各ジョブの概要に出す。
 - **マージの前（PR を「マージしてよい」と伝える前）**：PR を作ると GitHub が全部（`build/check_all.sh` を base と labs の6組に分けて並行）を走らせる（.github/workflows/check.yml。PR と main への取り込みでだけ走る）。その結果が成功であることを `gh api repos/{owner}/{repo}/actions/runs` で確かめてから伝える。手元で全部を走らせるのは、GitHub で落ちた原因を調べるときだけ。
+- **画面のテスト**（#483 の C。2026-11-17）：CI の段 screen が、ブランチの生成物（out/site/net/stats2.json）を見本の代わりに入れて、公開中の画面（knowledge-net の main）の単体テストと、概念・関係を読む画面のテストの一部を走らせる（build/screen_tests.sh。手元でも同じ）。教材の概念・構造を変えて画面が読めない・画面のテストが落ちるものを、マージの前に見つける。落ちたら、画面の側を直す PR を knowledge-net に先に出す（画面を先に公開する）。
 - **公開**：公開サイトの更新（deploy_site.sh）と Notion への公開は、全部が通った main から行う。
 
 | 変えたもの | ブランチの途中で確かめること |
