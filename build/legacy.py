@@ -31,7 +31,7 @@ def _require(name: str, target: dict) -> str | None:
     """満たしていなければ理由を返す。"""
     if name == "terms_defined":
         terms = load_yaml(ROOT / "content" / "terms.yaml") or []
-        missing = [t["id"] for t in terms if not t.get("definition")]
+        missing = [t["id"] for t in terms if not t.get("definition") and not t.get("heading_of")]   # 文脈の見出しは定義を持たない（① の 2。#302・#475）
         return f"定義のない用語 {len(missing)}" if missing else None
     if name == "term_pages_unlinked":   # 説明のある概念はネットワークを指すので、旧版を指す残りだけ数える
         terms = {t["id"]: t for t in load_yaml(ROOT / "content" / "terms.yaml") or []}
