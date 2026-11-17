@@ -47,10 +47,10 @@ items:
     checks:   # 2026-11-17（#51）
       content: {state: 確認済み, evidence: "独立な確かめ（2026-11-17）：旧版15行を1つずつ取り込んだ問題（Q-U03-025・U05-025〜029・U05T-024・U06-024〜026・U07-024〜026・U08-024〜025）と照合。数・選択肢・正解は15問とも一致。抜けていた ①-08 の「層化抽出の平均も同じ考え方」は Q-U06-026 の答えに足した。説明の直しは #469 の意図した修正（U06-024・026・U07-025）"}
       refs: {state: 確認済み, evidence: "Notion の被リンク0（list_page_backlinks、2026-11-17）。原本・生成物の参照0（build の absent）。残るのは migration/old の旧版ページの写し（移行の記録で、たどるリンクではない）"}
-      readback: {state: 未確認}
+      readback: {state: 確認済み, evidence: "取り込んだ15問がある6単元（U03・U05・U05T・U06・U07・U08）を Notion から読み戻し、生成物と照合して一致（notion_compare。U03・U05・U05T・U07・U08 は 2026-11-17、U06 は答えを足して入れ直した後の 2026-11-18）"}
       function: {state: 確認済み, evidence: "解く・読む：各単元の応用「本番形式で解く」（正解・誤りの理由・ラボか図つき）。正誤・次回復習の記録：旧版は15行とも未着手・解いた回数0で移す記録がなく、記録は個人用の学習記録で行う（#54）。段階・範囲表No での絞り込み：15問とも ① データの記述で、単元の並びで代わる"}
       backup: {state: 確認済み, evidence: "publish/legacy-backup/LEG-pq-db/（DB の型とビュー・15行の属性・15ページの本文。fetch・query の返り値を機械で切り出し、2026-11-17）。個人の記録は入っていない"}
-      deps: {state: 未確認, note: "処理からの参照は0（DB とデータソースの ID を stats2-course・knowledge-net・stats2-labs・GitHub Actions で検索、2026-11-17）。残り：Notion の DB の自動化・ボタンは API から見えないので、渡辺さんが Notion の画面（DB の右上の ⚡）で無いことを確かめる"}
+      deps: {state: 確認済み, evidence: "処理からの参照0（DB とデータソースの ID を stats2-course・knowledge-net・stats2-labs・GitHub Actions で検索、2026-11-17）。Notion の DB の自動化なし・接続なし（渡辺さんが Notion の画面で確認、2026-11-18）"}
   - id: LEG-confusion
     name: 混同しやすい概念｜図で比べる（比較13組）
     notion: [{id: 406b7cd539a1813095c5c41c64477e81, type: page, title: 混同しやすい概念｜図で比べる}]
