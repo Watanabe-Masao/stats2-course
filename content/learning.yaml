@@ -218,6 +218,20 @@ learning:
     version: 1
     reason: 平均の式は総和記号で（1/n）Σ xᵢ と書く。総和記号は記法なので定義の構成要素にはせず、式を読むための前提知識とする（#310）。
     units: [U02, U06]
+  - id: LRN-eqtransform-std
+    op: add
+    from: TERM-eqtransform
+    to: TERM-std
+    version: 1
+    reason: 標準化の問い（z から元の値に戻す x＝μ＋zσ）は、等式の両辺に同じ操作をする式の変形を使う。式の変形は手続きで定義の構成要素にはしないので、前提知識とする（#441）。
+    units: [U01, U08]
+  - id: LRN-function-rv
+    op: add
+    from: TERM-function
+    to: TERM-rv
+    version: 1
+    reason: 確率変数は、試行の結果の1つ1つに数を1つ対応させるもので、入れた値に出力を1つ決める関数の考えで読む。基準の定義の語には入れず、前提知識とする（#441）。
+    units: [U02, U13]
   # ---- 足す：特別な場合の組（⑥ の 3：候補にしない。教材で向きを決めて前提知識に書く。#345）
   - id: LRN-var-cov
     op: add

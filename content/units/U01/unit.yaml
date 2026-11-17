@@ -6,7 +6,7 @@ recall_group: 要約（代表値・ばらつき）
 next: U02
 prereq: []
 used_by: [U02, U03, U05T, U06, U07, U08, U10]
-terms: [TERM-ratio, TERM-point]
+terms: [TERM-ratio, TERM-point, TERM-eqtransform]
 labs: [LAB-ratio]
 goal: 「何%」と言われたとき、**何を基準（分母）にした割合かを言え**、基準量の逆算・増減の重ね合わせ・簡単な式の変形ができる。
 stage_goals:
@@ -64,3 +64,4 @@ checks:
   - '810/900 == 0.9 and 150/100 == 1.5 and (90+150)/2 == 120 and (810+150)/(900+100) == 0.96 and abs((0.9*900+1.5*100)/1000 - 0.96) < 1e-12'
   # 創造
   - '300/1500 == 0.2 and 300/1000 == 0.3 and 1500/1.5 == 1000'
+concepts_linked: true

@@ -59,6 +59,8 @@ add("TERM-perm", C(9, 26, 4) + C(24, 26, 4) + C(39, 26, 4) + arrow(14.5, 26, 18.
 add("TERM-comb", "".join(C(8+i*8, 18, 2.8, i in (1, 3)) for i in range(5)) + P("M14 25 q2 4 4 0 M30 25 q2 4 4 0") + T("ₙCₖ", 24, 43, 12))
 add("TERM-sigma", T("Σ", 24, 34, 26) + T("i", 39, 42, 8, 600) + T("n", 39, 14, 8, 600), "記号")
 add("TERM-fact", T("n!", 24, 32, 20), "記号")
+add("TERM-eqtransform", T("=", 24, 30, 20) + P("M8 14h10M30 14h10") + P("M13 9v10M35 9v10") + P("M8 38h10M30 38h10"), "記号")   # 両辺に同じ操作（#441）
+add("TERM-function", T("f", 15, 32, 20) + arrow(22, 26, 36, 26) + D(40, 26, 2.4), "記号")   # 入れた値に1つの出力を対応させる（#441）
 
 # ── データと変数：全体と一部・物差し・札
 add("TERM-population", C(24, 24, 17) + "".join(C(x, y, 1.8) for x, y in [(14, 17), (24, 12), (34, 17), (13, 28), (24, 24), (35, 28), (18, 35), (30, 35)]))
@@ -120,6 +122,7 @@ add("TERM-geomean", P("M6 27l4-2 5 11 6-22h21") + T("×", 32, 32, 13) + T("n", 9
 add("TERM-mean", NL + "".join(D(x, 34, 2.2) for x in (8, 15, 20, 30, 39)) + f'<path d="M22.4 37l-4 6h8z" fill="currentColor" stroke="none"/>' + T("x̄", 22.4, 24, 11))
 add("TERM-data-var", NL + "".join(D(x, 34, 2.2) for x in (8, 14, 30, 38)) + P("M23 10v28", stroke_dasharray="2 3") + arrow(23, 18, 8, 18) + arrow(23, 18, 38, 18) + T("²", 40, 14, 10))
 add("TERM-data-sd", NL + "".join(D(x, 34, 2.2) for x in (8, 14, 30, 38)) + P("M23 10v28", stroke_dasharray="2 3") + arrow(23, 20, 14, 20) + arrow(23, 20, 32, 20) + T("s", 23, 15, 10))
+add("TERM-data-std", NL + "".join(D(x, 34, 2.2) for x in (8, 14, 30, 38)) + P("M23 10v28", stroke_dasharray="2 3") + T("0", 23, 47, 8) + T("z", 38, 15, 10))   # データの標準化（#312）
 add("TERM-quantile", AX() + P(bell(24, 13, 11, 40)) + tail(5, 14, 24, 13, 11, 40, .45) + P("M14 18v22", stroke_dasharray="2 2") + T("10%", 9, 14, 7, 600))
 add("TERM-range", NL + "".join(D(x, 34, 2) for x in (16, 21, 26, 31)) + C(8, 34, 3, True) + C(40, 34, 3, True) + arrow(24, 22, 8, 22) + arrow(24, 22, 40, 22))
 

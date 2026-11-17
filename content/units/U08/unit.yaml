@@ -7,7 +7,7 @@ prev: U07
 next: U09
 prereq: [U07, U05]
 used_by: [U16, U25]
-terms: [TERM-std, TERM-sd, TERM-outlier, TERM-skew, TERM-kurt, TERM-normal]
+terms: [TERM-data-std, TERM-std, TERM-data-sd, TERM-sd, TERM-outlier, TERM-skew, TERM-kurt, TERM-normal]
 labs: [LAB-z]
 goal: 平均もばらつきも違う2つの値を、**z得点（平均から標準偏差いくつ分か）で同じ物差しに乗せて比べられ**、外れ値・歪度・尖度から分布の特徴を言葉で言える。
 stage_goals:
