@@ -219,14 +219,16 @@ class TestForPhone(unittest.TestCase):
         self.assertIn(f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n層化：x̄ₛₜ＝Σ(Nₕ/N)\n'
                       "Z \\~ N(0, 1)、P(棄却 \\| H₀)\n</callout>", out)
 
-    def test_wide_table_fits_page(self):
-        """#492：3列以上の表だけをページ幅の表にする（2列は Notion のパイプの表のまま）。セルの中の「\\|」は文字の | に戻す。
-        想定する故障：2列の表まで変える・見出しの行や最後の行を落とす・表のあとの空行を食って次の段落とくっつく。"""
+    def test_wide_table_becomes_two_columns(self):
+        """#492：3列以上の表だけを2列にまとめる（iPhone の Notion は表を画面の幅に縮めず、3列目が切れる。2026-11-17 の実画面）。
+        想定する故障：2列の表まで変える・3列目の中身や列の見出しを落とす・セルの中の | で列が増える・表のあとの空行を食う。
+        見つけ方：2列と3列の表を並べ、出力の文字列を見る。"""
         md = "| a | b |\n| --- | --- |\n| 1 | 2 |\n\n| 記号 | 意味 | 値 |\n| --- | --- | --- |\n| N_h | 店数 | P(A \\| B) |\n| x | y | z |\n\n後"
         out = for_phone(md)
         self.assertIn("| a | b |\n| --- | --- |\n| 1 | 2 |", out)
-        self.assertIn('<table fit-page-width="true" header-row="true">\n<tr>\n<td>記号</td>\n<td>意味</td>\n<td>値</td>\n</tr>\n'
-                      "<tr>\n<td>Nₕ</td>\n<td>店数</td>\n<td>P(A | B)</td>\n</tr>\n<tr>\n<td>x</td>\n<td>y</td>\n<td>z</td>\n</tr>\n</table>\n\n後", out)
+        self.assertIn("| 記号 | 意味／値 |\n| --- | --- |\n"
+                      '| Nₕ | 店数<br /><span color="gray">値：</span>P(A \\| B) |\n'
+                      '| x | y<br /><span color="gray">値：</span>z |\n\n後', out)
 
     def test_no_underscore_left(self):
         r = NotionRenderer(course(), TARGET)

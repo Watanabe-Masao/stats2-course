@@ -63,7 +63,8 @@ def code_to_callout(m: re.Match) -> str:
     return f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n' + "\n".join(lines) + "\n</callout>"
 
 
-# ③ 3列以上の表は iPhone の Notion で右が切れる（表は画面の幅に縮まない）→ ページ幅に合わせる表にする（#492）
+# ③ 3列以上の表は iPhone の Notion で右が切れる（列の幅が決まっていて、fit-page-width でも縮まない。2026-11-17 の実画面）
+#    → 2列にまとめる：1列目はそのまま、2列目に2列目以降を改行で重ね、3列目からは灰色の列の見出しを付ける（#492）
 TABLE = re.compile(r"^(\|.*\|)\n\|(?: *-+ *\|)+\n((?:\|.*\|\n?)*)", re.M)
 CELL_SPLIT = re.compile(r"(?<!\\)\|")
 
@@ -73,14 +74,19 @@ def _cells(row: str) -> list[str]:
 
 
 def wide_table(m: re.Match) -> str:
-    """3列以上のパイプの表 → <table fit-page-width="true">（見出しの行つき）。2列の表はそのまま。"""
+    """3列以上のパイプの表 → 2列のパイプの表。2列の表はそのまま。"""
     head = _cells(m.group(1))
     if len(head) < 3:
         return m.group(0)
-    rows = [head] + [_cells(r) for r in m.group(2).rstrip("\n").split("\n")]
-    body = "\n".join("<tr>\n" + "\n".join(f"<td>{c}</td>" for c in r) + "\n</tr>" for r in rows)
+    esc = lambda c: c.replace("|", "\\|")
+    rows = [[head[0], "／".join(head[1:])]]
+    for r in (_cells(r) for r in m.group(2).rstrip("\n").split("\n")):
+        rest = [r[1]] + [f'<span color="gray">{h}：</span>{c}' for h, c in zip(head[2:], r[2:])]
+        rows.append([r[0], "<br />".join(rest)])
+    lines = [f"| {esc(a)} | {esc(b)} |" for a, b in rows]
+    lines.insert(1, "| --- | --- |")
     tail = "\n" if m.group(2).endswith("\n") else ""
-    return f'<table fit-page-width="true" header-row="true">\n{body}\n</table>{tail}'
+    return "\n".join(lines) + tail
 
 
 def for_phone(md: str) -> str:
