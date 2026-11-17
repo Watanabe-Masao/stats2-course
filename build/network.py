@@ -12,7 +12,7 @@ from fractions import Fraction
 import re
 import math
 
-from model import CONTENT, ROOT, Course, load_yaml, run_check
+from model import CONTENT, ROOT, Course, load_yaml, run_check, term_state
 import term_icons  # 語の印（#220）
 from effects import effect_errors, question_errors
 from learning import export_learning, learning_order, load_learning   # 学ぶ順（⑥。#266）
@@ -1467,7 +1467,7 @@ def _assemble(c: Course, target: dict) -> dict:
     for tid, t in c.terms.items():
         if not (filled(t) or skeleton(t) or heading(t) or tid in referenced):
             continue
-        status = "heading" if heading(t) else "filled" if filled(t) else "skeleton" if skeleton(t) else "stub"
+        status = term_state(t)   # 状態は1か所で決める（model.term_state。#483）
         e = {"id": g(tid), "name": t["name"], "status": status, "version": t.get("version", 1),
              "units": units_of.get(tid, []), "problems": problems_of.get(tid, [])}
         for k in ("en", "short", "category"):

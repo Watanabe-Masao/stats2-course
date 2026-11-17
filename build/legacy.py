@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from model import ROOT, load_yaml
+from model import ROOT, load_yaml, term_written
 
 SCAN_DIRS = ("content", "templates")
 
@@ -31,11 +31,11 @@ def _require(name: str, target: dict) -> str | None:
     """満たしていなければ理由を返す。"""
     if name == "terms_defined":
         terms = load_yaml(ROOT / "content" / "terms.yaml") or []
-        missing = [t["id"] for t in terms if not t.get("definition") and not t.get("heading_of")]   # 文脈の見出しは定義を持たない（① の 2。#302・#475）
+        missing = [t["id"] for t in terms if not term_written(t)]   # 文脈の見出しは定義を持たないが書き終えた形（model.term_state）
         return f"定義のない用語 {len(missing)}" if missing else None
     if name == "term_pages_unlinked":   # 説明のある概念はネットワークを指すので、旧版を指す残りだけ数える
         terms = {t["id"]: t for t in load_yaml(ROOT / "content" / "terms.yaml") or []}
-        n = sum(1 for tid in (target.get("terms") or {}) if not terms.get(tid, {}).get("definition"))
+        n = sum(1 for tid in (target.get("terms") or {}) if not term_written(terms.get(tid, {})))
         return f"旧版の用語ページを指す用語 {n}" if n else None
     return f"知らない検査 {name}"
 
