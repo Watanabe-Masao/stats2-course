@@ -283,7 +283,8 @@ class NotionRenderer:
 
     def legacy_page(self, report: list[dict]) -> str:
         """旧版（削除予定）。publish/legacy.yaml の項目ごとに、置き換え先・削除の条件・今の状態と、旧版そのもの（子）を並べる。"""
-        state = {"still": "まだ参照あり", "ready": "削除してよい", "deleted": "削除済み"}
+        from legacy import SIX
+        state = {"still": "まだ参照あり", "ready": "削除の候補（build の確認は通った。削除は6条件と承認のあと）", "archived": "アーカイブ済み", "deleted": "削除済み"}
         lines = ['<callout icon="🗄" color="gray_bg">\n新しい構造に取り込むまで残している旧版。'
                  "条件を満たしたものから削除する（管理表は GitHub の publish/legacy.yaml）。新しく参照しない。\n</callout>"]
         for r in report:
@@ -293,7 +294,12 @@ class NotionRenderer:
             lines += ["", f"## {it['name']}", "",
                       f"- 置き換え先：{it.get('replaced_by', '')}",
                       f"- 削除する時期：{it.get('when', '未定')}",
-                      f"- 今の状態：<b>{state[r['state']]}</b>", ""]
+                      f"- 今の状態：<b>{state[r['state']]}</b>"]
+            checks = it.get("checks") or {}
+            if checks:   # 削除の6条件（渡辺さん 2026-11-17）
+                lines += ["- 削除の6条件：" + "・".join(f"{SIX[k]} {(checks.get(k) or {}).get('state', '未確認')}" for k in SIX),
+                          f"- 削除の承認：{it.get('approved') or 'まだ'}"]
+            lines.append("")
             for n in it.get("notion", []):
                 pid = str(n["id"]).replace("-", "")
                 tag = "database" if n.get("type") == "database" else "page"

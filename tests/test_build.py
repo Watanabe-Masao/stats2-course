@@ -444,7 +444,23 @@ class TestLegacy(unittest.TestCase):
         ], {})
         self.assertEqual(err, [])
         self.assertIn("まだ", lines[0])
-        self.assertIn("削除してよい", lines[1])
+        self.assertIn("削除の候補", lines[1])   # build が通っても「削除してよい」とは出さない（6条件と承認のあと。2026-11-17）
+
+    def test_delete_needs_six_conditions_approval_and_archive(self):
+        # 確かめる対象：削除の判定（渡辺さん 2026-11-17）を build が止めること。想定する故障：6条件・承認・アーカイブのどれかが欠けたまま
+        #   deleted を書いても通る（「削除の候補」を削除してよいと読み違えて消す）。確認済みに根拠がなくても通る。
+        # 見つけ方：1つずつ欠けた項目で誤りが出て、全部そろうと出ないこと。2026-11-17 より前の削除（LEG-confirm-q）は除くこと
+        six = {k: {"state": "確認済み", "evidence": "読み戻して照合（2026-11-17）"} for k in ("content", "refs", "readback", "function", "backup", "deps")}
+        base = {"id": "LEG-y", "name": "y", "absent": ["ZZZ-NOT-USED"], "checks": six, "approved": "2026-11-18 渡辺さん", "archived": "2026-11-18", "deleted": "2026-11-20"}
+        self.assertEqual(self._run([base], {})[0], [])
+        for drop in ("approved", "archived"):
+            self.assertTrue(self._run([{k: v for k, v in base.items() if k != drop}], {})[0], drop)
+        part = {**base, "checks": {**six, "backup": {"state": "未確認"}}}
+        self.assertTrue(any("5/6" in e for e in self._run([part], {})[0]))
+        noev = {**base, "checks": {**six, "deps": {"state": "確認済み"}}}
+        self.assertTrue(any("evidence" in e for e in self._run([noev], {})[0]))
+        old = {"id": "LEG-z", "name": "z", "absent": ["ZZZ-NOT-USED"], "deleted": "2026-10-29"}
+        self.assertEqual(self._run([old], {})[0], [])
 
     def test_real_table_is_clean(self):
         from legacy import legacy_status

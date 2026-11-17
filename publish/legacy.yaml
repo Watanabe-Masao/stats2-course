@@ -1,8 +1,21 @@
 # 旧版（Notion）のうち、新しい構造に取り込むまで残しているもの。ここが削除の管理表。
-#   - build が毎回、各項目の状態（まだ参照あり／削除してよい／削除済み）を出す
-#   - 「削除してよい」になったら Notion で削除し、deleted: に日付を書く
+#   - build が毎回、各項目の状態（まだ参照あり／削除の候補／アーカイブ済み／削除済み）を出す
+#   - 削除は下の「削除の判定」の6条件と承認のあと、アーカイブを経て行い、deleted: に日付を書く
 #   - deleted の項目の文字列・ID が原本や生成物に残っていると build が止まる（消し忘れ・戻し忘れの検出）
 #   - 全部の項目が deleted になったら、最終ゴール6「旧版がすべて削除されている」の完了
+#
+# 削除の判定（渡辺さん 2026-11-17）：削除してよい＝6条件がすべて「確認済み」＋対象ごとの明示的な削除承認（approved）。
+#   build が見るのは「原本・生成物から旧版を参照していない」（② の一部）と require の検査（① の一部）だけ。build が通っても「削除の候補」で、削除してよいではない。
+#   checks の6条件（state は 未確認／確認済み／問題あり。確認済みには evidence（何で確かめたか・日付）を書く）：
+#     content   ① 内容の移行：旧版の必要な情報が新版にある（件数だけでなく、内容・数式・成立条件も照合）
+#     refs      ② 参照の移行：ほかの Notion ページ・DB・教材から旧版を参照していない（リンク先も正常）
+#     readback  ③ 公開内容の一致：新版を Notion から読み戻し、生成物と内容・ID・関係を照合した
+#     function  ④ 機能の代替：旧版で行っていた検索・閲覧・問題参照などが新版でできる
+#     backup    ⑤ 復元できる：削除の前に、復元に要るデータと関係を保存した
+#     deps      ⑥ 依存がない：自動化・API・同期・外部リンクなど、旧版の ID に依存する処理がない
+#   進め方は二段階：6条件がそろい承認を得たら、まずアーカイブ（archived: 日付。旧版（削除予定）の下へ移す・閲覧だけにする）し、
+#   参照や同期に問題がないことを確かめてから削除（deleted: 日付）する。build は、6条件・承認・アーカイブのない deleted を止める
+#   （2026-11-17 より前に削除した LEG-confirm-q は、この決まりの前の記録として除く）。
 #
 # 条件：
 #   absent    原本（content/・templates/・publish/notion.yaml）と生成物（out/notion）にあってはならない文字列
@@ -31,21 +44,49 @@ items:
     replaced_by: 原本の問題に取り込む（本番形式の5択）
     absent: ["REF-PQ-DB"]
     when: W0 の後の小さなブランチ
+    checks:
+      content: {state: 未確認}
+      refs: {state: 未確認}
+      readback: {state: 未確認}
+      function: {state: 未確認}
+      backup: {state: 未確認}
+      deps: {state: 未確認}
   - id: LEG-confusion
     name: 混同しやすい概念｜図で比べる（比較13組）
     notion: [{id: 406b7cd539a1813095c5c41c64477e81, type: page, title: 混同しやすい概念｜図で比べる}]
     replaced_by: 関係データの「対比」と、そこから生成する比較
     absent: ["REF-CONFUSION"]
     when: 該当する単元の段階が終わったとき（遅くとも W5）
+    checks:
+      content: {state: 未確認}
+      refs: {state: 未確認}
+      readback: {state: 未確認}
+      function: {state: 未確認}
+      backup: {state: 未確認}
+      deps: {state: 未確認}
   - id: LEG-term-db
     name: 統計用語辞典（114行）
     notion: [{id: da48813bf8b74e69824967eb3c68399c, type: database, title: 統計用語辞典}]
     replaced_by: 原本の概念データ（terms.yaml を広げたもの）と、ネットワークの画面
     require: [terms_defined, term_pages_unlinked]
     when: W5 の終わり
+    checks:
+      content: {state: 未確認}
+      refs: {state: 未確認}
+      readback: {state: 未確認}
+      function: {state: 未確認}
+      backup: {state: 未確認}
+      deps: {state: 未確認}
   - id: LEG-reference
     name: 公式・用語リファレンス
     notion: [{id: 405b7cd539a1818f9198f683d487c86d, type: page, title: 公式・用語リファレンス}]
     replaced_by: 単元の「忘れたら」をネットワークの画面の分類（unit.yaml の recall_group）へ
     absent: ["legacy_reference"]
     when: W5 の終わり
+    checks:
+      content: {state: 未確認}
+      refs: {state: 未確認}
+      readback: {state: 未確認}
+      function: {state: 未確認}
+      backup: {state: 未確認}
+      deps: {state: 未確認}
