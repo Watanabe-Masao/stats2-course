@@ -190,3 +190,38 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-17'
   fingerprint: 55335084d8ef5dc5
+- formula: F-var-def
+  points:
+  - 単位（元の単位の2乗）
+  judgement: '#481 で TERM-var・TERM-sd の conditions.data を、分布の裾と標本の外れ値を分けた文に書き直したためのやり直し。前の記録（2026-11-10、c96e7dfe4712999a）のあとの差分を git diff origin/main -- content/terms.yaml で確かめた。式の木・記号の表・principle・誤解・反例・conditions.math・basis_formula・契約は変わっていない。E((X−μ)²)・E(X²)・(E(X))² はどれも X の単位の2乗で引き算の両側がそろい、μ は of: X で X と同じ単位（Casella & Berger Def. 2.3.2）。新しい data の行は裾と外れ値が値の大きさに効くことを言うだけで、単位の判断には影響しない。レビューの改善の指摘で「有限でない」を「有限の値に定まらない」にした（要件の outside「∞ になるか定まらない」と同じ範囲）'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-17'
+  fingerprint: b70ba048e5b8cc9f
+- formula: F-var-def
+  points:
+  - 前提（2乗の期待値が有限）
+  judgement: '#481 の conditions.data の書き直しによるやり直し。conditions.math の要件「E(X²) が有限」と outside は変わっていない。|x|≦1＋x² と (X−μ)²≦2X²＋2μ² から E(X) と E((X−μ)²) も有限で、2つ目の等号（展開と線形性）にはこの前提が要り、これで足りる（Casella & Berger Thm 2.3.4）。新しい data の行「裾が重いと、有限の値に定まらないこともある」は、要件が現実の分布で崩れうることを分布の言葉で言い、要件・outside と食い違わない（自由度2の t 分布で E(X²)＝∞、p(k)∝1/k³ で E(X) は有限・E(X²)＝∞、コーシー分布は E(X) も定まらない）。「こともある」の限定で、裾が長くても分散が有限な分布（指数分布・対数正規分布）とも食い違わない'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-17'
+  fingerprint: b70ba048e5b8cc9f
+- formula: F-var-sum
+  points:
+  - 台が離散（値の表）のときの形で、連続なら積分になること
+  judgement: '#481 の conditions.data の書き直しによるやり直し。前の記録（2026-11-12、2c0e37930ab4f011）のあとで、式の木・記号の表（p(x) の意味の連続なら積分の文を含む）・ラベル・契約は変わっていない。木 Σ_x (x−μ)²p(x) は p(x)＝P(X＝x) をもつ離散の形で、連続では ∫(x−μ)²f(x)dx になる（Casella & Berger Def. 2.2.1）。新しい data の行の「裾」は離散・連続のどちらにも当てはまる語で、台の書き分けと食い違わない。無限の台で和が有限になる前提は conditions.math の E(X²) が有限で足り、data の行の「有限の値に定まらない」はこれが崩れた場合の言い換え（各項が0以上なので、E(X) が有限で E(X²)＝∞ なら和は ＋∞。p(k)∝1/k³ で確かめた）'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-17'
+  fingerprint: 03d437da9aa0f13a
+- formula: F-var-sum
+  points:
+  - F-var-def と同じ量であること
+  judgement: '#481 の conditions.data の書き直しによるやり直し。式の木・記号の表・F-var-def の木は変わっていない。E g(X)＝Σ_x g(x)p(x) で g(x)＝(x−μ)² とおくと F-var-def の1つ目の等号の右辺と同じ量（Casella & Berger Def. 2.2.1・Def. 2.3.2）。μ は of: X・kind: param で和の動く記号 x に取り込まれない。data の行の「確率は小さくても極端な値をとる裾があると、分散は大きくなる」も、この式の項で分数で確かめた：値 [0,100,1000]・重み [80,18,2] で分散 20356、1000 の確率2%を0に移すと 1476（約14倍）。1000 の項 (1000−38)²×0.02≒18507 が全体の約9割'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-17'
+  fingerprint: 03d437da9aa0f13a
+- formula: F-var-linear
+  points:
+  - 導き方
+  judgement: '#481 の conditions.data の書き直しによるやり直し。前の記録（2026-11-10、111adff59a2a1edf）のあとで、式の木・記号・DER-var-linear・REL-expect-var・契約・conditions.math は変わっていない。DER-var-linear の3段（線形性で E(aX＋b)＝aμ＋b、ずれが a(X−μ)、2乗の期待値で a² が出る）は Casella & Berger Thm 2.3.4 の証明と一致し、前提「V(X) が有限」は要件「E(X²) が有限」と同値。新しい data の行は、分散が有限の値に定まらない分布ではこの導出の前提が成り立たないことを示すだけで、導出の段と前提の書き方に影響しない'
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-17'
+  fingerprint: 146e13c87abb9d47
