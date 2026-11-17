@@ -70,3 +70,20 @@ jobs:
         run: for i in 1 2 3; do npx playwright install-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
       - run: build/check_all.sh
         env: {PART: labs, SHARD: "${{ matrix.shard }}/6"}
+  # 教材の生成物で知識ネットワークの画面のテストを走らせる（#483 の C）。教材の概念・構造の変更で画面が崩れるのを、マージの前に見つける
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12", cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v5
+        with: {node-version: "22"}
+      - run: npm ci
+      - run: python3 build/build.py
+      - run: git clone --quiet --depth 1 https://github.com/Watanabe-Masao/knowledge-net .kn && (cd .kn && npm ci)
+      # ブラウザの依存（フォントなど）は失敗したら 60 秒おいて 3 回までやり直す（base と同じ理由）
+      - run: cd .kn && for i in 1 2 3; do npx playwright install --with-deps chromium && exit 0; echo "ブラウザの依存の取得に失敗（$i 回目）"; sleep 60; done; exit 1
+      - run: build/screen_tests.sh
