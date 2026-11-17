@@ -1,7 +1,7 @@
 # 単元U07の問題。id は変えない（個人の解答記録がこの id を指す）。
 - id: Q-U07-001
   stage: S1
-  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-sd, TERM-cv]
+  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-data-sd, TERM-cv]
   label: 例題B（穴埋め）
   format: fill
   powers: [P1, P2]
@@ -45,7 +45,7 @@
 
 - id: Q-U07-003
   stage: S1
-  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-data-var, TERM-sd]
+  concepts: [TERM-mean, TERM-dev, TERM-unbvar, TERM-data-var, TERM-data-sd]
   difficulty: 1
   format: written
   powers: [P1]
@@ -121,7 +121,7 @@
 
 - id: Q-U07-011
   stage: S2
-  concepts: [TERM-mean, TERM-unbvar, TERM-sd]
+  concepts: [TERM-mean, TERM-unbvar, TERM-data-sd]
   label: 計算練習
   format: written
   powers: [P1, P2]
@@ -160,7 +160,7 @@
 
 - id: Q-U07-020
   stage: S3
-  concepts: [TERM-sd, TERM-cv]
+  concepts: [TERM-data-sd, TERM-cv]
   tag: 変動係数
   format: written
   powers: [P3, P1]
@@ -254,7 +254,7 @@
 
 - id: Q-U07-030
   stage: S4
-  concepts: [TERM-mean, TERM-unbvar, TERM-sd]
+  concepts: [TERM-mean, TERM-unbvar, TERM-data-sd]
   tag: 投資のリスク
   format: written
   powers: [P3, P1]
@@ -292,7 +292,7 @@
 
 - id: Q-U07-032
   stage: S4
-  concepts: [TERM-mean, TERM-sd]
+  concepts: [TERM-mean, TERM-data-sd]
   tag: 安全在庫
   format: written
   powers: [P3, P1]
