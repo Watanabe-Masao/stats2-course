@@ -122,6 +122,10 @@ claims:
       by: P
       date: '2026-11-09'
       version: 51a388a
+    - method: 独立な確かめ
+      by: '#307 の確かめ'
+      date: '2026-11-18'
+      version: de6bd04
     external: 未照合
   version: 1
 - id: CLM-6a
@@ -511,6 +515,10 @@ claims:
       by: M
       date: '2026-11-09'
       version: 6a03c21
+    - method: 独立な確かめ
+      by: '#307 の確かめ'
+      date: '2026-11-18'
+      version: de6bd04
     external: 未照合
   version: 1
 - id: CLM-20b
@@ -584,6 +592,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: '#307 の確かめ'
+      date: '2026-11-18'
+      version: de6bd04
     external: なし
   version: 1
 - id: CLM-23
@@ -793,6 +805,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: '#307 の確かめ'
+      date: '2026-11-18'
+      version: de6bd04
     external: 未照合
   version: 1
 - id: CLM-28c
