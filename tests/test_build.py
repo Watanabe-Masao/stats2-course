@@ -49,6 +49,17 @@ class TestCourseIsClean(unittest.TestCase):
         self.assertEqual(err, [])
         self.assertGreater(n, 0)
 
+    def test_reference_inside_code_block_stops(self):
+        # 確かめる対象：コードブロックの中の参照（{{unit:}} など）を build が止めること（#483 の D で U31 に見つけた）。
+        # 想定する故障：Notion のコードブロックではメンションが描かれず、空のメンションの文字がそのまま出る。
+        # 見つけ方：写しの本文のコードブロックに {{unit:U01}} を入れると止まり、ブロックの外なら止まらない
+        c = course()
+        uid = "U31"
+        c.units[uid]["bodies"]["S1"] = "```txt\n式（{{unit:U01}}）\n```\n"
+        self.assertTrue(any("コードブロックの中に参照" in e for e in validate(c)))
+        c.units[uid]["bodies"]["S1"] = "{{unit:U01}}\n```txt\n式\n```\n"
+        self.assertFalse(any("コードブロックの中に参照" in e for e in validate(c)))
+
     def test_every_container_has_a_look(self):
         from model import CONTAINERS
         self.assertEqual(CONTAINERS - {"toggle"}, set(COMP["callouts"]))

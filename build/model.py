@@ -265,6 +265,12 @@ def _validate_unit(c: Course, uid: str, u: dict, texts: list) -> list[str]:
             else:
                 texts.append((f"{uid}.{key}.{sid}", u[key][sid]))
 
+    # コードブロック（``` の中）に参照（{{unit:}}・{{lab:}} など）を書かない：Notion のコードブロックではメンション・リンクが描かれず、
+    # 空のメンションの文字がそのまま出る（2026-11-17、#483 の D の読み戻しで U31 の式の構造に見つけた）
+    for sid, body in u["bodies"].items():
+        for m in re.finditer(r"```[a-z]*\n(.*?)```", body or "", re.S):
+            for ref in re.findall(r"\{\{(?:unit|lab|fig|term|ref|problem):[^}]*\}\}", m.group(1)):
+                err.append(f"{uid}/{sid}.md: コードブロックの中に参照 {ref} がある（Notion では描かれない。コードブロックの外に出すか、名前の文字で書く）")
     probs = u["problems"]
     used: dict[str, int] = {}
     for sid, body in u["bodies"].items():
