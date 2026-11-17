@@ -393,7 +393,7 @@ deploy_site.sh はそのあと push の前に2つを確かめて、合わなけ�
 
 `site_base_url` が空の配布先では、`python3 build/publish_prep.py <ID>` で素材を一覧してアップロードし（返った content_length が一覧のバイト数と一致することを確かめる）、`python3 build/publish_prep.py <ID> <json>` で作る `out/notion/<ID>.publish.md` を使う。
 
-旧版（Notion）の残りは `publish/legacy.yaml` で管理する。build が各項目を「まだ参照あり／削除してよい／削除済み」で出す。「削除してよい」になったら、その生成物を Notion に公開してから旧版を削除し、`deleted:` に日付を書く。削除済みの ID が原本や生成物に戻ると build が止まる。旧版を新しく参照しない（refs に足さない）。
+旧版（Notion）の残りは `publish/legacy.yaml` で管理する。build が各項目を「まだ参照あり／削除の候補／アーカイブ済み／削除済み」で出す。build が確かめるのは原本・生成物からの参照と require だけで、「削除の候補」は削除してよいではない。削除してよいのは、6条件（内容の移行・参照の移行・公開内容の一致・機能の代替・復元できる・依存がない。項目の `checks`）がすべて確認済み（evidence つき）で、対象ごとに渡辺さんの削除の承認（`approved`）があるときだけ（渡辺さん 2026-11-17）。そのあと二段階で、まずアーカイブ（`archived:`）し、参照や同期に問題がないことを確かめてから削除して `deleted:` に日付を書く。build は、6条件・承認・アーカイブのない `archived`・`deleted` を止める。削除済みの ID が原本や生成物に戻ると build が止まる。旧版を新しく参照しない（refs に足さない）。
 
 入口ページ（root.md）の子ページは `<page url>` ブロックのまま置く（mention に変えると子ページが消えるため Notion が拒否する）。新しい単元ページを作ると入口の末尾に子ページが付くので、root.md の並びに合わせて動かす。
 

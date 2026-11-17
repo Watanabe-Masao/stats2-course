@@ -85,7 +85,8 @@ WAVES = [("W0", ["U13", "U14", "U15", "U16"]), ("W1", ["U09", "U10", "U11", "U12
 def _legacy_short(line: str) -> str:
     s = line.strip()
     state, rest = s.split("　", 1)
-    return f"{rest.strip().split('：')[0].split('（')[0]}：{state}"
+    m = re.search(r"6条件 (\d+/\d+)", rest)
+    return f"{rest.strip().split('：')[0].split('（')[0]}：{state}" + (f"（6条件 {m.group(1)}）" if m else "")
 
 
 def migration_line() -> str:
