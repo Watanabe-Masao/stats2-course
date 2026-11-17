@@ -1146,6 +1146,40 @@ class TestNetwork(unittest.TestCase):
         q["concepts"] = list(q["concepts"]) + ["TERM-pop-mean"]
         self.assertTrue(any("文脈の見出し。共有する概念（TERM-expect）" in x for x in network.validate_network(c3)))
 
+    def test_term_state_is_shared(self):
+        # 確かめる対象：概念の状態（説明あり・見出し・骨格・まだ）を、進み具合・旧版の判定・Notion の用語のリンク・公開の JSON が同じ1つの判定（model.term_state）で読むこと（#483 の A）。
+        # 想定する故障：どこか1か所が「定義があるか」で別に数え、文脈の見出しを「まだ」と扱う（#479：進み具合が 137/141、#482：旧版の判定が「まだ」に戻った）。
+        # 見つけ方：見出し・説明あり・骨格・まだの4語を単元の用語に入れた写しで、4か所の答えを状態ごとに並べて比べる。
+        # 既存との違い：test_heading は見出しの書き方の止め。ここは数え方が1つにそろっていること
+        import network, progress, legacy, render_notion
+        from model import term_state
+        c = copy.deepcopy(course())
+        picks = {"heading": "TERM-pop-mean", "filled": "TERM-expect", "skeleton": None, "stub": None}
+        for tid, t in c.terms.items():
+            st = term_state(t)
+            if picks.get(st) is None and st in ("skeleton", "stub"):
+                picks[st] = tid
+        if picks["skeleton"] is None:   # 今の原本に骨格がなければ写しで作る
+            c.terms["TERM-pop-var"] = {"id": "TERM-pop-var", "name": "骨格のテスト", "short": "s", "category": "推定"}
+            picks["skeleton"] = "TERM-pop-var"
+        if picks["stub"] is None:
+            c.terms["TERM-stub-test"] = {"id": "TERM-stub-test", "name": "まだのテスト", "category": "推定"}
+            picks["stub"] = "TERM-stub-test"
+        uid = next(iter(c.units))
+        c.units[uid]["terms"] = list(picks.values())
+        written = {st: st in ("filled", "heading") for st in picks}
+        row = progress.unit_row(c, uid, {})
+        self.assertEqual(row["concepts"], (sum(written.values()), 4))
+        r = render_notion.NotionRenderer(c, {"network_url": "https://example/"})
+        for st, tid in picks.items():
+            self.assertEqual("🕸" in r.term_ref(tid), written[st], st)
+        self.assertEqual(legacy._require("terms_defined", {}), None)   # 今の原本：見出しは定義がなくても「定義のない用語」に数えない
+        from model import term_written
+        for st, tid in picks.items():
+            self.assertEqual(term_written(c.terms[tid]), written[st], st)
+        d = network.export_network(course(), {"site_base_url": ""})
+        self.assertEqual(next(x for x in d["concepts"] if x["id"] == "stats2:TERM-pop-mean")["status"], "heading")
+
     def test_network_ties(self):
         # 確かめる対象：孤立の数え方（#343）が、⑤ の上のつながり（関係の端・通す定理・主張の前提と結論）と ⑥ の置き場（学ぶ順の足す）を分けて数えること。
         # 想定する故障：通す定理（theorem）や主張の点だけでつながる命題の概念（ベイズの定理・加法定理）を孤立に数え、要らない線を足させる。

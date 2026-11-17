@@ -406,3 +406,20 @@ def run_checks(c: Course) -> tuple[int, list[str]]:
             except Exception as ex:  # noqa: BLE001
                 err.append(f"{where}: 検算式のエラー {ex} → {e}")
     return n, err
+
+
+def term_state(t: dict) -> str:
+    """概念の状態（1か所で決める。#483 の A）：heading＝文脈の見出し（定義を持たない。① の 2）・filled＝説明あり・skeleton＝骨格・stub＝まだ。
+    進み具合・旧版の判定・Notion の用語のリンク・公開の JSON は、どれもこれを使う（別々に「定義があるか」で数えると、見出しを「まだ」と数える。#479・#482）"""
+    if t.get("heading_of"):
+        return "heading"
+    if t.get("definition"):
+        return "filled"
+    if t.get("short"):
+        return "skeleton"
+    return "stub"
+
+
+def term_written(t: dict) -> bool:
+    """書き終えた形か：説明ありか、文脈の見出し"""
+    return term_state(t) in ("filled", "heading")

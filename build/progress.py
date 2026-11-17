@@ -17,7 +17,7 @@ import re
 import sys
 
 from legacy import legacy_status
-from model import CONTENT, ROOT, load_course, load_yaml
+from model import CONTENT, ROOT, load_course, load_yaml, term_state, term_written
 from network import load_network, migration_counts
 
 
@@ -43,26 +43,26 @@ def unit_row(c, uid: str, target: dict) -> dict:
     legacy_terms = target.get("terms") or {}
     return {
         "unit": uid,
-        "concepts": (sum(1 for t in terms if c.terms.get(t, {}).get("definition") or c.terms.get(t, {}).get("heading_of")), len(terms)),   # 文脈の見出しは定義を持たないが、それで書き終えた形（#302）
+        "concepts": (sum(1 for t in terms if term_written(c.terms.get(t, {}))), len(terms)),   # 文脈の見出しは定義を持たないが、それで書き終えた形（model.term_state）
         # 骨格（#105）：定義1文か説明があり、分類がある語
-        "skeleton": (sum(1 for t in terms if (c.terms.get(t, {}).get("short") or c.terms.get(t, {}).get("definition") or c.terms.get(t, {}).get("heading_of")) and c.terms.get(t, {}).get("category")), len(terms)),
+        "skeleton": (sum(1 for t in terms if term_state(c.terms.get(t, {})) != "stub" and c.terms.get(t, {}).get("category")), len(terms)),
         "problems": (sum(1 for p in probs.values() if p.get("concepts")), len(probs)),
         "figure": "{{fig:" in s1,
         "model": model,
         "hatten": "complex_pattern" in s5 and not pred56,
         "sozo": "解釈" in s6 and bool(re.search(r"\|\s*解釈\s*\|", s6)),
-        "legacy_terms": sum(1 for t in terms if t in legacy_terms and not c.terms.get(t, {}).get("definition")),
+        "legacy_terms": sum(1 for t in terms if t in legacy_terms and not term_written(c.terms.get(t, {}))),
     }
 
 
 def own_terms(c) -> list:
     """数える語：文脈の見出し（heading_of。① の 2・#302・#475）は自分の定義・定義1文を持たないので、骨格・説明の分母に入れない"""
-    return [t for t in c.terms.values() if not t.get("heading_of")]
+    return [t for t in c.terms.values() if term_state(t) != "heading"]
 
 
 def legacy_term_count(c, target) -> int:
     """旧版の用語ページを指している用語の数（説明のある概念はネットワークを指すので数えない）。"""
-    return sum(1 for t in (target.get("terms") or {}) if not c.terms.get(t, {}).get("definition"))
+    return sum(1 for t in (target.get("terms") or {}) if not term_written(c.terms.get(t, {})))
 
 
 def mark(v) -> str:
