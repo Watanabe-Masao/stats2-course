@@ -276,7 +276,7 @@
     why: χ²＝4.96 は5.991 に届かない（p≒0.084）。同じ割合で300人なら χ²＝9.92 で棄却する。
 
 - id: Q-U27-032
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
   stage: S4
   format: written
   powers: [P1, P3]
