@@ -756,6 +756,52 @@ claims:
       version: 60d6f01
     external: 未照合
   version: 1
+- id: CLM-28c
+  label: ④-28c
+  kind: 極限
+  statement:
+    text: 行の合計 n₁, …, n_r（r≧2）をデータを取る前に決めた r 個の独立な多項の標本（列の区分は c≧2 個）で、H₀：どの行でも列の区分の確率が等しい（p₁ⱼ＝…＝p_rⱼ、j＝1, …, c）が正しいとき、どの nᵢ も→∞ で、共通の確率を列の合計の割合 n・ⱼ÷n（H₀ のもとでの最尤推定）で推定した期待度数 Eᵢⱼ＝nᵢ×n・ⱼ÷n による Σ(O−E)²/E の分布は、自由度 (r−1)(c−1) のカイ二乗分布 χ²((r−1)(c−1)) に近づく（同質性の検定。1つの集団から総数を取る ④-28b と同じ統計量・同じ自由度だが、取り方と H₀ が違う）
+  premises:
+    subjects:
+    - TERM-expected
+  conclusion:
+    subjects:
+    - TERM-test-stat
+    predicates:
+    - TERM-chi2
+  conditions:
+  - text: 各行の中の観測が独立に同じ確率で列の区分に入り、行どうしも独立
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: カイ二乗分布に近づくとは保証できない（同じ家族・同じ日にまとまって答える客を数えると、度数のばらつきが多項分布より大きくなる）
+  - text: 列の区分はデータを見る前に決め、どの区分の確率も正
+    kind: 仮定
+    outside: 近づくとは保証できない（区分をデータを見て選ぶと、ずれが大きく見える切り方を選べる。確率0の区分があると、その列の期待度数が0になる）
+  - text: H₀（どの行でも列の区分の確率が等しい）が正しい
+    kind: 仮定
+    outside: 0 を中心とした（ずれのない）カイ二乗分布に近づくとは言えない（行ごとに割合が違えば、n とともに χ² は大きくなる）
+  grounds:
+  - source:
+      title: 独立な多項の標本（積多項）での Pearson のカイ二乗統計量の極限（原典は未照合。2次資料で、取り方・H₀・期待度数 nᵢ・n・ⱼ÷n・自由度 (r−1)(c−1) と「H₀ のもとで χ² に従う」という結論まで確かめた。極限の条件はその資料に書かれていない）
+      locator: 照合した2次資料：UC Berkeley Stat 135（2026年春）Lecture 32「Chi-square Test of Homogeneity」https://stat135.berkeley.edu/spring-2026/lectures/lecture-32.html
+    external: true
+  - source:
+      title: 残差 Wᵢⱼ＝(Oᵢⱼ−nᵢpⱼ)/√(nᵢpⱼ) の行は独立に N(0, I−vv′)（v＝(√pⱼ)ⱼ）に近づき、統計量は W を行の重みの方向 u＝(√(nᵢ/n))ᵢ と v に直交する部分へ射影した長さの2乗に近づく。残る次元は (r−1)(c−1) で、極限は u によらないので、行の合計の比 nᵢ÷n の条件は要らない
+  - source:
+      title: 有限の n で列の合計 n・ⱼ＝0 となり E＝0 で統計量が定まらない事象は、列 j では確率 (1−pⱼ)^n（H₀ のもとで、n 個の観測がどれも列 j に入らない確率）で、どれかの列で起きる確率は Σⱼ(1−pⱼ)^n 以下になり0に近づくので、この事象を除いても分布の極限は変わらない（どの区分の確率も正の仮定から）
+  - claim: CLM-45
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AC
+      date: '2026-11-17'
+      version: a83d3c6
+    external: 2次資料
+  version: 1
 - id: CLM-29
   label: ④-29
   kind: 手続きの保証
