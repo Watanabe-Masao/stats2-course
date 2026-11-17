@@ -37,9 +37,12 @@ def normalize(t: str) -> str:
     t = re.sub(r'<image\s+source="([^"]+)"\s*>\s*(.*?)\s*</image>', lambda m: f"![{m.group(2)}]({m.group(1)})", t, flags=re.S)
     # 同じ色の span が続くのは、Notion がメンションの前後で区切っただけ（同じ色なら1つにつなぐ）
     t = re.sub(r'</span><span color="([^"]+)">', "", t)
+    # データベースの子：Notion は data-source-url と inline を足して返す
+    t = re.sub(r'(<database url="[^"]+")[^>]*>', r"\1>", t)
     t = re.sub(r"<br\s*/?>", "\n", t)   # 段落の中の改行：生成物は改行、Notion は <br> でつなぐ
     t = re.sub(r"[ \t\u3000]+", " ", t)
     t = re.sub(r" *\n *", "\n", t)
+    t = re.sub(r" *\| *", "|", t)   # 表の区切りの前後の空白
     t = re.sub(r"\n{2,}", "\n", t)
     return t.strip()
 
