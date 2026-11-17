@@ -219,6 +219,15 @@ class TestForPhone(unittest.TestCase):
         self.assertIn(f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n層化：x̄ₛₜ＝Σ(Nₕ/N)\n'
                       "Z \\~ N(0, 1)、P(棄却 \\| H₀)\n</callout>", out)
 
+    def test_wide_table_fits_page(self):
+        """#492：3列以上の表だけをページ幅の表にする（2列は Notion のパイプの表のまま）。セルの中の「\\|」は文字の | に戻す。
+        想定する故障：2列の表まで変える・見出しの行や最後の行を落とす・表のあとの空行を食って次の段落とくっつく。"""
+        md = "| a | b |\n| --- | --- |\n| 1 | 2 |\n\n| 記号 | 意味 | 値 |\n| --- | --- | --- |\n| N_h | 店数 | P(A \\| B) |\n| x | y | z |\n\n後"
+        out = for_phone(md)
+        self.assertIn("| a | b |\n| --- | --- |\n| 1 | 2 |", out)
+        self.assertIn('<table fit-page-width="true" header-row="true">\n<tr>\n<td>記号</td>\n<td>意味</td>\n<td>値</td>\n</tr>\n'
+                      "<tr>\n<td>Nₕ</td>\n<td>店数</td>\n<td>P(A | B)</td>\n</tr>\n<tr>\n<td>x</td>\n<td>y</td>\n<td>z</td>\n</tr>\n</table>\n\n後", out)
+
     def test_no_underscore_left(self):
         r = NotionRenderer(course(), TARGET)
         for uid in COURSE.units:

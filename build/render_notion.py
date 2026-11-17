@@ -63,9 +63,30 @@ def code_to_callout(m: re.Match) -> str:
     return f'<callout icon="{spec["icon"]}" color="{spec["color"]}">\n' + "\n".join(lines) + "\n</callout>"
 
 
+# ③ 3列以上の表は iPhone の Notion で右が切れる（表は画面の幅に縮まない）→ ページ幅に合わせる表にする（#492）
+TABLE = re.compile(r"^(\|.*\|)\n\|(?: *-+ *\|)+\n((?:\|.*\|\n?)*)", re.M)
+CELL_SPLIT = re.compile(r"(?<!\\)\|")
+
+
+def _cells(row: str) -> list[str]:
+    return [c.strip().replace("\\|", "|") for c in CELL_SPLIT.split(row.strip())[1:-1]]
+
+
+def wide_table(m: re.Match) -> str:
+    """3列以上のパイプの表 → <table fit-page-width="true">（見出しの行つき）。2列の表はそのまま。"""
+    head = _cells(m.group(1))
+    if len(head) < 3:
+        return m.group(0)
+    rows = [head] + [_cells(r) for r in m.group(2).rstrip("\n").split("\n")]
+    body = "\n".join("<tr>\n" + "\n".join(f"<td>{c}</td>" for c in r) + "\n</tr>" for r in rows)
+    tail = "\n" if m.group(2).endswith("\n") else ""
+    return f'<table fit-page-width="true" header-row="true">\n{body}\n</table>{tail}'
+
+
 def for_phone(md: str) -> str:
-    """ページ全体をスマホで読める形にする（#489）。表示の数式（$$ の行）の中は変えない。"""
+    """ページ全体をスマホで読める形にする（#489・#492）。表示の数式（$$ の行）の中は変えない。"""
     md = FENCE.sub(code_to_callout, md)
+    md = TABLE.sub(wide_table, md)
     out, in_math = [], False
     for line in md.split("\n"):
         if line.strip() == "$$":
@@ -366,4 +387,4 @@ class NotionRenderer:
         table = "| タブ | 目指すこと | できる状態 |\n| --- | --- | --- |\n" + rows
         powers = "\n".join(f"- {p['icon']} <b>{p['name']}</b>：{p['desc']}" for p in self.c.powers.values())
         src = src.replace("{{stages_table}}", table).replace("{{powers_list}}", powers)
-        return self.body(src) + "\n"
+        return for_phone(self.body(src)) + "\n"
