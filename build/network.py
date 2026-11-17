@@ -652,6 +652,26 @@ def heading_errors(c: "Course") -> list[str]:
             err.append(f"{tid}: 文脈の見出しにも forms（姿）を書く（推定するなどの端になる）")
         if not (isinstance(t.get("version"), int) and t["version"] >= 1):
             err.append(f"{tid}: 文脈の見出しには version（1以上の整数）を書く")
+        ctx = h.get("context")
+        if ctx is not None:   # 文脈ごとの構造（型 v2 の改訂7。#475）：取り方・H₀・この文脈の成立条件（③ の区分。仮定は主張つき）
+            from conditions import detail_errors
+            extra = set(ctx) - {"sampling", "null_hypothesis", "conditions"}
+            if extra:
+                err.append(f"{tid}: heading_of.context に知らない項目 {'・'.join(sorted(extra))}")
+            if not str(ctx.get("sampling") or "").strip():
+                err.append(f"{tid}: heading_of.context に取り方（sampling）を書く")
+            h0 = ctx.get("null_hypothesis") or {}
+            if not str(h0.get("text") or "").strip():
+                err.append(f"{tid}: heading_of.context に帰無仮説（null_hypothesis.text）を書く")
+            for x in h0.get("terms") or []:
+                if x not in c.terms:
+                    err.append(f"{tid}: null_hypothesis.terms の {x} が terms.yaml にない")
+            rows = ctx.get("conditions") or []
+            err += detail_errors(f"{tid}（文脈）", rows, set(c.terms), {x["name"] for x in c.shared.get("sources", [])}, True, True)
+            ids = {cl.get("id") for cl in load_claims()}
+            for row in rows:
+                if row.get("claim") and re.match(r"^CLM-", str(row["claim"])) and row["claim"] not in ids:
+                    err.append(f"{tid}: 文脈の成立条件の claim {row['claim']} が claims.yaml にない")
     return err
 
 
@@ -1457,6 +1477,13 @@ def _assemble(c: Course, target: dict) -> dict:
             h = t["heading_of"]
             e["heading_of"] = {"concept": g(h["concept"]), "correspondence": h["correspondence"],
                                "object_diff": h["object_diff"], "context_diff": h["context_diff"]}
+            if h.get("context"):   # 文脈ごとの構造（型 v2 の改訂7。#475）
+                cx = h["context"]
+                h0 = cx["null_hypothesis"]
+                e["heading_of"]["context"] = {
+                    "sampling": cx["sampling"],
+                    "null_hypothesis": {"text": h0["text"], **({"terms": [g(x) for x in h0["terms"]]} if h0.get("terms") else {})},
+                    **({"conditions": export_detail(cx["conditions"], g, {x["name"]: x.get("url") for x in c.shared.get("sources", [])})} if cx.get("conditions") else {})}
         if t.get("group"):   # 意味のまとまり（型の改訂35。docs/relation-map.md）
             e["group"] = g(t["group"])
         if base and term_icons.svg(tid):   # 語の印（build/term_icons.py が原本。公開サイトの icons/ に書く。#220）

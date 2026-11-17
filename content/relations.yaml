@@ -820,21 +820,21 @@ relations:
     from: TERM-crosstab
     to: TERM-indep-test
     type: 定める
-    description: 独立性検定は、クロス集計表の度数から行う。
+    description: クロス集計表のカイ二乗検定（独立性検定・同質性の検定）は、クロス集計表の度数から行う。
     basis:
       units:
       - U27
-    version: 2
+    version: 3
   - id: REL-h0-expected
     from: TERM-h0
     to: TERM-expected
     type: 定める
     to_form: number
-    description: 期待度数は、帰無仮説（適合度検定なら仮定した分布、独立性検定なら独立）が正しいとしたときに、各欄に入ると見込む度数。帰無仮説を決めないと求められない。
+    description: 期待度数は、帰無仮説（適合度検定なら仮定した分布、独立性検定なら独立、同質性の検定ならどの行でも列の割合が等しい）が正しいとしたときに、各欄に入ると見込む度数。帰無仮説を決めないと求められない。
     basis:
       units:
       - U27
-    version: 2
+    version: 3
   - id: REL-expect-expected
     from: TERM-expect
     to: TERM-expected
@@ -862,11 +862,11 @@ relations:
     to: TERM-indep-test
     type: 定める
     from_form: rv
-    description: 独立性検定は、観測度数と期待度数のずれから統計量を作る。
+    description: クロス集計表のカイ二乗検定は、観測度数と期待度数（行計×列計÷総数。独立性検定でも同質性の検定でも同じ）のずれから統計量を作る。
     basis:
       units:
       - U27
-    version: 2
+    version: 3
   - id: REL-ratio-point
     from: TERM-ratio
     to: TERM-point
@@ -1820,15 +1820,6 @@ relations:
     basis:
       units: [U32]
 
-  - id: REL-indep-indeptest
-    from: TERM-indep
-    to: TERM-indep-test
-    version: 1
-    type: 定める
-    description: 独立性検定の帰無仮説は「2つの変数は独立」。独立が定義に直接出る。
-    basis:
-      units: [U27]
-
   - id: REL-unbvar-pairedt
     from: TERM-unbvar
     to: TERM-paired-t
@@ -1877,9 +1868,9 @@ relations:
   - id: REL-indeptest-test
     from: TERM-indep-test
     to: TERM-test
-    version: 1
+    version: 2
     type: 一種
-    description: 独立性検定は、クロス集計表の2つの変数が独立かを調べる仮説検定。
+    description: クロス集計表のカイ二乗検定は、クロス集計表の度数で H₀（独立、またはどの行でも列の割合が等しい）を調べる仮説検定。
     basis:
       units: [U27]
 

@@ -25,7 +25,7 @@
     why: 期待度数20、ずれの2乗の和80÷20＝4。自由度3の点7.815 に届かない。同じ χ²＝4 でも、自由度1なら棄却、自由度3なら棄却しない。
 
 - id: Q-U27-002
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
   stage: S1
   label: 例題C（自力）
   format: written
@@ -63,7 +63,7 @@
     why: 期待度数は60・30・30。比率の欄に 2・1・1 と入れれば、合計が1でなくても割合として扱われる。
 
 - id: Q-U27-004
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
   stage: S1
   difficulty: 2
   format: written
@@ -82,7 +82,7 @@
     why: 期待度数は 25・40・35。カードの列はずれがなく、現金とスマホのずれだけが χ² に効く。自由度は2。
 
 - id: Q-U27-005
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, CLM-28b]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, CLM-28c]
   stage: S1
   difficulty: 3
   format: written
@@ -173,7 +173,7 @@
     why: 自由度＝4−1−1＝2 なので5.991。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
 
 - id: Q-U27-021
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
   stage: S3
   format: written
   powers: [P1, P3]
@@ -240,7 +240,7 @@
     why: 50×50÷100＝25。帯グラフの点線（全体の区切り）が50%の位置にある。
 
 - id: Q-U27-030
-  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28b]
+  concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
   stage: S4
   format: written
   powers: [P1, P3]

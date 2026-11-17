@@ -1129,6 +1129,18 @@ class TestNetwork(unittest.TestCase):
             c2 = copy.deepcopy(course())
             mutate(c2)
             self.assertTrue(any(want in x for x in network.heading_errors(c2)), want)
+        # 文脈ごとの構造（型 v2 の改訂7。#475）：同質性の検定の H₀・取り方・条件の行を書き出し、取り方・H₀ がない・条件の主張がないことを止める
+        h = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-homog-ctx")["heading_of"]
+        self.assertEqual((h["concept"], h["context"]["conditions"][0]["claim"]), ("stats2:TERM-indep-test", "CLM-28c"))
+        for mutate, want in (
+            (lambda c: c.terms["TERM-homog-ctx"]["heading_of"]["context"].pop("sampling"), "取り方（sampling）"),
+            (lambda c: c.terms["TERM-homog-ctx"]["heading_of"]["context"]["null_hypothesis"].pop("text"), "帰無仮説（null_hypothesis.text）"),
+            (lambda c: c.terms["TERM-homog-ctx"]["heading_of"]["context"]["conditions"][0].pop("claim"), "何を保証する仮定か（claim）"),
+            (lambda c: c.terms["TERM-homog-ctx"]["heading_of"]["context"]["conditions"][0].update({"claim": "CLM-99z"}), "claim CLM-99z が claims.yaml にない"),
+        ):
+            c2 = copy.deepcopy(course())
+            mutate(c2)
+            self.assertTrue(any(want in x for x in network.heading_errors(c2)), want)
         c3 = copy.deepcopy(course())
         q = next(q for u in c3.units.values() for q in u["problems"].values() if q.get("concepts"))
         q["concepts"] = list(q["concepts"]) + ["TERM-pop-mean"]
