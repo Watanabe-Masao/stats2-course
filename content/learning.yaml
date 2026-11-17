@@ -232,6 +232,35 @@ learning:
     version: 1
     reason: 確率変数は、試行の結果の1つ1つに数を1つ対応させるもので、入れた値に出力を1つ決める関数の考えで読む。基準の定義の語には入れず、前提知識とする（#441）。
     units: [U02, U13]
+  # ---- 足す：文脈の見出しは、共有する概念のあと（① の 2：見出しは定義を持たず、意味を共有する概念から読む。#302）
+  - id: LRN-expect-popmean
+    op: add
+    from: TERM-expect
+    to: TERM-pop-mean
+    version: 1
+    reason: 母平均は期待値の文脈の見出しで、自分の定義を持たず、母集団の分布の期待値として読む（① の 2）。期待値の意味を先に持つ（#302）。
+    units: [U18]
+  - id: LRN-var-popvar
+    op: add
+    from: TERM-var
+    to: TERM-pop-var
+    version: 1
+    reason: 母分散は確率変数の分散の文脈の見出しで、自分の定義を持たず、母集団の分布の分散として読む（① の 2）。分散の意味を先に持つ（#302）。
+    units: [U18]
+  - id: LRN-population-popmean
+    op: add
+    from: TERM-population
+    to: TERM-pop-mean
+    version: 1
+    reason: 母平均の対応の文は、母集団から無作為に1つ取り出した要素の値の期待値として読む（⑥ の 5 の 4：説明が実際に使う概念。#302）。
+    units: [U17, U18]
+  - id: LRN-population-popvar
+    op: add
+    from: TERM-population
+    to: TERM-pop-var
+    version: 1
+    reason: 母分散の対応の文は、母集団から無作為に1つ取り出した要素の値の分散として読む（⑥ の 5 の 4：説明が実際に使う概念。#302）。
+    units: [U17, U18]
   # ---- 足す：特別な場合の組（⑥ の 3：候補にしない。教材で向きを決めて前提知識に書く。#345）
   - id: LRN-var-cov
     op: add

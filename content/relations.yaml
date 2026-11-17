@@ -2156,6 +2156,43 @@ relations:
     basis:
       units: [U05, U13]
 
+  - id: REL-xbar-popmean
+    from: TERM-sample-mean
+    to: TERM-pop-mean   # 行き先は文脈の見出し（⑤ の 4 の推定する。① の 2）
+    version: 1
+    type: 推定する
+    properties: [CLM-20a, CLM-20b]   # 一致の根拠の大数の法則は ④ の 20b の根拠として扱い、通す定理には添えない（⑤ の 4 の推定する。check-pairs その24）
+    description: 標本平均 X̄ で、母平均 μ を推し量る。各 Xᵢ を母集団から無作為に取り出せば、各 Xᵢ の期待値が μ なので E(X̄)＝μ（④-20a）。これがどの μ でも成り立つので不偏。さらに独立に取り出し、母分散が有限なら、n を大きくすると X̄ は μ に確率収束する（④-20b。一致）。
+    conditions:
+      - text: X₁, …, Xₙ は母集団から無作為に（どの要素も同じ確率で）取り出した値（各 Xᵢ の分布が母集団の分布）
+        kind: 仮定
+        terms: [TERM-population, TERM-random-sampling]
+        claim: CLM-20a
+        outside: E(X̄) は母平均とは限らない（抽出枠のずれや、大きさに比例して選ぶなどの偏った取り方では、X̄ が近づく先も母平均でない）
+      - text: 一致には、X₁, …, Xₙ が独立（有限母集団からは戻して選ぶ）で、母分散が有限
+        kind: 仮定
+        terms: [TERM-indep]
+        claim: CLM-20b
+        outside: ④-20b による一致の保証は使えない（不偏の ④-20a は独立を使わないので、戻さずに選んでも E(X̄)＝μ）
+    basis:
+      units: [U18, U19]
+
+  - id: REL-unbvar-popvar
+    from: TERM-unbvar
+    to: TERM-pop-var   # 行き先は文脈の見出し（① の 2・6 の 2 の決まったこと）
+    version: 1
+    type: 推定する
+    properties: [CLM-11]
+    description: 不偏分散 s² で、母分散 σ² を推し量る。n≧2 で、各 Xᵢ を母集団から無作為に、独立に取り出し、母分散が有限なら、どの母数の値でも E(s²)＝σ²（④-11。不偏）。
+    conditions:
+      - text: X₁, …, Xₙ は母集団から無作為に（どの要素も同じ確率で）、独立に取り出した値（有限母集団からは戻して選ぶ）
+        kind: 仮定
+        terms: [TERM-population, TERM-random-sampling, TERM-indep]
+        claim: CLM-11
+        outside: E(s²)＝σ² とは保証できない（偏った取り方では近づく先が母分散でない。有限母集団から戻さずに選ぶと E(s²)＝Nσ²/(N−1) で大きい側にずれる）
+    basis:
+      units: [U18]
+
   - id: REL-datavar-acf
     from: TERM-data-var
     to: TERM-acf

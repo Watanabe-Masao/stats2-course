@@ -618,6 +618,43 @@ def filled(t: dict) -> bool:
     return bool(t.get("definition"))
 
 
+def heading(t: dict) -> bool:
+    """文脈の見出し（製本 ① の 2。#302）：自分の定義を持たず、heading_of で共有する概念を指す"""
+    return bool(t.get("heading_of"))
+
+
+HEADING_OWN = ("definition", "short", "basis", "basis_formula", "formulas", "conditions", "principle", "example", "counterexample",
+               "misconceptions", "workspace", "table_workspace", "labs", "figures", "claims")
+
+
+def heading_errors(c: "Course") -> list[str]:
+    """文脈の見出しの書き方（① の 2。#302）：自分の定義を持たない・共有する概念は説明のある概念（見出しでない）・対応と2つの違いの文・分類と姿。
+    意味（何を共有し、どう違うか）が正しいかは製本 ① の確かめ（人と独立な確かめ）で見る"""
+    err: list[str] = []
+    for tid, t in c.terms.items():
+        if not heading(t):
+            continue
+        h = t["heading_of"]
+        own = [k for k in HEADING_OWN if t.get(k)]
+        if own:
+            err.append(f"{tid}: 文脈の見出しは自分の定義を持たない（{'・'.join(own)} を書かない。共有する概念に書く。① の 2）")
+        for k in ("correspondence", "object_diff", "context_diff"):
+            if not str(h.get(k) or "").strip():
+                err.append(f"{tid}: heading_of に {k}（{ {'correspondence': '対応', 'object_diff': '対象の違い', 'context_diff': '文脈の違い'}[k]}）の文を書く")
+        sh = c.terms.get(h.get("concept"))
+        if sh is None:
+            err.append(f"{tid}: heading_of.concept {h.get('concept')} が terms.yaml にない")
+        elif heading(sh) or not filled(sh):
+            err.append(f"{tid}: heading_of.concept {h['concept']} は説明のある概念（見出しでない）にする（意味は共有する概念に1つだけ持つ）")
+        if not t.get("category"):
+            err.append(f"{tid}: 文脈の見出しにも category（分類）を書く")
+        if not t.get("forms"):
+            err.append(f"{tid}: 文脈の見出しにも forms（姿）を書く（推定するなどの端になる）")
+        if not (isinstance(t.get("version"), int) and t["version"] >= 1):
+            err.append(f"{tid}: 文脈の見出しには version（1以上の整数）を書く")
+    return err
+
+
 def skeleton(t: dict) -> bool:
     """骨格：定義1文（short）だけあり、説明（definition）はまだ（#105・P1）"""
     return bool(t.get("short")) and not filled(t)
@@ -659,9 +696,9 @@ def skeleton_gaps(c: Course) -> dict:
     """骨格の完了の条件（#105）で数えるもの：定義1文がない語・分類がない語・どの関係にもつながっていない語"""
     linked = linked_terms(c)
     return {
-        "no_short": [tid for tid, t in c.terms.items() if not (t.get("short") or filled(t))],
+        "no_short": [tid for tid, t in c.terms.items() if not (t.get("short") or filled(t) or heading(t))],
         "no_category": [tid for tid, t in c.terms.items() if not t.get("category")],
-        "isolated": [tid for tid, t in c.terms.items() if (t.get("short") or filled(t)) and tid not in linked],
+        "isolated": [tid for tid, t in c.terms.items() if (t.get("short") or filled(t) or heading(t)) and tid not in linked],
     }
 
 
@@ -1319,6 +1356,8 @@ def validate_network(c: Course) -> list[str]:
                     continue
                 if ref not in c.terms:
                     err.append(f"{qid}: concepts の {ref} が用語・関係・主張にない")
+                elif heading(c.terms[ref]):   # 見出しは意味を持たない（① の 2）。解くのに要る意味は共有する概念か、見出しを端にする関係で指す（#302）
+                    err.append(f"{qid}: concepts の {ref} は文脈の見出し。共有する概念（{c.terms[ref]['heading_of']['concept']}）か、見出しを端にする関係を指す")
                 elif not filled(c.terms[ref]):
                     err.append(f"{qid}: concepts の {ref} はまだ説明のない用語（概念にしてから指す）")
             if u.get("concepts_linked") and not q.get("retired") and not refs:
@@ -1326,8 +1365,8 @@ def validate_network(c: Course) -> list[str]:
     # 説明のある概念は、関係・定理の点・導出・学ぶ順の足すのどれかにつながっている（孤立させない。数え方は network_ties。#343）
     linked = linked_terms(c)
     for tid, t in c.terms.items():
-        if filled(t) and tid not in linked:
-            err.append(f"{tid}: 説明のある概念なのに、関係・主張・導出・学ぶ順の足すのどれにもつながっていない")
+        if (filled(t) or heading(t)) and tid not in linked:
+            err.append(f"{tid}: {'文脈の見出し' if heading(t) else '説明のある概念'}なのに、関係・主張・導出・学ぶ順の足すのどれにもつながっていない")
     err += experiment_errors(c, rel_ids | {x["id"] for x in load_learning()}, {d["id"] for d in ders})   # 問いのつながりは学ぶ順の足す（LRN-）も指せる（#266）
     if load_experiments():
         err += walk_texts_errors(load_walk_texts())
@@ -1337,6 +1376,7 @@ def validate_network(c: Course) -> list[str]:
     err += condition_errors(c, rels)
     err += basis_exclude_errors(c, rels)
     err += v2_source_errors(c)
+    err += heading_errors(c)
     err += dependency_errors(rels)
     # 学ぶ順（⑥。M6・#266）：候補＋足す−外すの重ねと輪を止める
     _, lerr = learning_order(rels, ders, load_learning(), set(c.terms))
@@ -1405,13 +1445,18 @@ def _assemble(c: Course, target: dict) -> dict:
     referenced = {r[k] for r in rels for k in ("from", "to")} | {p for d in ders for p in d["premises"]} | {d["conclusion"] for d in ders}
     concepts = []
     for tid, t in c.terms.items():
-        if not (filled(t) or skeleton(t) or tid in referenced):
+        if not (filled(t) or skeleton(t) or heading(t) or tid in referenced):
             continue
-        e = {"id": g(tid), "name": t["name"], "status": "filled" if filled(t) else "skeleton" if skeleton(t) else "stub", "version": t.get("version", 1),
+        status = "heading" if heading(t) else "filled" if filled(t) else "skeleton" if skeleton(t) else "stub"
+        e = {"id": g(tid), "name": t["name"], "status": status, "version": t.get("version", 1),
              "units": units_of.get(tid, []), "problems": problems_of.get(tid, [])}
         for k in ("en", "short", "category"):
             if t.get(k):
                 e[k] = t[k]
+        if heading(t):   # 文脈の見出し（型 v2 の改訂6。① の 2。#302）：共有する概念の id に教材名を付ける
+            h = t["heading_of"]
+            e["heading_of"] = {"concept": g(h["concept"]), "correspondence": h["correspondence"],
+                               "object_diff": h["object_diff"], "context_diff": h["context_diff"]}
         if t.get("group"):   # 意味のまとまり（型の改訂35。docs/relation-map.md）
             e["group"] = g(t["group"])
         if base and term_icons.svg(tid):   # 語の印（build/term_icons.py が原本。公開サイトの icons/ に書く。#220）

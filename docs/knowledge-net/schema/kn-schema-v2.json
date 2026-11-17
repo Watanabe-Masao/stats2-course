@@ -980,9 +980,10 @@
             "enum": [
               "filled",
               "skeleton",
-              "stub"
+              "stub",
+              "heading"
             ],
-            "description": "filled：説明あり。skeleton：骨格（定義1文と分類だけ。肉付けは段階ごとに）。stub：関係から指されているが、骨格もまだない概念"
+            "description": "filled：説明あり。skeleton：骨格（定義1文と分類だけ。肉付けは段階ごとに）。stub：関係から指されているが、骨格もまだない概念。heading：文脈の見出し（製本 ① の 2。自分の定義を持たず、heading_of で共有する概念を指す。型 v2 の改訂6。stats2-course #302）"
           },
           "definition": {
             "$ref": "#/$defs/text"
@@ -1542,6 +1543,7 @@
             "type": "object",
             "required": [
               "concept",
+              "correspondence",
               "object_diff",
               "context_diff"
             ],
@@ -1550,13 +1552,18 @@
               "concept": {
                 "$ref": "#/$defs/gid"
               },
+              "correspondence": {
+                "$ref": "#/$defs/text",
+                "description": "共有する概念との対応（例：母平均は、母集団の分布の期待値。μ＝E(X)）"
+              },
               "object_diff": {
                 "$ref": "#/$defs/text"
               },
               "context_diff": {
                 "$ref": "#/$defs/text"
               }
-            }
+            },
+            "description": "文脈の見出し（製本 ① の 2）：共有する概念の id・対応・対象の違い・文脈の違い。見出しは自分の定義を持たない"
           },
           "alt_definitions": {
             "type": "array",
@@ -1608,6 +1615,89 @@
                 "short",
                 "category"
               ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "heading"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "heading_of",
+                "category"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "definition"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "short"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "basis"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "basis_formula"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "formulas"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "conditions"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "conditions_detail"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "principle"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "example"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "counterexample"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "heading_of"
+              ]
+            },
+            "then": {
+              "properties": {
+                "status": {
+                  "const": "heading"
+                }
+              }
             }
           }
         ]
@@ -2455,5 +2545,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 5
+  "x-revision": 6
 }

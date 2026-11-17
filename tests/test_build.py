@@ -1104,7 +1104,35 @@ class TestNetwork(unittest.TestCase):
         err2 = network.skeleton_errors(c2)
         self.assertTrue(any("定義1文（short）か説明（definition）がない" in x for x in err2))
         g = network.skeleton_gaps(course())
-        self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short"))))
+        self.assertEqual(len(g["no_short"]), sum(1 for t in course().terms.values() if not (t.get("definition") or t.get("short") or t.get("heading_of"))))
+
+    def test_heading(self):
+        # 確かめる対象：文脈の見出し（① の 2。#302）を status heading で書き出し、型 v2 の改訂6に合うこと。見出しの書き方の止め（heading_errors）と、問題が見出しを指す止め。
+        # 想定する故障：①見出しを骨格・まだの語として書き出す（画面が点線と「定義だけ」で出す）②heading_of の共有する概念に教材名が付かず、画面が共有する概念を引けない
+        #   ③見出しに定義を書いても通る（意味が2か所になる）④共有する概念が見出し・説明のない語でも通る ⑤対応の文がなくても通る ⑥問題が意味を持たない見出しを指しても通る。
+        # 見つけ方：今の原本の母平均を書き出して状態と heading_of を見る。写しに1つずつ誤りを入れて、それぞれの止めの言葉が出ること。
+        # 既存との違い：test_skeleton は骨格の short・category。見出しは short を持たない別の状態
+        import network
+        c = course()
+        d = network.export_network(c, {"site_base_url": ""})
+        e = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-pop-mean")
+        self.assertEqual((e["status"], e["heading_of"]["concept"]), ("heading", "stats2:TERM-expect"))
+        self.assertNotIn("short", e)
+        self.assertFalse(network.schema_errors(v2(d)))
+        self.assertEqual(network.heading_errors(c), [])
+        for mutate, want in (
+            (lambda c: c.terms["TERM-pop-mean"].update({"definition": "母集団の平均"}), "自分の定義を持たない（definition"),
+            (lambda c: c.terms["TERM-pop-mean"]["heading_of"].update({"concept": "TERM-pop-var"}), "説明のある概念（見出しでない）"),
+            (lambda c: c.terms["TERM-pop-mean"]["heading_of"].pop("correspondence"), "correspondence（対応）"),
+            (lambda c: c.terms["TERM-pop-mean"].pop("category"), "category（分類）"),
+        ):
+            c2 = copy.deepcopy(course())
+            mutate(c2)
+            self.assertTrue(any(want in x for x in network.heading_errors(c2)), want)
+        c3 = copy.deepcopy(course())
+        q = next(q for u in c3.units.values() for q in u["problems"].values() if q.get("concepts"))
+        q["concepts"] = list(q["concepts"]) + ["TERM-pop-mean"]
+        self.assertTrue(any("文脈の見出し。共有する概念（TERM-expect）" in x for x in network.validate_network(c3)))
 
     def test_network_ties(self):
         # 確かめる対象：孤立の数え方（#343）が、⑤ の上のつながり（関係の端・通す定理・主張の前提と結論）と ⑥ の置き場（学ぶ順の足す）を分けて数えること。

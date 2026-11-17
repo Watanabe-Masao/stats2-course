@@ -3360,6 +3360,30 @@
     locator: 推定（点推定・推定量の性質）
   checks:
   - sum([48,52,47,55,50])/5 == 50.4 and sorted([48,52,47,55,50])[2] == 50
+- id: TERM-pop-mean
+  name: 母平均
+  en: population mean
+  category: 推定
+  forms: [number]
+  # 文脈の見出し（製本 ① の 2。#302）：自分の定義を持たず、期待値の意味を共有する。定義・式・成立条件は期待値に書く
+  heading_of:
+    concept: TERM-expect
+    correspondence: 母集団の分布の期待値（μ＝E(X)。X は母集団から無作為に〔どの要素も同じ確率で〕1つ取り出した要素の値で、その分布が母集団の分布）
+    object_diff: 期待値は確率分布（確率変数）について言う。母平均は母集団について言う
+    context_diff: 母平均は推測統計の中で、標本から知りたい、決まっているが分からない数として出る。期待値は確率の計算の中で、分布から決まる数として出る
+  version: 1
+- id: TERM-pop-var
+  name: 母分散
+  en: population variance
+  category: 推定
+  forms: [number]
+  # 文脈の見出し（製本 ① の 2・6 の 2 の決まったこと。#310・#302）：確率変数の分散の意味を共有する
+  heading_of:
+    concept: TERM-var
+    correspondence: 母集団の分布の分散（σ²＝V(X)。X は母集団から無作為に1つ取り出した要素の値。有限母集団なら全 N 個の値の、N で割ったデータの分散と同じ値）
+    object_diff: 分散（確率変数の分散）は確率分布について言う。母分散は母集団について言う
+    context_diff: 母分散は推測統計の中で、標本から知りたい、決まっているが分からない数として出る。確率変数の分散は確率の計算の中で、分布から決まる数として出る
+  version: 1
 - id: TERM-point-est
   name: 点推定
   en: point estimation

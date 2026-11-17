@@ -143,6 +143,9 @@ add("TERM-mse", C(24, 24, 15) + D(24, 24, 1.6) + D(33, 16, 2.6) + R(24, 16, 9, 8
 add("TERM-ci", P("M6 32h36") + P("M12 18v10 M12 23h24 M36 18v10", stroke_width="3") + D(24, 23, 3.2))
 add("TERM-conf-level", "".join(P(f"M{a} {y}h{b}", stroke_opacity="1" if i != 3 else ".35") for i, (a, b, y) in enumerate([(10, 22, 10), (14, 20, 17), (8, 24, 24), (26, 14, 31), (12, 22, 38)])) + P("M24 6v36", stroke_dasharray="2 2.5") + T("95%", 40, 46, 7, 600))
 add("TERM-interval-est", AX() + P(bell(24, 13, 12, 40), stroke_opacity=".4") + P("M13 30v8 M13 34h22 M35 30v8", stroke_width="3"))
+# 文脈の見出し（① の 2。#302）：的の真ん中に母集団の数の記号（推し量られる側の、決まっているが分からない数）
+add("TERM-pop-mean", C(24, 24, 18) + C(24, 24, 11) + T("μ", 24, 29, 12))
+add("TERM-pop-var", C(24, 24, 18) + C(24, 24, 11) + T("σ²", 24, 28, 10))
 
 # ── 確率分布：山と棒
 add("TERM-normal", AX() + f'<path d="{bell(24, 13, 10, 40)}" fill="currentColor" fill-opacity=".18"/>')
