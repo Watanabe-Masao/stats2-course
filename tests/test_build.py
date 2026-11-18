@@ -1791,7 +1791,7 @@ class TestProgress(unittest.TestCase):
         """確かめる対象：進み具合の「検証」（案 A。#58）が、問題が指す式のレビューの版と主張の確かめから決まること。
         想定する故障：①レビューの記録が古くなった（式が変わった）単元を検証済みと数える ②未照合の主張を指す単元を検証済みと数える
           ③retired の問題が指す概念で未にする。
-        見つけ方：今の原本で検証済みの単元を1つ取り、その問題に未照合の主張と、レビューのない式の概念を足すと未になり、理由に名前が出る。
+        見つけ方：今の原本で検証済みの単元を1つ取り、その問題に未照合の主張と、レビューのあとに記号を変えた式の概念を足すと未になり、理由に名前が出る。
         retired の問題に足しても検証済みのまま。既存との違い：上のテストは実装済みの数だけを見る。
         検出の確かめ（2026-11-19）：未照合を見ない・retired を除かない、の2つの誤りで落ちることを見た"""
         from progress import verify_rows
@@ -1806,6 +1806,9 @@ class TestProgress(unittest.TestCase):
         retired = dict(probs[q], retired=True, concepts=[unmatched])
         probs["Q-TEST-R"] = retired
         self.assertEqual(verify_rows(c)[u], [])
+        # 式のレビューのあとに式が変わった形を作る（記号の意味を変えると版がずれる。今の原本のレビューの有無によらない）
+        f0 = c.terms["TERM-normal"]["formulas"][0]
+        f0["symbols"] = [dict(x, meaning=str(x.get("meaning", "")) + "（変えた）") for x in f0.get("symbols") or []]
         probs[q] = dict(probs[q], concepts=list(probs[q].get("concepts") or []) + [unmatched, "TERM-normal"])
         gaps = verify_rows(c)[u]
         self.assertTrue(any(unmatched in g for g in gaps), gaps)
