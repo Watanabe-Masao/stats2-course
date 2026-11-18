@@ -1,0 +1,37 @@
+# 公開確認済みの記録（#58）。build/notion_compare.py --record が、読み戻しが生成物と一致したページだけを書く。手で書かない。
+# 名前: {digest: 一致した生成物の指紋, date: 照らした日}。今の生成物の指紋と同じなら、進み具合で「公開確認済み」
+U01: {digest: '2e85c17a78af10e8', date: '2026-11-19'}
+U02: {digest: '7e877fbfcb568d9e', date: '2026-11-19'}
+U03: {digest: '3d041daa51eed63e', date: '2026-11-19'}
+U04: {digest: '0736fe6928417589', date: '2026-11-19'}
+U05: {digest: '4566ad1382d1d7d1', date: '2026-11-19'}
+U05T: {digest: 'f48fccb210683bed', date: '2026-11-19'}
+U06: {digest: '5517edf87f2f6cb9', date: '2026-11-19'}
+U07: {digest: 'cb0f0e2809cd6aa6', date: '2026-11-19'}
+U08: {digest: '569d1fef5808f140', date: '2026-11-19'}
+U09: {digest: 'd858c966f7c7c6f5', date: '2026-11-19'}
+U10: {digest: 'a69d226f9a14fd51', date: '2026-11-19'}
+U11: {digest: '47afaa3515ca800a', date: '2026-11-19'}
+U12: {digest: '907cb2de45ca9828', date: '2026-11-19'}
+U13: {digest: 'ef00bb0e4d6d396a', date: '2026-11-19'}
+U14: {digest: '02ee8350b91f1bf7', date: '2026-11-19'}
+U15: {digest: '3ae9be732daa17ff', date: '2026-11-19'}
+U16: {digest: 'f6afdc367cffe510', date: '2026-11-19'}
+U17: {digest: '7d03d22bc153bd1e', date: '2026-11-19'}
+U18: {digest: 'e33c26df3cd6ef6b', date: '2026-11-19'}
+U19: {digest: '2c71612b47174a3c', date: '2026-11-19'}
+U20: {digest: 'ce84d911c79a072a', date: '2026-11-19'}
+U21: {digest: '7cf8ebb8a1d29239', date: '2026-11-19'}
+U22: {digest: 'fc612540aea36016', date: '2026-11-19'}
+U23: {digest: '23ad20de38494a00', date: '2026-11-19'}
+U24: {digest: '72e9e1d08cf4576c', date: '2026-11-19'}
+U25: {digest: 'ede7e115804eca0b', date: '2026-11-19'}
+U26: {digest: 'd50cc825f7be4b0f', date: '2026-11-19'}
+U27: {digest: '5b66edf75f60fd21', date: '2026-11-19'}
+U28: {digest: '9d8fdfa985173be5', date: '2026-11-19'}
+U29: {digest: 'bf54512c0eac044a', date: '2026-11-19'}
+U30: {digest: '4ecc36b1ede0a918', date: '2026-11-19'}
+U31: {digest: '766fea01476993b8', date: '2026-11-19'}
+U32: {digest: '57c7429b17f1f1b9', date: '2026-11-19'}
+guide: {digest: '74132791faeafdc6', date: '2026-11-19'}
+legacy: {digest: 'a580391d2ffb00fd', date: '2026-11-19'}
