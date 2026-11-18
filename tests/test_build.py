@@ -1817,3 +1817,17 @@ class TestSiteStamp(unittest.TestCase):
         for name, args in cases.items():
             with self.subTest(name):
                 self.assertTrue(stamp_errors(*args), name)
+
+
+class TestQidInText(unittest.TestCase):
+    """確かめる対象：学ぶ人が読む実験室の文に、作る側の問いの番号（「（D-01）」）が残らない（qid_in_text。#507）。
+    想定する故障：ほかの問いを番号で指した文がそのまま画面に出る（渡辺さんの iPhone の画面 2026-11-18：A-01 の考察の「（D-01）」）。
+    見つけ方：番号を含む文と含まない値（id・binom-D-01 のような問いの id）を渡して、文だけを止めることを見る。
+    既存との違い：experiment_errors のほかの止めは型と数を見て、文の中身は見ない。
+    検出の確かめ（2026-11-18）：原本に「（D-01）」を戻すと build が止まることを見た"""
+
+    def test_stops_only_parenthesized_number_in_text(self):
+        import network
+        got = network.qid_in_text({"id": "binom-D-01", "open": "D-01", "reason": {"steps": ["平均は「題」（D-01）で確かめる", "ふつうの文"]}})
+        self.assertEqual(len(got), 1)
+        self.assertIn("reason.steps[0]", got[0])
