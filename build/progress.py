@@ -11,8 +11,10 @@
   用語      単元の用語のうち、まだ旧版の用語ページを指している数（0 が完了）
   製本への移行  関係のうち v2 の種類で書いた行と、名前だけ写せる行・写せない行（未移行）の数（#259・#264）
   公開      Notion のページが今の生成物と同じと照らし済みか（publish/published.yaml の指紋と今の生成物の指紋。#58）
-状態は3つに分ける（#58）：実装済み（上の項目。原本にある）・検証済み（自動の止めと内容のレビュー。記録の置き場は ④ §9 で決める。まだ数えない）・
-  公開確認済み（公開）。
+  検証      案 A（渡辺さん 2026-11-19。#58）：単元の問題が指す概念の式のレビューが今の版にそろい（formula-reviews の指紋）、
+            指す主張（CLM-）の確かめが済んでいる（数学の確かめがあり、外部の結果が未照合でない。④ §9）。
+            build・CI の止めは main に入った時点で通っている。単元の本文・問題文の中身が正しいことは保証しない（#373 で単元ごとに読み直す）
+状態は3つに分ける（#58）：実装済み（上の項目。原本にある）・検証済み（検証）・公開確認済み（公開）。
 """
 from __future__ import annotations
 
@@ -23,6 +25,7 @@ from legacy import legacy_status
 from model import CONTENT, ROOT, load_course, load_yaml, term_state, term_written
 from network import load_network, migration_counts
 from published import confirmed, load as load_published
+import formulas
 
 
 def _text(uid: str, s: int) -> str:
@@ -101,6 +104,38 @@ def migration_line() -> str:
             f"名前だけ写せる {sum(m['named'].values())}（{part(m['named'])}）、未移行 {sum(m['left'].values())}（{part(m['left'])}）")
 
 
+def verify_rows(c) -> dict:
+    """単元 → 検証が済んでいない理由の一覧（空なら検証済み。案 A。#58）"""
+    contracts = load_yaml(formulas.CONTRACTS)
+    reviews = ((load_yaml(formulas.REVIEWS) or {}).get("reviews") or []) if formulas.REVIEWS.exists() else []
+    pend = formulas.pending(contracts, reviews, formulas.current_fingerprints(c.terms, contracts))
+    claims = {x["id"]: x for x in (load_yaml(CONTENT / "claims.yaml") or {}).get("claims") or []}
+
+    def claim_gap(cid: str):
+        v = (claims.get(cid) or {}).get("verification") or {}
+        if not v.get("math"):
+            return f"{cid} の数学の確かめがない"
+        if v.get("external") in (None, "未照合"):
+            return f"{cid} の外部の結果が未照合"
+        return None
+
+    out = {}
+    for uid in c.index:
+        refs = {r for p in c.units[uid]["problems"].values() if not p.get("retired") for r in (p.get("concepts") or [])}
+        gaps = set()
+        for r in refs:
+            if r.startswith("CLM-"):
+                g = claim_gap(r)
+                if g:
+                    gaps.add(g)
+            for f in (c.terms.get(r) or {}).get("formulas") or []:
+                fid = f.get("id") if isinstance(f, dict) else None
+                if fid and fid in pend:
+                    gaps.add(f"{fid}：{pend[fid]}")
+        out[uid] = sorted(gaps)
+    return out
+
+
 def published_marks(pages: dict | None) -> dict:
     """ページごとの公開確認済み（今の生成物と照らし済み）。生成物がないときは空"""
     if not pages:
@@ -119,6 +154,7 @@ def notion_page(c=None, target: dict | None = None, pages: dict | None = None) -
     """Notion 用（スマホ前提：表を使わず、単元ごとに1行）。pages を渡すと、単元のページが公開確認済みかも出す（#58）"""
     c = c or load_course()
     pub = published_marks(pages)
+    ver = verify_rows(c)
     target = target if target is not None else (load_yaml(ROOT / "publish" / "notion.yaml") or {})
     rows = {uid: unit_row(c, uid, target) for uid in c.index}
     probs = [p for u in c.units.values() for p in u["problems"].values()]
@@ -133,6 +169,7 @@ def notion_page(c=None, target: dict | None = None, pages: dict | None = None) -
              f"・創造 {sum(r['sozo'] for r in rows.values())}/{len(rows)} 単元",
              f"- {migration_line()}",
              "- 旧版：", *[f"  - {_legacy_short(x)}" for x in legacy_status({})[1]],
+             f"- 検証済み（問題が指す式のレビューと主張の確かめが今の版。本文・問題文の中身の読み直しは含まない）：{sum(not v for v in ver.values())}/{len(c.index)} 単元",
              *([f"- 公開確認済み（Notion を読み戻して今の生成物と照らし済み）：{sum(pub.get(u, False) for u in c.index)}/{len(c.index)} 単元"] if pub else []), ""]
     for w, units in WAVES:
         lines += [f"## {w}", ""]
@@ -141,9 +178,9 @@ def notion_page(c=None, target: dict | None = None, pages: dict | None = None) -
             m = lambda v: mark(v).replace("・", "未")  # noqa: E731（区切りの「・」と見分けるため）
             lines.append(f"- {uid}：骨格 {m(r['skeleton'])}／概念 {m(r['concepts'])}／問題 {m(r['problems'])}／概念図 {m(r['figure'])}"
                          f"／手本 {m(r['model'])}／発展 {m(r['hatten'])}／創造 {m(r['sozo'])}／用語 {m(r['legacy_terms'])}"
-                         + (f"／公開 {m(pub.get(uid, False))}" if pub else ""))
+                         + f"／検証 {m(not ver[uid])}" + (f"／公開 {m(pub.get(uid, False))}" if pub else ""))
         lines.append("")
-    lines.append('<span color="gray">✓＝済み　未＝まだ　数字＝済み/全体（用語は旧版を指している残りの数。公開は、Notion のページを読み戻して今の生成物と照らし済み）</span>')
+    lines.append('<span color="gray">✓＝済み　未＝まだ　数字＝済み/全体（用語は旧版を指している残りの数。検証は、問題が指す式のレビューと主張の確かめが今の版。公開は、Notion のページを読み戻して今の生成物と照らし済み）</span>')
     return "\n".join(lines) + "\n"
 
 
@@ -152,14 +189,15 @@ def report() -> str:
     target = load_yaml(ROOT / "publish" / "notion.yaml") or {}
     rows = [unit_row(c, uid, target) for uid in c.index]
     pub = published_marks(generated_pages())
+    ver = verify_rows(c)
     lines = ["# 進み具合（原本から自動で数えた値）", "",
              "✓＝済み　・＝まだ　数字＝済み/全体（用語は旧版を指している残りの数）", "",
-             "| 単元 | 骨格 | 概念 | 問題→概念 | 概念図 | 手本 | 発展 | 創造 | 用語 | 公開 |",
-             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+             "| 単元 | 骨格 | 概念 | 問題→概念 | 概念図 | 手本 | 発展 | 創造 | 用語 | 検証 | 公開 |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for r in rows:
         lines.append(f"| {r['unit']} | {mark(r['skeleton'])} | {mark(r['concepts'])} | {mark(r['problems'])} | {mark(r['figure'])} | "
                      f"{mark(r['model'])} | {mark(r['hatten'])} | {mark(r['sozo'])} | {mark(r['legacy_terms'])} | "
-                     f"{mark(pub.get(r['unit'])) if pub else '—'} |")
+                     f"{mark(not ver[r['unit']])} | {mark(pub.get(r['unit'])) if pub else '—'} |")
     n = len(rows)
     filled = sum(1 for t in own_terms(c) if t.get("definition"))
     probs = [p for u in c.units.values() for p in u["problems"].values()]
@@ -174,7 +212,8 @@ def report() -> str:
               "- 6 旧版：", *[f"  {x.strip()}" for x in legacy_status({})[1]],
               f"- 公開確認済み（Notion を読み戻して今の生成物と照らし済み。#58）：{sum(1 for v in pub.values() if v)}/{len(pub)} ページ"
               if pub else "- 公開確認済み：生成物がない（build のあとに走らせる）",
-              "- 検証済み（自動の止めと内容のレビュー）：記録の置き場を ④ §9 で決めてから数える（#58）",
+              f"- 検証済み（案 A。#58）：{sum(not v for v in ver.values())}/{len(ver)} 単元。済んでいない理由：",
+              *[f"  - {u}：{'・'.join(g)}" for u, g in ver.items() if g],
               "- 2 孤立した概念がないこと・7 個人の記録は、build と #54 で確かめる"]
     return "\n".join(lines) + "\n"
 
