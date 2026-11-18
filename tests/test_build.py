@@ -1787,6 +1787,30 @@ class TestProgress(unittest.TestCase):
         self.assertNotIn("| ", md)   # スマホ前提：表を使わない
         self.assertIn("U32：", md)
 
+    def test_verified_follows_reviews_and_claims(self):
+        """確かめる対象：進み具合の「検証」（案 A。#58）が、問題が指す式のレビューの版と主張の確かめから決まること。
+        想定する故障：①レビューの記録が古くなった（式が変わった）単元を検証済みと数える ②未照合の主張を指す単元を検証済みと数える
+          ③retired の問題が指す概念で未にする。
+        見つけ方：今の原本で検証済みの単元を1つ取り、その問題に未照合の主張と、レビューのない式の概念を足すと未になり、理由に名前が出る。
+        retired の問題に足しても検証済みのまま。既存との違い：上のテストは実装済みの数だけを見る。
+        検出の確かめ（2026-11-19）：未照合を見ない・retired を除かない、の2つの誤りで落ちることを見た"""
+        from progress import verify_rows
+        c = course()
+        ok = [u for u, g in verify_rows(c).items() if not g]
+        self.assertTrue(ok)
+        u = ok[0]
+        probs = c.units[u]["problems"]
+        q = next(iter(probs))
+        from model import CONTENT
+        unmatched = next(x["id"] for x in (load_yaml(CONTENT / "claims.yaml") or {})["claims"] if (x.get("verification") or {}).get("external") == "未照合")
+        retired = dict(probs[q], retired=True, concepts=[unmatched])
+        probs["Q-TEST-R"] = retired
+        self.assertEqual(verify_rows(c)[u], [])
+        probs[q] = dict(probs[q], concepts=list(probs[q].get("concepts") or []) + [unmatched, "TERM-normal"])
+        gaps = verify_rows(c)[u]
+        self.assertTrue(any(unmatched in g for g in gaps), gaps)
+        self.assertTrue(any(g.startswith("F-normal-pdf") for g in gaps), gaps)
+
 
 class TestVersions(unittest.TestCase):
     def test_version_required(self):
