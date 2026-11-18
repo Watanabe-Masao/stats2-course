@@ -82,7 +82,7 @@ def main(argv: list[str]) -> int:
     if r.t.get("home_page"):
         pages["home"] = r.home_page()
     if r.t.get("progress_page"):
-        pages["progress"] = progress_page(course, r.t)
+        pages["progress"] = progress_page(course, r.t, pages)   # 単元のページの公開確認済み（#58）
     if r.t.get("legacy_page"):
         pages["legacy"] = r.legacy_page(legacy_report(pages))
     lint = [e for name, md in pages.items() for e in lint_page(name, md, assets)]
