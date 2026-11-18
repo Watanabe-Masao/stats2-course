@@ -78,7 +78,7 @@ items:
       readback: {state: 確認済み, evidence: "概念は公開サイト（net の JSON）で出す。公開サイトを #502 の main から更新し（2026-11-18、deploy_site.sh の確認が通った）、Notion の単元・ガイドは読み戻して生成物と一致"}
       function: {state: 確認済み, evidence: "引く・読む：公開サイトのライブラリ・検索・概念のページ（定義・式・条件・例・反例・誤解）。導入状態の記録：114行すべて未導入で、記録は個人用の学習記録（#54）へ"}
       backup: {state: 確認済み, evidence: "publish/legacy-backup/LEG-term-db/（DB の型・114行の属性。各行のページ本文は空であることを確かめた。2026-11-18）"}
-      deps: {state: 未確認, note: "DB とデータソースの ID をコード・CI・3つのリポジトリで検索して処理からの参照0（2026-11-18）。残り：Notion の DB の自動化（⚡）と接続を渡辺さんが画面で確かめる"}
+      deps: {state: 確認済み, evidence: "DB とデータソースの ID をコード・CI・3つのリポジトリで検索して処理からの参照0（2026-11-18）。Notion の DB の自動化なし（オートメーションの画面が空）・接続なし（渡辺さんが Notion の画面で確認、2026-11-18）"}
   - id: LEG-reference
     name: 公式・用語リファレンス
     notion: [{id: 405b7cd539a1818f9198f683d487c86d, type: page, title: 公式・用語リファレンス}]
