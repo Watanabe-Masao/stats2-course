@@ -89,3 +89,41 @@ class TestNotionCompare(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPublishedRecord(unittest.TestCase):
+    """確かめる対象：公開確認済みの記録（#58。notion_compare --record と published.confirmed）。
+    想定する故障：①照らして食い違ったページまで公開確認済みと書く ②生成物が変わったあとも記録が古いまま「公開確認済み」と数える
+      ③1つのページを記録すると、ほかのページの記録を消す。
+    見つけ方：一時の場所に生成物と読み戻しを置き、一致する1ページと食い違う1ページを --record で照らして、記録に一致したほうだけが入り、
+      生成物を1字変えると confirmed が偽になり、別のページを記録しても前の記録が残ることを見る。
+    既存との違い：上のテストは照合の正規化だけを見て、記録は見ない。
+    検出の確かめ（2026-11-19）：record を食い違ったページにも呼ぶ・confirmed で指紋を比べない、の2つの誤りを入れて落ちることを見た"""
+
+    def test_record_only_matches_and_detect_change(self):
+        import tempfile
+
+        import published
+
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            out, back, rec = d / "out", d / "back", d / "published.yaml"
+            out.mkdir(), back.mkdir()
+            (out / "A.md").write_text(GEN, encoding="utf-8")
+            (back / "A.md").write_text(GEN, encoding="utf-8")
+            (out / "B.md").write_text(GEN, encoding="utf-8")
+            (back / "B.md").write_text(GEN.replace("① 正しい。", "① 誤り。"), encoding="utf-8")
+            old_out, old_rec = nc.OUT, published.RECORD
+            try:
+                nc.OUT, published.RECORD = out, rec
+                self.assertEqual(nc.main(["x", str(back), "A", "B", "--record"]), 1)
+                r = published.load()
+                self.assertEqual(set(r), {"A"})
+                self.assertTrue(published.confirmed("A", GEN))
+                self.assertFalse(published.confirmed("A", GEN + "x"))
+                self.assertFalse(published.confirmed("B", GEN))
+                (back / "B.md").write_text(GEN, encoding="utf-8")
+                nc.main(["x", str(back), "B", "--record"])
+                self.assertEqual(set(published.load()), {"A", "B"})
+            finally:
+                nc.OUT, published.RECORD = old_out, old_rec

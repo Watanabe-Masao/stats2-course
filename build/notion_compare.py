@@ -4,7 +4,8 @@
   図の ID・ページへの参照（メンション）・見出しの並び・数（タブ・開く段・囲み・表の行・埋め込み・画像）も照らす。
 許す違い：Notion が書き方を自動で直したもの（メンションの書き方、`\\_` などのエスケープ、空白・改行の数、メンションに Notion が付ける題）。
   指す先が同じなら同じとみる。
-使い方：python3 build/notion_compare.py <読み戻した本文のフォルダ> NAME ...（NAME は out/notion の名前。U01・progress など）
+使い方：python3 build/notion_compare.py <読み戻した本文のフォルダ> NAME ... [--record]（NAME は out/notion の名前。U01・progress など）
+  --record：一致したページの生成物の指紋と今日の日付を publish/published.yaml に書く（公開確認済み。#58）
   どれかが食い違えば終了コード 1（警告として使う。止めるか知らせるかの基準（CLAUDE.md）で、Notion の照合は公開の手順の中で知らせる）。
 読み戻しは Notion の fetch の <content> の中身をそのまま NAME.md に保存したもの（CI からは Notion の鍵を使えないので、公開の手順の中で行う）。
 """
@@ -94,7 +95,9 @@ def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 2
-    folder, names, bad = Path(argv[1]), argv[2:], 0
+    rec = "--record" in argv
+    argv = [a for a in argv if a != "--record"]
+    folder, names, bad, ok = Path(argv[1]), argv[2:], 0, {}
     for n in names:
         g, f = OUT / f"{n}.md", folder / f"{n}.md"
         if not f.exists():
@@ -109,6 +112,14 @@ def main(argv: list[str]) -> int:
                 print(f"   {d}")
         else:
             print(f"✅ {n}：一致（本文・ID・参照・構造）")
+            ok[n] = g.read_text(encoding="utf-8")
+    if rec and ok:
+        import datetime
+
+        from published import record
+
+        record(ok, datetime.date.today().isoformat())
+        print(f"📝 公開確認済みを記録した：{'・'.join(ok)}（publish/published.yaml）")
     return 1 if bad else 0
 
 
