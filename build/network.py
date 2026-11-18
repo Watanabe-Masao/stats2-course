@@ -611,7 +611,26 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
         for bad in ("answer", "expect"):
             if bad in x or bad in (x.get("predict") or {}):
                 err.append(f"{eid}: 予想の答え（{bad}）は書かない（公開の JSON に出てしまう。画面がモデルから求める）")
+        err += [f"{eid}: {w}" for w in qid_in_text(x)]
     return err
+
+
+QID_NOTE = re.compile(r"[（(]([A-F]-\d{2})[）)]")
+
+
+def qid_in_text(o, path: str = "") -> list[str]:
+    """学ぶ人が読む文に、作る側の問いの番号（「（D-01）」）を書かない（画面の原則 14。stats2-course #507。2026-11-18）。
+    ほかの問いを指すときは題（「成功回数の期待値はどこにある？」）だけで書く。id・open などの値は文ではないので見ない"""
+    out: list[str] = []
+    if isinstance(o, dict):
+        for k, v in o.items():
+            out += qid_in_text(v, f"{path}.{k}" if path else str(k))
+    elif isinstance(o, list):
+        for i, v in enumerate(o):
+            out += qid_in_text(v, f"{path}[{i}]")
+    elif isinstance(o, str) and (m := QID_NOTE.search(o)):
+        out.append(f"{path} の文に問いの番号「{m.group(0)}」がある。学ぶ人には題だけで指す（画面の原則 14）")
+    return out
 
 
 def filled(t: dict) -> bool:
