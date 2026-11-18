@@ -155,6 +155,13 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-13'
   fingerprint: d894ece0486472fa
+- formula: F-binom-pmf
+  points:
+  - モデルの仮定（独立・同じ p）と反例の実験の言い分
+  judgement: "実験室 EXP-binom-p の文から、作る側の問いの番号を外したことによるやり直し（#507・PR #508。画面の原則 14）。前回の記録（2026-11-13、d894ece0486472fa）からの差分だけを確かめた。git diff 4070278^1 4070278 で content/terms.yaml・formula-contracts.yaml・derivations.yaml・build/formulas.py に差はなく、変わったのは content/experiments.yaml の2行だけで、どちらも末尾の「（D-01）」「（E-04）」を消しただけ（ほかの字は同じ）。experiments.yaml だけを 4070278^1 の版に戻して版を計算し直すと d894ece0486472fa にちょうど戻り、reason の steps の行（「（D-01）」）だけを戻しても版は変わらないので、版に入る差は反例 fatigue の text の「（E-04）」だけ。fatigue の言い分（各回は独立のまま確率だけが回ごとに違う・分散 Σpᵢ(1−pᵢ)＝np(1−p)−Σ(pᵢ−p)² で二項分布より狭い・その条件と見えにくさの注意・共通のずれのときは E-04 で確かめる）は一字も変わらず、breaks・mechanism・effect・concept・name も前回と同じ。指す題「その日の調子が1セット全部に効くと、山の広がりは？」は binom-E-04 の title と、reason の「成功回数の期待値はどこにある？」は binom-D-01 の title と一字一句同じで（grep で各1か所）、どちらも同じ実験室の retired でない問いなので、番号がなくても入口の題からたどれる。番号は学ぶ人には意味のない作る側の印で、外して言い分が変わる所・誤って読める所はない"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-19'
+  fingerprint: d3ddeba7b508d433
 - formula: F-expect-def
   points:
   - 無限の台で和が収束する前提
