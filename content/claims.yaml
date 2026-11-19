@@ -220,6 +220,9 @@ claims:
     predicates:
     - TERM-std-normal
   grounds:
+  - claim: CLM-20b
+  - source:
+      title: t(k) の定義で T_k＝Z/√(V_k/k)（Z と V_k は独立、V_k は χ²(k)）と書き、V_k を独立な Zᵢ²（V(Zᵢ²)＝2 は有限）の和として表すと、④-20b で V_k/k→1（確率）
   - source:
       title: スルツキーの定理
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
@@ -1410,11 +1413,17 @@ claims:
   - claim: CLM-20b
   - source:
       title: 各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は ④-20b（Xᵢ と Xᵢ² に当てる）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
-      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf 。2群の重み wₙ（収束しなくてよい）を合わせる所は、特性関数の一様収束を使わず部分列で扱う：どの部分列にも wₙ→w となる部分列があり、そこでは定数 sₙ＝wₙt→s＝wt について sₙAₙ→sA（分布。Slutsky、Stanford Stats 300b Lecture 1 p.5）なので、E e^{isₙAₙ}→E e^{isA}（分布収束の定義：有界で連続な関数の期待値の収束。同 Lecture 14 p.14-1 の前の議論）。2群の独立で特性関数は積になり、極限 e^{−t²/2} は部分列によらないので、Lévy の連続性定理で全体の列も N(0, 1) に近づく
+      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
+  - source:
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
   - source:
       title: スルツキーの定理
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
+    external: true
+  - source:
+      title: s₁², s₂² の一致で ④-20b を Xᵢ² に当てるには V(Xᵢ²)＜∞（E Xᵢ⁴＜∞）が要る。仮定（0＜σ²＜∞）だけで言うには Khinchin の大数の法則（平均が有限なら標本平均は確率収束する）に頼る
+      locator: 2次資料で照らしていない（#271 の独立な確かめ 2026-11-19）
     external: true
   teaching:
     conclusion: true
@@ -1425,7 +1434,7 @@ claims:
       by: AA
       date: '2026-11-16'
       version: 80da9de
-    external: 2次資料
+    external: 未照合
   version: 1
 - id: CLM-45
   label: ④-45
@@ -1458,8 +1467,10 @@ claims:
   - claim: CLM-20b
   - source:
       title: H₀ のもとで、各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(p̂₁−p̂₂)/√(p(1−p)(1/n₁＋1/n₂)) は N(0, 1) に近づく（2群の重みが収束しなくてよいので、n₁/n₂ の比の条件は要らない）。p̄ は ④-20b で p に確率収束し、p̄(1−p̄)/(p(1−p)) は連続写像で1に確率収束する
-      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf 。2群の重み wₙ（収束しなくてよい）を合わせる所は、特性関数の一様収束を使わず部分列で扱う：どの部分列にも wₙ→w となる部分列があり、そこでは定数 sₙ＝wₙt→s＝wt について sₙAₙ→sA（分布。Slutsky、Stanford Stats 300b Lecture 1 p.5）なので、E e^{isₙAₙ}→E e^{isA}（分布収束の定義：有界で連続な関数の期待値の収束。同 Lecture 14 p.14-1 の前の議論）。2群の独立で特性関数は積になり、極限 e^{−t²/2} は部分列によらないので、Lévy の連続性定理で全体の列も N(0, 1) に近づく
+      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
+  - source:
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
   - source:
       title: スルツキーの定理（p̄＝0 か 1 で z が定まらない事象の確率は0に近づくので、結論は変わらない）
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
