@@ -594,7 +594,6 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                 cd = (c.terms.get(ref) or {}).get("conditions") or {}
                 return cd.get("math", []) if isinstance(cd, dict) else []   # 形の違う条件は、その概念の検査が別に止める
             # 主張の仮定の行も数える（製本 ⑦「反例が指す主張は ④」。分布の生まれ方の仮定は概念から主張の条件へ移す。#291）。
-            # 主張は、結論の主語か述語につなぐ概念を持つものだけ（その概念について言う主張）
             # 主張は、結論の述語につなぐ概念を持つもの（その概念に従う・なると言う主張）だけ。retired は外す
             def claim_conds(ref: str) -> list:
                 return [r.get("text", "") if isinstance(r, dict) else str(r)

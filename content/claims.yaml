@@ -18,9 +18,7 @@ claims:
     outside: 回数が結果で変わる（成功するまで続ける など）と、成功回数は二項分布に従うとは言えない（偶然に一致することはある）
   - text: 各 Xᵢ は 0 か 1（結果が成功・失敗の2つ）で、P(Xᵢ＝1)＝p がどの i でも同じ（各回の成功確率 p が同じ）
     kind: 仮定
-    terms:
-    - TERM-bernoulli
-    outside: 回ごとに成功確率が違うと、成功回数は二項分布に従うとは言えない（各回が独立のままなら、二項分布にはならない。独立でもないときは偶然に一致することがある）
+    outside: 回ごとに成功確率が違うと、成功回数は二項分布に従うとは言えない（各回が独立のままなら、B(n, p) の形にはならない。独立でもないときは偶然に一致することがある）
   - text: X₁, …, Xₙ が独立（各回が独立）
     kind: 仮定
     terms:
@@ -35,6 +33,14 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: AI
+      date: '2026-11-20'
+      version: 726d408
+    - method: 独立な確かめ
+      by: AI2
+      date: '2026-11-20'
+      version: fa0a89a
     external: なし
   version: 2
 - id: CLM-2
@@ -1539,8 +1545,6 @@ claims:
   conditions:
   - text: 各回は成功か失敗で、成功確率 p がどの回でも同じ（成功確率 p が毎回同じ）
     kind: 仮定
-    terms:
-    - TERM-bernoulli
     outside: 回を重ねるほど成功しやすくなる（慣れ）・しにくくなる場面では、試行回数は幾何分布に従うとは言えない（偶然に一致することはある）
   - text: X₁, X₂, … が独立（各回が独立）
     kind: 仮定
@@ -1554,7 +1558,15 @@ claims:
     conclusion: true
     proof: 扱う
   verification:
-    math: []
+    math:
+    - method: 独立な確かめ
+      by: AI
+      date: '2026-11-20'
+      version: 726d408
+    - method: 独立な確かめ
+      by: AI2
+      date: '2026-11-20'
+      version: fa0a89a
     external: なし
   version: 1
 - id: CLM-47
@@ -1571,8 +1583,6 @@ claims:
   conditions:
   - text: 各回は成功か失敗で、成功確率 p がどの回でも同じ（成功確率 p が毎回同じ）
     kind: 仮定
-    terms:
-    - TERM-bernoulli
     outside: 回ごとに成功確率が変わると、試行回数は負の二項分布に従うとは言えない（偶然に一致することはある）
   - text: X₁, X₂, … が独立（各回が独立）
     kind: 仮定
@@ -1586,7 +1596,15 @@ claims:
     conclusion: true
     proof: 扱う
   verification:
-    math: []
+    math:
+    - method: 独立な確かめ
+      by: AI
+      date: '2026-11-20'
+      version: 726d408
+    - method: 独立な確かめ
+      by: AI2
+      date: '2026-11-20'
+      version: fa0a89a
     external: なし
   version: 1
 - id: CLM-48
@@ -1611,6 +1629,10 @@ claims:
     conclusion: true
     proof: 扱う
   verification:
-    math: []
+    math:
+    - method: 独立な確かめ
+      by: AI2
+      date: '2026-11-20'
+      version: fa0a89a
     external: なし
   version: 1
