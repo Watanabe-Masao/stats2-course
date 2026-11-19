@@ -1139,7 +1139,7 @@
       of: X
       domain: {min: 0}   # σ＝√V(X) は0になりうる（0で割る式の側〔F-std-def〕が σ＞0 を持つ）
     - symbol: V( )
-      meaning: 分散（ずれの2乗の期待値）
+      meaning: 分散（ずれの2乗の期待値。単位は元の単位の2乗）
       key: V
       concept: TERM-var
     - symbol: X
@@ -1409,6 +1409,7 @@
       concept: TERM-pdf
     - symbol: x
       meaning: 値
+      range: 実数全体
       key: x
       kind: value
     - symbol: X
@@ -1790,7 +1791,7 @@
     tree: {"op": "eq", "args": [{"op": "fn", "args": [{"sym": "AB"}], "name": "P"}, {"op": "mul", "args": [{"op": "fn", "args": [{"sym": "A"}], "name": "P"}, {"op": "fn", "args": [{"sym": "B"}], "name": "P"}]}]}
   conditions:
     math:
-    - text: A・B は、同じ標本空間の上の同じ確率 P で確率が決まった2つの事象（確率変数 X・Y の独立は、値の事象 {X∈A}・{Y∈B} のどの組も独立なこと）
+    - text: A・B は、同じ標本空間の上の同じ確率 P で確率が決まった2つの事象（確率変数 X・Y の独立は、値の集合 C・D でつくる事象 {X∈C}・{Y∈D} のどの組も独立なこと）
       kind: 要件
       outside: この定義の独立として扱えない
     data:
@@ -2336,7 +2337,7 @@
     - symbol: P( )
       meaning: 確率
       key: P
-      concept: TERM-dist
+      concept: TERM-prob
     - symbol: X
       meaning: 確率変数
       key: X
@@ -2705,16 +2706,17 @@
       key: f
       concept: TERM-pdf
     - symbol: λ
-      meaning: 単位時間あたりに起きる平均の回数
+      meaning: 単位時間あたりに起きる平均の回数（x と同じ時間の単位で数える。4/時なら x は時間、分で測るなら λ＝1/15 /分）
       range: 0より大きい
       key: lambda
       kind: param
       domain: {min: 0, minOpen: true}
     - symbol: x
-      meaning: 待ち時間
+      meaning: 待ち時間（負の値では密度は0）
       range: 0以上
       key: x
       kind: value
+      domain: {min: 0}
     - symbol: e
       meaning: 自然対数の底（約2.718）
       key: e
