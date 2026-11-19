@@ -375,7 +375,7 @@ learning:
     from: TERM-poisson
     to: TERM-expo
     version: 1
-    reason: 指数分布の説明が「ポアソン分布で数える出来事の間隔」を使うので、ポアソン分布を先に学ぶ。
+    reason: 指数分布の説明が「ポアソン過程の出来事の間隔」を使うので、ポアソン分布を先に学ぶ。
   - id: LRN-binom-normal
     op: add
     from: TERM-binom

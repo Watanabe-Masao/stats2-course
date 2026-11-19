@@ -815,6 +815,37 @@ class TestNetwork(unittest.TestCase):
         self.assertIsNone(kinds_check(data, {"定める", "移る"}))
         self.assertIsNone(kinds_check({"relations": [{"legacy_type": "前提"}]}, set()))
 
+    def test_generation_claim_in_basis_review_refs(self):
+        # 確かめる対象：分布の生まれ方の主張（種類「従う」・結論の主語なし・述語がその分布）が、その分布の基準の式の契約の review_refs に入っていること（#291）。
+        # 想定する故障：生まれ方の仮定を主張の条件へ移したあと、新しい主張を足しても・既にある主張を契約に書き忘れても、基準の式の版に入らず、
+        # 主張を直しても古いレビューで公開される（2026-11-20 の外部のレビュー「参照する主張の追加・削除・変更でも無効化されるか」）。
+        # 見つけ方：F-geom-pmf の契約から CLM-46 を外すと、prepare がその名前で止める。極限・重なりの主張（CLM-3・4・27）は求めない。
+        # 既存との違い：test_review_version_and_publish_gate は、契約に書いた主張の文が版に入ること。ここは、書くべき主張が契約から漏れないこと。
+        # 検出の確かめ（2026-11-20）：formulas.prepare のこの検査を外すと落ちることを見た
+        import formulas as fm
+        c = course()
+        from model import load_yaml
+        k = load_yaml(fm.CONTRACTS)
+        self.assertEqual([e for e in fm.prepare(copy.deepcopy(c.terms), k) if "生まれ方の主張" in e], [])
+        next(x for x in k["contracts"] if x["formula"] == "F-geom-pmf")["review_refs"] = []
+        err = [e for e in fm.prepare(copy.deepcopy(c.terms), k) if "生まれ方の主張" in e]
+        self.assertEqual(len(err), 1, err)
+        self.assertIn("CLM-46", err[0])
+        # 主張を外す（retired）と、契約が指したままなら止まる。想定する故障：retired にしても版が変わらず、古いレビューで公開される
+        k2 = load_yaml(fm.CONTRACTS)
+        real = fm.evidence
+        def retired():
+            ev = copy.deepcopy(real())
+            ev["CLM-46"]["retired"] = True
+            return ev
+        fm.evidence = retired
+        try:
+            err2 = [e for e in fm.prepare(copy.deepcopy(c.terms), k2) if "retired" in e]
+        finally:
+            fm.evidence = real
+        self.assertEqual(len(err2), 1, err2)
+        self.assertIn("F-geom-pmf", err2[0])
+
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
         # 想定する故障：レビューのあとに記号の of・domain や概念の条件を変えても、古い記録で「レビュー済み」のまま公開される／

@@ -88,10 +88,28 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
                     err.append(f"契約 {fid}：conditions は text と tree（比べる式の木）で書く")
             if set(k.get("review_excludes") or []) - REVIEW_EXCLUDABLE:
                 err.append(f"契約 {fid}：review_excludes に書けるのは parts・why だけ")
+            ev = evidence()
             for r in k.get("review_refs") or []:
-                if r not in evidence():
+                if r not in ev:
                     err.append(f"契約 {fid}：review_refs の {r} が導出・実験室・主張にない")
+                elif ev[r].get("retired"):
+                    err.append(f"契約 {fid}：review_refs の {r} は外した主張（retired）。外したなら契約からも外し、レビューをやり直す")
             checks[fid] = [c["tree"] for c in k.get("conditions") or [] if isinstance(c, dict) and isinstance(c.get("tree"), dict)]
+        # 分布の生まれ方の主張（種類「従う」で、結論の主語がなく述語がその分布）は、分布の基準の式（basis_formula）の契約の review_refs に入れる。
+        # 範囲の注：F 分布などに basis_formula を足すと、変換の主張（CLM-9 の T²～F など、同じ形のもの）も求められる。そのとき範囲を見直す
+        # 想定する故障：生まれ方の仮定を主張の条件へ移したあと（#291）、主張を足す・直す・外しても、基準の式の古いレビューのまま公開される（2026-11-20 の外部のレビュー）
+        ks_by = {k.get("formula"): k for k in contracts.get("contracts") or []}
+        claims_now = evidence_claims()
+        for tid_, t in terms.items():
+            bf = t.get("basis_formula")
+            if not bf or bf not in ks_by:
+                continue
+            for cl in claims_now:
+                con = cl.get("conclusion") or {}
+                if cl.get("retired") or cl.get("kind") != "従う" or con.get("subjects") or tid_ not in (con.get("predicates") or []):
+                    continue
+                if cl["id"] not in (ks_by[bf].get("review_refs") or []):
+                    err.append(f"契約 {bf}：分布の生まれ方の主張 {cl['id']} を review_refs に入れる（{tid_} の基準の式。#291）")
         missing = sorted(set(by_id) - seen)
         if missing:
             err.append(f"契約がない式（未分類）：{'・'.join(missing)}（content/formula-contracts.yaml に書く。#118 C6）")
@@ -127,6 +145,13 @@ REVIEWS = ROOT / "content" / "formula-reviews.yaml"
 REFERENCE = ROOT / "docs" / "formula-correctness" / "reference.json"
 
 
+def evidence_claims() -> list:
+    """主張の原本（content/claims.yaml）。分布の生まれ方の主張を基準の式の契約に結ぶ検査で使う（#291）"""
+    from model import load_yaml   # build の中から呼ぶ（循環を避けて関数の中で読む）
+    cl = ROOT / "content" / "claims.yaml"
+    return ((load_yaml(cl) or {}).get("claims") or []) if cl.exists() else []
+
+
 def evidence() -> dict:
     """レビューの観点の根拠になる原本（契約の review_refs で指す）：導出 DER-… と、実験室 EXP-… の反例（counterexamples・contrasts）と、
     主張 CLM-… の本文と条件の行（式のモデルの仮定が主張の側にあるとき。#291：分布の生まれ方の仮定を概念から主張へ移した）"""
@@ -140,7 +165,8 @@ def evidence() -> dict:
         out[x["id"]] = {"counterexamples": x.get("counterexamples") or [], "contrasts": x.get("contrasts") or []}
     cl = ROOT / "content" / "claims.yaml"
     for c in ((load_yaml(cl) or {}).get("claims") or []) if cl.exists() else []:
-        out[c["id"]] = {"statement": c.get("statement"), "conditions": c.get("conditions") or []}
+        # retired も版に入れる：主張を外す（id は消さず retired にする）と、それを指す式のレビューが古くなる（2026-11-20 の独立なレビュー）
+        out[c["id"]] = {"statement": c.get("statement"), "conditions": c.get("conditions") or [], "retired": bool(c.get("retired"))}
     return out
 
 
