@@ -702,6 +702,14 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: AJ
+      date: '2026-11-20'
+      version: b49ac66
+    - method: 独立な確かめ
+      by: AJ2
+      date: '2026-11-20'
+      version: 870bdeb
     external: なし
   version: 2
 - id: CLM-27
