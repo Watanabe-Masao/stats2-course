@@ -848,7 +848,7 @@
    },
    {
     "symbol": "V( )",
-    "meaning": "分散（ずれの2乗の期待値）",
+    "meaning": "分散（ずれの2乗の期待値。単位は元の単位の2乗）",
     "key": "V",
     "concept": "TERM-var"
    },
@@ -1083,6 +1083,7 @@
    {
     "symbol": "x",
     "meaning": "値",
+    "range": "実数全体",
     "key": "x",
     "kind": "value"
    },
@@ -3623,7 +3624,7 @@
    },
    {
     "symbol": "λ",
-    "meaning": "単位時間あたりに起きる平均の回数",
+    "meaning": "単位時間あたりに起きる平均の回数（x と同じ時間の単位で数える。4/時なら x は時間、分で測るなら λ＝1/15 /分）",
     "range": "0より大きい",
     "key": "lambda",
     "kind": "param",
@@ -3634,10 +3635,13 @@
    },
    {
     "symbol": "x",
-    "meaning": "待ち時間",
+    "meaning": "待ち時間（負の値では密度は0）",
     "range": "0以上",
     "key": "x",
-    "kind": "value"
+    "kind": "value",
+    "domain": {
+     "min": 0
+    }
    },
    {
     "symbol": "e",
