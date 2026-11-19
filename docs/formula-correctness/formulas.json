@@ -4135,8 +4135,13 @@
    {
     "symbol": "x",
     "meaning": "値",
+    "range": "a 以上 b 以下（区間の外の密度は0）",
     "key": "x",
-    "kind": "value"
+    "kind": "value",
+    "domain": {
+     "min": "a",
+     "max": "b"
+    }
    },
    {
     "symbol": "a",
