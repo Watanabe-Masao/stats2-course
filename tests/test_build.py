@@ -831,6 +831,20 @@ class TestNetwork(unittest.TestCase):
         err = [e for e in fm.prepare(copy.deepcopy(c.terms), k) if "生まれ方の主張" in e]
         self.assertEqual(len(err), 1, err)
         self.assertIn("CLM-46", err[0])
+        # 主張を外す（retired）と、契約が指したままなら止まる。想定する故障：retired にしても版が変わらず、古いレビューで公開される
+        k2 = load_yaml(fm.CONTRACTS)
+        real = fm.evidence
+        def retired():
+            ev = copy.deepcopy(real())
+            ev["CLM-46"]["retired"] = True
+            return ev
+        fm.evidence = retired
+        try:
+            err2 = [e for e in fm.prepare(copy.deepcopy(c.terms), k2) if "retired" in e]
+        finally:
+            fm.evidence = real
+        self.assertEqual(len(err2), 1, err2)
+        self.assertIn("F-geom-pmf", err2[0])
 
     def test_review_version_and_publish_gate(self):
         # 確かめる対象：レビューを式の版（fingerprint）に結び付け、公開の前に止める（#118 M9）。
