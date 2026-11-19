@@ -41,7 +41,8 @@ def normalize_term(t: dict) -> None:
             out[scope], d = _split(cond[scope], scope)
             details += d
     t["conditions"] = {**cond, **out}
-    if any(not d.get("_plain") for d in details):
+    # 要件の行がない概念（math が空。#532）も区分の形で出す。手掛かりだけでも、ほかの移した概念と同じ見え方にする（画面の原則 4）
+    if any(not d.get("_plain") for d in details) or (details and cond.get("math") == []):
         t[DETAIL] = details
 
 

@@ -1005,11 +1005,10 @@
                   "math"
                 ],
                 "additionalProperties": false,
-                "description": "math：数学的な定義・成立の条件。data：現実のデータに当てはめるときの条件・確かめ方の手掛かり",
+                "description": "math：数学的な定義・成立の条件（要件・目安。仮定は保証する主張の条件に書くので、要件のない概念では空でよい。stats2-course #532）。data：現実のデータに当てはめるときの条件・確かめ方の手掛かり",
                 "properties": {
                   "math": {
                     "type": "array",
-                    "minItems": 1,
                     "items": {
                       "$ref": "#/$defs/text"
                     }
@@ -2584,5 +2583,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 7
+  "x-revision": 8
 }

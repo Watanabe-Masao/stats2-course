@@ -1170,6 +1170,7 @@ def validate_network(c: Course) -> list[str]:
         err.append(f"shared.yaml：柱の分類 {cat} が concept_categories にない")
 
     # 概念
+    live_claims = [cl for cl in load_claims() if not cl.get("retired")]
     for tid, t in c.terms.items():
         if not filled(t):
             continue
@@ -1179,8 +1180,14 @@ def validate_network(c: Course) -> list[str]:
         if miss:
             err.append(f"{tid}: 概念の説明に {'・'.join(miss)} がない")
         cond = t.get("conditions")
-        if cond is not None and not (isinstance(cond, dict) and cond.get("math")):
+        if cond is not None and not (isinstance(cond, dict) and isinstance(cond.get("math"), list)):
             err.append(f"{tid}: conditions は math（数学的な条件）と data（データに当てはめるときの条件）に分けて書く")
+        elif cond is not None and not cond["math"] and not any(
+            cl.get("conditions") and tid in (cl.get("conclusion") or {}).get("predicates", []) for cl in live_claims
+        ):
+            # 要件の行がない概念（#532 の A）：仮定は主張の条件にあるので、その概念について言える主張（結論の述語）で、
+            # 条件の行のあるものが要る。仮定を消しただけ・主張を retired にしただけで、概念のページから条件が消えるのを止める
+            err.append(f"{tid}: conditions.math が空なら、この概念を結論の述語にする主張（retired でなく、条件の行のあるもの）が要る（#532）")
         for f in t.get("formulas", []):
             for s in f.get("symbols", []):
                 if not (s.get("symbol") and s.get("meaning")):
