@@ -482,6 +482,7 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
     """実験の定義を確かめる：id・つなぐ概念と線・条件の範囲・テーマ・反例（崩す条件は概念の成り立つ条件の言葉で）。予想の答えは書かない（画面がモデルから求める）"""
     err: list[str] = []
     seen = set()
+    claims_all = load_claims()   # 反例の breaks を主張の条件でも照らす（#291）
     for x in load_experiments():
         eid = x.get("id", "?")
         if not str(eid).startswith("EXP-"):
@@ -594,17 +595,15 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
                 return cd.get("math", []) if isinstance(cd, dict) else []   # 形の違う条件は、その概念の検査が別に止める
             # 主張の仮定の行も数える（製本 ⑦「反例が指す主張は ④」。分布の生まれ方の仮定は概念から主張の条件へ移す。#291）。
             # 主張は、結論の主語か述語につなぐ概念を持つものだけ（その概念について言う主張）
+            # 主張は、結論の述語につなぐ概念を持つもの（その概念に従う・なると言う主張）だけ。retired は外す
             def claim_conds(ref: str) -> list:
-                out = []
-                for cl in load_claims():
-                    con = cl.get("conclusion") or {}
-                    if ref in (con.get("subjects") or []) + (con.get("predicates") or []):
-                        out += [r.get("text", "") if isinstance(r, dict) else str(r) for r in cl.get("conditions") or []]
-                return out
+                return [r.get("text", "") if isinstance(r, dict) else str(r)
+                        for cl in claims_all if not cl.get("retired") and ref in ((cl.get("conclusion") or {}).get("predicates") or [])
+                        for r in cl.get("conditions") or []]
             conds = [q for ref in links.get("concepts") or [] for q in math_conds(ref) + claim_conds(ref)]
             for part in str(b.get("breaks", "")).split("・"):
                 if conds and not any(part.strip() and part.strip() in q for q in conds):
-                    err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念の成り立つ条件にない")
+                    err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念・主張の成り立つ条件にない")
         if x.get("model") == "table":
             err += table_errors(eid, x)
         err += effect_errors(eid, x)   # 反例の言い分（effect）を厳密な計算で確かめる（#118 層3）
