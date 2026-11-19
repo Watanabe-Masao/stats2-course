@@ -75,6 +75,14 @@ claims:
       by: O
       date: '2026-11-09'
       version: 3eaf05a
+    - method: 独立な確かめ
+      by: AK
+      date: '2026-11-20'
+      version: b7fb77d
+    - method: 独立な確かめ
+      by: AK2
+      date: '2026-11-20'
+      version: c165653
     external: なし
   version: 2
 - id: CLM-3
