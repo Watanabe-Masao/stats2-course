@@ -236,6 +236,10 @@ claims:
       by: D
       date: '2026-11-08'
       version: 525bbdb
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
     external: 2次資料
   version: 1
 - id: CLM-9
@@ -1434,6 +1438,10 @@ claims:
       by: AA
       date: '2026-11-16'
       version: 80da9de
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
     external: 未照合
   version: 1
 - id: CLM-45
@@ -1484,5 +1492,9 @@ claims:
       by: AB
       date: '2026-11-16'
       version: 16c831a
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
     external: 2次資料
   version: 1
