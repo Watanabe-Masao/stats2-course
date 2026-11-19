@@ -2835,8 +2835,10 @@
       concept: TERM-pdf
     - symbol: x
       meaning: 値
+      range: a 以上 b 以下（区間の外の密度は0）
       key: x
       kind: value
+      domain: {min: a, max: b}
     - symbol: a
       meaning: 値のとりうる範囲の左端
       key: a
