@@ -867,16 +867,32 @@ class TestNetwork(unittest.TestCase):
         # 書き換える・basis_formula を変えても、古いレビューで公開される（2026-11-08 の独立なレビューで見つかった）。区分を持たない概念の式の版まで変わる。
         # 見つけ方：二項分布の仮定の行の kind と outside、basis_formula をそれぞれ変えると F-binom-pmf だけが止まる。
         # 検出の確かめ（2026-11-08）：fingerprint に区分を入れる行を外すと、この3つの assert が落ちることを見た
+        # 二項分布の仮定の行は主張 ④-1 へ移した（#291）ので、残った要件の行で確かめる
         for change in ("kind", "outside", "basis"):
             terms3 = copy.deepcopy(c.terms)
-            row = next(d for d in terms3["TERM-binom"]["_conditions_detail"] if d.get("text") == "各回が独立")
+            row = next(d for d in terms3["TERM-binom"]["_conditions_detail"] if d.get("kind") == "要件")
             if change == "kind":
-                row["kind"] = "要件"
+                row["kind"] = "仮定"
             elif change == "outside":
                 row["outside"] += "（書き換えた）"
             else:
                 terms3["TERM-binom"]["basis_formula"] = "F-binom-mean"
             self.assertEqual([e.split("：")[0] for e in publish_errors(k, rec, current_fingerprints(terms3, k))], ["代表の式 F-binom-pmf"], change)
+        # 契約の review_refs が指す主張の条件の行も版に入る（#291）。想定する故障：二項分布の生まれ方の仮定を主張 ④-1 へ移したあと、
+        # ④-1 の条件の行を書き換えても F-binom-pmf の古いレビューで公開される（2026-11-20 の独立なレビューで見つかった穴）。
+        # 見つけ方：evidence() が返す CLM-1 の条件の行の文を変えると、F-binom-pmf だけが止まる。
+        # 検出の確かめ（2026-11-20）：evidence() から主張を外す（claims.yaml を読まない）と、この assert が落ちることを見た
+        import formulas as fm
+        real = fm.evidence
+        def changed():
+            ev = copy.deepcopy(real())
+            ev["CLM-1"]["conditions"][0]["text"] += "（書き換えた）"
+            return ev
+        fm.evidence = changed
+        try:
+            self.assertEqual([e.split("：")[0] for e in publish_errors(k, rec, fm.current_fingerprints(c.terms, k))], ["代表の式 F-binom-pmf"])
+        finally:
+            fm.evidence = real
 
     def test_lab_random_rule(self):
         # 確かめる対象：ラボの中に乱数を書かない決まり（issue 144 P6）。想定する故障：Math.random（種なし）や自前の rng が新しく入る・
@@ -969,7 +985,7 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("compare.p＝2 が vary の範囲にない" in e for e in err))
         self.assertTrue(any("箱（total）は取る数（n の最大）以上" in e for e in err))
         self.assertTrue(any("予想の答え（answer）は書かない" in e for e in err))
-        self.assertTrue(any("breaks「空が青い」が、つなぐ概念の成り立つ条件にない" in e for e in err))
+        self.assertTrue(any("breaks「空が青い」が、つなぐ概念・主張の成り立つ条件にない" in e for e in err))
         d = network.export_network(c, {"site_base_url": ""})
         e = d["experiments"][0]
         self.assertEqual(e["id"], "stats2:EXP-binom-p")

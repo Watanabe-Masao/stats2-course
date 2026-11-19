@@ -90,7 +90,7 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
                 err.append(f"契約 {fid}：review_excludes に書けるのは parts・why だけ")
             for r in k.get("review_refs") or []:
                 if r not in evidence():
-                    err.append(f"契約 {fid}：review_refs の {r} が導出・実験室にない")
+                    err.append(f"契約 {fid}：review_refs の {r} が導出・実験室・主張にない")
             checks[fid] = [c["tree"] for c in k.get("conditions") or [] if isinstance(c, dict) and isinstance(c.get("tree"), dict)]
         missing = sorted(set(by_id) - seen)
         if missing:
@@ -128,7 +128,8 @@ REFERENCE = ROOT / "docs" / "formula-correctness" / "reference.json"
 
 
 def evidence() -> dict:
-    """レビューの観点の根拠になる原本（契約の review_refs で指す）：導出 DER-… と、実験室 EXP-… の反例（counterexamples・contrasts）"""
+    """レビューの観点の根拠になる原本（契約の review_refs で指す）：導出 DER-… と、実験室 EXP-… の反例（counterexamples・contrasts）と、
+    主張 CLM-… の本文と条件の行（式のモデルの仮定が主張の側にあるとき。#291：分布の生まれ方の仮定を概念から主張へ移した）"""
     out = {}
     der = ROOT / "content" / "derivations.yaml"
     exp = ROOT / "content" / "experiments.yaml"
@@ -137,6 +138,9 @@ def evidence() -> dict:
         out[d["id"]] = d
     for x in ((load_yaml(exp) or {}).get("experiments") or []) if exp.exists() else []:
         out[x["id"]] = {"counterexamples": x.get("counterexamples") or [], "contrasts": x.get("contrasts") or []}
+    cl = ROOT / "content" / "claims.yaml"
+    for c in ((load_yaml(cl) or {}).get("claims") or []) if cl.exists() else []:
+        out[c["id"]] = {"statement": c.get("statement"), "conditions": c.get("conditions") or []}
     return out
 
 
