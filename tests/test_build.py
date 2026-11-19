@@ -985,7 +985,7 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("compare.p＝2 が vary の範囲にない" in e for e in err))
         self.assertTrue(any("箱（total）は取る数（n の最大）以上" in e for e in err))
         self.assertTrue(any("予想の答え（answer）は書かない" in e for e in err))
-        self.assertTrue(any("breaks「空が青い」が、つなぐ概念の成り立つ条件にない" in e for e in err))
+        self.assertTrue(any("breaks「空が青い」が、つなぐ概念・主張の成り立つ条件にない" in e for e in err))
         d = network.export_network(c, {"site_base_url": ""})
         e = d["experiments"][0]
         self.assertEqual(e["id"], "stats2:EXP-binom-p")
