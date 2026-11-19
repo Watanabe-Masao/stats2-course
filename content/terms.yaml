@@ -2337,7 +2337,7 @@
     - symbol: P( )
       meaning: 確率
       key: P
-      concept: TERM-prob
+      concept: TERM-dist
     - symbol: X
       meaning: 確率変数
       key: X
