@@ -195,7 +195,7 @@ claims:
   grounds:
   - source:
       title: 中心極限定理
-      locator: 照合した2次資料：HKUST MATH 5411 講義資料 Chapter 2 §2.2 Theorem 2.2（p.36。iid で平均 µ・有限の分散 σ²＞0 なら (Sₙ−nµ)/(σ√n) は分布で N(0, 1) に近づく）https://www.math.hkust.edu.hk/~makchen/MATH5411/Chap2Sec2.pdf
+      locator: 照合した2次資料：HKUST の講義資料（URL の MATH5411）Chapter 2 §2.2 Theorem 2.2（印刷頁 p.36。iid で平均 µ・有限の分散 σ²＞0 なら (Sₙ−nµ)/(σ√n) は分布で N(0, 1) に近づく。Sₙ＝X₁＋…＋Xₙ は Theorem 2.4 で定義）https://www.math.hkust.edu.hk/~makchen/MATH5411/Chap2Sec2.pdf
     external: true
   teaching:
     conclusion: true
@@ -283,7 +283,7 @@ claims:
   grounds:
   - source:
       title: Helmert の直交変換で Σ(Xᵢ−X̄)²/σ² を n−1 個の独立な N(0, 1) の2乗の和に書く（Cochran の定理）
-      locator: 照合した2次資料：Penn State STAT 414 §26.3「Sampling Distribution of Sample Variance」の定理（正規分布からの大きさ n の無作為標本で、1. X̄ と S² は独立、2. (n−1)S²/σ² は χ²(n−1) に従う。1 はその頁では証明を省いて述べている）https://online.stat.psu.edu/stat414/book/export/html/787
+      locator: 照合した2次資料：Penn State STAT 414 §26.3「Sampling Distribution of Sample Variance」の定理（正規分布からの大きさ n の無作為標本で、1. X̄ と S² は独立、2. (n−1)S²/σ² は χ²(n−1) に従う。1 はその頁では証明を省いて述べている。照らしたのは結論で、頁の証明は積率母関数によるもので 1 を使う。title の Helmert の道筋は照らしていない）https://online.stat.psu.edu/stat414/book/export/html/787
     external: true
   teaching:
     conclusion: true
@@ -502,7 +502,7 @@ claims:
   - claim: CLM-20b
   - source:
       title: スルツキーの定理（p̂(1−p̂) → p(1−p) の平方根をとる所は連続写像定理）
-      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理）、p.5 Slutsky の定理の帰結（Xₙ→X（分布）・Yₙ→c（確率）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
+      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   - source:
       title: p̂ が 0 か 1 のとき分母は 0 になるが、その確率は n→∞ で 0 に近づくので、その場合の値をどう決めても極限は同じ（区間の幅は 0 になる。④ §8）
@@ -1453,9 +1453,11 @@ claims:
   - claim: CLM-20b
   - source:
       title: H₀ のもとで、各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(p̂₁−p̂₂)/√(p(1−p)(1/n₁＋1/n₂)) は N(0, 1) に近づく（2群の重みが収束しなくてよいので、n₁/n₂ の比の条件は要らない）。p̄ は ④-20b で p に確率収束し、p̄(1−p̄)/(p(1−p)) は連続写像で1に確率収束する
+      locator: 特性関数の積で合わせる所は Lévy の連続性定理（と、分布収束なら特性関数が有界な区間で一様に収束すること）に頼る。2次資料で照らしていない（#271 の独立な確かめ 2026-11-19）
+    external: true
   - source:
       title: スルツキーの定理（p̄＝0 か 1 で z が定まらない事象の確率は0に近づくので、結論は変わらない）
-      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理）、p.5 Slutsky の定理の帰結（Xₙ→X（分布）・Yₙ→c（確率）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
+      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   teaching:
     conclusion: true
@@ -1466,5 +1468,5 @@ claims:
       by: AB
       date: '2026-11-16'
       version: 16c831a
-    external: 2次資料
+    external: 未照合
   version: 1
