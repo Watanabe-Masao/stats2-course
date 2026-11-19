@@ -92,6 +92,20 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
                 if r not in evidence():
                     err.append(f"契約 {fid}：review_refs の {r} が導出・実験室・主張にない")
             checks[fid] = [c["tree"] for c in k.get("conditions") or [] if isinstance(c, dict) and isinstance(c.get("tree"), dict)]
+        # 分布の生まれ方の主張（種類「従う」で、結論の主語がなく述語がその分布）は、分布の基準の式（basis_formula）の契約の review_refs に入れる。
+        # 想定する故障：生まれ方の仮定を主張の条件へ移したあと（#291）、主張を足す・直す・外しても、基準の式の古いレビューのまま公開される（2026-11-20 の外部のレビュー）
+        ks_by = {k.get("formula"): k for k in contracts.get("contracts") or []}
+        claims_now = evidence_claims()
+        for tid_, t in terms.items():
+            bf = t.get("basis_formula")
+            if not bf or bf not in ks_by:
+                continue
+            for cl in claims_now:
+                con = cl.get("conclusion") or {}
+                if cl.get("retired") or cl.get("kind") != "従う" or con.get("subjects") or tid_ not in (con.get("predicates") or []):
+                    continue
+                if cl["id"] not in (ks_by[bf].get("review_refs") or []):
+                    err.append(f"契約 {bf}：分布の生まれ方の主張 {cl['id']} を review_refs に入れる（{tid_} の基準の式。#291）")
         missing = sorted(set(by_id) - seen)
         if missing:
             err.append(f"契約がない式（未分類）：{'・'.join(missing)}（content/formula-contracts.yaml に書く。#118 C6）")
@@ -125,6 +139,13 @@ def contract_summary(contracts: dict | None) -> dict:
 
 REVIEWS = ROOT / "content" / "formula-reviews.yaml"
 REFERENCE = ROOT / "docs" / "formula-correctness" / "reference.json"
+
+
+def evidence_claims() -> list:
+    """主張の原本（content/claims.yaml）。分布の生まれ方の主張を基準の式の契約に結ぶ検査で使う（#291）"""
+    from model import load_yaml   # build の中から呼ぶ（循環を避けて関数の中で読む）
+    cl = ROOT / "content" / "claims.yaml"
+    return ((load_yaml(cl) or {}).get("claims") or []) if cl.exists() else []
 
 
 def evidence() -> dict:

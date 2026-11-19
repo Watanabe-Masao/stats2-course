@@ -146,6 +146,7 @@ contracts:
   kinds: [確率モデル]
   properties: [非負, 正規化, 条件しだい, 収束]
   review: [収束は REL-binom-poisson で]
+  review_refs: [CLM-25]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-poisson-moments
   kinds: [恒等式]
   properties: [同値]
@@ -155,6 +156,7 @@ contracts:
 - formula: F-geom-pmf
   kinds: [確率モデル]
   properties: [非負, 正規化, 単調, 条件しだい]
+  review_refs: [CLM-46]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-geom-mean
   kinds: [恒等式]
   properties: [同値, 単調, 条件しだい]
@@ -167,6 +169,7 @@ contracts:
   conditions:
   - text: r ≦ k（r 回目の成功は r 回目より前には起きない）
     tree: {"op": "fn", "name": "le", "args": [{"sym": "r"}, {"sym": "k"}]}
+  review_refs: [CLM-47]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-hyper-pmf
   kinds: [確率モデル]
   properties: [非負, 正規化, 対称, 条件しだい]
@@ -175,6 +178,7 @@ contracts:
     tree: {"op": "fn", "name": "le", "args": [{"sym": "k"}, {"sym": "M"}]}
   - text: n−(N−M) ≦ k（外れを全部引いても足りない分は当たり）
     tree: {"op": "fn", "name": "ge", "args": [{"sym": "k"}, {"op": "sub", "args": [{"sym": "n"}, {"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}]}]}
+  review_refs: [CLM-48]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-hyper-mean
   kinds: [恒等式]
   properties: [同値]
@@ -182,6 +186,7 @@ contracts:
   kinds: [確率モデル]
   properties: [非負, 正規化, 単調, 単位の整合]
   review: [単位（λ は 1/時間）]
+  review_refs: [CLM-25]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-expo-surv
   kinds: [恒等式]
   properties: [有界, 単調, 同値, 不変]
