@@ -1593,6 +1593,31 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("TERM-binom: conditions は math" in e for e in err))
         self.assertTrue(any("TERM-std: 出典" in e for e in err))
 
+    # 確かめる対象：conditions.math が空の概念（要件の行がない。#532 の A）を、その概念について言える主張（結論の述語）に
+    #   条件の行があるときだけ通すこと。
+    # 想定する故障：仮定の行を消しただけ・主張を retired にしただけで、概念のページから条件が消えたまま公開される。
+    #   逆に、移した概念（標準正規分布。主張 ④-2 の条件）を止めてしまう。
+    # 見つけ方：教材の標準正規分布は通り、主張のない標準化の math を空にすると止まり、標準正規分布を結論にする主張を全部
+    #   retired にすると標準正規分布が止まる。この止めは「主張の側に条件がある」ことだけを見て、移した行がどの主張に移ったかは見ない
+    #   （それはレビューで見る）。
+    # 既存との違い：上の test_conditions_split_and_sources は math・data に分けていない形だけを見る。
+    # 検出の確かめ（2026-11-20）：network.py の「結論の述語にする主張」の止めを外すと、2つ目と3つ目の確かめで落ちることを見た
+    def test_empty_math_needs_claim_with_conditions(self):
+        c = course()
+        self.assertEqual(c.terms["TERM-std-normal"]["conditions"]["math"], [])
+        need = "conditions.math が空なら"
+        self.assertFalse(any(need in e for e in self._validate(c=c)))
+        c.terms["TERM-std"]["conditions"]["math"] = []
+        self.assertTrue(any(e.startswith(f"TERM-std: {need}") for e in self._validate(c=c)))
+        orig = self.n.load_claims
+        # 標準正規分布を結論の述語にする主張は ④-2 のほかにも（極限の主張など）あるので、全部を retired にする
+        sn = lambda x: "TERM-std-normal" in ((x.get("conclusion") or {}).get("predicates") or [])  # noqa: E731
+        self.n.load_claims = lambda: [dict(x, retired=True) if sn(x) else x for x in orig()]
+        try:
+            self.assertTrue(any(e.startswith(f"TERM-std-normal: {need}") for e in self._validate(c=course())))
+        finally:
+            self.n.load_claims = orig
+
     def test_other_course_allowed_own_prefix_not(self):
         rels = copy.deepcopy(self.rels)
         rels[0]["from"] = "math:CON-ratio"

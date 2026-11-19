@@ -56,6 +56,12 @@ claims:
     - TERM-std
     predicates:
     - TERM-std-normal
+  conditions:
+  - text: X が正規分布 N(μ, σ²)（σ＞0）に従う
+    kind: 仮定
+    terms:
+    - TERM-normal
+    outside: 標準化しても平均0・標準偏差1になるだけで、分布の形は元のまま（右に裾の長い分布は、標準化しても右に裾が長い）。標準正規分布表の確率は当てはまらない
   grounds:
   - source:
       title: 密度の変数変換
@@ -70,7 +76,7 @@ claims:
       date: '2026-11-09'
       version: 3eaf05a
     external: なし
-  version: 1
+  version: 2
 - id: CLM-3
   label: ④-3
   kind: 極限
