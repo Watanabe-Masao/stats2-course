@@ -828,7 +828,15 @@ claims:
       by: '#307 の確かめ'
       date: '2026-11-18'
       version: de6bd04
-    external: 未照合
+    - method: 独立な確かめ
+      by: AH
+      date: '2026-11-19'
+      version: 707c7e2
+    - method: 独立な確かめ
+      by: AH2
+      date: '2026-11-19'
+      version: f8da5c6
+    external: 2次資料
   version: 1
 - id: CLM-28c
   label: ④-28c
