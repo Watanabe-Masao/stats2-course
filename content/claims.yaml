@@ -220,8 +220,12 @@ claims:
     predicates:
     - TERM-std-normal
   grounds:
+  - claim: CLM-20b
+  - source:
+      title: t(k) の定義で T_k＝Z/√(V_k/k)（Z と V_k は独立、V_k は χ²(k)）と書き、V_k を独立な Zᵢ²（V(Zᵢ²)＝2 は有限）の和として表すと、④-20b で V_k/k→1（確率）。T_k の分布は (Z, V_k) の分布だけで決まるので、Z と独立な1つの列 Z₁, Z₂, … で V_k＝Z₁²＋…＋Z_k² と表してよい
   - source:
       title: スルツキーの定理
+      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   teaching:
     conclusion: true
@@ -232,7 +236,11 @@ claims:
       by: D
       date: '2026-11-08'
       version: 525bbdb
-    external: 未照合
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
+    external: 2次資料
   version: 1
 - id: CLM-9
   label: ④-9
@@ -686,6 +694,7 @@ claims:
   grounds:
   - source:
       title: χ²(k) の密度の一般式に k＝2 を代入
+      locator: 照合した2次資料：NIST/SEMATECH e-Handbook of Statistical Methods §1.3.6.6.6「Chi-Square Distribution」（密度 f(x)＝e^(−x/2)x^(ν/2−1)/(2^(ν/2)Γ(ν/2))、x≧0。ν＝2 で (1/2)e^(−x/2)）https://itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
     external: true
   teaching:
     proof: 範囲外
@@ -699,7 +708,7 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
-    external: 未照合
+    external: 2次資料
   version: 1
 - id: CLM-28a
   label: ④-28a
@@ -1407,9 +1416,18 @@ claims:
   - claim: CLM-6b
   - claim: CLM-20b
   - source:
-      title: 各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は ④-20b（Xᵢ と Xᵢ² に当てる）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
+      title: 各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は ④-20b（Xᵢ に当てる）と Khinchin の大数の法則（Xᵢ² に当てる。下の行）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
+      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
+    external: true
   - source:
-      title: スルツキーの定理
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
+  - source:
+      title: スルツキーの定理（s₁²＝s₂²＝0 で t が定まらない事象の確率は0に近づくので、結論は変わらない）
+      locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
+    external: true
+  - source:
+      title: s₁², s₂² の一致で ④-20b を Xᵢ² に当てるには V(Xᵢ²)＜∞（E Xᵢ⁴＜∞）が要る。仮定（0＜σ²＜∞）だけで言うには Khinchin の大数の法則（平均が有限なら標本平均は確率収束する）に頼る
+      locator: 2次資料で照らしていない（#271 の独立な確かめ 2026-11-19）
     external: true
   teaching:
     conclusion: true
@@ -1420,6 +1438,10 @@ claims:
       by: AA
       date: '2026-11-16'
       version: 80da9de
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
     external: 未照合
   version: 1
 - id: CLM-45
@@ -1453,8 +1475,10 @@ claims:
   - claim: CLM-20b
   - source:
       title: H₀ のもとで、各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(p̂₁−p̂₂)/√(p(1−p)(1/n₁＋1/n₂)) は N(0, 1) に近づく（2群の重みが収束しなくてよいので、n₁/n₂ の比の条件は要らない）。p̄ は ④-20b で p に確率収束し、p̄(1−p̄)/(p(1−p)) は連続写像で1に確率収束する
-      locator: 特性関数の積で合わせる所は Lévy の連続性定理（と、分布収束なら特性関数が有界な区間で一様に収束すること）に頼る。2次資料で照らしていない（#271 の独立な確かめ 2026-11-19）
+      locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
+  - source:
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ＝√(n₂/(n₁＋n₂))（＝√((1/n₁)/(1/n₁＋1/n₂))）∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
   - source:
       title: スルツキーの定理（p̄＝0 か 1 で z が定まらない事象の確率は0に近づくので、結論は変わらない）
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
@@ -1468,5 +1492,9 @@ claims:
       by: AB
       date: '2026-11-16'
       version: 16c831a
-    external: 未照合
+    - method: 独立な確かめ
+      by: AD
+      date: '2026-11-19'
+      version: 1bc65aa
+    external: 2次資料
   version: 1
