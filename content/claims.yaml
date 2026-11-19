@@ -554,7 +554,7 @@ claims:
     outside: 標本平均が μ に近づくとは保証できない
   - text: 分散 σ² が有限
     kind: 仮定
-    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外・未照合）
+    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外。2次資料での照合は ④-44 の根拠の行）
     terms:
     - TERM-var
   grounds:
@@ -567,6 +567,10 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    - method: 独立な確かめ
+      by: AE
+      date: '2026-11-19'
+      version: 4c21aca
     external: なし
   version: 1
 - id: CLM-22
@@ -1427,7 +1431,7 @@ claims:
     external: true
   - source:
       title: s₁², s₂² の一致で ④-20b を Xᵢ² に当てるには V(Xᵢ²)＜∞（E Xᵢ⁴＜∞）が要る。仮定（0＜σ²＜∞）だけで言うには Khinchin の大数の法則（平均が有限なら標本平均は確率収束する）に頼る
-      locator: 2次資料で照らしていない（#271 の独立な確かめ 2026-11-19）
+      locator: 照合した2次資料：Texas A&M（URL の STAT 614）2022年秋、Quan Zhou の講義資料 Lecture 15 Theorem 15.3「Khintchin's WLLN」（p.4。i.i.d. で平均 µ、E|X₁|＜∞ なら Sₙ/n→µ（確率））https://web.stat.tamu.edu/~quan/MathProb/STAT614_Unit15_QuanZhou.pdf 。Xᵢ² も独立に同じ分布に従い（Xᵢ の関数）、E|Xᵢ²|＝σ²＋μ²＜∞（σ² が有限なら μ も有限）なので、仮定から足りる
     external: true
   teaching:
     conclusion: true
@@ -1442,7 +1446,7 @@ claims:
       by: AD
       date: '2026-11-19'
       version: 1bc65aa
-    external: 未照合
+    external: 2次資料
   version: 1
 - id: CLM-45
   label: ④-45
