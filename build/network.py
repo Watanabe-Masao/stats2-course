@@ -592,7 +592,16 @@ def experiment_errors(c: Course, rel_ids: set, der_ids: set) -> list[str]:
             def math_conds(ref: str) -> list:
                 cd = (c.terms.get(ref) or {}).get("conditions") or {}
                 return cd.get("math", []) if isinstance(cd, dict) else []   # 形の違う条件は、その概念の検査が別に止める
-            conds = [q for ref in links.get("concepts") or [] for q in math_conds(ref)]
+            # 主張の仮定の行も数える（製本 ⑦「反例が指す主張は ④」。分布の生まれ方の仮定は概念から主張の条件へ移す。#291）。
+            # 主張は、結論の主語か述語につなぐ概念を持つものだけ（その概念について言う主張）
+            def claim_conds(ref: str) -> list:
+                out = []
+                for cl in load_claims():
+                    con = cl.get("conclusion") or {}
+                    if ref in (con.get("subjects") or []) + (con.get("predicates") or []):
+                        out += [r.get("text", "") if isinstance(r, dict) else str(r) for r in cl.get("conditions") or []]
+                return out
+            conds = [q for ref in links.get("concepts") or [] for q in math_conds(ref) + claim_conds(ref)]
             for part in str(b.get("breaks", "")).split("・"):
                 if conds and not any(part.strip() and part.strip() in q for q in conds):
                     err.append(f"{eid}: 反例 {b.get('id')} の breaks「{part}」が、つなぐ概念の成り立つ条件にない")

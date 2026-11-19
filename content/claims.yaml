@@ -12,6 +12,24 @@ claims:
   conclusion:
     predicates:
     - TERM-binom
+  conditions:
+  - text: n は決まった数（回数 n が決まっていて、結果によって変わらない）
+    kind: 仮定
+    outside: 回数が結果で変わる（成功するまで続ける など）と、成功回数は二項分布に従うとは言えない（偶然に一致することはある）
+  - text: 各 Xᵢ は 0 か 1（結果が成功・失敗の2つ）で、P(Xᵢ＝1)＝p がどの i でも同じ（各回の成功確率 p が同じ）
+    kind: 仮定
+    terms:
+    - TERM-bernoulli
+    outside: 回ごとに成功確率が違うと、成功回数は二項分布に従うとは言えない（偶然に一致することはある）
+    data_hints:
+    - p が客や時間でほぼ同じかを確かめる
+  - text: X₁, …, Xₙ が独立（各回が独立）
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 回どうしが影響し合うと、成功回数は二項分布に従うとは言えない（偶然に一致することはある）
+    data_hints:
+    - 客ごとの購入のように、互いに影響しない（口コミや連れ立ちがない）かを確かめる
   grounds:
   - source:
       title: 和が k になる並びは ₙCₖ 通りで、どの並びの確率も（独立なので）pᵏ(1−p)ⁿ⁻ᵏ
@@ -22,7 +40,7 @@ claims:
       date: '2026-11-08'
       version: dc2b65a
     external: なし
-  version: 1
+  version: 2
 - id: CLM-2
   label: ④-2
   kind: 従う
@@ -1510,4 +1528,90 @@ claims:
       date: '2026-11-19'
       version: 1bc65aa
     external: 2次資料
+  version: 1
+- id: CLM-46
+  label: ④-46
+  kind: 従う
+  statement:
+    text: 0＜p≦1 とし、X₁, X₂, … が独立に同じ Bern(p) に従うとき（回数を先に決めずに、成功するまで続ける）、初めて Xᵢ＝1 となる i を X とすると、P(X＝k)＝(1−p)^(k−1)·p（k＝1, 2, …）。X は幾何分布に従う（成功した回も数える）
+  premises:
+    subjects:
+    - TERM-bernoulli
+  conclusion:
+    predicates:
+    - TERM-geom
+  conditions:
+  - text: 各回は成功か失敗で、成功確率 p がどの回でも同じ（成功確率 p が毎回同じ）
+    kind: 仮定
+    terms:
+    - TERM-bernoulli
+    outside: 回を重ねるほど成功しやすくなる（慣れ）・しにくくなる場面では、試行回数は幾何分布に従うとは言えない（偶然に一致することはある）
+  - text: X₁, X₂, … が独立（各回が独立）
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 前の結果で次の成功しやすさが変わると、試行回数は幾何分布に従うとは言えない（偶然に一致することはある）
+  grounds:
+  - source:
+      title: X＝k は「初めの k−1 回が失敗で、k 回目が成功」と同じ。独立なので確率は各回の確率の積 (1−p)^(k−1)·p。p＝1 のときは 0⁰＝1 と読み、X＝1 が確率1。p＞0 なので Σ_{k≧1}(1−p)^(k−1)p＝1（いつかは成功する）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math: []
+    external: なし
+  version: 1
+- id: CLM-47
+  label: ④-47
+  kind: 従う
+  statement:
+    text: r を1以上の整数、0＜p≦1 とし、X₁, X₂, … が独立に同じ Bern(p) に従うとき、r 回目の成功が起きた回を X とすると、P(X＝k)＝ₖ₋₁C_{r−1}·p^r·(1−p)^(k−r)（k＝r, r＋1, …）。X は負の二項分布に従う（成功した回も数える。r＝1 は ④-46 の幾何分布）
+  premises:
+    subjects:
+    - TERM-bernoulli
+  conclusion:
+    predicates:
+    - TERM-negbinom
+  conditions:
+  - text: 各回は成功か失敗で、成功確率 p がどの回でも同じ（成功確率 p が毎回同じ）
+    kind: 仮定
+    terms:
+    - TERM-bernoulli
+    outside: 回ごとに成功確率が変わると、試行回数は負の二項分布に従うとは言えない（偶然に一致することはある）
+  - text: X₁, X₂, … が独立（各回が独立）
+    kind: 仮定
+    terms:
+    - TERM-indep
+    outside: 前の結果で次の成功しやすさが変わると、試行回数は負の二項分布に従うとは言えない（偶然に一致することはある）
+  grounds:
+  - source:
+      title: X＝k は「初めの k−1 回にちょうど r−1 回成功し、k 回目が成功」と同じ。初めの k−1 回の並びは ₖ₋₁C_{r−1} 通りで、独立なのでどの並びの確率も p^(r−1)(1−p)^(k−r)。k 回目の成功の p を掛ける
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math: []
+    external: なし
+  version: 1
+- id: CLM-48
+  label: ④-48
+  kind: 従う
+  statement:
+    text: 整数 N・M・n が 0≦M≦N・1≦n≦N を満たし、N 個（うち当たり M 個）から大きさ n のどの組も同じ確率で選ばれるように取り出すとき、当たりの個数 X について P(X＝k)＝C(M, k)·C(N−M, n−k)÷C(N, n)（k＝0, 1, …, n。範囲の外の組合せの数は0と読むので、値をとるのは max(0, n−(N−M))≦k≦min(n, M)）。X は超幾何分布に従う
+  conclusion:
+    predicates:
+    - TERM-hyper
+  conditions:
+  - text: 大きさ n のどの組も同じ確率で選ばれる（組なので、同じものを2回取らない＝戻さずに取り出す）
+    kind: 仮定
+    outside: 戻して取り出すと、当たりの個数は二項分布 B(n, M/N) に従い、超幾何分布ではない。選ばれやすさに偏りがあると、どちらにも従うとは言えない
+  grounds:
+  - source:
+      title: 組は全部で C(N, n) 通りで、どれも確率 1÷C(N, n)。当たりが k 個の組は、当たりから k 個・はずれから n−k 個を選ぶ C(M, k)·C(N−M, n−k) 通り（④-40 の単純無作為抽出と同じ数え方）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math: []
+    external: なし
   version: 1
