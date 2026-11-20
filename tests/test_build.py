@@ -1602,6 +1602,29 @@ class TestNetwork(unittest.TestCase):
     #   （それはレビューで見る）。
     # 既存との違い：上の test_conditions_split_and_sources は math・data に分けていない形だけを見る。
     # 検出の確かめ（2026-11-20）：network.py の「結論の述語にする主張」の止めを外すと、2つ目と3つ目の確かめで落ちることを見た
+    # 確かめる対象：主張の条件の行の札（terms）に、主張の端（前提・結論の概念）を重ねると止まること。
+    # 想定する故障：画面で同じ概念の札が主張の中に2つ並ぶ（2026-11-20 の iPhone の確認で ④-2 に「正規分布」が2つ出た。画面の原則 8）。
+    # 見つけ方：教材の原本は通り、④-2 の行に結論の述語（標準正規分布）を足すと、その主張と概念の名前で止まる。
+    # 既存との違い：画面のテスト（claims.spec.ts）は二項分布の主張だけを見る。ここは全部の主張を原本で見る。
+    # 検出の確かめ（2026-11-20）：network.py の止めを外すと、2つ目の確かめで落ちることを見た
+    def test_claim_row_terms_not_ends(self):
+        need = "は主張の前提・結論にもある"
+        self.assertFalse(any(need in e for e in self.n.v2_source_errors(course())))
+        orig = self.n.load_claims
+
+        def dup():
+            out = orig()
+            for x in out:
+                if x["id"] == "CLM-2":
+                    x["conditions"][0]["terms"] = ["TERM-std-normal"]
+            return out
+
+        self.n.load_claims = dup
+        try:
+            self.assertTrue(any(e.startswith("claims.yaml：CLM-2 の条件の行") and "TERM-std-normal" in e and need in e for e in self.n.v2_source_errors(course())))
+        finally:
+            self.n.load_claims = orig
+
     def test_empty_math_needs_claim_with_conditions(self):
         c = course()
         self.assertEqual(c.terms["TERM-std-normal"]["conditions"]["math"], [])
