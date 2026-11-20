@@ -190,6 +190,7 @@ contracts:
 - formula: F-expo-surv
   kinds: [恒等式]
   properties: [有界, 単調, 同値, 不変]
+  review: [単位（λ は 1/時間）]   # F-expo-pdf と同じ観点（#514 で λ の意味をそろえた）
 - formula: F-expo-mean
   kinds: [恒等式]
   properties: [同値, 単位の整合]

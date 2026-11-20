@@ -3729,7 +3729,7 @@
    },
    {
     "symbol": "λ",
-    "meaning": "単位時間あたりに起きる平均の回数",
+    "meaning": "単位時間あたりに起きる平均の回数（x と同じ時間の単位で数える。4/時なら x は時間、分で測るなら λ＝1/15 /分）",
     "range": "0より大きい",
     "key": "lambda",
     "kind": "param",
@@ -3740,10 +3740,13 @@
    },
    {
     "symbol": "x",
-    "meaning": "待ち時間",
+    "meaning": "待ち時間（負の値では P(X＞x)＝1 で、この式は使えない）",
     "range": "0以上",
     "key": "x",
-    "kind": "value"
+    "kind": "value",
+    "domain": {
+     "min": 0
+    }
    },
    {
     "symbol": "e",
