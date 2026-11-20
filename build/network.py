@@ -1034,6 +1034,16 @@ def v2_source_errors(c: Course) -> list[str]:
                 for tid in v:
                     if not NS.match(tid) and tid not in c.terms:
                         err.append(f"claims.yaml：{cl.get('id')} の {side}.{k} の {tid} が terms.yaml にない")
+        # 条件の行の札（terms）に、主張の端（前提・結論の概念）を重ねない。画面は主張の札に端を出すので、同じ概念の札が2つ並ぶ
+        # （画面の原則 8：同じ機能を2か所に置かない。2026-11-20 の iPhone の確認で ④-2 に「正規分布」が2つ出た）
+        ends = {t for side in ("premises", "conclusion") for v in (cl.get(side) or {}).values() for t in v}
+        for row in cl.get("conditions") or []:
+            dup = sorted(set(row.get("terms") or []) & ends)
+            if dup:
+                err.append(
+                    f"claims.yaml：{cl.get('id')} の条件の行「{str(row.get('text', ''))[:24]}」の terms の {'・'.join(dup)} は主張の前提・結論にもある"
+                    "（主張の札と同じ札が2つ並ぶ。行の terms から外す。画面の原則 8）"
+                )
     for tid, t in c.terms.items():
         bad = set(t.get("forms") or []) - forms
         if bad:

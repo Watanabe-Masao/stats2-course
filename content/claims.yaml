@@ -59,8 +59,6 @@ claims:
   conditions:
   - text: X が正規分布 N(μ, σ²)（σ＞0）に従う
     kind: 仮定
-    terms:
-    - TERM-normal
     outside: 標準化しても（X の平均 μ・標準偏差 σ が有限で σ＞0 なら）平均0・標準偏差1になるだけで、分布の形は元のまま（右に裾の長い分布は、標準化しても右に裾が長い）。標準正規分布表の確率はそのまま当てはまらない
   grounds:
   - source:
@@ -180,7 +178,6 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    - TERM-normal
     outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。CLM-6b）
   grounds:
   - source:
@@ -1281,8 +1278,6 @@ claims:
   conditions:
   - text: 枠に同じ要素が重複して載っていない
     kind: 仮定
-    terms:
-    - TERM-frame
     outside: 2回載っている要素の入る確率は n/N より大きい（1−(N−2)Cn/NCn）
   - text: 戻さずに選ぶ（大きさ n の組み合わせから1つを選ぶ）
     kind: 仮定
@@ -1354,8 +1349,6 @@ claims:
     outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる）
   - text: 分散 σ² が有限
     kind: 仮定
-    terms:
-    - TERM-var
     outside: V(X̄) が有限の値に定まるとは保証できない
   grounds:
   - source:
