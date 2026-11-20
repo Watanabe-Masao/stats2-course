@@ -1781,7 +1781,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -2219,7 +2219,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -2665,7 +2665,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -2785,8 +2785,7 @@
    "properties": [
     "非負",
     "正規化",
-    "条件しだい",
-    "収束"
+    "条件しだい"
    ]
   }
  },
@@ -2870,7 +2869,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -3132,7 +3131,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -3312,7 +3311,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -3717,7 +3716,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -3962,7 +3961,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },
@@ -5220,7 +5219,7 @@
   "symbols": [
    {
     "symbol": "P( )",
-    "meaning": "確率",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
     "key": "P",
     "concept": "TERM-dist"
    },

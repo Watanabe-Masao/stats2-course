@@ -144,7 +144,7 @@ contracts:
   representative: true
 - formula: F-poisson-pmf
   kinds: [確率モデル]
-  properties: [非負, 正規化, 条件しだい, 収束]
+  properties: [非負, 正規化, 条件しだい]   # 収束は分布の式の性質ではなく、二項→ポアソンの関係（REL-binom-poisson・④-3）で扱う（渡辺さん 2026-11-21。#514）
   review: [収束は REL-binom-poisson で]
   review_refs: [CLM-25]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-poisson-moments
