@@ -1060,7 +1060,7 @@ relations:
     from: TERM-unbvar
     to: TERM-cv
     type: 定める
-    description: 変動係数は、不偏分散の平方根を平均で割ったもの（単元 U07 の求め方。#310）。不偏分散が定義に直接出る。
+    description: 変動係数は、不偏分散の平方根を平均で割ったもの（単元 U07 の求め方）。不偏分散が定義に直接出る。
     basis:
       units:
       - U07
@@ -1493,7 +1493,7 @@ relations:
     version: 1
     type: 定める
     to_form: function
-    description: 確率の公理の3つ目（互いに排反な事象の和の確率は、確率の和）に排反が直接出る。事象・標本空間は排反をたどって着くので、線にしない。
+    description: 確率の公理の3つ目（互いに排反な事象の和の確率は、確率の和）に排反が直接出る。
     basis:
       units: [U10]
 
