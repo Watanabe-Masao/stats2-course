@@ -1873,8 +1873,21 @@ class TestProgress(unittest.TestCase):
         u = ok[0]
         probs = c.units[u]["problems"]
         q = next(iter(probs))
-        from model import CONTENT
-        unmatched = next(x["id"] for x in (load_yaml(CONTENT / "claims.yaml") or {})["claims"] if (x.get("verification") or {}).get("external") == "未照合")
+        # 未照合の主張を作る（原本の未照合は #527 で0になったので、読み込みを書き換える。今の原本の状態によらない）
+        import progress
+        unmatched = "CLM-36"
+        orig_load = progress.load_yaml
+
+        def load_unmatched(path):
+            d = orig_load(path)
+            if str(path).endswith("claims.yaml"):
+                for x in d["claims"]:
+                    if x["id"] == unmatched:
+                        x["verification"] = dict(x.get("verification") or {}, external="未照合")
+            return d
+
+        progress.load_yaml = load_unmatched
+        self.addCleanup(setattr, progress, "load_yaml", orig_load)
         retired = dict(probs[q], retired=True, concepts=[unmatched])
         probs["Q-TEST-R"] = retired
         self.assertEqual(verify_rows(c)[u], [])
