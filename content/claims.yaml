@@ -1159,6 +1159,7 @@ claims:
   grounds:
   - source:
       title: 群間平方和/σ²・群内平方和/σ² が独立に χ²(g−1)・χ²(n−g) に従う（Cochran の定理）
+      locator: 照合した2次資料：Penn State STAT 415 §13.3「Theoretical Results」。SSE の定理（第 i 群の X_ij が N(μ_i, σ²) に互いに独立に従うとき、SSE/σ² は χ²(n−m)。各群の (n_i−1)W_i²/σ² が χ²(n_i−1) で、独立なカイ二乗の和として）、SST の定理（H₀：μ_i がすべて等しいとき、SST/σ² は χ²(m−1)。その頁では証明を省いて述べている）、F の定理（X_ij が N(μ, σ²) のとき、SST と SSE は独立で〔証明を省く〕、F＝MST/MSE は F(m−1, n−m)）。m が群の数 g。照らしたのは結論で、title の Cochran の定理という道筋はその頁に出てこない（照らしていない）https://online.stat.psu.edu/stat415/book/export/html/823
     external: true
   - source:
       title: F 分布の定義
@@ -1171,7 +1172,7 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
-    external: 未照合
+    external: 2次資料
   version: 1
 - id: CLM-37
   label: ④-37
