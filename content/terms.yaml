@@ -1983,7 +1983,7 @@
   - id: F-rv-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2177,7 +2177,7 @@
   - id: F-binom-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2317,7 +2317,7 @@
   - id: F-poisson-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2400,7 +2400,7 @@
   - id: F-geom-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2492,7 +2492,7 @@
   - id: F-negbinom-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2549,7 +2549,7 @@
   - id: F-hyper-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2666,7 +2666,7 @@
     label: 待ち時間が x を超える確率
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -2761,7 +2761,7 @@
   - id: F-pdf-interval
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
@@ -5278,7 +5278,7 @@
   - id: F-bernoulli-pmf
     symbols:
     - symbol: P( )
-      meaning: 確率
+      meaning: 確率。X が決まった値（範囲）をとる事象の確率で、記号 P は事象の確率と同じ。この教材では、確率変数の値についての確率なので確率分布へ開く（事象 A の確率 P(A) の式では確率へ開く。違いは何を説明するかの分け方で、数学として別の記号ではない）
       key: P
       concept: TERM-dist
     - symbol: X
