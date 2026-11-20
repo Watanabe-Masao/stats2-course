@@ -1768,7 +1768,7 @@
   version: 1
   labs:
   - {id: LAB-expect, preset: s5-free, purpose: 'P(X＝x, Y＝y)＝P(X＝x)P(Y＝y) のとき、共分散が0になることを確かめる'}
-  principle: P(A∩B)＝P(A)P(B)。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
+  principle: P(A∩B)＝P(A)P(B)。これが独立の定義で、確率0の事象も含めて使える。「一方が起きたかどうかで、もう一方の起こりやすさが変わらない」（P(A|B)＝P(A)）は、P(B)＞0 のときのこの式の言い換え。P(B)＝0 のときは条件付き確率 P(A|B) が定まらないが、積の式では B はどんな事象 A とも独立になる。この式は定義として読むほかに、両辺を計算して比べれば、独立かどうかの判定にも使える。確率変数なら同時の確率が積に分かれる。独立なら共分散は0になり、和の分散は分散の和になる。
   formulas:
   - id: F-indep-def
     symbols:
@@ -2674,7 +2674,7 @@
       key: X
       kind: rv
     - symbol: λ
-      meaning: 単位時間あたりに起きる平均の回数
+      meaning: 単位時間あたりに起きる平均の回数（x と同じ時間の単位で数える。4/時なら x は時間、分で測るなら λ＝1/15 /分）
       range: 0より大きい
       key: lambda
       kind: param
@@ -2684,6 +2684,7 @@
       range: 0以上
       key: x
       kind: value
+      domain: {min: 0}
     - symbol: e
       meaning: 自然対数の底（約2.718）
       key: e
