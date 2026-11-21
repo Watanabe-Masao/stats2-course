@@ -258,8 +258,8 @@
     id: LAB-ts
     mode: growth
     set: {m: 2, rates: "20,-20"}
-    task: ＋20%、−20% の2期間の平均成長率は何%か（幾何平均）。
-    predict: {type: number, key: gmean, label: "平均成長率", unit: "%"}
+    task: ＋20%、−20% の2期間の平均成長率は何%か（幾何平均。減るなら −）。
+    predict: {type: number, key: gmean, label: "平均成長率（減るなら −）", unit: "%"}
     expect: -2.020
     why: 1.2×0.8＝0.96 の平方根から1を引いて約−2.0%。算術平均の0%の線では、2期後に元の100に戻ってしまい、実際の96を再現しない。
 
