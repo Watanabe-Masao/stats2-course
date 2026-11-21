@@ -202,10 +202,10 @@
     id: LAB-ptest
     mode: p1
     set: {side: upper, alpha: 0.05, x: 4, n: 30, p0: 0.05}
-    task: 30個中4個、基準5%、右片側。二項分布で直接計算した p 値は（小数で）？
-    predict: {type: number, key: pexact, label: "二項分布の p 値"}
-    expect: 0.0608
-    why: P(X≧4)≒0.061 で棄却しない。正規近似の p 値（約0.018）は小さすぎる。np₀＝1.5 では近似が崩れる。
+    task: 30個中4個、基準5%、右片側5%。正規近似の z で判断すると、H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
+    why: z≒2.09、正規近似の p 値は約0.018 で棄却する。しかし np₀＝1.5 では近似が崩れる。二項分布で直接計算すると P(X≧4)≒0.061 で棄却しない。
 
 - id: Q-U26-023
   concepts: [TERM-pool, TERM-se, TERM-ci, TERM-chi2, TERM-f, TERM-reject, REL-unbvar-chi2]
