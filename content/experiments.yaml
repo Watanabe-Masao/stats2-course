@@ -167,12 +167,12 @@ experiments:
                         fb: [掛けると 400p になり、p から離れる。, '', p には 20 が掛け算で付いている。引き算では外れない。]
                   - {kind: probe}
           - id: binom-A-02
-            title: 試行回数を増やすと分布はどう変わる？
+            title: 1セットの回数を増やすと分布はどう変わる？
             finds: 成功回数と成功割合のばらつき
             concept: TERM-binom
             related: [TERM-sd]
-            predict: 試行回数を増やしたとき、成功回数と成功割合のばらつきがどうなるか
-            operate: 試行回数 n
+            predict: 1セットの回数を増やしたとき、成功回数と成功割合のばらつきがどうなるか
+            operate: 1セットの回数 n
             judge: 成功回数の標準偏差は √n に比例して増え、成功割合の標準偏差は 1/√n に比例して減ることを、別の n で説明できる
             open: 'spread'
             apply:
@@ -180,7 +180,7 @@ experiments:
               task: 成功確率 30% の調査で、成功の割合の標準偏差を 0.08 以下にしたい。回数 n は最低いくつ要る？
               solve: {method: min-n-share-sd, p: 0.3, sd: 0.08}
               answer: {type: number, unit: 回, tol: {abs: 0}}
-              why: 成功割合の標準偏差は試行回数の平方根に反比例する。標準偏差を半分にするには、試行回数を4倍にする。
+              why: 成功割合の標準偏差は1セットの回数の平方根に反比例する。標準偏差を半分にするには、1セットの回数を4倍にする。
               walk:   # 解き方を組み立てる（#181・渡辺さんの「解法の段 骨格設計」）。式・記号の意味・計算の行と意味・値は engine が作る
                 segments:
                 - {text: '成功確率 ', role: text}
@@ -565,7 +565,7 @@ experiments:
             concept: TERM-binom   # 主だった標本誤差と標準誤差の対比は、姿が違うので ⑤ の線にしなかった（#298）。標準誤差は骨格なので、説明のある二項分布を主にし、2つは関連にした
             related: [TERM-se, TERM-sampling-error]
             predict: 同じ条件の実験をくり返すと、実測の割合が理論と一致するか
-            operate: 同じ条件の実験の回数
+            operate: セット数（同じ条件の実験をくり返す数）
             judge: 実測の割合が実験ごとにばらつく理由を標本変動（SE）で説明し、ばらつきの目安と比べて理論を疑うかを判断できる
             open: 'repeat'
             apply:
@@ -739,7 +739,7 @@ experiments:
                 - kind: probe
                   todo: "下のチップを課題の n・p・k に合わせ、N を求めたセット数にしてずれの目安を読む。次に 100 セット減らして比べる（境目の前後）"
           - id: binom-C-03
-            title: 同じ実験を繰り返すと同じ結果になる？
+            title: 同じ実験をくり返すと同じ結果になる？
             finds: 標本変動
             concept: TERM-binom
             retired: true   # C-01 と同じ発見（同じ条件でも実験ごとにばらつく）。C-01 の観察で扱う（#169）
