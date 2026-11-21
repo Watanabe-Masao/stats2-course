@@ -19,9 +19,9 @@
     id: LAB-ttest
     mode: paired
     set: {side: two, alpha: 0.05, dbar: 2, sd: 5, n: 25}
-    task: 同じ25店の前後の差は平均2万円、差の標準偏差5万円。両側の p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0569
+    task: 同じ25店の前後の差は平均2万円、差の標準偏差5万円。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
     why: t＝2、自由度24で p≒0.057。5%をわずかに超えるので棄却しない。差の区間が0を含むのと同じ判断。
 
 - id: Q-U25-002
@@ -136,9 +136,9 @@
     id: LAB-ttest
     mode: paired
     set: {side: two, alpha: 0.05, dbar: 1.2, sd: 2, n: 10}
-    task: 同じ10人の前後の差は平均1.2・標準偏差2。両側の p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0903
+    task: 同じ10人の前後の差は平均1.2・標準偏差2。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
     why: t≒1.90、自由度9で p≒0.090。人数を増やすと、同じ平均差でも有意になりやすい。
 
 - id: Q-U25-012
@@ -174,9 +174,9 @@
     id: LAB-ttest
     mode: two
     set: {method: welch, side: two, alpha: 0.05, x1: 68, s1: 3, n1: 12, x2: 62, s2: 9, n2: 8}
-    task: 店A（12日・平均68・s＝3）と店B（8日・平均62・s＝9）。ウェルチの両側 p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.1061
+    task: 店A（12日・平均68・s＝3）と店B（8日・平均62・s＝9）。ウェルチの両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
     why: p≒0.11 で棄却しない。等分散に切り替えると p≒0.044 で棄却してしまう。
 
 - id: Q-U25-021
@@ -281,9 +281,9 @@
     id: LAB-ttest
     mode: paired
     set: {side: two, alpha: 0.05, dbar: -4, sd: 6, n: 20}
-    task: 同じ20人の差（新−旧）は平均−4秒・標準偏差6秒。両側の p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0077
+    task: 同じ20人の差（新−旧）は平均−4秒・標準偏差6秒。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
     why: t≒−2.98、p≒0.008。差の平均が負でも、両側なら |t| で判断する。
 
 - id: Q-U25-032
@@ -319,7 +319,7 @@
     id: LAB-ttest
     mode: one
     set: {side: two, alpha: 0.05, xbar: 102.1, mu0: 100, s: 8, n: 64}
-    task: 64店の平均102.1・s＝8、基準100（t＝2.1、自由度63）。両側の p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0397
+    task: 64店の平均102.1・s＝8、基準100（t＝2.1、自由度63）。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
     why: p≒0.040 で棄却する。n を16、平均を104.2 にすると同じ t＝2.1 でも p≒0.053 で棄却しない。
