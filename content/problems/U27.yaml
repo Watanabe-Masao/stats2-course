@@ -167,10 +167,10 @@
     id: LAB-chisq
     mode: gof
     set: {alpha: 0.05, k: 4, m: 1, o: [35, 38, 19, 8], w: [0.3679, 0.3679, 0.1839, 0.0803]}
-    task: 4区分、λ をデータから推定。この適合度の検定の自由度は？
-    predict: {type: number, key: df, label: "自由度"}
-    expect: 2
-    why: 自由度＝4−1−1＝2（区分の数−1−推定した母数の数）。比べる境目は5.991。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
+    task: 4区分、λ をデータから推定。5%で H₀（ポアソン分布に合う）をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
+    why: χ²≒0.147 は、自由度＝4−1−1＝2（区分の数−1−推定した母数の数）の境目5.991 よりずっと小さいので棄却しない。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
 
 - id: Q-U27-021
   concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
