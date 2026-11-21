@@ -184,9 +184,9 @@
     id: LAB-ptest
     mode: var
     set: {side: lower, alpha: 0.05, n: 21, s2: 4.5, v0: 9}
-    task: σ₀²＝9、21個の s²＝4.5。左片側の p 値は（小数で）？
-    predict: {type: number, key: p, label: "p 値"}
-    expect: 0.0318
+    task: σ₀²＝9、21個の s²＝4.5。左片側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却する
     why: χ²＝10 は左側の境目10.851 より小さく、左側の面積は約0.032。
 
 - id: Q-U26-022
