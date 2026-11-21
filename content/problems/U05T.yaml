@@ -56,8 +56,8 @@
     id: LAB-ts
     mode: ratio
     set: {x0: 200, r1: 25, r2: -20}
-    task: 200個が25%増え、その後20%減った。全体の増減率は何%か。
-    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    task: 200個が25%増え、その後20%減った。最初を基準にした全体の増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "全体の増減率（減るなら −）", unit: "%"}
     expect: 0
     why: 1.25×0.8＝1.0 で元の200個に戻る。率の数字（25と20）が違っても、基準が違うので元に戻ることがある。
 
@@ -75,8 +75,8 @@
     id: LAB-ts
     mode: ratio
     set: {x0: 100, r1: 20, r2: -20}
-    task: 100が20%増え、その後20%減った。全体の増減率は何%か。
-    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    task: 100が20%増え、その後20%減った。最初を基準にした全体の増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "全体の増減率（減るなら −）", unit: "%"}
     expect: -4
     why: 2回目の20%減は、増えた後の120を基準にするので24減る。率を足すと0%だが、実際は96。
 

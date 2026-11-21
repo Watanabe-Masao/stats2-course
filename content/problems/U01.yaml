@@ -75,8 +75,8 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 1000, r1: 20, r2: -10}
-    task: 1,000万円が20%増えてから10%減った。最初と比べて全体で何%か。
-    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    task: 1,000万円が20%増えてから10%減った。最初を基準にした増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "全体の増減率（減るなら −）", unit: "%"}
     expect: 8
     why: 1,000×1.2＝1,200、1,200×0.9＝1,080。倍率 1.2×0.9＝1.08 で8%増。率を足した10%にはならない。
 
@@ -94,8 +94,8 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 200, r1: -10, r2: 10}
-    task: 200 が10%減ってから10%増えた。最初と比べて全体で何%か。
-    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    task: 200 が10%減ってから10%増えた。最初を基準にした増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "全体の増減率（減るなら −）", unit: "%"}
     expect: -1
     why: 200×0.9＝180、180×1.1＝198。倍率 0.9×1.1＝0.99 で1%減。増やすときの基準は減った後の180。
 
@@ -132,8 +132,8 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 1000, r1: 25, r2: -20}
-    task: 売価を25%上げた。元に戻すには、上げた後から何%下げればよいか。
-    predict: {type: number, key: back, label: "元に戻す率", unit: "%"}
+    task: 売価を25%上げた。元に戻すには、上げた後の売価を基準に何%増減すればよいか（減るなら −）。
+    predict: {type: number, key: back, label: "元に戻す増減率（減るなら −）", unit: "%"}
     expect: -20
     why: 1÷1.25−1＝−0.2 で20%下げる。1,000×1.25＝1,250、1,250×0.8＝1,000 で元に戻る。
 
@@ -208,8 +208,8 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 1000, r1: -20, r2: -10}
-    task: 1,000円を20%引きにしてから、さらに10%引きにした。全体で何%か。
-    predict: {type: number, key: total, label: "全体の増減率", unit: "%"}
+    task: 1,000円を20%引きにしてから、さらに10%引きにした。元の価格を基準にした増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "全体の増減率（減るなら −）", unit: "%"}
     expect: -28
     why: 1,000×0.8＝800円、800×0.9＝720円。倍率 0.72 で28%引き。
 
@@ -258,8 +258,8 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 100, r1: 10, r2: -5}
-    task: 客数が10%増え、客単価が5%減った。売上は全体で何%か（前年を100として見る）。
-    predict: {type: number, key: total, label: "売上の増減率", unit: "%"}
+    task: 客数が10%増え、客単価が5%減った。前年を基準にした売上の増減率は何%か（減るなら −）。
+    predict: {type: number, key: total, label: "売上の増減率（減るなら −）", unit: "%"}
     expect: 4.5
     why: 売上＝客数×客単価なので倍率を掛ける。1.1×0.95＝1.045 で4.5%増。
 
@@ -315,7 +315,7 @@
     id: LAB-ratio
     mode: chain
     set: {x0: 1000, r1: 50, r2: -50}
-    task: 50%値上げした後、元に戻すには何%下げればよいか（くわしくの「元に戻す率」）。
-    predict: {type: number, key: back, label: "元に戻す率", unit: "%"}
+    task: 50%値上げした後、元に戻すには、上げた後の価格を基準に何%増減すればよいか（減るなら −）。
+    predict: {type: number, key: back, label: "元に戻す増減率（減るなら −）", unit: "%"}
     expect: -33.333
     why: 1÷1.5−1≒−0.333 で約33.3%下げる。2回目を−50%にすると750円で、元の75%になる。
