@@ -212,10 +212,10 @@
     id: LAB-ttest
     mode: one
     set: {side: two, alpha: 0.05, xbar: 105, mu0: 100, s: 5, n: 6}
-    task: 6店の平均105・s＝5、基準100。両側5%の t の境目は（小数で）？
-    predict: {type: number, key: crit, label: "境目 t"}
-    expect: 2.5706
-    why: 約2.571。t≒2.45 は1.96 は超えるが、この境目には届かない。
+    task: 6店の平均105・s＝5、基準100。両側5%で H₀ をどうするか。
+    predict: {type: choice, key: decision, label: "H₀ を", options: [棄却する, 棄却しない]}
+    expect: 棄却しない
+    why: t≒2.45 は1.96 は超えるが、自由度5 の両側5%の境目 約2.571 には届かないので棄却しない。
 
 - id: Q-U25-023
   concepts: [TERM-welch, TERM-t, TERM-df, TERM-paired-t, TERM-unbvar, TERM-se, TERM-reject, TERM-pvalue, REL-pairedt-welch-contrast, REL-t-normal]
