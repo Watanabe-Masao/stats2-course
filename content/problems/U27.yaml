@@ -167,10 +167,10 @@
     id: LAB-chisq
     mode: gof
     set: {alpha: 0.05, k: 4, m: 1, o: [35, 38, 19, 8], w: [0.3679, 0.3679, 0.1839, 0.0803]}
-    task: 4区分、λ をデータから推定。比べる境目（上側5%点）は（小数で）？
-    predict: {type: number, key: crit, label: "境目"}
-    expect: 5.991
-    why: 自由度＝4−1−1＝2 なので5.991。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
+    task: 4区分、λ をデータから推定。この適合度の検定の自由度は？
+    predict: {type: number, key: df, label: "自由度"}
+    expect: 2
+    why: 自由度＝4−1−1＝2（区分の数−1−推定した母数の数）。比べる境目は5.991。「推定した母数」を0個にすると自由度3・境目7.815 になる。棒グラフでは観測と期待がほぼ重なる。
 
 - id: Q-U27-021
   concepts: [TERM-indep-test, TERM-crosstab, TERM-expected, TERM-chi2, TERM-df, TERM-reject, CLM-28c]
