@@ -15,7 +15,7 @@ modes:   # ラボと原本の約束。set＝場面の版で渡せる値、values
     name: ダミー変数
     purpose: 平日（D＝0）と週末（D＝1）を1つの式に入れる。交互作用なしは平行な2本（D の係数＝同じ x での差）、ありは傾きも群ごと。単純な平均の差と比べる
     set: [data, inter]                    # data＝"x,D,y"。inter＝交互作用を入れるか
-    values: [bD, mdiff, b1, slope0, slope1, bI]
+    values: [bD, mdiff, b1, slope0, slope1, bI, bs]   # bs：客数だけの単回帰の傾き（画面に出る）
   - key: colin
     name: 多重共線性
     purpose: x₁ と x₂ の相関を変え、同じ仕組み（本当の係数はどちらも1）から標本を40回取り直した (b₁, b₂) を点で打つ。VIF、係数のばらつき、b₁＋b₂ のばらつき、符号が逆になった回数（固定の乱数）
