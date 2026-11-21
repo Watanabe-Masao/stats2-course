@@ -36,11 +36,11 @@
   lab:
     id: LAB-test
     mode: power
-    set: {side: two, alpha: 0.05, mu0: 100, mu1: 105.6, sigma: 10, n: 25}
-    task: μ₀＝100、本当の μ₁＝105.6、σ＝10、25人、両側5%。第2種の過誤の確率 β は（小数で）？
+    set: {side: two, alpha: 0.05, mu0: 100, mu1: 105.6, sigma: 10, n: 16}
+    task: μ₀＝100、本当の μ₁＝105.6、σ＝10。α は両側5%のまま、人数を16人にする。第2種の過誤の確率 β は（小数で）？ α と同じ5%になるか。
     predict: {type: number, key: beta, label: "β"}
-    expect: 0.2005
-    why: 本当の z の中心は 5.6÷2＝2.8。境目1.96を超える確率（検出力）が約0.80、見逃す確率 β が約0.20。
+    expect: 0.3897
+    why: 約0.39 で、α の5% とは別の値。25人なら約0.20、人数を増やすほど小さくなる。α は「正しい H₀ を棄却する確率」として先に決める値で、β は本当の値・n・σ で決まる。
 
 - id: Q-U24-003
   concepts: [TERM-h0, TERM-h1, TERM-test-stat, TERM-pvalue, TERM-alpha, TERM-sides, TERM-se, TERM-normal, CLM-6b]
