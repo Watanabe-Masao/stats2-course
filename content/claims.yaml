@@ -240,7 +240,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: 2次資料
   version: 1
 - id: CLM-7
@@ -882,7 +882,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: 2次資料
   version: 1
 - id: CLM-28c
@@ -932,7 +932,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: 2次資料
   version: 1
 - id: CLM-29
@@ -1309,7 +1309,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: なし
   version: 1
 - id: CLM-20a
@@ -1514,7 +1514,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: 2次資料
   version: 1
 - id: CLM-45
@@ -1572,7 +1572,7 @@ claims:
     - by: AM
       date: '2026-11-22'
       method: 独立な確かめ
-      version: e848210
+      version: 401712f
     external: 2次資料
   version: 1
 - id: CLM-46
