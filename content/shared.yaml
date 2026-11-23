@@ -38,7 +38,40 @@ concept_groups:
   - {id: GRP-dist-count, category: 確率分布, name: くり返して数える, summary: 取り出し・試行をくり返して、当たりや成功の数を数える}
   - {id: GRP-dist-wait, category: 確率分布, name: 待つ・まれに起こる, summary: 成功までの回数を待つ、まれな出来事の回数を数える}
   - {id: GRP-dist-cont, category: 確率分布, name: 連続の分布, summary: 値が連続にとれ、確率を密度の面積で表す分布}
-relation_map_ready: [確率分布]
+  # ほかの11分類（関係図への一本化。#587・#588。2026-11-23。学ぶ順に並べる）
+  - {id: GRP-math-expr, category: 数学の道具, name: 式を読む・動かす, summary: 足し合わせる記号、入れた値に出る値を決める約束、等式を解く操作}
+  - {id: GRP-math-count, category: 数学の道具, name: 並べ方・選び方を数える, summary: 区別できるものを並べる数・選ぶ数と、それを作る掛け算}
+  - {id: GRP-data-whole, category: データと変数, name: 全体と一部, summary: 調べたい全体と取り出した一部、それぞれの性質を表す値}
+  - {id: GRP-data-var, category: データと変数, name: 変数の種類, summary: 値がもつ情報の段階で、変数を分類と数量に分ける}
+  - {id: GRP-data-ratio, category: データと変数, name: 割合の言い方, summary: 全体に対する部分の大きさと、2つの割合の差の言い方}
+  - {id: GRP-chart-one, category: 図表, name: 1つの変数の分布を見る, summary: 1つの量的変数の値が、どこにどれだけあるかを表や図にする}
+  - {id: GRP-chart-two, category: 図表, name: 2つの変数の組を見る, summary: 2つの変数の値の組を、表や点で並べて関係を見る}
+  - {id: GRP-sum-center, category: 要約（代表値・ばらつき）, name: 真ん中を1つの数にする, summary: データの中心を、平均・真ん中の値・多い値・倍率の平均で表す}
+  - {id: GRP-sum-pos, category: 要約（代表値・ばらつき）, name: 並べた位置で区切る, summary: 小さい順に並べた位置の値と、その間の広がり・外れた値}
+  - {id: GRP-sum-spread, category: 要約（代表値・ばらつき）, name: 平均からのずれで測る, summary: 平均からのずれを2乗して平均し、ばらつきを1つの数や物差しにする}
+  - {id: GRP-sum-shape, category: 要約（代表値・ばらつき）, name: 分布の形, summary: 左右の非対称さと裾の重さを数にする}
+  - {id: GRP-sum-rv, category: 要約（代表値・ばらつき）, name: 確率変数の平均とばらつき, summary: データの平均とばらつきを、確率で重み付けした形で確率変数に移す}
+  - {id: GRP-prob-event, category: 確率, name: 出来事を集合で表す, summary: 起こりうる結果の全体と、注目する結果の集まり、その関係}
+  - {id: GRP-prob-calc, category: 確率, name: 確率を計算する, summary: 和・積・条件付きの確率の決まりと、場合に分けて足す計算}
+  - {id: GRP-prob-bayes, category: 確率, name: 結果から原因をさかのぼる, summary: 見る前の確率を、結果の起こりやすさで見たあとの確率に更新する}
+  - {id: GRP-survey-way, category: 調査・実験, name: 標本の選び方, summary: 母集団から標本を無作為に選ぶ方法と、その工夫}
+  - {id: GRP-survey-error, category: 調査・実験, name: ずれの出どころ, summary: 一部だけを調べるずれと、それ以外の理由で一定の向きに生じるずれ}
+  - {id: GRP-survey-exp, category: 調査・実験, name: 実験で比べる, summary: ほかの要因の混ざりを、くじ引きの割り当てで切り離す}
+  - {id: GRP-sd-stat, category: 標本分布・極限, name: 統計量のばらつき, summary: 標本を取り直すたびに変わる統計量の分布と、そのばらつきの大きさ}
+  - {id: GRP-sd-limit, category: 標本分布・極限, name: 標本を大きくすると, summary: n を大きくしたときに標本平均とその分布が近づく先}
+  - {id: GRP-sd-dist, category: 標本分布・極限, name: 推定・検定で使う分布, summary: 正規分布から作られ、自由度で形が決まる分布}
+  - {id: GRP-est-point, category: 推定, name: 1つの値で推定する, summary: 母数を、標本から決まる式の値1つで見込む}
+  - {id: GRP-est-good, category: 推定, name: 推定量のよさ, summary: 推定量が母数にどれだけ近いかを、偏り・ばらつき・n を増やしたときで比べる}
+  - {id: GRP-est-interval, category: 推定, name: 幅で推定する, summary: 母数を含む確率の下限が決まった作り方で、区間を作る}
+  - {id: GRP-test-frame, category: 検定, name: 仮説を立てて判定する, summary: 仮説と、ずれを1つの数にした統計量、棄却するかを決める基準}
+  - {id: GRP-test-error, category: 検定, name: 判定の誤り, summary: 正しい仮説を棄却する誤りと、誤った仮説を見逃す誤り}
+  - {id: GRP-test-mean, category: 検定, name: 平均を比べる検定, summary: 2群・多群の平均の差を、t 分布や F 分布で調べる}
+  - {id: GRP-test-count, category: 検定, name: 度数・割合を比べる検定, summary: 観測した度数や割合が、仮説のもとの見込みとずれるかを調べる}
+  - {id: GRP-ts, category: 時系列, name: 時間の並びを読む, summary: 時間順の値の細かい変動をならし、前の時点との似かたを数にする}
+  - {id: GRP-corr, category: 相関・回帰, name: 2つの変数の関係の強さ, summary: 2つの量的変数が同じ向きにずれる度合いと、見かけの関係}
+  - {id: GRP-reg-fit, category: 相関・回帰, name: 回帰式を求める, summary: 説明変数から目的変数を見込む1次式を、残差を小さくして決める}
+  - {id: GRP-reg-eval, category: 相関・回帰, name: 回帰式の当てはまりと注意, summary: 回帰式がどれだけ説明するかと、使うときに崩れる所}
+relation_map_ready: [確率分布, 数学の道具, データと変数, 図表, 要約（代表値・ばらつき）, 確率, 調査・実験, 標本分布・極限, 推定, 検定, 時系列, 相関・回帰]   # 全分類（#588。2026-11-23）
 # 型 v2 で書き終えた分類（製本への移行。docs/schema-v2-design.md 8・#264）。relation_map_ready（v1 の関係図の決まり）とは別。
 # 空のあいだ、build は全部の関係を legacy_type（v1 の種類の名前）で書き出す。分類を足すのは M5（#265）
 v2_ready: [確率分布, 確率, 標本分布・極限, 推定, 検定, 要約（代表値・ばらつき）, 相関・回帰, 調査・実験, データと変数, 図表, 時系列, 数学の道具]   # 2026-11-09（確率分布 #289・確率 #295・標本分布・極限 #298・推定 #301・検定 #304・要約 #310）・2026-11-10（相関・回帰 #317・調査・実験 #321・データと変数 #323・図表 #326・時系列 #329・数学の道具 #332）
