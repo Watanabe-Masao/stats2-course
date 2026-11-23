@@ -54,6 +54,11 @@ def main(argv: list[str]) -> int:
     nofig = relations_without_figures()
     if nofig:
         print(f"⚠ 図のない関係（移る・比べる・導ける・特別な場合）{len(nofig)}本：{', '.join(nofig)}（relations.yaml の figures。#95）")
+    from network import concepts_without_overview
+    noov = concepts_without_overview(course)
+    if noov:
+        print(f"⚠ 概要の問い・つまりがない説明ありの概念 {len(noov)}語（terms.yaml の question・gist。#577。"
+              f"docs/rollout.md の 1-5。全部そろったら止める形にする）")
     from network import basis_gaps, load_network
     gaps = basis_gaps(course, load_network()[0])
     if gaps:

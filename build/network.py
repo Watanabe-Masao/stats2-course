@@ -1108,6 +1108,12 @@ def material_cycles(rels: list[dict] | None = None) -> list[list[str]]:
 VISUAL_TYPES = ("移る", "比べる", "導ける", "特別な場合")
 
 
+def concepts_without_overview(course) -> list[str]:
+    """説明ありの概念で、概要の問い（question）かつまり（gist）がない語（#577。docs/rollout.md の 1-5）。"""
+    return [tid for tid, t in course.terms.items()
+            if t.get("definition") and not (t.get("question") and t.get("gist"))]
+
+
 def relations_without_figures() -> list[str]:
     rels, _ = load_network()
     return [r["id"] for r in rels if r.get("type") in VISUAL_TYPES and not r.get("figures")]
