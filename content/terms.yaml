@@ -3,6 +3,7 @@
   name: 順列
   en: permutation
   category: 数学の道具
+  group: GRP-math-count
   forms: [number]
   basis:
     text: 異なる n 個のものから r 個（n・r は 0≦r≦n の整数。定義の要件）を取り出し、順番を区別して1列に並べる並べ方の数 ₙPᵣ（何も取り出さない r＝0 は1通り）
@@ -33,9 +34,15 @@
         - {path: [1, 1], name: 残した中の並べ方, meaning: 取り出さずに残した n−r 個の並びは数えないので、その並べ方の数で割る}
   conditions:
     math:
-      - n と r は整数で、0 ≦ r ≦ n
-      - n 個はどれも区別できる
-      - 同じものを2回使わない（取り出したものは戻さない）
+      - kind: 要件
+        text: n と r は整数で、0 ≦ r ≦ n
+        outside: n・r が範囲の外なら、この定義の順列の数は決まらない
+      - kind: 要件
+        text: n 個はどれも区別できる
+        outside: 区別できないものがあれば、この定義の順列ではない（同じものを含む順列として数え直す）
+      - kind: 要件
+        text: 同じものを2回使わない（取り出したものは戻さない）
+        outside: 戻して何度でも使えるなら、この定義の順列ではない（重複順列として数える）
     data:
       - 「順番を区別する」場面かを確かめる。役割（委員長・副委員長）・順位・並ぶ位置があれば順列、選ぶだけなら組合せで数える
       - 同じものを2回使える場面（暗証番号の数字など）かを確かめる
@@ -55,6 +62,7 @@
   name: 組合せ
   en: combination
   category: 数学の道具
+  group: GRP-math-count
   forms: [number]
   basis:
     text: 異なる n 個のものから、順番を区別せずに r 個（n・r は 0≦r≦n の整数。定義の要件）を選ぶ選び方の数 ₙCᵣ（何も選ばない r＝0 は1通り）
@@ -98,9 +106,15 @@
       meaning: 残した n−r 個も順番を区別しないので、その並べ方の数で割る
   conditions:
     math:
-    - n と r は整数で、0 ≦ r ≦ n
-    - n 個はどれも区別できる
-    - 同じものを2回選ばない（選んだものは戻さない）
+    - kind: 要件
+      text: n と r は整数で、0 ≦ r ≦ n
+      outside: n・r が範囲の外なら、この定義の組合せの数は決まらない
+    - kind: 要件
+      text: n 個はどれも区別できる
+      outside: 区別できないものがあれば、この定義の組合せではない（選び方を数え直す）
+    - kind: 要件
+      text: 同じものを2回選ばない（選んだものは戻さない）
+      outside: 戻して何度でも選べるなら、この定義の組合せではない（重複組合せとして数える）
     data:
     - 「順番を区別しない」選び方かを確かめる。役割（委員長・副委員長）や順位があるなら順列で数える
   example: 5人から2人の係を選ぶ選び方は ₅C₂＝5!÷(2!×3!)＝120÷12＝10 通り。
@@ -119,6 +133,7 @@
   name: 総和記号（Σ）
   en: summation
   category: 数学の道具
+  group: GRP-math-expr
   forms: [operation]
   basis:
     text: 指定した添え字の範囲にわたって、各項を足し合わせること。Σ はその書き方。有限和 Σ_{i=1}^{n} aᵢ＝a₁＋a₂＋…＋aₙ（上端が下端より小さいときは、足す項がないので和は0（空の和））。下端から順に書いた、項が無限に続く和 Σ_{i=m}^{∞} aᵢ は、部分和 Sₙ＝Σ_{i=m}^{n} aᵢ の n→∞ の極限で定め、その極限が有限の実数のときに値をもつ。集合にわたって足す和 Σₓ（期待値のように取り得る値の集合で足す。値が整数でも、順を決めて書いていなければこちら）は、絶対値の和が有限（絶対収束）のときに、足す順によらず1つの有限の値に定まる（項がすべて非負なら、そのまま足した和が有限であることと同じ）
@@ -158,6 +173,7 @@
   name: 階乗
   en: factorial
   category: 数学の道具
+  group: GRP-math-count
   forms: [number]
   basis_formula: F-fact-def
   question: 区別できる n 個を全部1列に並べる並べ方は、何通りある？
@@ -185,7 +201,9 @@
     tree: {"op": "eq", "args": [{"op": "fn", "name": "fact", "args": [{"sym": "n"}]}, {"op": "prod", "var": "i", "lower": {"num": 1}, "upper": {"sym": "n"}, "args": [{"sym": "i"}]}]}
   conditions:
     math:
-    - n は0以上の整数（0! は 1 と決める。何も並べない並べ方は1通り）
+    - kind: 要件
+      text: n は0以上の整数（0! は 1 と決める。何も並べない並べ方は1通り）
+      outside: 0以上の整数でなければ、この定義の階乗は決まらない
     data:
     - n が大きいとすぐに大きくなる（10! は 3628800）。計算では約分してから掛けると楽になる
   example: 3人を1列に並べる並べ方は 3!＝3×2×1＝6 通り。
@@ -203,6 +221,7 @@
   name: 母集団
   en: population
   category: データと変数
+  group: GRP-data-whole
   forms: [event]
   basis:
     text: 調べたい性質をもつ対象（人・物・出来事）の全部の要素の集まり（要素の数 N。限りなく多いとみなすこともある）。推測統計で「母集団の分布」と言うときは、値が数の変数について、母集団から1つ無作為に取り出した要素の値（確率変数）の分布を指し、母集団そのものとは別のもの
@@ -233,6 +252,7 @@
   name: 標本
   en: sample
   category: データと変数
+  group: GRP-data-whole
   forms: [rv]
   basis:
     text: 母集団について調べるために（実際には抽出枠から）n 回選んだ個体（復元抽出では重なりうる）の、調べる変数の値を並べた組 X₁, …, Xₙ（どの個体が選ばれるかの偶然で値が決まる。選ばれた個体の集まり S は、標本の選ばれ方の結果として文の中で言う。n を標本の大きさと呼び、観測したあとの値 x₁, …, xₙ も同じ名前で呼ぶ）
@@ -265,6 +285,7 @@
   name: 母数
   en: parameter
   category: データと変数
+  group: GRP-data-whole
   forms: [number]
   basis:
     text: 母集団の性質を表す数 θ（母平均 μ・母分散 σ² など）。母集団の全部の要素の値から決まり、全数を調べない限り標本からは決まらないので、ふつうは分からない（母集団の分布を分布の族で表すときは、その族を区別する数（二項分布の p など）を同じ名前で呼ぶ）
@@ -298,6 +319,7 @@
   name: 統計量
   en: statistic
   category: データと変数
+  group: GRP-data-whole
   forms: [rv]
   basis:
     text: 標本 X₁, …, Xₙ の値だけで値が数（実数1つ）に決まる関数 T＝t(X₁, …, Xₙ) として作る確率変数（分からない母数を含まないことと、値が数であることは定義の要件。観測したあとの値も同じ名前で呼ぶ。定義ではない補足：標本を取り直すたびに値が変わりうる。分からない母数を推し量る推定や、仮説を確かめる検定に使う）
@@ -332,6 +354,7 @@
   name: 標本空間
   en: sample space
   category: 確率
+  group: GRP-prob-event
   forms: [event]
   basis:
     text: 1回の試行で起こりうる結果を、重なりなく漏れなく全部集めた集合 Ω
@@ -363,6 +386,7 @@
   name: 事象
   en: event
   category: 確率
+  group: GRP-prob-event
   forms: [event]
   basis:
     text: 標本空間 Ω の部分集合（起こりうる結果のうち、注目するものの集まり）
@@ -394,6 +418,7 @@
   name: 抽出枠
   en: sampling frame
   category: データと変数
+  group: GRP-data-whole
   forms: [event]
   basis:
     text: 標本を選ぶ元にする、要素を1つずつ並べた一覧（名簿・台帳・地図の区画など）に載っている要素の集まり。母集団の要素の全部を1回ずつ含むとは限らず、漏れ・重複・対象外の要素を含むことがある
@@ -425,6 +450,7 @@
   name: 無作為抽出
   en: random sampling
   category: 調査・実験
+  group: GRP-survey-way
   forms: [procedure]
   basis:
     text: 抽出枠の中から標本を選ぶとき、どの標本をどの確率で選ぶかを前もって決め（枠のどの要素も、抽出の単位が要素の集まりのときはその集まりを通して、選ばれる確率が0より大きい）、その確率に従うくじ（乱数）で選ぶ手続き。大きさ n のどの組み合わせも同じ確率で選ぶものを単純無作為抽出と呼び、そのとき各要素の選ばれる確率は n/N（N は枠の要素の数）
@@ -505,6 +531,7 @@
   name: バイアス（偏り）
   en: bias
   category: 調査・実験
+  group: GRP-survey-error
   forms: [number]
   basis:
     text: 母数 θ の推定量 θ̂ について E(θ̂)−θ（E(θ̂) が存在するとき。母数の値ごとに決まる。期待値は、標本の選び方と、測り方・回答を含むデータの取り方の全体についてとる）。0 でなければ、推定値はくり返したときに平均として一方の向きにずれる。応募した人だけを調べるなど、選ばれ方の確率が分からない取り方でも、選ばれ方を確率のモデルで表せば偏りは定まるが、その確率が分からないので大きさを見積もれない
@@ -582,6 +609,7 @@
   name: 質的変数
   en: qualitative variable
   category: データと変数
+  group: GRP-data-var
   forms: [function]
   basis:
     text: 個体（調べる対象の1つ1つ）ごとに値を1つ対応させる変数のうち、尺度が名義尺度か順序尺度のもの。値は分類（カテゴリ）を表し、数字で書いても値どうしの足し算・引き算に意味がない
@@ -614,6 +642,7 @@
   name: 量的変数
   en: quantitative variable
   category: データと変数
+  group: GRP-data-var
   forms: [function]
   basis:
     text: 個体（調べる対象の1つ1つ）ごとに値を1つ対応させる変数のうち、尺度が間隔尺度か比例尺度のもの。値は数量を表し、値どうしの差に意味がある（比例尺度なら比にも意味がある）
@@ -648,6 +677,7 @@
   name: 尺度
   en: level of measurement
   category: データと変数
+  group: GRP-data-var
   forms: [property]
   basis:
     text: 変数の値について、意味をもつ比べ方・計算で分けた4つの段階。名義尺度（同じか違うかだけ）、順序尺度（大小の順まで）、間隔尺度（差まで。0 の位置は決め方による）、比例尺度（比まで。0 が「無い」を表す）。上の段階は、下の段階の比べ方を全部含む
@@ -682,6 +712,7 @@
   name: 最頻値
   en: mode
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-center
   forms: [number]
   basis:
     text: データに現れる値のうち、現れる回数（度数）がいちばん多い値（いちばん多い値が2つ以上あれば、それぞれが最頻値。度数分布表から読むときは、度数がいちばん多い階級の階級値を同じ名前で呼ぶ）
@@ -714,6 +745,7 @@
   name: 中央値
   en: median
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-center
   forms: [number]
   basis:
     text: 値に順序があるデータ x₁, …, xₙ（n≧1。順序があることは定義の要件）を小さい順に並べたとき、真ん中の位置の値（n が奇数なら (n＋1)/2 番目、偶数なら n/2 番目と n/2＋1 番目の2つの値の和の半分。偶数で真ん中の2つの値が違うときは、値が量的であることも要件で、順序だけのデータではこの定義では定まらない）
@@ -750,6 +782,7 @@
   name: 度数分布表
   en: frequency table
   category: 図表
+  group: GRP-chart-one
   forms: [function]   # 階級 → 度数。記述の道具はデータを固定して見る（① の 3。#342）
   basis:
     text: 量的なデータ x₁, …, xₙ（n≧1。値が数であることは定義の要件）について、互いに重ならず、すべての値を含む区間（階級）c₁, …, c_k を小さい順に決め、各階級 c_j に入る値の個数（度数）f_j を階級の順に並べた表（f₁＋…＋f_k＝n。相対度数 f_j/n・累積度数を添えることが多い）
@@ -783,6 +816,7 @@
   name: ヒストグラム
   en: histogram
   category: 図表
+  group: GRP-chart-one
   forms: [function, random_set]   # 基準はデータを固定した階段の関数。標本から作って密度を推定するとき（④-30・推定する）は偶然で決まる関数として同じ名前で呼ぶ（① の 3。#342）
   basis:
     text: 度数分布表（階級 c_j は有界で幅 w_j は 0＜w_j＜∞、隣り合う階級の境目が一致する。度数 f_j、総数 n）について、各階級の上に、面積がその階級の相対度数 f_j/n に等しい柱（高さ f_j/(n·w_j)）を隙間なく並べた図。x が c_j に入るとき h(x)＝f_j/(n·w_j)、どの階級にも入らないとき h(x)＝0 とする階段の関数として読め、すべての値が階級に入るとき柱の面積の合計は1になる（階級の幅がそろうとき、縦軸に度数をとって描くのは、縦の目盛りだけが違う同じ図）
@@ -815,6 +849,7 @@
   name: 箱ひげ図
   en: box plot
   category: 図表
+  group: GRP-chart-one
   forms: [number]   # 5つの数の組。記述の道具はデータを固定して見る（① の 3。#342）
   basis:
     text: 量的なデータ（n≧2）の最小値・第1四分位数 Q₁・第2四分位数 Q₂（中央値）・第3四分位数 Q₃・最大値の5つの数を、1本の数直線の上に、Q₁ から Q₃ までの箱、箱の中の Q₂ の線、箱の両端から最小値と最大値までのひげで表した図（柵 Q₁−1.5(Q₃−Q₁)・Q₃＋1.5(Q₃−Q₁) の外の値を外れ値として点で分け、ひげを柵の内側のいちばん外の値までにした図も、同じ名前で呼ぶ）
@@ -849,6 +884,7 @@
   name: 四分位数
   en: quartile
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-pos
   forms: [number]
   basis:
     text: データを小さい順に並べ、中央値を第2四分位数 Q₂、中央値より下の半分の中央値を第1四分位数 Q₁、上の半分の中央値を第3四分位数 Q₃ とする（n が奇数のときは、真ん中の値を両方の半分から除く。n≧2 で、値が量的であることは定義の要件）
@@ -881,6 +917,7 @@
   name: 四分位範囲
   en: interquartile range
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-pos
   forms: [number]
   basis:
     text: 第3四分位数から第1四分位数を引いた値 Q₃−Q₁（真ん中の半分のデータの広がり）
@@ -913,6 +950,7 @@
   name: 外れ値
   en: outlier
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-pos
   forms: [property]
   basis:
     text: データの値のうち、決めた基準でほかの値から大きく離れているとみなすもの。この教材の基準は箱ひげ図の柵で、Q₁−1.5×(Q₃−Q₁) より小さいか、Q₃＋1.5×(Q₃−Q₁) より大きい値（z の大きさなどほかの判定は、外れ値の候補を見つける別の目安で、この定義の外）
@@ -947,6 +985,7 @@
   name: 割合
   en: ratio
   category: データと変数
+  group: GRP-data-ratio
   forms: [number]
   basis:
     text: もとにする量 B に対する、比べる量 A の比 A/B（B を1とみた A の大きさ。100倍すると百分率（%）。A が B の一部なら 0 以上 1 以下、前年比のように A が B より大きければ 1 を超える）。B＞0 は定義の要件
@@ -978,6 +1017,7 @@
   name: パーセントポイント
   en: percentage point
   category: データと変数
+  group: GRP-data-ratio
   forms: [number]
   basis:
     text: 2つの割合 p₁・p₂ を百分率で表したときの差 p₂−p₁ を、その数で表したもの（単位はポイント。10% から 12% は 2 ポイント。前の割合を基準にした相対的な変化 (p₂−p₁)/p₁（p₁＞0 のとき。10% から 12% は 20% 増）とは別）
@@ -1010,6 +1050,7 @@
   name: 偏差
   en: deviation
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [number]
   basis:
     text: データ x₁, …, xₙ の各値 xᵢ から平均 x̄ を引いた値 xᵢ−x̄（平均からのずれ）
@@ -1041,6 +1082,7 @@
   name: 分散
   en: variance
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-rv
   forms: [operation, number]
   basis_formula: F-var-def
   question: 確率変数の値は、期待値からどれくらい散らばる？
@@ -1144,6 +1186,7 @@
   name: 不偏分散
   en: unbiased variance
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [rv]
   basis:
     text: 標本 X₁, …, Xₙ（n≧2。n≧2 は定義の要件）から作る統計量 s²＝{(X₁−X̄)²＋…＋(Xₙ−X̄)²}/(n−1)（X̄ は標本平均。観測したあとの値も同じ名前で呼ぶ）
@@ -1181,6 +1224,7 @@
   name: 標準偏差
   en: standard deviation
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-rv
   forms: [operation, number]
   basis_formula: F-sd-def
   question: 確率変数の散らばりを、元の単位で言うと？
@@ -1232,6 +1276,7 @@
   name: 変動係数
   en: coefficient of variation
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [number]
   basis:
     text: 平均 x̄ が正の量的なデータ x₁, …, xₙ（n≧2）について、不偏分散の平方根 s＝√{Σ(xᵢ−x̄)²/(n−1)} を平均で割った値 s/x̄（x̄＞0・n≧2 は定義の要件）
@@ -1269,6 +1314,7 @@
   name: 不偏性
   en: unbiasedness
   category: 推定
+  group: GRP-est-good
   forms: [property]
   basis:
     text: 母数 θ の推定量 θ̂ について、モデルのすべての母数の値で（θ 以外の母数を含む） E(θ̂)＝θ が成り立つこと
@@ -1303,6 +1349,7 @@
   name: 標準化
   en: standardization
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-rv
   forms: [operation]
   basis_formula: F-std-def
   question: 期待値も散らばりも違う確率変数どうしを、同じ物差しで比べるには？
@@ -1382,6 +1429,7 @@
   name: 歪度
   en: skewness
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-shape
   forms: [number]
   basis:
     text: データ x₁, …, xₙ（データの標準偏差 √v＞0 は定義の要件。v はデータの分散）について、(xᵢ−x̄)/√v の3乗の平均 (1/n)Σ{(xᵢ−x̄)/√v}³
@@ -1418,6 +1466,7 @@
   name: 尖度
   en: kurtosis
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-shape
   forms: [number]
   basis:
     text: データ x₁, …, xₙ（データの標準偏差 √v＞0 は定義の要件。v はデータの分散）について、(xᵢ−x̄)/√v の4乗の平均 (1/n)Σ{(xᵢ−x̄)/√v}⁴（3を引かない決め方。正規分布では標準化した値の4乗の期待値が3で、正規分布から取った大きな標本の尖度は3に近づく）
@@ -1539,6 +1588,7 @@
   name: 期待値
   en: expected value
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-rv
   forms: [operation, number]
   basis_formula: F-expect-def
   question: 結果が毎回変わるくじの値を、確率を考えて1つの数で表すといくつになる？
@@ -1638,6 +1688,7 @@
   name: 幾何平均
   en: geometric mean
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-center
   forms: [number]
   basis:
     text: n 個の正の値 x₁, …, xₙ（正であることは定義の要件）を掛け合わせた積の n 乗根 (x₁x₂⋯xₙ)^(1/n)（伸び率なら、倍率 1＋伸び率 に当てはめる）
@@ -1672,6 +1723,7 @@
   name: 移動平均
   en: moving average
   category: 時系列
+  group: GRP-ts
   forms: [function]
   basis:
     text: 等間隔の時点 t＝1, …, T の量的なデータ（時系列）x₁, …, x_T と窓の幅 m（1≦m≦T の整数）について、各時点 t で、窓に入る連続した m 個の値の平均（算術平均）M_t を、窓を1期ずつずらして求めた値の列（窓の置き方で、t を真ん中にする中央移動平均 M_t＝(x_{t−h}＋…＋x_{t＋h})/m（この定義では m＝2h＋1 が奇数のときだけで、偶数の m は後方で求める。偶数の m で両端を半分の重みにして中央に合わせる中心化移動平均も同じ名前で呼ぶが、算術平均の形ではない）と、t までの過去 m 期をとる後方移動平均 M_t＝(x_{t−m＋1}＋…＋x_t)/m を呼び分ける。窓が系列からはみ出す時点では求めない。値が量的で時点が等間隔であることは定義の要件）
@@ -1710,6 +1762,7 @@
   name: 自己相関
   en: autocorrelation
   category: 時系列
+  group: GRP-ts
   forms: [number]
   basis:
     text: 等間隔の時点の量的なデータ（時系列）x₁, …, x_T（T≧2。値がすべて同じでないこと（データの分散＞0）は定義の要件）と、ずらす期間（ラグ）k（0≦k≦T−1 の整数）について、ラグ k の自己共分散 c_k＝(1/T)Σ_{t=1}^{T−k}(x_t−x̄)(x_{t+k}−x̄) を、系列のデータの分散 c₀＝(1/T)Σ_{t=1}^{T}(x_t−x̄)² で割った値 r_k＝c_k/c₀（x̄ は系列全体の平均。分子と分母の T は消えるので、r_k＝Σ_{t=1}^{T−k}(x_t−x̄)(x_{t+k}−x̄)/Σ_{t=1}^{T}(x_t−x̄)² と同じ値。r₀＝1、|r_k|≦1。平均と割る数を系列全体でとるので、ずらした対 (x_t, x_{t+k}) の相関係数とは一般に一致しない）
@@ -1751,6 +1804,7 @@
   name: 相関係数
   en: correlation coefficient
   category: 相関・回帰
+  group: GRP-corr
   forms: [number]
   basis:
     text: 量的な2変数のデータ (x₁, y₁), …, (xₙ, yₙ)（n≧2。x と y のデータの標準偏差がどちらも0でないことは定義の要件）について、データの共分散を x と y のデータの標準偏差の積で割った値 r＝s_xy/(s_x·s_y)（割る数は分子と分母で消えるので、r＝Σ(xᵢ−x̄)(yᵢ−ȳ)/√{Σ(xᵢ−x̄)²·Σ(yᵢ−ȳ)²} と同じ値）
@@ -1784,6 +1838,7 @@
   name: 余事象
   en: complement
   category: 確率
+  group: GRP-prob-event
   forms: [event]
   basis:
     text: 事象 A に対して、標本空間 Ω のうち A に入らない結果を全部集めた事象 Aᶜ＝Ω∖A
@@ -1816,6 +1871,7 @@
   name: 排反
   en: mutually exclusive
   category: 確率
+  group: GRP-prob-event
   forms: [property]
   basis:
     text: 2つの事象 A・B が共通の結果を持たない（A∩B＝∅）こと
@@ -1848,6 +1904,7 @@
   name: 独立
   en: independence
   category: 確率
+  group: GRP-prob-calc
   forms: [property]
   basis_formula: F-indep-def
   question: 一方が起きたかどうかで、もう一方の起こりやすさは変わる？
@@ -1898,6 +1955,7 @@
   name: 条件付き確率
   en: conditional probability
   category: 確率
+  group: GRP-prob-calc
   forms: [number]
   basis_formula: F-cond-def
   short: ある事象が起きたと分かったうえで、別の事象が起こる確率
@@ -1947,6 +2005,7 @@
   name: ベイズの定理
   en: Bayes' theorem
   category: 確率
+  group: GRP-prob-bayes
   forms: [proposition]
   claims: [CLM-23]
   basis:
@@ -2003,6 +2062,7 @@
   name: 事前確率
   en: prior probability
   category: 確率
+  group: GRP-prob-bayes
   forms: [number]
   basis:
     text: 結果 D を見る前に、原因・仮説 H（事象）に割り当てる確率 P(H)
@@ -2034,6 +2094,7 @@
   name: 尤度
   en: likelihood
   category: 確率
+  group: GRP-prob-bayes
   forms: [number]
   basis:
     text: 原因・仮説 H のもとで、観測した結果 D が起こる条件付き確率 P(D|H)（D を固定し、H を替えて比べる）
@@ -3040,6 +3101,7 @@
   name: 標本分布
   en: sampling distribution
   category: 標本分布・極限
+  group: GRP-sd-stat
   forms: [distribution]
   basis:
     text: 母集団から大きさ n の標本を取ることをくり返すとき、標本から計算する統計量を確率変数とみたときの確率分布
@@ -3074,6 +3136,7 @@
   name: 標準誤差
   en: standard error
   category: 標本分布・極限
+  group: GRP-sd-stat
   forms: [number]
   basis:
     text: 推定量 θ̂ の標本分布の標準偏差 √V(θ̂)（例：独立に同じ分布に従う標本で、標本平均の標準誤差は σ/√n）
@@ -3162,6 +3225,7 @@
   name: 大数の法則
   en: law of large numbers
   category: 標本分布・極限
+  group: GRP-sd-limit
   forms: [proposition]
   claims: [CLM-20b]
   basis:
@@ -3204,6 +3268,7 @@
   name: 中心極限定理
   en: central limit theorem
   category: 標本分布・極限
+  group: GRP-sd-limit
   forms: [proposition]
   claims: [CLM-6b]
   basis:
@@ -3245,6 +3310,7 @@
   name: 連続修正
   en: continuity correction
   category: 標本分布・極限
+  group: GRP-sd-limit
   forms: [operation]
   basis:
     text: 整数値をとる確率変数 X の確率を、確率密度で表される分布に従う Y の確率で近似するとき、P(X≦k) を P(Y≦k＋0.5)、P(X≧k) を P(Y≧k−0.5) で近似する（境目を 0.5 ずらす）操作
@@ -3276,6 +3342,7 @@
   name: t 分布
   en: t distribution
   category: 標本分布・極限
+  group: GRP-sd-dist
   forms: [distribution]
   basis:
     text: Z が N(0, 1) に従い、V が χ²(k) に従い、Z と V が独立なとき、T＝Z/√(V/k) の分布を自由度 k の t 分布 t(k) とする（k は1以上の整数）
@@ -3318,6 +3385,7 @@
   name: カイ二乗分布
   en: chi-squared distribution
   category: 標本分布・極限
+  group: GRP-sd-dist
   forms: [distribution]
   basis:
     text: Z₁, …, Z_k が独立に N(0, 1) に従うとき、Z₁²＋…＋Z_k² の分布を自由度 k のカイ二乗分布 χ²(k) とする（k は1以上の整数。独立は定義の要件）
@@ -3358,6 +3426,7 @@
   name: F 分布
   en: F distribution
   category: 標本分布・極限
+  group: GRP-sd-dist
   forms: [distribution]
   basis:
     text: U が χ²(m)、V が χ²(n) に従い、U と V が独立なとき、(U/m)/(V/n) の分布を自由度 (m, n) の F 分布 F(m, n) とする（m・n は1以上の整数）
@@ -3396,6 +3465,7 @@
   name: 自由度
   en: degrees of freedom
   category: 標本分布・極限
+  group: GRP-sd-dist
   forms: [number]
   basis:
     text: n 個の値に k 個の互いに独立な1次の制約（例：偏差の和が0）があるとき、自由に動ける値の個数 n−k。t・カイ二乗・F 分布では、族を区別する正の整数の母数を同じ名前で呼ぶ
@@ -3427,6 +3497,7 @@
   name: 推定量
   en: estimator
   category: 推定
+  group: GRP-est-point
   forms: [rv]
   basis:
     text: 母数 θ を推定する目的で使う統計量 θ̂（標本 X₁, …, Xₙ の関数で、分からない母数を含まないもの。観測したあとの値は推定値と呼ぶ）
@@ -3458,6 +3529,7 @@
   name: 母平均
   en: population mean
   category: 推定
+  group: GRP-est-point
   forms: [number]
   # 文脈の見出し（製本 ① の 2。#302）：自分の定義を持たず、期待値の意味を共有する。定義・式・成立条件は期待値に書く
   heading_of:
@@ -3470,6 +3542,7 @@
   name: 母分散
   en: population variance
   category: 推定
+  group: GRP-est-point
   forms: [number]
   # 文脈の見出し（製本 ① の 2・6 の 2 の決まったこと。#310・#302）：確率変数の分散の意味を共有する
   heading_of:
@@ -3482,6 +3555,7 @@
   name: 点推定
   en: point estimation
   category: 推定
+  group: GRP-est-point
   forms: [procedure]
   basis:
     text: 標本の値を推定量 θ̂ に入れて得た1つの値（推定値）を、母数 θ の値の推定とする手続き
@@ -3513,6 +3587,7 @@
   name: 一致性
   en: consistency
   category: 推定
+  group: GRP-est-good
   forms: [property]
   basis:
     text: 標本の大きさ n ごとの母数 θ の推定量 θ̂ₙ が、モデルのすべての母数の値で（θ 以外の母数を含む）、どの ε＞0 についても n→∞ で P(|θ̂ₙ−θ|≧ε)→0 となること（θ̂ₙ は θ に確率収束する）
@@ -3545,6 +3620,7 @@
   name: 有効性
   en: efficiency
   category: 推定
+  group: GRP-est-good
   forms: [property]
   basis:
     text: 同じ母数 θ の2つの不偏推定量 θ̂₁・θ̂₂ について、モデルのすべての母数の値で（θ 以外の母数を含む） V(θ̂₁)≦V(θ̂₂) のとき、θ̂₁ は θ̂₂ より有効という（分散の小さい不偏推定量ほどよいとする比べ方）
@@ -3579,6 +3655,7 @@
   name: 平均二乗誤差（MSE）
   en: mean squared error
   category: 推定
+  group: GRP-est-good
   forms: [number]
   basis:
     text: 母数 θ の推定量 θ̂ について、E[(θ̂−θ)²]（推定量と母数のずれの2乗の期待値。母数の値ごとに決まる）
@@ -3664,6 +3741,7 @@
   name: 信頼区間
   en: confidence interval
   category: 推定
+  group: GRP-est-interval
   forms: [random_set]
   basis:
     text: 母数 θ を区間で推定するために、標本から作る2つの統計量 L≦U でつくる区間 [L, U]（観測したあとの区間も同じ名前で呼ぶ）
@@ -3705,6 +3783,7 @@
   name: 信頼係数
   en: confidence level
   category: 推定
+  group: GRP-est-interval
   forms: [number]
   basis:
     text: 信頼区間 [L, U] を作る方法について、モデルのすべての母数の値で（θ 以外の母数を含む）とった、区間が θ を含む確率 P(L≦θ≦U) の下限（これが 1−α のとき、信頼係数 1−α の信頼区間という。95% など）
@@ -3738,6 +3817,7 @@
   name: 対応のある t 検定
   en: paired t-test
   category: 検定
+  group: GRP-test-mean
   forms: [procedure]
   basis:
     text: 同じ対象の2つの測定値の対 (Xᵢ, Yᵢ)（i＝1, …, n）の差 Dᵢ＝Xᵢ−Yᵢ について、H₀：差の母平均が 0 を、t＝D̄/(s_D/√n)（D̄・s_D² は差の標本平均・不偏分散）で検定する仮説検定
@@ -3774,6 +3854,7 @@
   name: ウェルチの t 検定
   en: Welch's t-test
   category: 検定
+  group: GRP-test-mean
   forms: [procedure]
   basis:
     text: 独立な2群の標本について、H₀：2つの母平均が等しい を、2群の母分散が等しいと仮定せずに、t＝(X̄₁−X̄₂)/√(s₁²/n₁＋s₂²/n₂)（X̄ⱼ・sⱼ² は群ごとの標本平均・不偏分散）で検定する仮説検定
@@ -3813,6 +3894,7 @@
   name: 帰無仮説
   en: null hypothesis
   category: 検定
+  group: GRP-test-frame
   forms: [proposition]
   basis:
     text: 母集団の分布（その母数）について置く仮説（真か偽かが決まる命題）で、データがそれと食い違うかを調べる対象にするもの。分布をただ1つに決める形（単純仮説。μ＝μ₀ など）か、決めた集まりに置く形（複合仮説）で立てる
@@ -3843,6 +3925,7 @@
   name: 対立仮説
   en: alternative hypothesis
   category: 検定
+  group: GRP-test-frame
   forms: [proposition]
   basis:
     text: 帰無仮説 H₀ が偽のときに母集団の分布がとりうるもの（の全部か一部）についての仮説で、H₀ を棄却したときに採るもの。ずれの向きを決める形（μ＞μ₀）と決めない形（μ≠μ₀）がある
@@ -3873,6 +3956,7 @@
   name: 検定統計量
   en: test statistic
   category: 検定
+  group: GRP-test-frame
   forms: [rv]
   basis:
     text: 帰無仮説 H₀ を棄却するかを決めるために使う統計量 T（H₀ のもとでの T の分布が分かるか、近似できるように作る。観測したあとの値も同じ名前で呼ぶ）
@@ -3908,6 +3992,7 @@
   name: p値
   en: p-value
   category: 検定
+  group: GRP-test-frame
   forms: [rv, number]
   basis:
     text: 検定統計量 T の観測値について、H₀ が正しいとしたとき T が観測値と同じかそれより極端な値（極端さの向きは前もって決める）をとる確率。H₀ が複合仮説なら H₀ の中での上限（T の関数とみると確率変数、観測したあとの値も p 値と呼ぶ）
@@ -3943,6 +4028,7 @@
   name: 有意水準
   en: significance level
   category: 検定
+  group: GRP-test-frame
   forms: [number]
   basis:
     text: 第1種の過誤の確率に、データを見る前に置く上限 α（5%・1% など）
@@ -3974,6 +4060,7 @@
   name: 棄却域
   en: rejection region
   category: 検定
+  group: GRP-test-frame
   forms: [event]
   basis:
     text: 検定統計量 T のとる値の集合 R で、T の観測値が R に入れば帰無仮説を棄却すると、データを見る前に決めたもの
@@ -4006,6 +4093,7 @@
   name: 片側検定・両側検定
   en: one-sided and two-sided tests
   category: 検定
+  group: GRP-test-frame
   forms: [procedure]
   basis:
     text: 仮説検定のうち、対立仮説 H₁ が母数のずれの向きを1つに決めるもの（片側検定）と、向きを決めないもの（両側検定）。棄却域はそれに合わせて置く（片側なら検定統計量の分布のその向きの端、両側ならふつう両端。ずれの向きによらず大きい値が出る統計量では、両側でも上側だけ）
@@ -4037,6 +4125,7 @@
   name: 第1種の過誤
   en: type I error
   category: 検定
+  group: GRP-test-error
   forms: [event, number]
   basis:
     text: 帰無仮説 H₀ が正しいときに、検定統計量が棄却域に入る（H₀ を棄却する）という判定の誤り（事象）。その確率も同じ名前で呼ぶ（その確率は H₀ の中のどの分布かで変わり、有意水準はその上限）
@@ -4065,6 +4154,7 @@
   name: 第2種の過誤
   en: type II error
   category: 検定
+  group: GRP-test-error
   forms: [event, number]
   basis:
     text: 帰無仮説 H₀ が誤っているとき（分布が H₀ の外にあるとき）に、検定統計量が棄却域に入らない（H₀ を棄却しない）という判定の誤り（事象）。その確率 β も同じ名前で呼ぶ（β は H₀ の外のどの分布かで変わる）
@@ -4096,6 +4186,7 @@
   name: 検出力
   en: power
   category: 検定
+  group: GRP-test-error
   forms: [number]
   basis:
     text: 帰無仮説 H₀ が誤っているときに H₀ を棄却する確率 1−β（β は第2種の過誤の確率。H₀ の外のどの分布かで値が変わる）
@@ -4127,6 +4218,7 @@
   name: プールした比率
   en: pooled proportion
   category: 検定
+  group: GRP-test-count
   forms: [rv]
   basis:
     text: 2群の標本の大きさ n₁・n₂ と標本比率 p̂₁・p̂₂ から作る (n₁p̂₁＋n₂p̂₂)/(n₁＋n₂)（2群を合わせた標本の中で性質をもつものの割合。観測したあとの値も同じ名前で呼ぶ）
@@ -4160,6 +4252,7 @@
   name: 期待度数
   en: expected frequency
   category: 検定
+  group: GRP-test-count
   forms: [number, rv]
   basis:
     text: 帰無仮説 H₀ のもとでの各欄（区分）の度数 Oᵢ の期待値 n·pᵢ（n は総数、pᵢ は H₀ のもとでその欄に入る確率）。H₀ が確率を1つに決めないとき（独立性検定、母数を推定する適合度検定）は、pᵢ の代わりに度数から推定した p̂ᵢ を使った n·p̂ᵢ（その期待値の推定値）（独立性検定では 行の合計×列の合計÷総数）
@@ -4192,6 +4285,7 @@
   name: クロス集計表のカイ二乗検定
   en: chi-squared test for contingency tables
   category: 検定
+  group: GRP-test-count
   forms: [procedure]
   basis:
     text: クロス集計表の度数について、H₀ を、統計量 Σ(O−E)²/E（O は観測度数、E は期待度数）で検定する仮説検定（H₀ は行と列の分かれ方についての仮説で、何を H₀ にし、統計量が近づく根拠が何かは取り方で決まる）
@@ -4232,6 +4326,7 @@
   name: 独立性検定
   en: test of independence
   category: 検定
+  group: GRP-test-count
   forms: [procedure]
   # 文脈の見出し（① の 2・6 の 20 の決まったこと。#475）：クロス集計表のカイ二乗検定の、1つの集団から総数を取る文脈
   heading_of:
@@ -4262,6 +4357,7 @@
   name: 同質性の検定
   en: test of homogeneity
   category: 検定
+  group: GRP-test-count
   forms: [procedure]
   # 文脈の見出し（① の 2・6 の 20 の決まったこと。#475）：クロス集計表のカイ二乗検定の、行ごとに標本数を先に決めて取る文脈
   heading_of:
@@ -4291,6 +4387,7 @@
   name: 適合度検定
   en: goodness-of-fit test
   category: 検定
+  group: GRP-test-count
   forms: [procedure]
   basis:
     text: k 個の区分に入った観測度数 O₁, …, O_k について、H₀：各区分の確率が決めた値（または決めた分布の族から出る値）である を、統計量 Σ(Oᵢ−Eᵢ)²/Eᵢ（Eᵢ は期待度数）で検定する仮説検定
@@ -4341,6 +4438,7 @@
   name: クロス集計表
   en: cross tabulation
   category: 図表
+  group: GRP-chart-two
   forms: [function]   # カテゴリの組 → 度数。記述の道具はデータを固定して見る（① の 3。#342）
   basis:
     text: 値が分類（カテゴリ）である2つの変数 A・B（値がカテゴリであることは定義の要件。量的変数は階級に分ければ使える）について、A のカテゴリ a₁, …, a_r と B のカテゴリ b₁, …, b_c の組 (a_i, b_j) ごとに、その組の値をもつ個体の個数（度数）O_ij を数え、r 行 c 列に並べた表（行・列の合計と総数 n を添える。O_ij の総和は n）
@@ -4372,6 +4470,7 @@
   name: 散布図
   en: scatter plot
   category: 図表
+  group: GRP-chart-two
   forms: [function]   # 個体 i → 点 (xᵢ, yᵢ)。同じ点の重なりも数えるので集合にしない。記述の道具はデータを固定して見る（① の 3。#342）
   basis:
     text: 対になったデータ (x₁, y₁), …, (xₙ, yₙ)（同じ個体の2つの量的変数の値の組。x・y の値が数であることは定義の要件）を、横軸に x、縦軸に y をとった座標平面の n 個の点 (xᵢ, yᵢ) で表した図
@@ -4408,6 +4507,7 @@
   name: 偏相関係数
   en: partial correlation coefficient
   category: 相関・回帰
+  group: GRP-corr
   forms: [number]
   basis:
     text: 3つの量的変数 x・y・z のデータについて、2つずつの相関係数 r_xy・r_xz・r_yz から求める r_xy・z＝(r_xy−r_xz r_yz)/√{(1−r_xz²)(1−r_yz²)}（r_xz²＜1 かつ r_yz²＜1 は定義の要件）
@@ -4444,6 +4544,7 @@
   name: 擬相関
   en: spurious correlation
   category: 相関・回帰
+  group: GRP-corr
   forms: [property]
   basis:
     text: 2つの変数の間に直接の因果の関係がないのに、両方に関係する第3の変数などのために、2つの変数の相関係数が0から離れて見えること
@@ -4479,6 +4580,7 @@
   name: 最小二乗法
   en: least squares method
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [procedure]
   basis:
     text: 回帰式の係数を、データの残差の2乗の和 Σeᵢ² が最小になるように決める方法（最小にする係数が1つに決まることは、切片の列（すべて1）と説明変数の値の列が1次独立であること（単回帰では x が全部同じでないこと）で保たれる）
@@ -4537,6 +4639,7 @@
   name: 回帰係数
   en: regression coefficient
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [number]
   basis:
     text: 目的変数 y を説明変数 x₁, …, x_k の1次式 ŷ＝b₀＋b₁x₁＋…＋b_kx_k で表す回帰式を最小二乗法で求めたときの、説明変数 x_j に掛かる係数 b_j（切片の列（すべて1）と説明変数の値の列が1次独立であることは定義の要件。そうでないと係数が1つに決まらない。単回帰では x が全部同じでないこと）
@@ -4589,6 +4692,7 @@
   name: 残差
   en: residual
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [number]
   basis:
     text: データに当てはめた回帰式について、i 番目の観測値 yᵢ から、その説明変数の値での回帰式の予測値 ŷᵢ を引いた値 eᵢ＝yᵢ−ŷᵢ
@@ -4622,6 +4726,7 @@
   name: 決定係数
   en: coefficient of determination
   category: 相関・回帰
+  group: GRP-reg-eval
   forms: [number]
   basis:
     text: 回帰式を当てはめたデータで、残差の2乗の和を目的変数の偏差の2乗の和で割り、1から引いた値 R²＝1−Σeᵢ²/Σ(yᵢ−ȳ)²（Σ(yᵢ−ȳ)²＞0 は定義の要件）
@@ -4686,6 +4791,7 @@
   name: 外挿
   en: extrapolation
   category: 相関・回帰
+  group: GRP-reg-eval
   forms: [procedure]
   basis:
     text: 回帰式を、当てはめに使ったデータの説明変数の値の範囲の外の値に当てはめて、目的変数を予測すること
@@ -4718,6 +4824,7 @@
   name: 重回帰分析
   en: multiple regression analysis
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [procedure]
   basis:
     text: 目的変数 y を k 個（k≧1）の説明変数 x₁, …, x_k の1次式 ŷ＝b₀＋b₁x₁＋…＋b_kx_k で表す回帰式を、最小二乗法で求める分析（名前の「重」は k≧2 の場合を指して使う）
@@ -4752,6 +4859,7 @@
   name: ダミー変数
   en: dummy variable
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [function]
   basis:
     text: 質的変数の1つのカテゴリについて、そのカテゴリに当てはまる個体で1、当てはまらない個体で0をとる変数
@@ -4784,6 +4892,7 @@
   name: 自由度調整済み決定係数
   en: adjusted coefficient of determination
   category: 相関・回帰
+  group: GRP-reg-eval
   forms: [number]
   basis:
     text: k 個の説明変数の回帰式を n 個のデータに当てはめたとき（n−k−1≧1 は定義の要件）、決定係数 R² を全体の自由度 n−1 と残差の自由度 n−k−1 で補正した 1−(1−R²)(n−1)/(n−k−1)
@@ -4815,6 +4924,7 @@
   name: 平均平方
   en: mean square
   category: 検定
+  group: GRP-test-mean
   forms: [rv]
   basis:
     text: 平方和をその自由度で割った値（群間・群内・回帰・残差などの平方和ごとに作る）
@@ -4850,6 +4960,7 @@
   name: 多重共線性
   en: multicollinearity
   category: 相関・回帰
+  group: GRP-reg-eval
   forms: [property]
   basis:
     text: 重回帰分析で、説明変数どうしの間に強い1次の関係がある（ある説明変数が、ほかの説明変数の1次式でほぼ表せる）こと
@@ -4882,6 +4993,7 @@
   name: 層化抽出
   en: stratified sampling
   category: 調査・実験
+  group: GRP-survey-way
   forms: [procedure]
   basis:
     text: 抽出枠（母集団）を重ならない層に分け、すべての層のそれぞれから、層ごとに先に決めた大きさの標本を無作為抽出で選ぶ手続き（母集団の平均は、層の推定値を母集団で層が占める割合 N_h/N で重み付けて足して推定する。合計なら層の大きさ N_h で重み付ける）
@@ -4913,6 +5025,7 @@
   name: 集落抽出
   en: cluster sampling
   category: 調査・実験
+  group: GRP-survey-way
   forms: [procedure]
   basis:
     text: 抽出枠（母集団）を集落（学校・地区・店など、要素の集まり）に分け、集落を単位にして無作為抽出で選び、選んだ集落の要素を全部調べる手続き
@@ -4945,6 +5058,7 @@
   name: 系統抽出
   en: systematic sampling
   category: 調査・実験
+  group: GRP-survey-way
   forms: [procedure]
   basis:
     text: 抽出枠の名簿の並びで、抽出間隔 k を決め、最初の1つを1〜k 番目から等しい確率で選び、そこから k おきに選ぶ手続き
@@ -4976,6 +5090,7 @@
   name: 多段抽出
   en: multistage sampling
   category: 調査・実験
+  group: GRP-survey-way
   forms: [procedure]
   basis:
     text: 母集団を大きさの違う単位の段（地域→店→客など）に分け、大きな単位から順に、各段で前の段で選んだ単位の中から無作為抽出で選ぶ手続き（各要素の選ばれる確率は、各段の、前の段で選ばれたという条件の下の確率の積。どの段の一覧も抽出枠になる）
@@ -5009,6 +5124,7 @@
   name: 標本誤差
   en: sampling error
   category: 調査・実験
+  group: GRP-survey-error
   forms: [rv]
   basis:
     text: 選ばれた個体の集まり S が決まったあと、S の要素を誤りなく測ったときの推定量の値 θ̂*(S) と、抽出枠の上の母数 θ_F（抽出枠の全部を誤りなく調べたときの値）の差 θ̂*(S)−θ_F（どの標本が選ばれたかで値が決まる）
@@ -5044,6 +5160,7 @@
   name: 非標本誤差
   en: non-sampling error
   category: 調査・実験
+  group: GRP-survey-error
   forms: [rv]
   basis:
     text: 実際に得たデータで求めた推定量の値 θ̂ と、母数 θ の差 θ̂−θ から、選んだ標本を誤りなく測ったときのずれを除いた部分 (θ̂−θ̂*(S))＋(θ_F−θ)（θ̂*(S) は選ばれた個体の集まり S の要素を誤りなく測ったときの推定量の値、θ_F は抽出枠の全部を誤りなく調べたときの値）。前の項は無回答・回答や記入の誤りなど測り方から、後ろの項は抽出枠と母集団のずれ（名簿の漏れなど）から来る。標本誤差 θ̂*(S)−θ_F と足すと θ̂−θ になる
@@ -5078,6 +5195,7 @@
   name: 無作為化
   en: randomization
   category: 調査・実験
+  group: GRP-survey-exp
   forms: [procedure]
   basis:
     text: 実験で、各対象をどの処理の群に入れるかを、対象の性質や実験者の判断でなく、前もって決めた確率に従うくじ（乱数）で決める手続き。完全無作為化は、群の大きさを先に決め、その大きさの割り当てを全部同じ確率で選ぶ形
@@ -5114,6 +5232,7 @@
   name: 交絡
   en: confounding
   category: 調査・実験
+  group: GRP-survey-exp
   forms: [property]
   basis:
     text: 処理（調べたい要因）T の群どうしで結果 Y を比べるとき、T と関係し（無作為に選んだ1個体の T と Z が独立でない）、Y にも影響する別の要因 Z があるために、比べた差に T の効果と Z の効果が混ざって分けられないこと（Z は処理の前に値が決まっている要因で、処理の結果として変わる量は含めない。独立でないかは、割り当て・抽出の偶然まで含めた確率で見る。1回の割り当てで偶然に生じた群の差は含めない。Y への影響・効果は因果の見立てで、統計の外の判断を含む）
@@ -5152,6 +5271,7 @@
   name: 分散分析
   en: analysis of variance
   category: 検定
+  group: GRP-test-mean
   forms: [procedure]
   basis:
     text: g 個の群の母平均がすべて等しいという H₀ を、F＝群間の平均平方÷群内の平均平方 で検定する仮説検定（教材の範囲は一元配置。g≧2 で定義でき、2級では主に g≧3 で使う）
@@ -5191,6 +5311,7 @@
   name: 多重比較
   en: multiple comparisons
   category: 検定
+  group: GRP-test-mean
   forms: [procedure]
   basis:
     text: 複数の帰無仮説（群の組ごとなど）をそれぞれ仮説検定するとき、正しい帰無仮説のうちどれか1つでも第1種の過誤を起こす確率（ファミリーワイズの誤り率）が決めた有意水準 α 以下になるように、各検定の基準を調整して判定する手続き（ボンフェローニの方法など）
@@ -5227,6 +5348,7 @@
   name: 事後確率
   en: posterior probability
   category: 確率
+  group: GRP-prob-bayes
   forms: [number]
   basis:
     text: 結果 D を見たあとの、原因・仮説 H の条件付き確率 P(H|D)
@@ -5258,6 +5380,7 @@
   name: 平均（算術平均）
   en: arithmetic mean
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-center
   forms: [number]
   basis:
     text: 足すことに意味のある値（量的変数）のデータ x₁, …, xₙ（n≧1。量的変数であることは定義の要件）の値をすべて足し、個数 n で割った値 x̄＝(x₁＋…＋xₙ)/n
@@ -5293,6 +5416,7 @@
   name: 確率（確率の公理）
   en: probability (axioms)
   category: 確率
+  group: GRP-prob-calc
   forms: [function, number]
   basis:
     text: 標本空間の事象 A のそれぞれに数 P(A) を対応させる関数で、どの A でも P(A)≧0、P(Ω)＝1、互いに排反な事象 A₁, A₂, … では P(A₁∪A₂∪…)＝P(A₁)＋P(A₂)＋…（確率の公理）を満たすもの。その値 P(A) も確率と呼ぶ
@@ -5342,6 +5466,7 @@
   name: 加法定理
   en: addition rule
   category: 確率
+  group: GRP-prob-calc
   forms: [proposition]
   claims: [CLM-32]
   basis:
@@ -5398,6 +5523,7 @@
   name: 乗法定理
   en: multiplication rule
   category: 確率
+  group: GRP-prob-calc
   forms: [proposition]
   claims: [CLM-33]
   basis:
@@ -5450,6 +5576,7 @@
   name: 全確率の公式
   en: law of total probability
   category: 確率
+  group: GRP-prob-calc
   forms: [proposition]
   claims: [CLM-34]
   basis:
@@ -5560,6 +5687,7 @@
   name: 標本平均
   en: sample mean
   category: 標本分布・極限
+  group: GRP-sd-stat
   forms: [rv]
   basis:
     text: 標本 X₁, …, Xₙ（n は1以上）から作る統計量 X̄＝(X₁＋…＋Xₙ)/n（観測したあとの値も同じ名前で呼ぶ）
@@ -5678,6 +5806,7 @@
   name: 標本比率
   en: sample proportion
   category: 標本分布・極限
+  group: GRP-sd-stat
   forms: [rv]
   basis:
     text: 各個体が性質をもてば1、もたなければ0とした標本 X₁, …, Xₙ の標本平均 p̂＝(X₁＋…＋Xₙ)/n（性質をもつ個数÷n）
@@ -5714,6 +5843,7 @@
   name: 区間推定
   en: interval estimation
   category: 推定
+  group: GRP-est-interval
   forms: [procedure]
   basis:
     text: 信頼係数 1−α（名目）を決め、それに合わせて作った信頼区間を標本から求めて、母数 θ の値の範囲として示す手続き（作り方ごとの保証は、その手続きの成立条件で言う。近似の作り方では、1−α に近づくのは各母数の値ごと：④-19）
@@ -5745,6 +5875,7 @@
   name: 仮説検定
   en: hypothesis testing
   category: 検定
+  group: GRP-test-frame
   forms: [procedure]
   basis:
     text: 母集団の分布についての帰無仮説 H₀ と対立仮説 H₁ を立て、有意水準 α を前もって決め、H₀ が正しいときに検定統計量 T が入る確率が α 以下になる棄却域 R を（H₁ の向きに合わせて）選び、T の観測値が R に入れば H₀ を棄却し、入らなければ棄却しない手続き
@@ -5774,6 +5905,7 @@
   name: 分位点
   en: quantile
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-pos
   forms: [number]
   basis:
     text: 量的なデータ（n≧1）を小さい順に並べた x₍₁₎≦…≦x₍ₙ₎ と割合 p（0≦p≦1）について、1＋p(n−1) 番目の位置の値（位置が整数でないときは、前後の2つの値を比例で埋める。線形補間の決め方）
@@ -5809,6 +5941,7 @@
   name: 範囲
   en: range
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-pos
   forms: [number]
   basis:
     text: データの最大値から最小値を引いた値
@@ -5841,6 +5974,7 @@
   name: 単回帰
   en: simple linear regression
   category: 相関・回帰
+  group: GRP-reg-fit
   forms: [procedure]
   basis:
     text: 1つの説明変数 x で目的変数 y を表す直線の式 ŷ＝a＋bx（回帰直線）を、最小二乗法で求める分析
@@ -5874,6 +6008,7 @@
   name: 式の変形
   en: transforming equations
   category: 数学の道具
+  group: GRP-math-expr
   forms: [procedure]
   basis:
     text: 等式の両辺に同じ数・式を足す・引く、0 でない同じ数を掛ける・割ることで、解を変えずに別の等式に書き換えること。文字の動く範囲は、元の等式の両辺が定まる値（分母が0にならない値など）とし、書き換えた等式もその範囲で解く。文字を含む式 g で両辺を掛ける・割るときは、その範囲で g が0になる値を別に確かめる（その範囲で解くと、g で掛けた等式の解は「元の解と、g＝0 になる値」、g で割った等式の解は「元の解から、g＝0 になる値を除いたもの」になる）
@@ -5919,6 +6054,7 @@
   name: 関数
   en: function
   category: 数学の道具
+  group: GRP-math-expr
   forms: [function]
   basis:
     text: 入れてよい値の集まり（定義域）D の値 x の1つ1つに、出てくる値をちょうど1つ対応させる約束 f。x に対応する値を f(x) と書く
@@ -5947,6 +6083,7 @@
   name: データの標準化
   en: standardization of data
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [operation]
   basis:
     text: 量的変数のデータ x₁, …, xₙ の各値から平均 x̄ を引き、データの標準偏差 √v（v は n で割ったデータの分散。0 でない）で割って、zᵢ＝(xᵢ−x̄)÷√v（z得点）に直すこと（n−1 で割った不偏分散の平方根で割るものも同じ名前で呼ぶ。そのとき z の、n−1 で割って求めた標準偏差が1）
@@ -6058,6 +6195,7 @@
   name: データの分散
   en: variance of data
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [number]
   basis:
     text: 量的変数のデータ x₁, …, xₙ（n≧1）の偏差の2乗の平均 {(x₁−x̄)²＋…＋(xₙ−x̄)²}/n
@@ -6091,6 +6229,7 @@
   name: データの標準偏差
   en: standard deviation of data
   category: 要約（代表値・ばらつき）
+  group: GRP-sum-spread
   forms: [number]
   basis:
     text: データの分散の正の平方根（データの値と同じ単位のばらつき）
@@ -6125,6 +6264,7 @@
   name: データの共分散
   en: covariance of data
   category: 相関・回帰
+  group: GRP-corr
   forms: [number]
   basis:
     text: 量的な2変数のデータ (x₁, y₁), …, (xₙ, yₙ)（n≧1）の、x と y の偏差の積の平均 {(x₁−x̄)(y₁−ȳ)＋…＋(xₙ−x̄)(yₙ−ȳ)}/n
