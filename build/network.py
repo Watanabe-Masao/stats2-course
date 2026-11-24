@@ -78,6 +78,21 @@ def _first(prompt: str, limit: int = 120) -> str:
     return t if len(t) <= limit else t[: limit - 1] + "…"
 
 
+def _plain(text: str) -> str:
+    """単元のページに出す文（ゴール・段のゴール）：強調の印と {{…}} の呼び出しを落とし、改行を空白に（型の改訂9。issue 596）"""
+    t = re.sub(r"\*\*|\{\{[^}]*\}\}", "", str(text or ""))
+    return re.sub(r"\s*\n\s*", " ", t).strip()
+
+
+def _entry(uid: str) -> str:
+    """単元の入口の問い：初学（S1.md）の「0｜入口の問い」の task の箱の文（なければ空）"""
+    f = CONTENT / "units" / uid / "S1.md"
+    if not f.exists():
+        return ""
+    m = re.search(r"###\s*0｜入口の問い.*?:::\s*task\s*\n(.*?)\n:::", f.read_text(encoding="utf-8"), flags=re.S)
+    return _plain(m.group(1)) if m else ""
+
+
 def load_network() -> tuple[list[dict], list[dict]]:
     rel = (load_yaml(CONTENT / "relations.yaml") or {}).get("relations", []) if (CONTENT / "relations.yaml").exists() else []
     der = (load_yaml(CONTENT / "derivations.yaml") or {}).get("derivations", []) if (CONTENT / "derivations.yaml").exists() else []
@@ -1576,6 +1591,18 @@ def _assemble(c: Course, target: dict) -> dict:
                  for qid, q in c.units[uid]["problems"].items() if not q.get("retired")]
         if probs:
             e["problems"] = probs
+        # 単元のページ（型の改訂9。issue 596）：入口の問い・分かるようになること・段ごとのゴールと到達の目安
+        u = c.units[uid]
+        if _entry(uid):
+            e["entry"] = _entry(uid)
+        if u.get("goal"):
+            e["goal"] = _plain(u["goal"])
+        sg, ev = u.get("stage_goals") or {}, u.get("evidence") or {}
+        stages = [{"id": st["id"], "name": st["name"], **({"goal": _plain(sg[st["id"]])} if sg.get(st["id"]) else {}),
+                   **({"evidence": _plain(ev[st["id"]])} if ev.get(st["id"]) else {})}
+                  for st in c.stages if sg.get(st["id"]) or ev.get(st["id"])]
+        if stages:
+            e["stages"] = stages
         units.append(e)
     relations = []
     for r in rels:
