@@ -809,6 +809,40 @@
                     }
                   }
                 }
+              },
+              "entry": {
+                "$ref": "#/$defs/text",
+                "description": "単元の入口の問い（初学の最初の問い。単元のページの頭。改訂9。stats2-course の issue 596）"
+              },
+              "goal": {
+                "$ref": "#/$defs/text",
+                "description": "この単元で分かるようになること（改訂9。issue 596）"
+              },
+              "stages": {
+                "type": "array",
+                "description": "段ごとのゴールと到達の目安（初学〜創造。改訂9。issue 596）",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "name": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "goal": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "evidence": {
+                      "$ref": "#/$defs/text"
+                    }
+                  }
+                }
               }
             }
           }
@@ -2583,5 +2617,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 8
+  "x-revision": 9
 }

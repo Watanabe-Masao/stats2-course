@@ -1966,3 +1966,27 @@ class TestQidInText(unittest.TestCase):
         got = network.qid_in_text({"id": "binom-D-01", "open": "D-01", "reason": {"steps": ["平均は「題」（D-01）で確かめる", "ふつうの文"]}})
         self.assertEqual(len(got), 1)
         self.assertIn("reason.steps[0]", got[0])
+
+
+class UnitPageExport(unittest.TestCase):
+    """単元のページ（型の改訂9。#596）：書き出しが単元の原本の入口の問い・ゴール・段のゴールを落とさず、記法の印を残さない。
+    想定する故障：入口の問いの箱の書き方が変わって正規表現が拾えず、黙って空になる・** や {{…}} が画面に出る・段の並びが崩れる。
+    見つけ方：全部の単元で入口の問いとゴールがあり（原本はどの単元も書いている）、印が残らず、段は stages.yaml の順。
+    U14 の入口の問いは原本の S1.md の文と照らす（期待値は原本のファイルから直接読む。書き出しの関数を通さない）。
+    既存との違い：型の検査（check_all）は項目の形だけを見る。中身が空でも通る
+    検出の確かめ（2026-11-24）：_entry の正規表現の「task」を「ask」にすると、1つ目の確かめで落ちることを見た"""
+
+    def test_entry_goal_stages(self):
+        from network import _entry, _plain
+        c = COURSE
+        order = [s["id"] for s in c.stages]
+        for uid, u in c.units.items():
+            self.assertTrue(_entry(uid), f"{uid} の入口の問いが空")
+            self.assertTrue(_plain(u.get("goal", "")), f"{uid} のゴールが空")
+            for t in (_entry(uid), _plain(u.get("goal", ""))):
+                self.assertNotRegex(t, r"\*\*|\{\{|\n", f"{uid} に記法の印が残る")
+            ids = [k for k in order if (u.get("stage_goals") or {}).get(k)]
+            self.assertEqual(ids, sorted(ids, key=order.index))
+        src = (Path(__file__).resolve().parent.parent / "content" / "units" / "U14" / "S1.md").read_text(encoding="utf-8")
+        self.assertIn(_entry("U14")[:20], src)
+        self.assertIn("1人も使わなかった", _entry("U14"))
