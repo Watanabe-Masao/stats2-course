@@ -2831,7 +2831,7 @@
   definition: 起きる平均の割合 λ が一定のポアソン過程で、次の出来事が起きるまでの待ち時間の分布。
   version: 1
   labs:
-  - {id: LAB-cont, preset: c-expo, purpose: すでに何分待っても、その先10分以内に来る確率は変わらない（平均10分なら 1−e⁻¹≒0.63）}
+  - {id: LAB-cont, preset: c-expo, purpose: すでに何分待っても、そこからさらに10分より長く待つ確率は変わらない（平均10分なら e⁻¹≒0.37）}
   principle: 密度 λe^(−λx)。待つほど密度が下がる、右に裾の長い形。すでに待った時間は残りの待ち時間を変えない（無記憶性）。ポアソン過程の出来事の間隔にあたる（件数がポアソン分布というだけでは言えない）。
   formulas:
   - id: F-expo-pdf
@@ -2940,7 +2940,7 @@
   - Fraction(60,4)==15
   - math.isclose(math.exp(-4*(15/60))/math.exp(-4*(10/60)), math.exp(-4*(5/60)))
   - abs(1-math.exp(-1)-0.632)<0.0005
-  - round(1-math.exp(-10/10),2)==0.63   # 概念から開くラボの目的の文の数（2026-11-25）
+  - round(math.exp(-10/10),2)==0.37   # 概念から開くラボの目的の文の数（2026-11-25）
 - id: TERM-pdf
   name: 確率密度関数
   en: probability density function
