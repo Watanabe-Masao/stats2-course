@@ -808,4 +808,27 @@ function distribution(tree, over, lo, hi, env = {}) {
 	}
 	return out;
 }
-export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula };
+/** 上限のない横軸（ポアソン分布・幾何分布の k など）を、どこまで並べるか。lo から確率を足していき、
+*  残り（その先の確率の合計）が eps 未満になった所を返す。式の値が出ない・増えない所が続いても cap で止める（stats2-course の issue 608）。
+*  返す tail は、並べた先に残る確率（1 − 並べた分の和。0 未満にはしない） */
+function tailEnd(tree, over, lo, env = {}, eps = 1e-4, cap = 400) {
+	const body = rhsOf(tree);
+	let sum = 0, x = Math.ceil(lo);
+	const last = x + cap;
+	for (; x <= last; x++) {
+		const y = evaluate(body, {
+			...env,
+			values: {
+				...env.values,
+				[over]: x
+			}
+		});
+		if (y !== void 0 && Number.isFinite(y) && y > 0) sum += y;
+		if (1 - sum < eps) break;
+	}
+	return {
+		hi: Math.min(x, last),
+		tail: Math.max(0, 1 - sum)
+	};
+}
+export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, stopReason, substitute, substituteFree, symbolTex, symbolsIn, tailEnd, toTex, validateFormula };

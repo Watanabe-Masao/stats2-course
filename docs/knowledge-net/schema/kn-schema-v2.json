@@ -1410,6 +1410,12 @@
                 "type": "integer",
                 "minimum": 0,
                 "description": "E(aX＋b) の式の番号（任意。あれば作業台に変換の欄を出す。stats2-course #156）"
+              },
+              "initial": {
+                "type": "object",
+                "description": "開いたときの記号の値（任意。記号の key と数。書かない記号は定義域から決める。stats2-course の issue 608）",
+                "propertyNames": { "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+                "additionalProperties": { "type": "number" }
               }
             }
           },
@@ -2617,5 +2623,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 9
+  "x-revision": 10
 }
