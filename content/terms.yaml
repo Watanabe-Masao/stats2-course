@@ -1098,6 +1098,12 @@
   gist: さいころの目は、期待値3.5のまわりに散らばる。1や6はずれが大きく、3や4は小さいが、ずれをそのまま確率で重み付けて足すと、＋と−が打ち消し合って0になる。
   definition: 確率変数が期待値からどれだけばらつくかを、ずれの2乗の期待値で表した量。
   version: 1
+  table_workspace:   # さいころの各面の重みを1から（6面とも確率がちょうど 1/6。渡辺さん 2026-11-25）
+    formula: 2
+    linear: 1
+    tables:   # 表は実験室のテーマを指す（値・重みを2か所に書かない。build が写す。#119）
+    - {experiment: EXP-expect-table, theme: dice, use: start}
+    - {experiment: EXP-expect-table, theme: dice, use: compare}
   labs:
   - {id: LAB-expect, preset: s1-var, purpose: ずれの2乗の期待値として分散を組み立てる}
   principle: (X−μ)² の期待値。2乗するので向きが消え、大きなずれほど重く効く。単位は元の単位の2乗になる。
