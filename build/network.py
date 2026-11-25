@@ -1286,8 +1286,14 @@ def validate_network(c: Course) -> list[str]:
                     if k not in syms or not syms[k].get("domain"):
                         err.append(f"{tid}: workspace の vary {k} は主役の式の、定義域（domain）のある記号")
                 o = syms.get(ws.get("over"))
-                if not o or not (o.get("domain") or {}).get("integer") or (o.get("domain") or {}).get("max") is None:
-                    err.append(f"{tid}: workspace の over {ws.get('over')} は主役の式の、上限のある整数の記号（棒を並べるため）")
+                # 上限のない整数（ポアソン分布の k など）も、画面が確率の残る所まで並べる（#608。knowledge-net の tailEnd）。下限は要る
+                if not o or not (o.get("domain") or {}).get("integer") or (o.get("domain") or {}).get("min") is None:
+                    err.append(f"{tid}: workspace の over {ws.get('over')} は主役の式の、下限のある整数の記号（棒を並べるため）")
+                for k, v in (ws.get("initial") or {}).items():
+                    if k not in set(ws.get("vary", [])) | {ws.get("over")}:
+                        err.append(f"{tid}: workspace の initial {k} は vary か over の記号")
+                    elif not isinstance(v, (int, float)) or isinstance(v, bool):
+                        err.append(f"{tid}: workspace の initial {k} は数")
             if "mean" in ws and not (isinstance(ws["mean"], int) and ws["mean"] < len(fs) and fs[ws["mean"]].get("tree")):
                 err.append(f"{tid}: workspace の mean {ws.get('mean')} が木のある式を指していない")
             if "linear" in ws and not (isinstance(ws["linear"], int) and ws["linear"] < len(fs) and (fs[ws["linear"]].get("tree") or fs[ws["linear"]].get("ref"))):

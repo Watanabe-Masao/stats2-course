@@ -988,11 +988,14 @@ class TestNetwork(unittest.TestCase):
         t["workspace"]["over"] = "p"                             # 整数でない
         t["workspace"]["mean"] = 9
         t["workspace"]["linear"] = 9                             # 変換の欄の式がない（#156）
+        t["workspace"]["initial"] = {"q": 1, "n": "10"}          # 動かさない記号・数でない（#608）
         err = self._validate(c)
         self.assertTrue(any("workspace の linear 9" in e for e in err))
         self.assertTrue(any("parts の path [1, 9] が木の中の節を指していない" in e for e in err))
         self.assertTrue(any("vary X は主役の式の、定義域（domain）のある記号" in e for e in err))
-        self.assertTrue(any("over p は主役の式の、上限のある整数の記号" in e for e in err))
+        self.assertTrue(any("over p は主役の式の、下限のある整数の記号" in e for e in err))
+        self.assertTrue(any("initial q は vary か over の記号" in e for e in err))
+        self.assertTrue(any("initial n は数" in e for e in err))
         self.assertTrue(any("mean 9 が木のある式を指していない" in e for e in err))
 
     def test_experiments(self):
