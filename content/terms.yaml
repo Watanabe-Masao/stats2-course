@@ -2503,6 +2503,7 @@
   figures: [FIG-U15-concept]
   labs:
   - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
+  workspace: {formula: 0, vary: [lambda], over: k, mean: 1, initial: {lambda: 3, k: 3}}   # 式の作業台（#608）。k に上限はない（画面が確率の残る所まで並べる）
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
   formulas:
   - id: F-poisson-pmf
@@ -2588,6 +2589,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-geom, purpose: 1割の当たりでも、初めて当たる回は1回目がいちばん起こりやすく、平均は 1÷0.1＝10 回}
+  workspace: {formula: 0, vary: [p], over: k, mean: 1}   # 式の作業台（#608）。k に上限はない
   principle: k−1 回続けて失敗してから成功する確率なので (1−p)^(k−1)p。毎回の確率が同じで独立なので、それまでの失敗は次の確率を変えない（無記憶性）。
   formulas:
   - id: F-geom-pmf
@@ -2683,6 +2685,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-negbinom, purpose: r を1（幾何分布）から3に増やすと山が右へ移り、止めるまでの回数の平均は r÷p になる}
+  workspace: {formula: 0, vary: [r, p], over: k, initial: {r: 3, p: 0.3, k: 10}}   # 式の作業台（#608）。k に上限はない。k＝10 は期待値 r/p
   principle: k 回目に r 回目の成功が起きるのは、それまでの k−1 回にちょうど r−1 回成功し、k 回目に成功するとき。並び方の数 ₖ₋₁C_{r−1} を掛ける。r＝1 なら幾何分布。
   formulas:
   - id: F-negbinom-pmf
@@ -2742,6 +2745,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-hyper, purpose: 戻さないので、取るたびに箱の中身が変わる。N を大きくすると、戻して取り出す二項分布の確率に近づく}
+  workspace: {formula: 0, vary: [N, M, n], over: k, mean: 1, initial: {N: 20, M: 8, n: 5, k: 2}}   # 式の作業台（#608）。20 個のうち当たり 8 個から 5 個を取り出す
   principle: 取り出し方の組合せの数の比。戻さないので、1個取るたびに残りの当たりの割合が変わる（各回は独立ではない）。
   formulas:
   - id: F-hyper-pmf
@@ -5674,6 +5678,7 @@
   gist: 1人の客に試食を出し、買えば1、買わなければ0と記録する。この1人が買う見込みを、記録する前に確率で表したい。
   definition: 値 1 を確率 p、値 0 を確率 1−p でとる確率変数の分布。成功を1、失敗を0と数えた1回の試行の結果の分布。
   version: 1
+  workspace: {formula: 0, vary: [p], over: k}   # 式の作業台（#608）。期待値の式は持たない（E(X)＝p は二項分布の n＝1）
   principle: とる値が 0 と 1 の2つだけなので、確率 p 1つで分布が決まる。平均は 1×p＋0×(1−p)＝p、分散は p(1−p)。1回の成功の回数（0回か1回）とみると、n 回分を足したものが二項分布になる。
   formulas:
   - id: F-bernoulli-pmf
