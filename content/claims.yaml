@@ -125,6 +125,10 @@ claims:
       by: C
       date: '2026-11-08'
       version: dc2b65a
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: なし
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-5a
@@ -158,6 +162,10 @@ claims:
       by: '#307 の確かめ'
       date: '2026-11-18'
       version: de6bd04
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: 2次資料
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-6a
@@ -482,6 +490,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: なし
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-18a
@@ -537,6 +549,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: なし
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-19
@@ -588,6 +604,10 @@ claims:
       by: '#307 の確かめ'
       date: '2026-11-18'
       version: de6bd04
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: 2次資料
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-20b
@@ -918,6 +938,10 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: 2次資料
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-28c
@@ -968,6 +992,10 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: 2次資料
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-29
@@ -1284,6 +1312,10 @@ claims:
       by: Q
       date: '2026-11-10'
       version: c69a6d9
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 62e8998
     external: なし
   version: 2   # 2026-11-26：主張の定義の書き漏れを足した（#565 の照らし・#532 の 1.3d）
 - id: CLM-38
