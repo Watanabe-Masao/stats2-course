@@ -197,6 +197,10 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-6b
@@ -241,6 +245,10 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-7
@@ -346,6 +354,10 @@ claims:
       by: O
       date: '2026-11-09'
       version: 3eaf05a
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-11
@@ -388,6 +400,10 @@ claims:
       by: O
       date: '2026-11-09'
       version: 91f0acc
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-13
@@ -601,7 +617,8 @@ claims:
   grounds:
   - claim: CLM-41
   - source:
-      title: V(X̄)＝σ²/n（CLM-41）とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+      title: 標本平均の分散 V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+      uses: [CLM-41]
   verification:
     math:
     - method: 独立な確かめ
@@ -684,6 +701,10 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-25
@@ -813,6 +834,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-28b
@@ -972,6 +997,10 @@ claims:
       by: G
       date: '2026-11-08'
       version: a3d17e9
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-30
@@ -1054,6 +1083,10 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-33
@@ -1085,6 +1118,10 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-34
@@ -1156,6 +1193,10 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-36
@@ -1209,6 +1250,10 @@ claims:
       by: AL
       date: '2026-11-20'
       version: 116ef94
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-37
@@ -1337,6 +1382,10 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-20a
@@ -1370,6 +1419,10 @@ claims:
       by: X
       date: '2026-11-16'
       version: c5eb1c0
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-41
@@ -1409,6 +1462,10 @@ claims:
       by: X
       date: '2026-11-16'
       version: c5eb1c0
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-42
@@ -1443,7 +1500,8 @@ claims:
   grounds:
   - claim: CLM-10
   - source:
-      title: CLM-10 で (nᵢ−1)sᵢ²/σ² は χ²(nᵢ−1) に従い、2つの標本が独立なのでこの2つも独立。F 分布の定義の比 {(n₁−1)s₁²/σ²/(n₁−1)}÷{(n₂−1)s₂²/σ²/(n₂−1)}＝s₁²/s₂²（等分散なので σ² が約分される）
+      title: 正規母集団の標本分散の分布の主張で (nᵢ−1)sᵢ²/σ² は χ²(nᵢ−1) に従い、2つの標本が独立なのでこの2つも独立。F 分布の定義の比 {(n₁−1)s₁²/σ²/(n₁−1)}÷{(n₂−1)s₂²/σ²/(n₂−1)}＝s₁²/s₂²（等分散なので σ² が約分される）
+      uses: [CLM-10]
   teaching:
     conclusion: true
     proof: 扱う
@@ -1453,6 +1511,10 @@ claims:
       by: Y
       date: '2026-11-16'
       version: 5ee32a8
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-43
@@ -1487,6 +1549,10 @@ claims:
       by: Z
       date: '2026-11-16'
       version: 087f354
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
   version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-44
@@ -1737,6 +1803,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 1：等式と解釈の条件を分けた）
 - id: CLM-50
   label: ④-50
@@ -1756,6 +1829,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C）
 - id: CLM-51
   label: ④-51
@@ -1780,6 +1860,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3c の補う1：SST＞0 を文に書いた）
 - id: CLM-52
   label: ④-52
@@ -1800,6 +1887,13 @@ claims:
   teaching:
     conclusion: true
     proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 4：式の性質・母集団の性質・推定の性質を分けた）
 - id: CLM-53
   label: ④-53
@@ -1824,6 +1918,13 @@ claims:
   teaching:
     conclusion: true
     proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 2：列の一次独立と n＞k＋1 を書き、誤差は無相関・等分散にした）
 - id: CLM-54
   label: ④-54
@@ -1848,6 +1949,13 @@ claims:
   teaching:
     conclusion: true
     proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3c の補う2：S² の割り方と N・n の範囲を書いた）
 - id: CLM-55
   label: ④-55
@@ -1869,6 +1977,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C）
 - id: CLM-56
   label: ④-56
@@ -1889,6 +2004,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・1.3b：標本の直線と母集団の平均の直線を分けた）
 - id: CLM-57
   label: ④-57
@@ -1918,6 +2040,13 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・決定 A1：信頼区間の主張を分布の主張から分けた）
 - id: CLM-58
   label: ④-58
@@ -1944,4 +2073,11 @@ claims:
   teaching:
     conclusion: true
     proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
   version: 1   # 2026-11-26 に立てた（#532 C・決定 A1）

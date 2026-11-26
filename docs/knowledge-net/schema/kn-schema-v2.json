@@ -1418,8 +1418,12 @@
               "initial": {
                 "type": "object",
                 "description": "開いたときの記号の値（任意。記号の key と数。書かない記号は定義域から決める。stats2-course の issue 608）",
-                "propertyNames": { "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
-                "additionalProperties": { "type": "number" }
+                "propertyNames": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "additionalProperties": {
+                  "type": "number"
+                }
               }
             }
           },
@@ -2418,6 +2422,14 @@
                     "url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "uses": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/claimId"
+                      },
+                      "minItems": 1,
+                      "description": "この段（証明の段）で使う主張の id。文の中では主張の名前で書き、追跡はこの id で行う（製本の番号を文に書かない。stats2-course #536・2026-11-26 の決定 A3）"
                     }
                   },
                   "description": "目安のとき：出典"
@@ -2627,5 +2639,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 11
+  "x-revision": 12
 }
