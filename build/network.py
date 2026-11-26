@@ -1231,11 +1231,15 @@ def validate_network(c: Course) -> list[str]:
         if cond is not None and not (isinstance(cond, dict) and isinstance(cond.get("math"), list)):
             err.append(f"{tid}: conditions は math（数学的な条件）と data（データに当てはめるときの条件）に分けて書く")
         elif cond is not None and not cond["math"] and not any(
-            cl.get("conditions") and tid in (cl.get("conclusion") or {}).get("predicates", []) for cl in live_claims
+            cl.get("conditions") and (tid in (cl.get("conclusion") or {}).get("predicates", [])
+                                      # 主張そのものが概念の語（ベイズの定理・大数の法則など。forms: proposition）は、概念の claims: にある自分を表す主張でもよい
+                                      # （何かの主張を指すだけでは通さない。渡辺さん 2026-11-26 の決定 A2）
+                                      or ("proposition" in (t.get("forms") or []) and cl.get("id") in (t.get("claims") or [])))
+            for cl in live_claims
         ):
             # 要件の行がない概念（#532 の A）：仮定は主張の条件にあるので、その概念について言える主張（結論の述語）で、
             # 条件の行のあるものが要る。仮定を消しただけ・主張を retired にしただけで、概念のページから条件が消えるのを止める
-            err.append(f"{tid}: conditions.math が空なら、この概念を結論の述語にする主張（retired でなく、条件の行のあるもの）が要る（#532）")
+            err.append(f"{tid}: conditions.math が空なら、この概念を結論の述語にする主張か、主張そのものの概念なら claims: にある自分の主張（retired でなく、条件の行のあるもの）が要る（#532）")
         for f in t.get("formulas", []):
             for s in f.get("symbols", []):
                 if not (s.get("symbol") and s.get("meaning")):

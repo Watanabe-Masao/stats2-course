@@ -1653,6 +1653,28 @@ class TestNetwork(unittest.TestCase):
         finally:
             self.n.load_claims = orig
 
+    # 確かめる対象：主張そのものが概念の語（大数の法則など。forms: proposition）は、概念の claims: にある自分の主張に条件があれば、
+    #   conditions.math を空にできること（渡辺さん 2026-11-26 の決定 A2）。
+    # 想定する故障：止めを広げすぎて、claims: に何か書いてあれば通る（自分を表さない語・条件のない主張でも通る）。広げ忘れて大数の法則を止める。
+    # 見つけ方：大数の法則の math を空にすると通り、forms から proposition を外すと止まり、自分の主張の条件を空にすると止まる。
+    # 既存との違い：上の test_empty_math_needs_claim_with_conditions は「結論の述語にする主張」の道だけを見る。
+    # 検出の確かめ（2026-11-26）：network.py の claims: の道を外すと1つ目で、proposition の条件を外すと2つ目で落ちることを見た
+    def test_empty_math_proposition_term_uses_own_claim(self):
+        need = "conditions.math が空なら"
+        c = course()
+        c.terms["TERM-lln"]["conditions"]["math"] = []
+        self.assertFalse(any(e.startswith(f"TERM-lln: {need}") for e in self._validate(c=c)))
+        c2 = course()
+        c2.terms["TERM-lln"]["conditions"]["math"] = []
+        c2.terms["TERM-lln"]["forms"] = ["function"]
+        self.assertTrue(any(e.startswith(f"TERM-lln: {need}") for e in self._validate(c=c2)))
+        orig = self.n.load_claims
+        self.n.load_claims = lambda: [dict(x, conditions=[]) if x["id"] == "CLM-20b" else x for x in orig()]
+        try:
+            self.assertTrue(any(e.startswith(f"TERM-lln: {need}") for e in self._validate(c=c)))
+        finally:
+            self.n.load_claims = orig
+
     def test_other_course_allowed_own_prefix_not(self):
         rels = copy.deepcopy(self.rels)
         rels[0]["from"] = "math:CON-ratio"
