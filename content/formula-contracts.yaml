@@ -229,3 +229,4 @@ contracts:
   properties: [有界, 同値, 条件しだい]
   representative: true
   review: [有界（0〜1 が保証されるのは、切片を含む最小二乗で当てはめたときだけ）]
+  review_refs: [CLM-51]   # 観点の根拠の仮定は主張 ④-51 の条件（#532 C で概念から移した。2026-11-26）
