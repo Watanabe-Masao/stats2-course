@@ -889,7 +889,34 @@ def _pdf(sp: dict):
     raise ValueError(f"family {f}")
 
 
+# ---- math-lab の描く関数で作る図（#582 の D0。#188 の 01b）----
+# 画面と同じ関数（docs/math-lab/draw.mjs の写し）で SVG を作る。node の呼び出しは1回にまとめる（prefetch）。
+# math-lab で描けない設定（重ねる分布・帯・境目・二項分布でない分布）は、下の Python の描き方のまま（D1 以降で移す）。
+_DRAWN: dict[str, str] = {}
+
+
+def _key(sp: dict) -> str:
+    import json
+    return json.dumps(sp, sort_keys=True, ensure_ascii=False)
+
+
+def prefetch(sps: list[dict]) -> None:
+    import json
+    import subprocess
+    todo = [sp for sp in sps if sp.get("type") == "dist" and _key(sp) not in _DRAWN]
+    if not todo:
+        return
+    r = subprocess.run(["node", str(ROOT / "build" / "draw_svg.mjs")], input=json.dumps([{"id": i, "spec": sp} for i, sp in enumerate(todo)]),
+                       capture_output=True, text=True, check=True, timeout=120)
+    for row in json.loads(r.stdout):
+        _DRAWN[_key(todo[row["id"]])] = row["svg"]   # 描けない設定は空（Python で描く）
+
+
 def dist(sp: dict) -> str:
+    prefetch([{**sp, "type": "dist"}])
+    drawn = _DRAWN.get(_key({**sp, "type": "dist"}))
+    if drawn:
+        return drawn
     import math
     c = Canvas()
     unit = sp.get("unit", "")
@@ -1486,6 +1513,10 @@ def _strings(v):
 
 def validate_figures(course: Course) -> list[str]:
     err = []
+    try:
+        prefetch([f["spec"] for f in specs(course).values()])
+    except Exception as e:  # noqa: BLE001
+        err.append(f"math-lab の描く関数で図を作れない（{type(e).__name__}: {e}）")
     for fid, f in specs(course).items():
         sp = f["spec"]
         if sp.get("type") not in TYPES:
@@ -1520,6 +1551,7 @@ def register(course: Course) -> None:
 
 def build_figures(course: Course) -> list[str]:
     OUT.mkdir(parents=True, exist_ok=True)
+    prefetch([f["spec"] for f in specs(course).values()])
     made = []
     for fid, f in specs(course).items():
         (OUT / f"{fid}.svg").write_text(TYPES[f["spec"]["type"]](f["spec"]), encoding="utf-8")
