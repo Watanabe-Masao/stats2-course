@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import ast
 import itertools
 import math
 import statistics
@@ -72,9 +73,21 @@ CHECK_ENV = {
 }
 
 
+def _guard(expr: str):
+    """検算の式は、_ で始まる属性と __ で始まる名前を使えない（builtins を空にしても ().__class__.__base__.__subclasses__() から外の型に届いたため。
+    #212 の検算の eval。2026-11-26）。捨てる変数の _ は使える"""
+    tree = ast.parse(expr, mode="eval")
+    for node in ast.walk(tree):
+        bad = (isinstance(node, ast.Attribute) and node.attr.startswith("_")) or (
+            isinstance(node, ast.Name) and node.id.startswith("__"))
+        if bad:
+            raise ValueError(f"検算の式に _ で始まる属性・__ で始まる名前は使えない：{ast.unparse(node)}")
+    return compile(tree, "<check>", "eval")
+
+
 def run_check(expr: str) -> bool:
     env = {"__builtins__": {}, **CHECK_ENV}
-    return bool(eval(expr, env))  # noqa: S307 (原本は自分たちで管理)
+    return bool(eval(_guard(expr), env))  # noqa: S307 (原本は自分たちで管理。_ で始まる名前は _guard が止める)
 
 
 # ---- データ ------------------------------------------------------------

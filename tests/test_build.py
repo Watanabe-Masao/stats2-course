@@ -147,6 +147,10 @@ class TestChecks(unittest.TestCase):
         self.assertTrue(run_check("comb(5,2) == 10"))
         with self.assertRaises(Exception):
             run_check("__import__('os')")
+        # builtins を空にしても、属性をたどると外の型に届いた（().__class__.__base__.__subclasses__()）。_ で始まる名前で止める
+        with self.assertRaises(ValueError):
+            run_check("().__class__.__base__.__subclasses__() != []")
+        self.assertTrue(run_check("sum(1 for _ in range(3)) == 3"))  # 捨てる変数の _ は使える
 
 
 class TestYaml(unittest.TestCase):
