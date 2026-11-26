@@ -194,3 +194,20 @@ class TestV2Checks(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# 確かめる対象：画面に出る文に製本の番号（④-NN）・主張の id（CLM-NN）を書くと止まること（#536。決定 A3）。
+# 想定する故障：言い換えたあとに番号を戻す・id の項目（label・uses・claim）まで文として止めて、正しいデータを止める。
+# 見つけ方：文の中の ④-6b と裸の CLM-6b は止まり、label・uses・教材名付きの id は止まらない。
+# 既存との違い：型（Ajv）は文の中身を見ない。
+# 検出の確かめ（2026-11-26）：pat の ④ の側を外すと1つ目で、skip から label を外すと2つ目で落ちることを見た
+class TestRefNumberLeaks(unittest.TestCase):
+    def test_leaks(self):
+        from v2_checks import ref_number_leaks
+        bad = {"concepts": [{"id": "stats2:TERM-x", "principle": "中心極限定理で近い（④-6b）"}],
+               "claims": [{"id": "stats2:CLM-1", "conditions": [{"text": "a", "outside": "CLM-6b により近い"}]}]}
+        err = ref_number_leaks(bad)
+        self.assertEqual(len(err), 2, err)
+        ok = {"claims": [{"id": "stats2:CLM-1", "label": "④-1",
+                          "grounds": [{"claim": "stats2:CLM-6b"}, {"source": {"title": "中心極限定理を当てる", "uses": ["stats2:CLM-6b"]}}]}]}
+        self.assertEqual(ref_number_leaks(ok), [])
