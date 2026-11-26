@@ -1525,7 +1525,7 @@ def fig_refs(c: Course, base: str, ids) -> list[dict]:
     from labs import fig_url
     if not base:
         return []   # 公開先がない配布先では、図への参照を出さない
-    return [{"id": f, "url": fig_url(base, f), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
+    return [{"id": f, "url": fig_url(base, f, c), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
             for f in ids or []]
 
 
