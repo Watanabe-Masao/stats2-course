@@ -1070,7 +1070,7 @@ def dist(sp: dict) -> str:
 
 
 def paths(sp: dict) -> str:
-    """n 回中ちょうど k 回成功する並びを全部書き出す（🛒 成功・❌ 失敗）。並び1つの確率×並びの数＝ちょうど k 回の確率。"""
+    """n 回中ちょうど k 回成功する並びを全部書き出す（塗った丸＝成功・白抜きの丸＝失敗。ラボと同じ印。絵文字にしない）。並び1つの確率×並びの数＝ちょうど k 回の確率。"""
     import itertools
     import math
     n, k, p = sp["n"], sp["k"], sp["p"]
@@ -1081,8 +1081,8 @@ def paths(sp: dict) -> str:
     c.text(16, 18, f"n＝{n} 回のうち ちょうど {k} 回成功する並び（{len(rows)} 通り）", 12.5, INK2)
     for row in rows:
         y += gap
-        for j, x in enumerate(row):   # ラボと同じ印（🛒 成功・❌ 失敗）
-            c.text(16 + j * 26, y + 1, "🛒" if x else "❌", 17)
+        for j, x in enumerate(row):   # ラボと同じ印（math-lab の並びの書き出し：成功は注目の色で塗る・失敗は白抜き）
+            c.circle(25 + j * 26, y - 5, r, fill=ORANGE if x else "none", stroke=None if x else INK3, width=2)
         pr = "×".join(_num(round(p if x else 1 - p, 6)) for x in row)
         c.text(36 + n * 26, y, pr, 12, INK2)
     path = p ** k * (1 - p) ** (n - k)
@@ -1095,7 +1095,11 @@ def paths(sp: dict) -> str:
     c.text(16, y, f"並びの数 {str(n).translate(sub)}C{str(k).translate(sub)}＝{ncr} 通り", 12.5, INK)
     y += 22
     c.text(16, y, f"ちょうど {k} 回＝{ncr}×{path:.{dec}f}＝{ncr * path:.{dec}f}", 13.5, INK, weight="bold")
-    c.text(16, 38, f"🛒 成功（確率 {_num(round(p, 6))}）　❌ 失敗（確率 {_num(round(1 - p, 6))}）", 11.5, INK2)
+    c.circle(22, 34, 6, fill=ORANGE)
+    c.text(32, 38, f"成功（確率 {_num(round(p, 6))}）", 11.5, INK2)
+    x2 = 190   # 2つ目の凡例は右半分の始めに置く（字の幅を数えない）
+    c.circle(x2, 34, 6, stroke=INK3, width=2)
+    c.text(x2 + 10, 38, f"失敗（確率 {_num(round(1 - p, 6))}）", 11.5, INK2)
     return c.done(y + 14)
 
 

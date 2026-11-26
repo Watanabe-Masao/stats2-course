@@ -58,7 +58,7 @@ def with_gist(lid: str, name: str, preset: dict) -> dict:
     gist = _gists().get((lid, name))
     if not gist:
         return preset
-    steps = [*preset["tour"]["steps"], {"title": "つまり", "text": f"💡 {gist}", "gist": True}]
+    steps = [*preset["tour"]["steps"], {"title": "つまり", "text": gist, "gist": True}]
     return {**preset, "tour": {**preset["tour"], "steps": steps}}
 
 

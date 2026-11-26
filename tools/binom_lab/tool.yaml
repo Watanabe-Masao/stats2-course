@@ -36,7 +36,7 @@ presets:
       decimals: 4
       steps:
         - title: 1回だけ試す
-          text: 成功（🛒）の確率は **p**、失敗（❌）は **1−p**。p＝0.3 で1回だけ試す。
+          text: 成功（塗った丸）の確率は **p**、失敗（白抜きの丸）は **1−p**。p＝0.3 で1回だけ試す。
           set: {n: 1, p: 0.3, k: 1}
           focus: seq
         - title: n 回くり返す
