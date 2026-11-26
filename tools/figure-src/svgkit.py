@@ -11,6 +11,39 @@ BG = C["figure-bg"]; INK = C["ink"]; INK2 = C["ink-2"]; INK3 = C["ink-3"]; GRID 
 BLUE = C["data-1"]; ORANGE = C["data-hi"]; VIOLET = C["data-2"]; AQUA = C["data-3"]; RED = C["bad"]
 MUTED = C["data-1-soft"]; SOFT = C["data-1-soft"]; LIGHT = C["data-bg"]; WARM_BG = C["data-hi-bg"]
 
+# ダークの画面で読む図（#582。2026-11-27 の iPhone の確認：暗い画面の中に白い板が出た）。
+# 図の色は上の名前の付いた色だけなので、明るい値を暗い値（tokens.json の $extensions.dark）に置き換える規則を、SVG の中に書く。
+# CSS は SVG の fill／stroke の属性より強いので、絵を描く側は変えなくてよい。地（figure-bg・surface。どちらも白）は、画面の面の暗い値にする
+_DARK_OF = {"figure-bg": "surface"}   # 地は画面の面の色に合わせる（figure-bg の暗い値は、図がダークに対応するまでの白のまま）
+_USED = ("figure-bg", "surface", "ink", "ink-2", "ink-3", "line", "data-1", "data-hi", "data-2", "data-3", "bad",
+         "data-1-soft", "data-bg", "data-hi-bg")
+
+
+def dark_map():
+    """明るい値 → 暗い値（図で使う色だけ。小文字の #rrggbb）"""
+    out = {}
+    for k in _USED:
+        light = C[k].lower()
+        dark = _T[_DARK_OF.get(k, k)]["$extensions"]["dark"].lower()
+        if out.get(light, dark) != dark:
+            raise ValueError(f"図の色 {light} の暗い値が2つある（{out[light]} と {dark}）")
+        out[light] = dark
+    return out
+
+
+def themed(svg: str) -> str:
+    """SVG に、ダークの画面で色を置き換える規則を足す（すでにあれば何もしない）"""
+    if "prefers-color-scheme" in svg:
+        return svg
+    import re
+    m = dark_map()
+    if (odd := sorted({v.lower() for v in re.findall(r'(?:fill|stroke)="(#[0-9a-fA-F]{6})"', svg)} - set(m))):
+        # 名前の付いた色の外の色は、暗い画面でそのまま残る（白い文字が暗い地で消えるなど）。tokens.json の色を使う
+        raise ValueError(f"図に、ダークの置き換えのない色がある：{', '.join(odd)}")
+    rules = "".join(f'[fill="{a}" i]{{fill:{b}}}[stroke="{a}" i]{{stroke:{b}}}' for a, b in m.items() if a != b)
+    head = svg.index(">", svg.index("<svg")) + 1
+    return f"{svg[:head]}<style>@media (prefers-color-scheme: dark){{{rules}}}</style>{svg[head:]}"
+
 
 def f(v):
     s = f"{v:.1f}"

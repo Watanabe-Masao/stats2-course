@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 from model import ROOT, TOOLS, Course
@@ -115,8 +116,20 @@ def fig_url(base: str, fid: str, course: Course | None = None) -> str:
     url = f"{base.rstrip('/')}/fig/{fid}.svg"
     if course is not None and fid in course.figures and (ROOT / course.figures[fid]["file"]).exists():
         import hashlib
-        url += "?v=" + hashlib.sha1((ROOT / course.figures[fid]["file"]).read_bytes()).hexdigest()[:10]
+        url += "?v=" + hashlib.sha1(fig_bytes(course, fid)).hexdigest()[:10]
     return url
+
+
+def fig_bytes(course: Course, fid: str) -> bytes:
+    """公開サイトに置く図の中身：設定から作る図は、ダークの画面で色を置き換える規則を足す（svgkit.themed。#582）。
+    URL の印（fig_url）もこの中身から作るので、規則が変わっても Notion は新しい図を読む"""
+    if str(ROOT / "tools" / "figure-src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "tools" / "figure-src"))
+    import svgkit
+    raw = (ROOT / course.figures[fid]["file"]).read_bytes()
+    if not course.figures[fid].get("generated"):
+        return raw   # 手で描いた図（assets/figures。2枚）は tokens の色でないので、明るいまま出す
+    return svgkit.themed(raw.decode("utf-8")).encode("utf-8")
 
 
 def lab_url(base: str, course: Course, aid: str) -> str:
@@ -174,8 +187,8 @@ def build_site(course: Course) -> list[dict]:
         links.append(f'<li><a href="{t["slug"]}/">{t["name"]}</a>（場面 {len(presets)}）</li>')
     figdir = SITE / "fig"   # 図も公開サイトから出す（アップロード不要）
     figdir.mkdir(exist_ok=True)
-    for fid, f in course.figures.items():
-        (figdir / f"{fid}.svg").write_bytes((ROOT / f["file"]).read_bytes())
+    for fid in course.figures:
+        (figdir / f"{fid}.svg").write_bytes(fig_bytes(course, fid))
     icondir = SITE / "icons"   # 語の印（build/term_icons.py。概念の icon がここを指す。#220）
     icondir.mkdir(exist_ok=True)
     import term_icons

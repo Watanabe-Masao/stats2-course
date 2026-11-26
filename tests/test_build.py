@@ -478,6 +478,24 @@ class TestVisuals(unittest.TestCase):
         finally:
             Path(f.name).unlink()
 
+    # 確かめる対象：公開する図をダークの画面で読める形にする svgkit.themed（#582。2026-11-27、暗い画面に白い板が出た）。
+    # 想定する故障：(1) 明るい地や文字の色が置き換わらない（白い板・暗い地に暗い字）、(2) 置き換えのない新しい色が黙って残る。
+    # 見つけ方：小さな SVG に通して、地・文字の置き換えの規則があること、知らない色で止まることを見る。
+    # 期待値は tokens.json の写しから直接読む（themed の中の対応表を使わない）。既存のテストは図の URL だけを見ていた
+    def test_figures_follow_dark_mode(self):
+        import json
+        sys.path.insert(0, str(ROOT / "tools" / "figure-src"))
+        import svgkit
+        t = json.loads((ROOT / "docs" / "math-lab" / "tokens.json").read_text(encoding="utf-8"))["color"]
+        bg, ink = t["figure-bg"]["$value"], t["ink"]["$value"]
+        out = svgkit.themed(f'<svg viewBox="0 0 1 1"><rect fill="{bg}"/><text fill="{ink}">a</text></svg>')
+        self.assertIn("@media (prefers-color-scheme: dark)", out)
+        self.assertIn(f'[fill="{bg.lower()}" i]{{fill:{t["surface"]["$extensions"]["dark"].lower()}}}', out)
+        self.assertIn(f'[fill="{ink.lower()}" i]{{fill:{t["ink"]["$extensions"]["dark"].lower()}}}', out)
+        self.assertEqual(svgkit.themed(out), out)   # 2回通しても重ねない
+        with self.assertRaisesRegex(ValueError, "#123456"):
+            svgkit.themed('<svg><rect fill="#123456"/></svg>')
+
     def test_term_links_to_network(self):
         r = NotionRenderer(course(), TARGET)
         self.assertEqual(r.term_ref("TERM-expect"), f"[期待値 🕸]({TARGET['network_url']}?c=stats2:TERM-expect)")

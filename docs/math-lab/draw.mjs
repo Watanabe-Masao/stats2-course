@@ -220,8 +220,8 @@ const COLORS = Object.fromEntries(Object.entries({
 	},
 	"figure-bg": {
 		"$value": "#ffffff",
-		"$extensions": { "dark": "#ffffff" },
-		"$description": "図の地（静止図がダークに対応するまで白のまま）"
+		"$extensions": { "dark": "#161919" },
+		"$description": "図の地（静止図は端末がダークのとき暗い色に替わるので、地も面の色に合わせる。stats2-course #582）"
 	},
 	"band-1": {
 		"$value": "#7d8f1c",
