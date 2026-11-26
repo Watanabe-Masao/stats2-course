@@ -484,6 +484,26 @@ function expand(node, env = {}) {
 	}
 	return steps;
 }
+/** 値が 0 になる組合せ・順列（ₙCₖ・ₙPₖ で k＜0 か k＞n）。結果が 0 のとき、なぜ 0 かを画面が言うため（超幾何分布の N−M 個から n−k 個は選べない、など。
+*  stats2-course の issue 507）。Σ・Π・∫ の中は動かす記号の値が決まらないので見ない */
+function zeroFactors(node, env = {}) {
+	const out = [];
+	const walk = (m) => {
+		if (!isOp(m) || m.op === "sum" || m.op === "prod" || m.op === "int") return;
+		if (m.op === "fn" && (m.name === "comb" || m.name === "perm") && m.args.length === 2) {
+			const n = evaluate(m.args[0], env), k = evaluate(m.args[1], env);
+			if (n !== void 0 && k !== void 0 && Number.isInteger(n) && Number.isInteger(k) && n >= 0 && (k < 0 || k > n)) out.push({
+				name: m.name,
+				node: m,
+				n,
+				k
+			});
+		}
+		m.args.forEach(walk);
+	};
+	walk(node);
+	return out;
+}
 /** 木の中の関数の名前（出てくる順・重なりなし。comb・fact・E など） */
 function fnsIn(node) {
 	const out = [];
@@ -756,7 +776,8 @@ function sliderRange(s, values, fallback) {
 	return {
 		min,
 		max: Math.max(min, max),
-		step
+		step,
+		empty: max < min
 	};
 }
 /** 展開が止まった理由：引数がそろっているのに値にならない演算を探す（0 で割る・負の数の平方根など） */
@@ -808,27 +829,51 @@ function distribution(tree, over, lo, hi, env = {}) {
 	}
 	return out;
 }
-/** 上限のない横軸（ポアソン分布・幾何分布の k など）を、どこまで並べるか。lo から確率を足していき、
-*  残り（その先の確率の合計）が eps 未満になった所を返す。式の値が出ない・増えない所が続いても cap で止める（stats2-course の issue 608）。
-*  返す tail は、並べた先に残る確率（1 − 並べた分の和。0 未満にはしない） */
-function tailEnd(tree, over, lo, env = {}, eps = 1e-4, cap = 400) {
+/** 上限のない横軸（ポアソン分布・幾何分布の k など）の、図に並べる窓と、分布の平均・標準偏差（stats2-course の issue 608）。
+*  lo から確率を足していき、残りが scanEps 未満になるまで（maxScan で止める）見る。
+*  窓：左右の端の外の確率がそれぞれ eps/2 未満になる所。maxBars より広いときは、一番高い所を真ん中に maxBars 本にする。
+*  below・above：窓の左・右の外の確率（見ていない先の確率は above に入れる）。
+*  mean・sd：見た所の全部で求めた値（窓で切った分布で求めると、裾の重い分布で標準偏差が小さく出る。2026-11-26 の独立な確かめ） */
+function spanOf(tree, over, lo, env = {}, { eps = 1e-4, maxBars = 400, scanEps = 1e-12, maxScan = 2e4 } = {}) {
 	const body = rhsOf(tree);
-	let sum = 0, x = Math.ceil(lo);
-	const last = x + cap;
-	for (; x <= last; x++) {
-		const y = evaluate(body, {
+	const x0 = Math.ceil(lo);
+	const ys = [];
+	let sum = 0, m1 = 0, m2 = 0, top = 0;
+	for (let i = 0; i <= maxScan; i++) {
+		const x = x0 + i;
+		const v = evaluate(body, {
 			...env,
 			values: {
 				...env.values,
 				[over]: x
 			}
 		});
-		if (y !== void 0 && Number.isFinite(y) && y > 0) sum += y;
-		if (1 - sum < eps) break;
+		const y = v !== void 0 && Number.isFinite(v) && v > 0 ? v : 0;
+		ys.push(y);
+		sum += y;
+		m1 += x * y;
+		m2 += x * x * y;
+		if (y > ys[top]) top = i;
+		if (1 - sum < scanEps) break;
 	}
+	const pre = [0];
+	for (const y of ys) pre.push(pre[pre.length - 1] + y);
+	let a = 0;
+	while (a < ys.length - 1 && pre[a + 1] < eps / 2) a++;
+	let b = a;
+	while (b < ys.length - 1 && 1 - pre[b + 1] >= eps / 2) b++;
+	if (b - a + 1 > maxBars) {
+		a = Math.max(0, Math.min(top - Math.floor(maxBars / 2), ys.length - maxBars));
+		b = a + maxBars - 1;
+	}
+	const mean = sum > 0 ? m1 / sum : NaN;
 	return {
-		hi: Math.min(x, last),
-		tail: Math.max(0, 1 - sum)
+		from: x0 + a,
+		to: x0 + b,
+		below: pre[a],
+		above: Math.max(0, 1 - pre[b + 1]),
+		mean,
+		sd: sum > 0 ? Math.sqrt(Math.max(0, m2 / sum - mean * mean)) : NaN
 	};
 }
-export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, stopReason, substitute, substituteFree, symbolTex, symbolsIn, tailEnd, toTex, validateFormula };
+export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, spanOf, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula, zeroFactors };
