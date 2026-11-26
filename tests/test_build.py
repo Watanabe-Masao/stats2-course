@@ -278,7 +278,7 @@ class TestLabs(unittest.TestCase):
         self.assertIn('<embed source="https://x.github.io/labs/scale/?p=Q-U04-010" />', out)
         page = r.unit_page("U04")
         self.assertNotIn("@@ASSET", page)   # 公開サイトがあれば、ラボも図もアップロード不要
-        self.assertIn('<image source="https://x.github.io/labs/fig/FIG-U04-scale.svg">', page)
+        self.assertRegex(page, r'<image source="https://x\.github\.io/labs/fig/FIG-U04-scale\.svg\?v=[0-9a-f]{10}">')
 
     def test_tour_states_and_expect(self):
         import tour
@@ -1609,7 +1609,7 @@ class TestNetwork(unittest.TestCase):
         c = course()
         d = export_network(c, {"site_base_url": "https://example.com/labs"})
         binom = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
-        self.assertEqual(binom["figures"][0]["url"], "https://example.com/labs/fig/FIG-U14-concept.svg")
+        self.assertRegex(binom["figures"][0]["url"], r"^https://example\.com/labs/fig/FIG-U14-concept\.svg\?v=[0-9a-f]{10}$")
         self.assertIn("B(4, 0.25)", binom["figures"][0]["caption"])
         rel = next(x for x in d["relations"] if x["id"] == "stats2:REL-binom-poisson")
         self.assertEqual([lab["kind"] for lab in rel["labs"]], ["tour", "check"])   # ラボで解説／ラボで確かめる
