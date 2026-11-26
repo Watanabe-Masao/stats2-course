@@ -178,7 +178,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。CLM-6b）
+    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。中心極限定理）。独立でなければ X̄ の分散が σ²/n とは限らない
   grounds:
   - source:
       title: 独立な正規分布の和は正規分布（再生性）
@@ -198,7 +198,7 @@ claims:
       date: '2026-11-09'
       version: 02c937b
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-6b
   label: ④-6b
   kind: 極限
@@ -217,7 +217,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: 標準化した標本平均が標準正規分布に近づくとは保証できない
+    outside: 標準化した標本平均が標準正規分布に近づくとは保証できない（正の相関があると X̄ の散らばりは σ/√n より大きく、N(μ, σ²/n) では幅を狭く見積もる。有限の母集団から戻さずに取ると、散らばりは小さい）
   - text: 分散 σ² が 0＜σ²＜∞
     kind: 仮定
     terms:
@@ -242,7 +242,7 @@ claims:
       method: 独立な確かめ
       version: 401712f
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-7
   label: ④-7
   kind: 極限
@@ -323,7 +323,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる）
+    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる。裾の重い母集団では分散の推測が大きくずれ、正の相関があると s² は σ² を小さく見積もりやすい）
   grounds:
   - source:
       title: Helmert の直交変換で Σ(Xᵢ−X̄)²/σ² を n−1 個の独立な N(0, 1) の2乗の和に書く（Cochran の定理）
@@ -347,7 +347,7 @@ claims:
       date: '2026-11-09'
       version: 3eaf05a
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-11
   label: ④-11
   kind: 推定量の性質
@@ -787,7 +787,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: t(n−1) に従うとは保証できない
+    outside: t(n−1) に従うとは保証できない（n が大きければ中心極限定理で近くなるが、n が小さく歪んだ母集団ではずれる。正の相関があると s/√n が X̄ のばらつきを小さく見積もり、|t| が大きく出やすい）
   - text: H₀（μ＝μ₀）が正しい
     kind: 仮定
     outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる）
@@ -814,7 +814,7 @@ claims:
       date: '2026-11-09'
       version: 60d6f01
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-28b
   label: ④-28b
   kind: 極限
@@ -1141,7 +1141,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: t(n−1) に従うとは保証できない
+    outside: t(n−1) に従うとは保証できない（棄却する割合が有意水準どおりとは限らない）
   - text: H₀（μ_D＝0）が正しい
     kind: 仮定
     outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる。t(n−1) をずらしただけの形ではない）
@@ -1157,7 +1157,7 @@ claims:
       date: '2026-11-09'
       version: 60d6f01
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-36
   label: ④-36
   kind: 従う
@@ -1182,7 +1182,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-normal
-    outside: F(g−1, n−g) に従うとは保証できない
+    outside: F(g−1, n−g) に従うとは保証できない（F 分布の点で判定した有意水準 α が、本当の第1種の過誤の確率と合うとは限らない）
   - text: 各群の分散が等しい
     kind: 仮定
     outside: F(g−1, n−g) に従うとは保証できない
@@ -1210,7 +1210,7 @@ claims:
       date: '2026-11-20'
       version: 116ef94
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-37
   label: ④-37
   kind: 等しい
@@ -1393,7 +1393,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる）
+    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる。正の相関があると V(X̄) は σ²/n より大きく、有限の母集団から戻さずに取ると小さい）
   - text: 分散 σ² が有限
     kind: 仮定
     outside: V(X̄) が有限の値に定まるとは保証できない
@@ -1410,7 +1410,7 @@ claims:
       date: '2026-11-16'
       version: c5eb1c0
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-42
   label: ④-42
   kind: 従う
@@ -1434,7 +1434,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-normal
-    outside: F(n₁−1, n₂−1) に従うとは保証できない（正規でないと、分布の形そのものが変わる）
+    outside: F(n₁−1, n₂−1) に従うとは保証できない（正規でないと、分布の形そのものが変わる。裾の重い母集団では F の点が当てにならない）
   - text: 2つの母分散が等しい
     kind: 仮定
     terms:
@@ -1454,7 +1454,7 @@ claims:
       date: '2026-11-16'
       version: 5ee32a8
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-43
   label: ④-43
   kind: 等しい
