@@ -1927,6 +1927,23 @@ class TestProgress(unittest.TestCase):
 
 
 class TestVersions(unittest.TestCase):
+    def test_rollout_counts(self):
+        # 確かめる対象：進み具合の「横展開」（完了計画の段6）が、作業台の要る分布と、まだの語を数え違えない。
+        # 想定する故障：作業台の要る語の選び方を誤って、まだの分布が数から落ちる（数が全部そろったように見えて、取りこぼしを知らせない）。
+        # 見つけ方：作業台のある分布から1つ外すと、要る語の数は変わらず、ある語が1つ減り、その名前が「まだ」に出る。
+        # 検出の確かめ（2026-11-26）：要る語を「作業台を持つ語」から選ぶ形にすると、要る語の数も一緒に減って落ちることを見た
+        from progress import rollout_lines
+        c = course()
+        line = lambda: next(x for x in rollout_lines(c) if x.startswith("- 式の作業台"))
+        before = line()
+        c.terms["TERM-poisson"].pop("workspace")
+        after = line()
+        import re
+        n0, d0 = map(int, re.search(r"要る分布 (\d+)/(\d+)", before).groups())
+        n1, d1 = map(int, re.search(r"要る分布 (\d+)/(\d+)", after).groups())
+        self.assertEqual((n1, d1), (n0 - 1, d0))
+        self.assertIn(c.terms["TERM-poisson"]["name"], after.split("まだ：")[1])
+
     def test_version_required(self):
         import network
         c = course()

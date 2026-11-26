@@ -184,6 +184,34 @@ def notion_page(c=None, target: dict | None = None, pages: dict | None = None) -
     return "\n".join(lines) + "\n"
 
 
+# 横展開（完了計画の段6。2026-11-26）：二項分布のページにある体験が、その体験の要る概念にあるかを数える。
+# 「手順にはあったのに作らずに段を閉じた」取りこぼし（2026-11-23 の概要の図、2026-11-26 の作業台・実験室）を繰り返さないため。
+# 数えて知らせるだけで止めない（まだが多い）。全部が「ある」か「付けない（理由の記録）」になったら build の止めに替える。
+# 作業台が要らない分布の語（式が一般の p(x) で、数で決まらない）。理由をここに書く
+NO_WORKSPACE = {"TERM-rv": "一般の p(x)（数で決まる分布ではない）", "TERM-dist": "一般の p(x) の和（同上）",
+                "TERM-pdf": "一般の f(x) の積分（同上）"}
+
+
+def rollout_lines(c) -> list:
+    ts = [t for t in own_terms(c) if t.get("definition")]
+    # 作業台が要る語：確率分布の分類で、確率関数・密度関数（pmf・pdf）の式を持つ語
+    need_ws = [t for t in ts if t.get("category") == "確率分布" and t["id"] not in NO_WORKSPACE
+               and any(isinstance(f, dict) and str(f.get("id", "")).endswith(("-pmf", "-pdf")) for f in t.get("formulas") or [])]
+    has_ws = [t for t in need_ws if t.get("workspace") or t.get("table_workspace")]
+    other_ws = [t for t in ts if (t.get("workspace") or t.get("table_workspace")) and t not in need_ws]
+    exps = (load_yaml(ROOT / "content" / "experiments.yaml") or {}).get("experiments") or []
+    mains = {it.get("concept") for e in exps if not e.get("retired") for g in e.get("catalog") or []
+             for it in g.get("items") or [] if not it.get("retired")}
+    charts = [t for t in ts if t.get("chart")]
+    rest_ws = [t["name"] if "name" in t else t["id"] for t in need_ws if t not in has_ws]
+    return ["", "## 横展開（二項分布のページにある体験。完了計画の段6）", "",
+            f"- 問い・つまり：{sum(1 for t in ts if t.get('question') and t.get('gist'))}/{len(ts)} 語",
+            f"- 概要の図：{len(charts)}/{len(ts)} 語（付ける語と付けない語の基準は 11/30 の E1。#577）",
+            f"- 式の作業台：要る分布 {len(has_ws)}/{len(need_ws)} 語（ほかに表で決まる分布など {len(other_ws)} 語。#608）"
+            + (f"。まだ：{'・'.join(rest_ws)}" if rest_ws else ""),
+            f"- 新しい形の実験室の問いの主概念：{len(mains & {t['id'] for t in ts})} 語（実験室 {sum(1 for e in exps if not e.get('retired'))}。#609）"]
+
+
 def report() -> str:
     c = load_course()
     target = load_yaml(ROOT / "publish" / "notion.yaml") or {}
@@ -215,6 +243,7 @@ def report() -> str:
               f"- 検証済み（案 A。#58）：{sum(not v for v in ver.values())}/{len(ver)} 単元。済んでいない理由：",
               *[f"  - {u}：{'・'.join(g)}" for u, g in ver.items() if g],
               "- 2 孤立した概念がないこと・7 個人の記録は、build と #54 で確かめる"]
+    lines += rollout_lines(c)
     return "\n".join(lines) + "\n"
 
 
