@@ -1052,6 +1052,15 @@ def v2_source_errors(c: Course) -> list[str]:
     for i in {x for x in ids if ids.count(x) > 1}:
         err.append(f"claims.yaml：主張の id {i} が重複")
     for cl in claims:
+        # 証明の段で使う主張（uses。#536・2026-11-26 の A3）：あること・自分でないこと・grounds の claim にも挙げていること
+        # （画面は名前で出し、追跡は ID で。文の中に製本の番号を書かない）
+        listed = {g.get("claim") for g in cl.get("grounds") or []}
+        for g in cl.get("grounds") or []:
+            for u in (g.get("source") or {}).get("uses") or []:
+                if u not in ids or u == cl.get("id"):
+                    err.append(f"claims.yaml：{cl.get('id')} の証明の段の uses の {u} が、自分以外の主張にない")
+                elif u not in listed:
+                    err.append(f"claims.yaml：{cl.get('id')} の証明の段で {u} を使うなら、grounds に claim: {u} も挙げる")
         for side in ("premises", "conclusion"):
             for k, v in (cl.get(side) or {}).items():
                 for tid in v:
@@ -1698,7 +1707,9 @@ def export_claim(cl: dict, g, refs=None) -> dict:
         e["conditions"] = [{**x, **({"terms": [g(t) for t in x["terms"]]} if x.get("terms") else {}),
                             **({"subject": g(x["subject"])} if x.get("subject") else {}), "target": x.get("target", "claim")} for x in cl["conditions"]]
     if cl.get("grounds"):
-        e["grounds"] = [{k: (g(v) if k in ("claim", "derivation") else v) for k, v in x.items()} for x in cl["grounds"]]
+        e["grounds"] = [{k: (g(v) if k in ("claim", "derivation") else
+                             {**v, "uses": [g(u) for u in v["uses"]]} if k == "source" and v.get("uses") else v)
+                         for k, v in x.items()} for x in cl["grounds"]]
     if cl.get("converse"):
         e["converse"] = g(cl["converse"])
     for k in ("counterexamples", "units"):
