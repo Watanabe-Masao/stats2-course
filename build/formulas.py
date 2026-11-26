@@ -86,6 +86,8 @@ def prepare(terms: dict, contracts: dict | None) -> list[str]:
             for c in k.get("conditions") or []:
                 if not (isinstance(c, dict) and c.get("text") and isinstance(c.get("tree"), dict)):
                     err.append(f"契約 {fid}：conditions は text と tree（比べる式の木）で書く")
+                elif c["tree"].get("op") not in ("lt", "le", "gt", "ge"):   # 比べるは op（#72 案 A。前の fn の le などは書けない）
+                    err.append(f"契約 {fid}：conditions の tree の一番上は比べる op（lt・le・gt・ge）")
             if set(k.get("review_excludes") or []) - REVIEW_EXCLUDABLE:
                 err.append(f"契約 {fid}：review_excludes に書けるのは parts・why だけ")
             ev = evidence()

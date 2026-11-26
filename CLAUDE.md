@@ -115,7 +115,7 @@
 
 - 問題の `concepts:` には、その問題を**解く・解説を理解するのに必要な**概念か関係か主張（content/claims.yaml の CLM-。線にしない主張。#289）を書く。選択肢や文中に名前が出るだけの概念は書かない。unit.yaml に `concepts_linked: true` を書いた単元は、retired 以外の全問に書く。
 - 概念・関係からラボ・図を指すときに書けるのは、ラボへの参照（`labs:`。id・preset・purpose）と図の id（`figures:`）だけ。URL・説明は build が作る（その場で描く図の設定 `chart` は別。数は engine が出す）。
-- 式は、記号が別の式に開く木で持つ（#71）。1式＝1つの等式の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける）。
+- 式は、記号が別の式に開く木で持つ（#71）。1式＝1つの関係（＝・＜・≦・＞・≧）の連なり（「E(X)＝np、V(X)＝np(1−p)」は2式に分ける。≦ と ＝ が混ざる式も2式に分ける。比べるの書き方は docs/authoring.md。#72）。
 - **式の元は木だけ**（#118 単位 A、2026-11-01）。原本に `tex` を書かない。公開の JSON の tex は build が math-lab の `toTex` で木から作る（build/formula_tex.mjs が docs/math-lab/formula.mjs の写しを読む。写しは型と同じく `python3 build/sync_schema.py --update` で取り込む）。木と tex の食い違い（M1）はこれで起きない。単元の「式の構造」の表は手書きのままなので、記号を概念に合わせる。
 - 同じ式を2つの概念に出すときは、元でない側に `- {ref: F-…}` だけを書く（build が元の式を写し、`defined_in` を付ける。#118 D2）。
 - **式ごとの検証の契約**は content/formula-contracts.yaml（#118 D6）：種類（kinds）・主張する性質（properties）・代表（representative）・記号どうしの条件（conditions：1つの端の domain で書けないもの。比べる式の木）・レビューの観点（review）。全部の式に1つずつ（ないと build が「未分類」で止める）。1つの記号の範囲は domain に、文の条件は概念の conditions.math に書き、契約には書かない。

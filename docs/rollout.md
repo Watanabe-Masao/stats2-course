@@ -74,7 +74,7 @@
 
 製本 ②。書き方は authoring「式の分解の木」、CLAUDE.md「問題・式の決まり」。
 
-1. 式は木で書く（`tex` を書かない）。記号に `of`・`domain`。1式＝1つの等式の連なり。
+1. 式は木で書く（`tex` を書かない）。記号に `of`・`domain`。1式＝1つの関係（＝・＜・≦・＞・≧）の連なり。
 2. 全部の式に契約（content/formula-contracts.yaml）。
 3. 代表の式は、書いた側でない独立なレビューの記録（content/formula-reviews.yaml。指紋つき）。
 

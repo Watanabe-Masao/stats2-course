@@ -369,7 +369,8 @@ claims:
 ```
 
 - 葉は `{"sym": key}` か `{"num": 数}`。演算は eq・add・sub・mul・div・pow・neg・sqrt・abs・sum・prod・int・fn（kn-schema の formulaNode）。sum・prod・int は `var`（動かす記号）と `lower`・`upper`。
-- `fn` の `name` は、その式の symbols の key（E・V・P・Cov・comb・fact など。記号に `concept` を書けば、その概念の式へ開く）か、記号に書かなくてよい共通の関数（exp・log・gt・ge・lt・le・between）。比べる式（X＞x・a≦X≦b）を gt・between で書くのは仮の形で、#72 で型として決め直す。
+- `fn` の `name` は、その式の symbols の key（E・V・P・Cov・comb・fact など。記号に `concept` を書けば、その概念の式へ開く）か、記号に書かなくてよい共通の関数（exp・log）。
+- 比べる（＜・≦・＞・≧）は `op` の `lt`・`le`・`gt`・`ge` で書く。引数は2つ以上で、左から読む関係の連なり（X＞x は `{op: gt, args: [X, x]}`、a≦X≦b は `{op: le, args: [a, X, b]}`）。値は隣どうしが全部成り立てば 1、どれか崩れれば 0。前の fn の gt・between などは build が止める（#72 案 A。2026-11-26）。契約の conditions の木も、一番上は比べる op。
 - 記号の `kind`：value（1つの値）・data（データの一覧）・rv（確率変数）・param（母数）・index（添え字）・const（定数）。
 - build が止めるもの：symbols の key にない葉・関数・動かす記号、記号の `concept` が用語にない、知らない演算。
 - build が型で検査し、out/site/net/stats2.json を書き出す。画面はこの JSON だけを読む。個人の理解度・得点・復習日は概念の原本に入れない（個人用の学習記録へ）。

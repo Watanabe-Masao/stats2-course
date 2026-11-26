@@ -386,3 +386,28 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-23'
   fingerprint: 10cca61e1edc4734
+- formula: F-expo-surv
+  points:
+  - 単位（λ は 1/時間）
+  judgement: "前回（2026-11-21、6d480731ab8095be）からの差分だけを確かめた（#72 案 A）。origin/main で版を計算し直すと 6d480731ab8095be にちょうど戻り、F-expo-surv に掛かる差は式の木の P( ) の中だけ（{op: fn, name: gt, args: [X, x]} → {op: gt, args: [X, x]}）。どちらも X＞x（狭い不等号・向き同じ）で、toTex はどちらも P(X>x)=e^{-\\lambda x}、evaluate は (X,x)＝(2,2)・(3,2)・(1,2) で 0・1・0 と一致した。記号の表（λ・x の単位と domain）は変わっていないので、観点の判断は前回のまま"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-26'
+  fingerprint: e43b330771e8f89b
+- formula: F-pdf-interval
+  points: []   # 契約に review がない（観点を書くと review_errors が止める）
+  judgement: "比べる式を op に書き直した差分を確かめた（#72 案 A）。P( ) の中を {op: fn, name: between, args: [a, X, b]} から {op: le, args: [a, X, b]} にした。le は隣どうしの a≦X と X≦b の連なりで a≦X≦b を表し、右辺 ∫_a^b f(x)dx の下端 a・上端 b と合う（連続なので端を含んでも値は同じ。a＝b なら両辺0）。toTex は P(a\\le X\\le b)=\\int_{a}^{b}f(x)\\,dx。evaluate（a＝1・b＝4）は X＝2・0・5 で 1・0・0、端の X＝1・4 で 1。前の between は TeX が a≦X≦b なのに値は X≦a≦b と読み、X＝2 で0・X＝0 で1と誤っていた。その食い違いはこの書き直しで直った。契約の条件 a≦b（fn le → le、順は同じ）は a b＝(1,2)・(2,2)・(3,2) で 1・1・0"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-26'
+  fingerprint: 88c09c88517a3f95
+- formula: F-negbinom-pmf
+  points: []   # 契約に review がない（観点を書くと review_errors が止める）
+  judgement: "契約の条件の木を op に書き直した差分を確かめた（#72 案 A）。r≦k を {op: fn, name: le, args: [r, k]} から {op: le, args: [r, k]} にした。引数の順と ≦ は同じで、toTex は r\\le k、evaluate は r＝3 で k＝2・3・4 のとき 0・1・1（r 回目の成功は r 回目より前には起きない、と合う）。式の木・記号の表は変わっていない"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-26'
+  fingerprint: 5a898706fb00cbde
+- formula: F-hyper-pmf
+  points: []   # 契約に review がない（観点を書くと review_errors が止める）
+  judgement: "契約の条件の木2つを op に書き直した差分を確かめた（#72 案 A）。k≦M は fn le → le で順は同じ。toTex は k\\le M、evaluate は M＝4 で k＝3・4・5 のとき 1・1・0。下限は {op: ge, args: [k, sub(n, sub(N, M))]} で k≧n−(N−M) を表す。sub の入れ子で n−(N−M) になり、toTex は k\\ge n-(N-M)。evaluate は N＝10・M＝4・n＝8（下限2）で k＝1・2・3 のとき 0・1・1。条件の文は『n−(N−M) ≦ k』と左右が逆の書き方だが、意味は同じ（前の fn ge と同じ並び）。式の木・記号の表は変わっていない"
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-26'
+  fingerprint: 7fdb83114290734b

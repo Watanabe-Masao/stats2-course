@@ -2893,7 +2893,7 @@
       meaning: 自然対数の底（約2.718）
       key: e
       kind: const
-    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "X"}, {"sym": "x"}], "name": "gt"}], "name": "P"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "gt", "args": [{"sym": "X"}, {"sym": "x"}]}], "name": "P"}, {"op": "pow", "args": [{"sym": "e"}, {"op": "neg", "args": [{"op": "mul", "args": [{"sym": "lambda"}, {"sym": "x"}]}]}]}]}
   - id: F-expo-mean
     label: 期待値
     symbols:
@@ -2991,7 +2991,7 @@
       meaning: 区間の右端
       key: b
       kind: value
-    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "fn", "args": [{"sym": "a"}, {"sym": "X"}, {"sym": "b"}], "name": "between"}], "name": "P"}, {"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x", "lower": {"sym": "a"}, "upper": {"sym": "b"}}]}
+    tree: {"op": "eq", "args": [{"op": "fn", "args": [{"op": "le", "args": [{"sym": "a"}, {"sym": "X"}, {"sym": "b"}]}], "name": "P"}, {"op": "int", "args": [{"op": "fn", "args": [{"sym": "x"}], "name": "f"}], "var": "x", "lower": {"sym": "a"}, "upper": {"sym": "b"}}]}
   - id: F-pdf-total
     label: 全体の面積は1
     symbols:

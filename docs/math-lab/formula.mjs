@@ -3,7 +3,16 @@
 const isSym = (n) => "sym" in n;
 const isNum = (n) => "num" in n;
 const isOp = (n) => "op" in n;
-/** 記号に書かなくてよい共通の関数（それ以外の fn の name は、その式の symbols の key） */
+/** 比べる演算（式の木の op）。並びは関係の連なりの読み方 */
+const COMPARE_OPS = [
+	"lt",
+	"le",
+	"gt",
+	"ge"
+];
+const isCompare = (op) => COMPARE_OPS.includes(op);
+/** 記号に書かなくてよい共通の関数（それ以外の fn の name は、その式の symbols の key）。
+*  gt・ge・lt・le・between は比べる op に移る前の形（読み替えの期間。教材を op に書き直したら外す。stats2-course #72） */
 const COMMON_FNS = [
 	"exp",
 	"log",
@@ -70,6 +79,12 @@ function formatNum(v) {
 	return s.includes("e") ? v.toExponential(4).replace(/e\+?(-?)(\d+)/, "\\times 10^{$1$2}") : s;
 }
 const ATOM = 4;
+const REL = {
+	lt: "<",
+	le: "\\le ",
+	gt: ">",
+	ge: "\\ge "
+};
 const TALL = /\\(dfrac|sum|prod|int|sqrt)/;
 const wrapParen = (t) => TALL.test(t) ? `\\left(${t}\\right)` : `(${t})`;
 const paren = (o, need) => need ? wrapParen(o.t) : o.t;
@@ -108,6 +123,13 @@ function toTex(node, opt = {}) {
 		switch (n.op) {
 			case "eq": return {
 				t: a.map((x) => x.t).join("="),
+				p: 0
+			};
+			case "lt":
+			case "le":
+			case "gt":
+			case "ge": return {
+				t: a.map((x) => paren(x, x.p < 1)).join(REL[n.op]),
 				p: 0
 			};
 			case "add": return {
@@ -359,6 +381,13 @@ const BUILTIN = {
 /** 1つの演算を、引数の値から計算する（計算できなければ undefined） */
 function apply(n, v, env) {
 	switch (n.op) {
+		case "lt":
+		case "le":
+		case "gt":
+		case "ge": {
+			const ok = (x, y) => n.op === "lt" ? x < y : n.op === "le" ? x <= y : n.op === "gt" ? x > y : x >= y;
+			return +v.slice(1).every((y, i) => ok(v[i], y));
+		}
 		case "add": return v.reduce((s, x) => s + x, 0);
 		case "sub": return v.slice(1).reduce((s, x) => s - x, v[0]);
 		case "mul": return v.reduce((s, x) => s * x, 1);
@@ -560,7 +589,7 @@ function validateFormula(f) {
 		}
 		const want = ARITY[n.op];
 		if (want !== void 0 && n.args.length !== want) bad.push(`${n.op} の引数は ${want} 個（今 ${n.args.length}）`);
-		if ((n.op === "eq" || n.op === "sub") && n.args.length < 2) bad.push(`${n.op} の引数は2個以上`);
+		if ((n.op === "eq" || n.op === "sub" || isCompare(n.op)) && n.args.length < 2) bad.push(`${n.op} の引数は2個以上`);
 		if (n.op === "fn" && !(n.name && (keys.has(n.name) || COMMON_FNS.includes(n.name)))) bad.push(`関数 ${n.name ?? "（名前なし）"} が symbols にも共通の関数にもない`);
 		if (n.var && !keys.has(n.var)) bad.push(`動かす記号 ${n.var} が symbols にない`);
 		const vk = n.var ? kinds.get(n.var) : void 0;
@@ -876,4 +905,4 @@ function spanOf(tree, over, lo, env = {}, { eps = 1e-4, maxBars = 400, scanEps =
 		sd: sum > 0 ? Math.sqrt(Math.max(0, m2 / sum - mean * mean)) : NaN
 	};
 }
-export { COMMON_FNS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, spanOf, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula, zeroFactors };
+export { COMMON_FNS, COMPARE_OPS, applyOpens, boundSymbols, checkDomain, comb, definitionsFor, describeDomain, distribution, evaluate, expand, factorial, fnsIn, formatNum, freeSymbols, freshName, inDomain, isCompare, isNum, isOp, isSym, lhsOf, nodeAt, openSymbol, perm, renameBound, replaceFree, rhsOf, sliderRange, spanOf, stopReason, substitute, substituteFree, symbolTex, symbolsIn, toTex, validateFormula, zeroFactors };

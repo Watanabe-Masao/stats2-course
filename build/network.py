@@ -34,8 +34,12 @@ NS = re.compile(r"^[a-z0-9-]+:")
 
 # 式の分解の木（kn-schema の formulaNode）。葉の記号・関数の名前・動かす記号は、その式の symbols の key を指す。
 # 次の関数だけは記号に書かなくてよい（どの式でも同じ意味）。計算・展開・表示は math-lab（#72）。
-BUILTIN_FN = {"exp", "log", "gt", "ge", "lt", "le", "between"}
-TREE_OPS = {"eq", "add", "sub", "mul", "div", "pow", "neg", "sqrt", "abs", "sum", "prod", "int", "fn"}
+BUILTIN_FN = {"exp", "log"}
+# 比べる（lt・le・gt・ge）は op（2つ以上の引数を左から読む関係の連なり。a≦X≦b は le(a, X, b)。#72 案 A・2026-11-26）。
+# 前の fn の gt・ge・lt・le・between は書けない（下の tree_errors が止める）
+COMPARE_OPS = {"lt", "le", "gt", "ge"}
+OLD_COMPARE_FN = {"gt", "ge", "lt", "le", "between"}
+TREE_OPS = {"eq", "lt", "le", "gt", "ge", "add", "sub", "mul", "div", "pow", "neg", "sqrt", "abs", "sum", "prod", "int", "fn"}
 
 
 def tree_errors(node, keys: set) -> list[str]:
@@ -54,12 +58,16 @@ def tree_errors(node, keys: set) -> list[str]:
         o = n.get("op")
         if o not in TREE_OPS:
             err.append(f"知らない演算 {o}")
-        if o == "fn" and n.get("name") not in keys and n.get("name") not in BUILTIN_FN:
+        if o == "fn" and n.get("name") in OLD_COMPARE_FN:
+            err.append(f"比べるは fn の {n.get('name')} でなく op に書く（{{op: le, args: [a, X, b]}} など。#72）")
+        elif o == "fn" and n.get("name") not in keys and n.get("name") not in BUILTIN_FN:
             err.append(f"関数 {n.get('name')} が symbols の key にない（{'・'.join(sorted(BUILTIN_FN))} は書かなくてよい）")
         if o in ("sum", "prod", "int") and n.get("var") and n["var"] not in keys:
             err.append(f"動かす記号 {n['var']} が symbols の key にない")
         if not n.get("args"):
             err.append(f"{o} に args がない")
+        elif o in COMPARE_OPS | {"eq"} and len(n["args"]) < 2:
+            err.append(f"{o} の引数は2個以上")
         for a in n.get("args", []) + [n[k] for k in ("lower", "upper") if k in n]:
             walk(a)
 

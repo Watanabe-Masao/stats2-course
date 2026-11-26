@@ -358,6 +358,10 @@
             "op": {
               "enum": [
                 "eq",
+                "lt",
+                "le",
+                "gt",
+                "ge",
                 "add",
                 "sub",
                 "mul",
@@ -371,7 +375,7 @@
                 "int",
                 "fn"
               ],
-              "description": "eq：等しい（左辺, 右辺, …）・add・sub・mul・div・pow（底, 指数）・neg・sqrt・abs・sum／prod（var の範囲で足す・掛ける）・int（var で積分）・fn（name の関数。E・V・Cov・P・exp・log・Φ・階乗・組合せ など）"
+              "description": "eq：等しい（左辺, 右辺, …）・lt／le／gt／ge：比べる（2つ以上の引数を左から読む関係の連なり。a≦X≦b は le(a, X, b)。値は隣どうしが全部成り立てば 1）・add・sub・mul・div・pow（底, 指数）・neg・sqrt・abs・sum／prod（var の範囲で足す・掛ける）・int（var で積分）・fn（name の関数。E・V・Cov・P・exp・log・Φ・階乗・組合せ など）"
             },
             "args": {
               "type": "array",
@@ -2623,5 +2627,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 10
+  "x-revision": 11
 }

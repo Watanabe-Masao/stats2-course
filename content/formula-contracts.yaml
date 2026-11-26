@@ -168,16 +168,16 @@ contracts:
   properties: [非負, 正規化, 条件しだい]
   conditions:
   - text: r ≦ k（r 回目の成功は r 回目より前には起きない）
-    tree: {"op": "fn", "name": "le", "args": [{"sym": "r"}, {"sym": "k"}]}
+    tree: {"op": "le", "args": [{"sym": "r"}, {"sym": "k"}]}
   review_refs: [CLM-47]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-hyper-pmf
   kinds: [確率モデル]
   properties: [非負, 正規化, 対称, 条件しだい]
   conditions:
   - text: k ≦ M（当たりの数より多くは引けない）
-    tree: {"op": "fn", "name": "le", "args": [{"sym": "k"}, {"sym": "M"}]}
+    tree: {"op": "le", "args": [{"sym": "k"}, {"sym": "M"}]}
   - text: n−(N−M) ≦ k（外れを全部引いても足りない分は当たり）
-    tree: {"op": "fn", "name": "ge", "args": [{"sym": "k"}, {"op": "sub", "args": [{"sym": "n"}, {"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}]}]}
+    tree: {"op": "ge", "args": [{"sym": "k"}, {"op": "sub", "args": [{"sym": "n"}, {"op": "sub", "args": [{"sym": "N"}, {"sym": "M"}]}]}]}
   review_refs: [CLM-48]   # 分布の生まれ方の主張（基準の式の版に入れる。#291）
 - formula: F-hyper-mean
   kinds: [恒等式]
@@ -202,7 +202,7 @@ contracts:
   properties: [非負, 有界, 単調]
   conditions:
   - text: a ≦ b
-    tree: {"op": "fn", "name": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
+    tree: {"op": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
 - formula: F-pdf-total
   kinds: [恒等式]
   properties: [正規化]
