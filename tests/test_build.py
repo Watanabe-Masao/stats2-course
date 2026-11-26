@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "build"))
 
 from labs import squeeze, validate_labs, variants  # noqa: E402
 from lint import lint_page  # noqa: E402
-from model import load_course, load_yaml, numbers, parse_blocks, run_check, run_checks, validate  # noqa: E402
+from model import ROOT, load_course, load_yaml, numbers, parse_blocks, run_check, run_checks, validate  # noqa: E402
 from render_notion import COMP, NotionRenderer, for_phone, subscripts  # noqa: E402
 
 COURSE = load_course()
@@ -278,7 +278,7 @@ class TestLabs(unittest.TestCase):
         self.assertIn('<embed source="https://x.github.io/labs/scale/?p=Q-U04-010" />', out)
         page = r.unit_page("U04")
         self.assertNotIn("@@ASSET", page)   # 公開サイトがあれば、ラボも図もアップロード不要
-        self.assertIn('<image source="https://x.github.io/labs/fig/FIG-U04-scale.svg">', page)
+        self.assertRegex(page, r'<image source="https://x\.github\.io/labs/fig/FIG-U04-scale\.svg(\?v=[0-9a-f]{10})?">')   # 印は図を作ったあとだけ（CI の単体テストは build の前。印は test_fig_url_has_content_version で見る）
 
     def test_tour_states_and_expect(self):
         import tour
@@ -456,6 +456,27 @@ class TestVisuals(unittest.TestCase):
         over = figures.dist({"type": "dist", "family": "binom", "n": 10, "p": 0.3, "kmax": 10,
                              "overlay": {"family": "poisson", "lam": 3, "label": "ポアソン"}})
         self.assertNotIn("aria-label", over)   # 重ねる分布はまだ Python で描く（D1 で移す）
+
+    # 確かめる対象：図の URL に中身の印（?v=）を付けること（Notion が同じ URL の画像を読み直さないため。2026-11-27）。
+    # 想定する故障：印を付け忘れる・中身が変わっても印が変わらない（Notion に古い図が残る）・中身が同じなのに印が変わる（入れ直しの差分が毎回出る）。
+    # 見つけ方：同じ中身で2回、違う中身で1回、印を比べる。
+    # 検出の確かめ（2026-11-27）：印を外す形で落ちることを見た
+    def test_fig_url_has_content_version(self):
+        import tempfile
+        from labs import fig_url
+        c = course()
+        (ROOT / "out").mkdir(exist_ok=True)   # CI の単体テストは build の前で、out がまだない
+        with tempfile.NamedTemporaryFile("w", suffix=".svg", dir=ROOT / "out", delete=False, encoding="utf-8") as f:
+            f.write("<svg>a</svg>")
+        try:
+            c.figures["FIG-T"] = {"id": "FIG-T", "file": str(Path(f.name).relative_to(ROOT))}
+            a1, a2 = fig_url("https://x/", "FIG-T", c), fig_url("https://x/", "FIG-T", c)
+            self.assertRegex(a1, r"^https://x/fig/FIG-T\.svg\?v=[0-9a-f]{10}$")
+            self.assertEqual(a1, a2)
+            Path(f.name).write_text("<svg>b</svg>", encoding="utf-8")
+            self.assertNotEqual(fig_url("https://x/", "FIG-T", c), a1)
+        finally:
+            Path(f.name).unlink()
 
     def test_term_links_to_network(self):
         r = NotionRenderer(course(), TARGET)
@@ -1589,7 +1610,7 @@ class TestNetwork(unittest.TestCase):
         c = course()
         d = export_network(c, {"site_base_url": "https://example.com/labs"})
         binom = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
-        self.assertEqual(binom["figures"][0]["url"], "https://example.com/labs/fig/FIG-U14-concept.svg")
+        self.assertRegex(binom["figures"][0]["url"], r"^https://example\.com/labs/fig/FIG-U14-concept\.svg(\?v=[0-9a-f]{10})?$")   # 印は図を作ったあとだけ
         self.assertIn("B(4, 0.25)", binom["figures"][0]["caption"])
         rel = next(x for x in d["relations"] if x["id"] == "stats2:REL-binom-poisson")
         self.assertEqual([lab["kind"] for lab in rel["labs"]], ["tour", "check"])   # ラボで解説／ラボで確かめる

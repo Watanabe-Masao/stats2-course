@@ -161,7 +161,7 @@ class NotionRenderer:
             if kind == "fig":
                 fid, _, cap = arg.partition("|")
                 cap = cap or self.c.figures[fid].get("caption", "")
-                src = fig_url(self.t["site_base_url"], fid) if self.t.get("site_base_url") else ASSET_PLACEHOLDER.format(fid)
+                src = fig_url(self.t["site_base_url"], fid, self.c) if self.t.get("site_base_url") else ASSET_PLACEHOLDER.format(fid)
                 return f'<image source="{src}">\n{self.inline(cap)}\n</image>'
             if kind == "ref":
                 pid = (self.t.get("refs") or {}).get(arg)

@@ -108,8 +108,15 @@ _PICK = ("window.__LABCFG__=(function(){try{var p=new URLSearchParams(location.s
          "return (p&&window.__LABPRESETS__[p])||{};}catch(e){return {};}})();")
 
 
-def fig_url(base: str, fid: str) -> str:
-    return f"{base.rstrip('/')}/fig/{fid}.svg"
+def fig_url(base: str, fid: str, course: Course | None = None) -> str:
+    """公開先の図の URL。course を渡すと、図の中身から作った印（?v=）を付ける。
+    Notion は一度読んだ画像を覚えていて、同じ URL で中身を替えても読み直さない（2026-11-27 の iPhone の確認。U14 の概念図が古い色のまま）。
+    中身が変わると URL も変わるので、新しい画像を読む。中身が同じなら URL も同じ（入れ直しても差分が出ない）"""
+    url = f"{base.rstrip('/')}/fig/{fid}.svg"
+    if course is not None and fid in course.figures and (ROOT / course.figures[fid]["file"]).exists():
+        import hashlib
+        url += "?v=" + hashlib.sha1((ROOT / course.figures[fid]["file"]).read_bytes()).hexdigest()[:10]
+    return url
 
 
 def lab_url(base: str, course: Course, aid: str) -> str:
