@@ -642,6 +642,11 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("関数 Q が symbols の key にない" in e for e in err))
         self.assertTrue(any("concept TERM-nothing が用語にない" in e for e in err))
         self.assertEqual(self.n.tree_errors({"op": "fn", "name": "exp", "args": [{"num": 1}]}, set()), [])
+        # 比べるは op（#72 案 A）。前の fn の between は止め、引数1つの比べるも止める
+        x = {"sym": "X"}
+        self.assertEqual(self.n.tree_errors({"op": "le", "args": [{"num": 0}, x, {"num": 1}]}, {"X"}), [])
+        self.assertTrue(any("op に書く" in e for e in self.n.tree_errors({"op": "fn", "name": "between", "args": [x, x, x]}, {"X"})))
+        self.assertTrue(any("引数は2個以上" in e for e in self.n.tree_errors({"op": "lt", "args": [x]}, {"X"})))
 
     def test_symbol_of_and_domain(self):
         # 記号と確率変数の対応（of）・定義域（domain）（#109）
