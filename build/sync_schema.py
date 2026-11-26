@@ -31,6 +31,8 @@ FILES = (
     ("knowledge-net", "math-lab/packages/engine/dist/random.js", ROOT / "docs" / "math-lab" / "random.js"),
     # 解き方の公式の記号と応用の課題の項目（engine から書き出した JSON。network.py が原本を確かめる。#208）
     ("knowledge-net", "math-lab/packages/engine/dist/contracts.json", ROOT / "docs" / "math-lab" / "contracts.json"),
+    # 図を SVG の文字列で描く関数の束（画面と同じ関数で静止図を作る。build/draw_svg.mjs が読む。#582 の D0）
+    ("knowledge-net", "math-lab/packages/ui/dist/draw.mjs", ROOT / "docs" / "math-lab" / "draw.mjs"),
 )
 
 

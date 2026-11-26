@@ -436,6 +436,27 @@ class TestVisuals(unittest.TestCase):
         f["spec"]["mu"] = 105                     # 本文にない数
         self.assertTrue(any("FIG-U16-concept" in e and "ない数" in e for e in figures.validate_figures(c)))
 
+    # 確かめる対象：二項分布の棒（重ねる分布・帯・境目なし）の静止図を、画面と同じ math-lab の描く関数で作ること（#582 の D0）。
+    # 想定する故障：写しの束が読めずに黙って Python の図に戻る・棒の高さが確率の比にならない・重ねる分布のある図まで math-lab に渡して崩れる。
+    # 見つけ方：束が付ける aria-label（Python の図にはない）で出どころを見て、棒の高さの比を Fraction で求めた二項確率と比べる。
+    # 既存との違い：上の test_dist_figure は Python の描き方の数の文字だけを見る。束の中の関数の単体テストは math-lab の draw.test.ts。
+    # 検出の確かめ（2026-11-27）：束の写しを読めなくすると1つ目で落ちることを見た（Python に戻ると aria-label がない）
+    def test_binom_dist_drawn_by_math_lab(self):
+        import re
+        from fractions import Fraction
+        from math import comb
+        import figures
+        svg = figures.dist({"type": "dist", "family": "binom", "n": 4, "p": 0.25, "highlight": [1], "unit": "人"})
+        self.assertIn('aria-label="二項分布 B(4, 0.25)', svg)
+        hs = [float(h) for h in re.findall(r'<rect x="[\d.]+" y="[\d.]+" width="[\d.]+" height="([\d.]+)" rx="3"', svg)]
+        pr = [comb(4, k) * Fraction(1, 4) ** k * Fraction(3, 4) ** (4 - k) for k in range(5)]
+        self.assertEqual(len(hs), 5)
+        for h, q in zip(hs, pr):
+            self.assertAlmostEqual(h / max(hs), float(q / max(pr)), delta=0.002)
+        over = figures.dist({"type": "dist", "family": "binom", "n": 10, "p": 0.3, "kmax": 10,
+                             "overlay": {"family": "poisson", "lam": 3, "label": "ポアソン"}})
+        self.assertNotIn("aria-label", over)   # 重ねる分布はまだ Python で描く（D1 で移す）
+
     def test_term_links_to_network(self):
         r = NotionRenderer(course(), TARGET)
         self.assertEqual(r.term_ref("TERM-expect"), f"[期待値 🕸]({TARGET['network_url']}?c=stats2:TERM-expect)")
