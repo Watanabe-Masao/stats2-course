@@ -367,6 +367,11 @@ claims:
     terms:
     - TERM-indep
     outside: E(s²)＝σ² とは保証できない（平均が違うと大きい側にずれ、相関があると一般にずれる（共分散の和が正なら小さい側に）。分散が違うと E(s²) は分散の平均になる）
+  - text: 分散 σ² が有限
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: E(s²)＝σ² とは限らない
   grounds:
   - source:
       title: E(ΣXᵢ²)−nE(X̄²)＝n(σ²＋μ²)−n(σ²/n＋μ²)＝(n−1)σ²（根拠の計算で使うのは、各 Xᵢ が同じ平均・同じ分散で互いに無相関なこと。これで足りる。独立同分布は教材で置く十分条件）
@@ -384,7 +389,7 @@ claims:
       date: '2026-11-09'
       version: 91f0acc
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-13
   label: ④-13
   kind: ならば
@@ -662,6 +667,10 @@ claims:
   conclusion:
     subjects:
     - TERM-posterior
+  conditions:
+  - text: H・D は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: 違う集団の確率を組み合わせると、事後確率にならない
   grounds:
   - source:
       title: 条件付き確率の定義を2通りに書く（P(H∩D)＝P(D|H)P(H)＝P(H|D)P(D)）
@@ -676,7 +685,7 @@ claims:
       date: '2026-11-09'
       version: 1dd9337
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-25
   label: ④-25
   kind: 従う
@@ -950,6 +959,10 @@ claims:
     predicates:
     - TERM-indep
     - TERM-expect
+  conditions:
+  - text: 完全無作為化（群の大きさを先に決め、その大きさの割り付けを全部同じ確率で選ぶ）で割り付ける
+    kind: 仮定
+    outside: 各個体が処置群に入る確率が等しいとは限らない。確率が等しくても、各店を独立に0.5 で振るなど群の大きさが偶然で決まる割り付けには使えない
   grounds:
   - source:
       title: 完全無作為化では、各個体が処置群に入る確率がどれも n₁/(n₁＋n₀) で等しく、群の大きさが固定なので、各群の平均の期待値がどちらも Z の全体の平均に等しい。「交絡の原因にならない」はこの結果の解釈で、⑧ が扱う
@@ -960,7 +973,7 @@ claims:
       date: '2026-11-08'
       version: a3d17e9
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-30
   label: ④-30
   kind: 推定量の性質
@@ -1028,6 +1041,10 @@ claims:
     - TERM-event
     predicates:
     - TERM-addition
+  conditions:
+  - text: A・B は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: この式で足し引きできない
   grounds:
   - source:
       title: A∪B＝A∪(B∖A)、B＝(A∩B)∪(B∖A) はどちらも排反な和なので、確率の公理の加法性（残りを ∅ にした有限の形。P(∅)＝0 は Ω＝Ω∪∅∪∅∪… と P(Ω)＝1 から）から
@@ -1038,7 +1055,7 @@ claims:
       date: '2026-11-09'
       version: 1dd9337
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-33
   label: ④-33
   kind: 等しい
@@ -1055,6 +1072,10 @@ claims:
     - TERM-event
     predicates:
     - TERM-multiplication
+  conditions:
+  - text: A・B は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: 違う確率の掛け算は、両方が起きる確率にならない
   grounds:
   - source:
       title: 条件付き確率の定義 P(B|A)＝P(A∩B)/P(A) の両辺に P(A) を掛ける
@@ -1065,7 +1086,7 @@ claims:
       date: '2026-11-09'
       version: 1dd9337
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-34
   label: ④-34
   kind: 等しい
@@ -1297,6 +1318,9 @@ claims:
   - text: 戻さずに選ぶ（大きさ n の組み合わせから1つを選ぶ）
     kind: 仮定
     outside: 戻して n 回選ぶと、ある要素が1回以上入る確率は 1−(1−1/N)ⁿ で、n≧2 では n/N より小さい
+  - text: 大きさ n のどの組み合わせも同じ確率で選ぶ（単純無作為抽出）
+    kind: 仮定
+    outside: 各要素の入る確率は n÷N とは限らない（層ごとに抽出率を変える層別抽出などでは、要素ごとに違う）
   grounds:
   - source:
       title: 組み合わせは全部で NCn 通りで、どれも確率 1/NCn。ある要素を含む組み合わせは、残りの N−1 個から n−1 個を選ぶ (N−1)C(n−1) 通り。その比は (N−1)C(n−1)/NCn＝n/N（n＝0 では含む組み合わせが0通りで 0＝0/N）
@@ -1314,7 +1338,7 @@ claims:
       method: 独立な確かめ
       version: 401712f
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-20a
   label: ④-20a
   kind: 等しい
@@ -1330,6 +1354,10 @@ claims:
     - TERM-sample-mean
     predicates:
     - TERM-expect
+  conditions:
+  - text: X₁, …, Xₙ は、どれも期待値が μ
+    kind: 仮定
+    outside: E(X̄) は各 Xᵢ の期待値の平均で、μ とは限らない
   grounds:
   - source:
       title: 期待値の線形性で E(X̄)＝(E(X₁)＋…＋E(Xₙ))/n＝nμ/n＝μ。独立も同じ分布も使わない
@@ -1343,7 +1371,7 @@ claims:
       date: '2026-11-16'
       version: c5eb1c0
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-41
   label: ④-41
   kind: 等しい
@@ -1443,6 +1471,10 @@ claims:
     - TERM-estimator
     predicates:
     - TERM-mse
+  conditions:
+  - text: 推定量 θ̂ の分散が有限
+    kind: 仮定
+    outside: 平均二乗誤差を分散と偏りの2乗に分けられない
   grounds:
   - source:
       title: θ̂−θ＝{θ̂−E(θ̂)}＋{E(θ̂)−θ} の2乗の期待値を開く。交わりの項 2{E(θ̂)−θ}·E{θ̂−E(θ̂)} は E{θ̂−E(θ̂)}＝0 なので消える
@@ -1456,7 +1488,7 @@ claims:
       date: '2026-11-16'
       version: 087f354
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-44
   label: ④-44
   kind: 極限
