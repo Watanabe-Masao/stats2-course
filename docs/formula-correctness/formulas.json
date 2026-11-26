@@ -3288,8 +3288,7 @@
     {
      "text": "r ≦ k（r 回目の成功は r 回目より前には起きない）",
      "tree": {
-      "op": "fn",
-      "name": "le",
+      "op": "le",
       "args": [
        {
         "sym": "r"
@@ -3469,8 +3468,7 @@
     {
      "text": "k ≦ M（当たりの数より多くは引けない）",
      "tree": {
-      "op": "fn",
-      "name": "le",
+      "op": "le",
       "args": [
        {
         "sym": "k"
@@ -3484,8 +3482,7 @@
     {
      "text": "n−(N−M) ≦ k（外れを全部引いても足りない分は当たり）",
      "tree": {
-      "op": "fn",
-      "name": "ge",
+      "op": "ge",
       "args": [
        {
         "sym": "k"
@@ -3761,7 +3758,7 @@
      "op": "fn",
      "args": [
       {
-       "op": "fn",
+       "op": "gt",
        "args": [
         {
          "sym": "X"
@@ -3769,8 +3766,7 @@
         {
          "sym": "x"
         }
-       ],
-       "name": "gt"
+       ]
       }
      ],
      "name": "P"
@@ -4003,7 +3999,7 @@
      "op": "fn",
      "args": [
       {
-       "op": "fn",
+       "op": "le",
        "args": [
         {
          "sym": "a"
@@ -4014,8 +4010,7 @@
         {
          "sym": "b"
         }
-       ],
-       "name": "between"
+       ]
       }
      ],
      "name": "P"
@@ -4056,8 +4051,7 @@
     {
      "text": "a ≦ b",
      "tree": {
-      "op": "fn",
-      "name": "le",
+      "op": "le",
       "args": [
        {
         "sym": "a"
