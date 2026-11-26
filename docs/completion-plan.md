@@ -85,6 +85,8 @@
 
 閉じる確かめ：build の止め（④-NN・仮定の行の掛かる先）・`formulas.py --publish-check`・画面のテスト。大きさ：中。
 
+**済み（2026-11-26）**：1 は knowledge-net PR 331・332 と stats2-course PR 618（#72 を閉じた）。2・3 は stats2-course PR 619・620（#536 を閉じた。#532 は C まで済み、iPhone での確かめが残る）。概念に残る仮定の行は0、画面の文の「④-NN」は build と lint が止める。
+
 ### 段2　図を描く部品を1つにする（#582 D0）
 
 画面の図・Notion の静止図・概念の chart を、math-lab の1つの部品で描く。D0 で、二項分布の棒の1型だけを移し、build が node で SVG を作る道を通す。段3・段4 の図は、この部品で描く。
