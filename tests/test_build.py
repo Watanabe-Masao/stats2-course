@@ -278,7 +278,7 @@ class TestLabs(unittest.TestCase):
         self.assertIn('<embed source="https://x.github.io/labs/scale/?p=Q-U04-010" />', out)
         page = r.unit_page("U04")
         self.assertNotIn("@@ASSET", page)   # 公開サイトがあれば、ラボも図もアップロード不要
-        self.assertRegex(page, r'<image source="https://x\.github\.io/labs/fig/FIG-U04-scale\.svg\?v=[0-9a-f]{10}">')
+        self.assertRegex(page, r'<image source="https://x\.github\.io/labs/fig/FIG-U04-scale\.svg(\?v=[0-9a-f]{10})?">')   # 印は図を作ったあとだけ（CI の単体テストは build の前。印は test_fig_url_has_content_version で見る）
 
     def test_tour_states_and_expect(self):
         import tour
@@ -465,6 +465,7 @@ class TestVisuals(unittest.TestCase):
         import tempfile
         from labs import fig_url
         c = course()
+        (ROOT / "out").mkdir(exist_ok=True)   # CI の単体テストは build の前で、out がまだない
         with tempfile.NamedTemporaryFile("w", suffix=".svg", dir=ROOT / "out", delete=False, encoding="utf-8") as f:
             f.write("<svg>a</svg>")
         try:
@@ -1609,7 +1610,7 @@ class TestNetwork(unittest.TestCase):
         c = course()
         d = export_network(c, {"site_base_url": "https://example.com/labs"})
         binom = next(x for x in d["concepts"] if x["id"] == "stats2:TERM-binom")
-        self.assertRegex(binom["figures"][0]["url"], r"^https://example\.com/labs/fig/FIG-U14-concept\.svg\?v=[0-9a-f]{10}$")
+        self.assertRegex(binom["figures"][0]["url"], r"^https://example\.com/labs/fig/FIG-U14-concept\.svg(\?v=[0-9a-f]{10})?$")   # 印は図を作ったあとだけ
         self.assertIn("B(4, 0.25)", binom["figures"][0]["caption"])
         rel = next(x for x in d["relations"] if x["id"] == "stats2:REL-binom-poisson")
         self.assertEqual([lab["kind"] for lab in rel["labs"]], ["tour", "check"])   # ラボで解説／ラボで確かめる
