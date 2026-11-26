@@ -178,7 +178,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。CLM-6b）
+    outside: N(μ, σ²/n) に従うとは保証できない（正規でない母集団でも分散が有限なら、n が大きいとき標準化したものが N(0, 1) に近づく。中心極限定理）。独立でなければ X̄ の分散が σ²/n とは限らない
   grounds:
   - source:
       title: 独立な正規分布の和は正規分布（再生性）
@@ -197,8 +197,12 @@ claims:
       by: L
       date: '2026-11-09'
       version: 02c937b
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-6b
   label: ④-6b
   kind: 極限
@@ -217,7 +221,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: 標準化した標本平均が標準正規分布に近づくとは保証できない
+    outside: 標準化した標本平均が標準正規分布に近づくとは保証できない（正の相関があると X̄ の散らばりは σ/√n より大きく、N(μ, σ²/n) では幅を狭く見積もる。有限の母集団から戻さずに取ると、X̄ の分散は σ²/n より小さい）
   - text: 分散 σ² が 0＜σ²＜∞
     kind: 仮定
     terms:
@@ -241,8 +245,12 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-7
   label: ④-7
   kind: 極限
@@ -257,7 +265,8 @@ claims:
   grounds:
   - claim: CLM-20b
   - source:
-      title: t(k) の定義で T_k＝Z/√(V_k/k)（Z と V_k は独立、V_k は χ²(k)）と書き、V_k を独立な Zᵢ²（V(Zᵢ²)＝2 は有限）の和として表すと、④-20b で V_k/k→1（確率）。T_k の分布は (Z, V_k) の分布だけで決まるので、Z と独立な1つの列 Z₁, Z₂, … で V_k＝Z₁²＋…＋Z_k² と表してよい
+      title: t(k) の定義で T_k＝Z/√(V_k/k)（Z と V_k は独立、V_k は χ²(k)）と書き、V_k を独立な Zᵢ²（V(Zᵢ²)＝2 は有限）の和として表すと、大数の法則で V_k/k→1（確率）。T_k の分布は (Z, V_k) の分布だけで決まるので、Z と独立な1つの列 Z₁, Z₂, … で V_k＝Z₁²＋…＋Z_k² と表してよい
+      uses: [CLM-20b]
   - source:
       title: スルツキーの定理
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
@@ -322,7 +331,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる）
+    outside: (n−1)s²/σ² がカイ二乗分布に従うとは保証できない（正規母集団でないと、一般には形が変わる。裾の重い母集団では分散の推測が大きくずれ、正の相関があると s² は σ² を小さく見積もりやすい）
   grounds:
   - source:
       title: Helmert の直交変換で Σ(Xᵢ−X̄)²/σ² を n−1 個の独立な N(0, 1) の2乗の和に書く（Cochran の定理）
@@ -345,8 +354,12 @@ claims:
       by: O
       date: '2026-11-09'
       version: 3eaf05a
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-11
   label: ④-11
   kind: 推定量の性質
@@ -366,6 +379,11 @@ claims:
     terms:
     - TERM-indep
     outside: E(s²)＝σ² とは保証できない（平均が違うと大きい側にずれ、相関があると一般にずれる（共分散の和が正なら小さい側に）。分散が違うと E(s²) は分散の平均になる）
+  - text: 分散 σ² が有限
+    kind: 仮定
+    terms:
+    - TERM-var
+    outside: σ² が有限の値に定まらず、E(s²) も有限にならないので、不偏かどうかを言えない
   grounds:
   - source:
       title: E(ΣXᵢ²)−nE(X̄²)＝n(σ²＋μ²)−n(σ²/n＋μ²)＝(n−1)σ²（根拠の計算で使うのは、各 Xᵢ が同じ平均・同じ分散で互いに無相関なこと。これで足りる。独立同分布は教材で置く十分条件）
@@ -382,8 +400,12 @@ claims:
       by: O
       date: '2026-11-09'
       version: 91f0acc
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-13
   label: ④-13
   kind: ならば
@@ -589,13 +611,14 @@ claims:
     outside: 標本平均が μ に近づくとは保証できない
   - text: 分散 σ² が有限
     kind: 仮定
-    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外。2次資料での照合は ④-44 の根拠の行）
+    outside: この根拠（チェビシェフの不等式）による保証は使えない（平均が有限なら成り立つことが知られている：ヒンチンの大数の法則。教材の範囲外。2次資料での照合はウェルチの t の主張の根拠の行）
     terms:
     - TERM-var
   grounds:
   - claim: CLM-41
   - source:
-      title: V(X̄)＝σ²/n（CLM-41）とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+      title: 標本平均の分散 V(X̄)＝σ²/n とチェビシェフの不等式 P(|X̄−μ|≧ε)≦σ²/(nε²)→0
+      uses: [CLM-41]
   verification:
     math:
     - method: 独立な確かめ
@@ -661,6 +684,10 @@ claims:
   conclusion:
     subjects:
     - TERM-posterior
+  conditions:
+  - text: H・D は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: 違う集団の確率を組み合わせると、事後確率にならない
   grounds:
   - source:
       title: 条件付き確率の定義を2通りに書く（P(H∩D)＝P(D|H)P(H)＝P(H|D)P(D)）
@@ -674,8 +701,12 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-25
   label: ④-25
   kind: 従う
@@ -761,7 +792,7 @@ claims:
   label: ④-28a
   kind: 従う
   statement:
-    text: n≧2 の正規母集団（σ＞0）の無作為標本で、H₀：μ＝μ₀ が正しいとき、t 統計量 (X̄−μ₀)/(s/√n) は t(n−1) に従う
+    text: n≧2 の正規母集団（σ＞0）の無作為標本で、H₀：μ＝μ₀ が正しいとき、t 統計量 (X̄−μ₀)/(s/√n)（s は n−1 で割る不偏分散の平方根）は t(n−1) に従う
   premises:
     subjects:
     - TERM-sample-mean
@@ -777,7 +808,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: t(n−1) に従うとは保証できない
+    outside: t(n−1) に従うとは保証できない（n が大きければ中心極限定理で近くなるが、n が小さく歪んだ母集団ではずれる。正の相関があると s/√n が X̄ のばらつきを小さく見積もり、|t| が大きく出やすい）
   - text: H₀（μ＝μ₀）が正しい
     kind: 仮定
     outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる）
@@ -803,8 +834,12 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-28b
   label: ④-28b
   kind: 極限
@@ -889,7 +924,7 @@ claims:
   label: ④-28c
   kind: 極限
   statement:
-    text: 行の合計 n₁, …, nᵣ（r≧2）をデータを取る前に決めた r 個の独立な多項の標本（列の区分は c≧2 個）で、H₀：どの行でも列の区分の確率が等しい（p₁ⱼ＝…＝pᵣⱼ、j＝1, …, c）が正しいとき、どの nᵢ も→∞ で、共通の確率を列の合計の割合 n・ⱼ÷n（H₀ のもとでの最尤推定）で推定した期待度数 Eᵢⱼ＝nᵢ×n・ⱼ÷n による Σ(O−E)²/E の分布は、自由度 (r−1)(c−1) のカイ二乗分布 χ²((r−1)(c−1)) に近づく（同質性の検定。1つの集団から総数を取る ④-28b と同じ統計量・同じ自由度だが、取り方と H₀ が違う）
+    text: 行の合計 n₁, …, nᵣ（r≧2）をデータを取る前に決めた r 個の独立な多項の標本（列の区分は c≧2 個）で、H₀：どの行でも列の区分の確率が等しい（p₁ⱼ＝…＝pᵣⱼ、j＝1, …, c）が正しいとき、どの nᵢ も→∞ で、共通の確率を列の合計の割合 n・ⱼ÷n（H₀ のもとでの最尤推定）で推定した期待度数 Eᵢⱼ＝nᵢ×n・ⱼ÷n による Σ(O−E)²/E の分布は、自由度 (r−1)(c−1) のカイ二乗分布 χ²((r−1)(c−1)) に近づく（同質性の検定。1つの集団から総数を取る適合度の χ² の主張と同じ統計量・同じ自由度だが、取り方と H₀ が違う）
   premises:
     subjects:
     - TERM-expected
@@ -949,6 +984,10 @@ claims:
     predicates:
     - TERM-indep
     - TERM-expect
+  conditions:
+  - text: 完全無作為化（群の大きさを先に決め、その大きさの割り付けを全部同じ確率で選ぶ）で割り付ける
+    kind: 仮定
+    outside: 各個体が処置群に入る確率が等しいとは限らない。確率が等しくても、各店を独立に0.5 で振るなど群の大きさが偶然で決まる割り付けには使えない
   grounds:
   - source:
       title: 完全無作為化では、各個体が処置群に入る確率がどれも n₁/(n₁＋n₀) で等しく、群の大きさが固定なので、各群の平均の期待値がどちらも Z の全体の平均に等しい。「交絡の原因にならない」はこの結果の解釈で、⑧ が扱う
@@ -958,8 +997,12 @@ claims:
       by: G
       date: '2026-11-08'
       version: a3d17e9
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-30
   label: ④-30
   kind: 推定量の性質
@@ -976,8 +1019,10 @@ claims:
     - TERM-unbiased
     - TERM-consistency
   grounds:
+  - claim: CLM-20b
   - source:
-      title: 階級に入る数は二項分布に従う。その平均と大数の法則（20b）
+      title: 階級に入る数は二項分布に従う。その平均と大数の法則
+      uses: [CLM-20b]
   verification:
     math:
     - method: 独立な確かめ
@@ -1025,6 +1070,10 @@ claims:
     - TERM-event
     predicates:
     - TERM-addition
+  conditions:
+  - text: A・B は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: この式で足し引きできない
   grounds:
   - source:
       title: A∪B＝A∪(B∖A)、B＝(A∩B)∪(B∖A) はどちらも排反な和なので、確率の公理の加法性（残りを ∅ にした有限の形。P(∅)＝0 は Ω＝Ω∪∅∪∅∪… と P(Ω)＝1 から）から
@@ -1034,8 +1083,12 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-33
   label: ④-33
   kind: 等しい
@@ -1052,6 +1105,10 @@ claims:
     - TERM-event
     predicates:
     - TERM-multiplication
+  conditions:
+  - text: A・B は同じ標本空間の上の、同じ確率 P の事象
+    kind: 仮定
+    outside: 違う確率の掛け算は、両方が起きる確率にならない
   grounds:
   - source:
       title: 条件付き確率の定義 P(B|A)＝P(A∩B)/P(A) の両辺に P(A) を掛ける
@@ -1061,8 +1118,12 @@ claims:
       by: K
       date: '2026-11-09'
       version: 1dd9337
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-34
   label: ④-34
   kind: 等しい
@@ -1102,7 +1163,7 @@ claims:
   label: ④-35
   kind: 従う
   statement:
-    text: n≧2 で、対の差 D₁, …, Dₙ が独立に同じ正規分布 N(μ_D, σ_D²)（σ_D＞0）に従い、H₀：μ_D＝0 が正しいとき、t＝D̄/(s_D/√n) は t(n−1) に従う
+    text: n≧2 で、対の差 D₁, …, Dₙ が独立に同じ正規分布 N(μ_D, σ_D²)（σ_D＞0）に従い、H₀：μ_D＝0 が正しいとき、t＝D̄/(s_D/√n)（s_D は差の不偏分散〔n−1 で割る〕の平方根）は t(n−1) に従う
   premises:
     subjects:
     - TERM-paired-t
@@ -1117,7 +1178,7 @@ claims:
     terms:
     - TERM-indep
     - TERM-normal
-    outside: t(n−1) に従うとは保証できない
+    outside: t(n−1) に従うとは保証できない（棄却する割合が有意水準どおりとは限らない）
   - text: H₀（μ_D＝0）が正しい
     kind: 仮定
     outside: t(n−1) に従うとは保証できない（H₀ が誤りなら非心 t 分布になる。t(n−1) をずらしただけの形ではない）
@@ -1132,13 +1193,17 @@ claims:
       by: N
       date: '2026-11-09'
       version: 60d6f01
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-36
   label: ④-36
   kind: 従う
   statement:
-    text: g 群（g≧2、全体の大きさ n＞g）の観測が独立で、各群が同じ分散 σ²（σ＞0）の正規分布に従い、H₀：g 個の母平均がすべて等しい が正しいとき、F＝群間の平均平方÷群内の平均平方 は F(g−1, n−g) に従う
+    text: g 群（g≧2、各群の大きさ nᵢ≧1、全体の大きさ n＞g）の観測が独立で、各群が同じ分散 σ²（σ＞0）の正規分布に従い、H₀：g 個の母平均がすべて等しい が正しいとき、F＝群間の平均平方÷群内の平均平方 は F(g−1, n−g) に従う
   premises:
     subjects:
     - TERM-anova
@@ -1158,7 +1223,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-normal
-    outside: F(g−1, n−g) に従うとは保証できない
+    outside: F(g−1, n−g) に従うとは保証できない（F 分布の点で判定した有意水準 α が、本当の第1種の過誤の確率と合うとは限らない）
   - text: 各群の分散が等しい
     kind: 仮定
     outside: F(g−1, n−g) に従うとは保証できない
@@ -1185,8 +1250,12 @@ claims:
       by: AL
       date: '2026-11-20'
       version: 116ef94
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: 2次資料
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-37
   label: ④-37
   kind: 等しい
@@ -1294,6 +1363,9 @@ claims:
   - text: 戻さずに選ぶ（大きさ n の組み合わせから1つを選ぶ）
     kind: 仮定
     outside: 戻して n 回選ぶと、ある要素が1回以上入る確率は 1−(1−1/N)ⁿ で、n≧2 では n/N より小さい
+  - text: 大きさ n のどの組み合わせも同じ確率で選ぶ（単純無作為抽出）
+    kind: 仮定
+    outside: 各要素の入る確率は n÷N とは限らない（層ごとに抽出率を変える層別抽出などでは、要素ごとに違う）
   grounds:
   - source:
       title: 組み合わせは全部で NCn 通りで、どれも確率 1/NCn。ある要素を含む組み合わせは、残りの N−1 個から n−1 個を選ぶ (N−1)C(n−1) 通り。その比は (N−1)C(n−1)/NCn＝n/N（n＝0 では含む組み合わせが0通りで 0＝0/N）
@@ -1310,8 +1382,12 @@ claims:
       date: '2026-11-22'
       method: 独立な確かめ
       version: 401712f
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-20a
   label: ④-20a
   kind: 等しい
@@ -1327,6 +1403,10 @@ claims:
     - TERM-sample-mean
     predicates:
     - TERM-expect
+  conditions:
+  - text: X₁, …, Xₙ は、どれも期待値が μ
+    kind: 仮定
+    outside: E(X̄) は各 Xᵢ の期待値の平均で、μ とは限らない
   grounds:
   - source:
       title: 期待値の線形性で E(X̄)＝(E(X₁)＋…＋E(Xₙ))/n＝nμ/n＝μ。独立も同じ分布も使わない
@@ -1339,8 +1419,12 @@ claims:
       by: X
       date: '2026-11-16'
       version: c5eb1c0
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-41
   label: ④-41
   kind: 等しい
@@ -1362,7 +1446,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-indep
-    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる）
+    outside: V(X̄)＝σ²/n とは保証できない（相関があると共分散の和の分だけずれる。分散がそろわないと Σσᵢ²/n² になる。正の相関があると V(X̄) は σ²/n より大きく、有限の母集団から戻さずに取ると小さい）
   - text: 分散 σ² が有限
     kind: 仮定
     outside: V(X̄) が有限の値に定まるとは保証できない
@@ -1378,8 +1462,12 @@ claims:
       by: X
       date: '2026-11-16'
       version: c5eb1c0
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-42
   label: ④-42
   kind: 従う
@@ -1403,7 +1491,7 @@ claims:
     kind: 仮定
     terms:
     - TERM-normal
-    outside: F(n₁−1, n₂−1) に従うとは保証できない（正規でないと、分布の形そのものが変わる）
+    outside: F(n₁−1, n₂−1) に従うとは保証できない（正規でないと、分布の形そのものが変わる。裾の重い母集団では F の点が当てにならない）
   - text: 2つの母分散が等しい
     kind: 仮定
     terms:
@@ -1412,7 +1500,8 @@ claims:
   grounds:
   - claim: CLM-10
   - source:
-      title: CLM-10 で (nᵢ−1)sᵢ²/σ² は χ²(nᵢ−1) に従い、2つの標本が独立なのでこの2つも独立。F 分布の定義の比 {(n₁−1)s₁²/σ²/(n₁−1)}÷{(n₂−1)s₂²/σ²/(n₂−1)}＝s₁²/s₂²（等分散なので σ² が約分される）
+      title: 正規母集団の標本分散の分布の主張で (nᵢ−1)sᵢ²/σ² は χ²(nᵢ−1) に従い、2つの標本が独立なのでこの2つも独立。F 分布の定義の比 {(n₁−1)s₁²/σ²/(n₁−1)}÷{(n₂−1)s₂²/σ²/(n₂−1)}＝s₁²/s₂²（等分散なので σ² が約分される）
+      uses: [CLM-10]
   teaching:
     conclusion: true
     proof: 扱う
@@ -1422,8 +1511,12 @@ claims:
       by: Y
       date: '2026-11-16'
       version: 5ee32a8
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行の説明を外れたときの文に引き継いだ（#532 C）
 - id: CLM-43
   label: ④-43
   kind: 等しい
@@ -1440,6 +1533,10 @@ claims:
     - TERM-estimator
     predicates:
     - TERM-mse
+  conditions:
+  - text: 推定量 θ̂ の分散が有限
+    kind: 仮定
+    outside: V(θ̂) が有限でないと両辺が有限の値にならず、平均二乗誤差を分散と偏りの2乗に分けられない
   grounds:
   - source:
       title: θ̂−θ＝{θ̂−E(θ̂)}＋{E(θ̂)−θ} の2乗の期待値を開く。交わりの項 2{E(θ̂)−θ}·E{θ̂−E(θ̂)} は E{θ̂−E(θ̂)}＝0 なので消える
@@ -1452,8 +1549,12 @@ claims:
       by: Z
       date: '2026-11-16'
       version: 087f354
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
     external: なし
-  version: 1
+  version: 2   # 2026-11-26：概念の仮定の行を条件に移した（#532 C）
 - id: CLM-44
   label: ④-44
   kind: 極限
@@ -1485,17 +1586,20 @@ claims:
   - claim: CLM-6b
   - claim: CLM-20b
   - source:
-      title: 各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は ④-20b（Xᵢ に当てる）と Khinchin の大数の法則（Xᵢ² に当てる。下の行）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
+      title: 各群に中心極限定理を当て、2群の独立から特性関数の積で合わせると、(X̄₁−X̄₂)/√(σ₁²/n₁＋σ₂²/n₂) は N(0, 1) に近づく（2群の重み √((σ₁²/n₁)/(σ₁²/n₁＋σ₂²/n₂)) が収束しなくてよいので、n₁/n₂ の比の条件は要らない）。s₁², s₂² は大数の法則（Xᵢ に当てる）と Khinchin の大数の法則（Xᵢ² に当てる。下の行）と連続写像で σ₁², σ₂² に確率収束し、分母の比はその重みつき平均として1に確率収束する
+      uses: [CLM-6b, CLM-20b]
       locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   - source:
-      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ中心極限定理で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
+      uses: [CLM-6b]
   - source:
       title: スルツキーの定理（s₁²＝s₂²＝0 で t が定まらない事象の確率は0に近づくので、結論は変わらない）
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   - source:
-      title: s₁², s₂² の一致で ④-20b を Xᵢ² に当てるには V(Xᵢ²)＜∞（E Xᵢ⁴＜∞）が要る。仮定（0＜σ²＜∞）だけで言うには Khinchin の大数の法則（平均が有限なら標本平均は確率収束する）に頼る
+      title: s₁², s₂² の一致で大数の法則を Xᵢ² に当てるには V(Xᵢ²)＜∞（E Xᵢ⁴＜∞）が要る。仮定（0＜σ²＜∞）だけで言うには Khinchin の大数の法則（平均が有限なら標本平均は確率収束する）に頼る
+      uses: [CLM-20b]
       locator: 照合した2次資料：Texas A&M（URL の STAT 614）2022年秋、Quan Zhou の講義資料 Lecture 15 Theorem 15.3「Khintchin's WLLN」（p.4。i.i.d. で平均 µ、E|X₁|＜∞ なら Sₙ/n→µ（確率））https://web.stat.tamu.edu/~quan/MathProb/STAT614_Unit15_QuanZhou.pdf 。Xᵢ² も独立に同じ分布に従い（Xᵢ の関数）、E|Xᵢ²|＝σ²＋μ²＜∞（σ² が有限なら μ も有限）なので、仮定から足りる
     external: true
   teaching:
@@ -1547,11 +1651,13 @@ claims:
   - claim: CLM-6b
   - claim: CLM-20b
   - source:
-      title: H₀ のもとで、各群に ④-6b を当て、2群の独立から特性関数の積で合わせると、(p̂₁−p̂₂)/√(p(1−p)(1/n₁＋1/n₂)) は N(0, 1) に近づく（2群の重みが収束しなくてよいので、n₁/n₂ の比の条件は要らない）。p̄ は ④-20b で p に確率収束し、p̄(1−p̄)/(p(1−p)) は連続写像で1に確率収束する
+      title: H₀ のもとで、各群に中心極限定理を当て、2群の独立から特性関数の積で合わせると、(p̂₁−p̂₂)/√(p(1−p)(1/n₁＋1/n₂)) は N(0, 1) に近づく（2群の重みが収束しなくてよいので、n₁/n₂ の比の条件は要らない）。p̄ は大数の法則で p に確率収束し、p̄(1−p̄)/(p(1−p)) は連続写像で1に確率収束する
+      uses: [CLM-6b, CLM-20b]
       locator: 照合した2次資料：UC Berkeley Statistics 205A（2002年秋、J. Pitman）Lecture 14 Theorem 14.2（p.14-1。各 t で E e^{itXₙ}→φ(t) で、φ が t＝0 で連続なら、φ はある X の特性関数で Xₙ→X（分布））https://www.stat.berkeley.edu/~pitman/s205f02/lecture14/lecture14.pdf ・Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1 p.3 Definition 0.3（分布収束の同値な定義：有界で連続な f について E f(Xₙ)→E f(X)）・p.5（Slutsky の帰結 YₙXₙ→cX）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
     external: true
   - source:
-      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ ④-6b で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ＝√(n₂/(n₁＋n₂))（＝√((1/n₁)/(1/n₁＋1/n₂))）∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
+      title: 重みが収束しなくてよい所の筋。n₁(k), n₂(k)→∞ を満たすどの列についても示す（どの列でも言えれば2重の極限も言える）。各群の標準化した平均を Aₖ・Bₖ（それぞれ中心極限定理で N(0, 1) に近づく。n₁(k) が単調に増えなくても、分布関数の各連続点での収束は受け継がれる）、重みを wₖ＝√(n₂/(n₁＋n₂))（＝√((1/n₁)/(1/n₁＋1/n₂))）∈[0, 1] とし、Zₖ＝wₖAₖ−√(1−wₖ²)Bₖ とする。2群の独立から、独立な確率変数の有界な関数の積の期待値は期待値の積（実部・虚部に分けて E(XY)＝E(X)E(Y) を当てる）なので、φ_{Zₖ}(t)＝E e^{itwₖAₖ}·E e^{−it√(1−wₖ²)Bₖ}。t を固めると、どの部分列にも wₖ→w となる部分列がある（wₖ は有界。ボルツァーノ＝ワイエルシュトラス）。そこでは √(1−wₖ²)→√(1−w²) で、定数 sₖ＝wₖt→wt について sₖAₖ→wtA（分布。スルツキー）なので E e^{isₖAₖ}→e^{−w²t²/2}（cos・sin は有界で連続）。もう一方も同じで、積は e^{−t²/2}。どの部分列にも φ_{Zₖ}(t)→e^{−t²/2} となる部分列があるので、数列として全体でも φ_{Zₖ}(t)→e^{−t²/2}。極限は t＝0 で連続な N(0, 1) の特性関数なので、Lévy の連続性定理で Zₖ→N(0, 1)（分布）
+      uses: [CLM-6b]
   - source:
       title: スルツキーの定理（p̄＝0 か 1 で z が定まらない事象の確率は0に近づくので、結論は変わらない）
       locator: 照合した2次資料：Stanford Stats 300b（2019年冬、J. Duchi）Lecture 1。p.4 Theorem 1（連続写像定理。g が P(X∈B)＝1 の集合 B で連続）、p.4 Theorem 2（Slutsky。(1) 定数への分布収束と確率収束は同値、(2) d(Xₙ,Yₙ)→0（確率）なら同じ極限）、p.5 その帰結（Xₙ→X（分布）・Yₙ→c（分布。(1) で確率と同じ）なら Xₙ＋Yₙ→X＋c、YₙXₙ→cX、c≠0 なら Xₙ/Yₙ→X/c）https://web.stanford.edu/class/stats300b/ScribeNotes/2019/lecture-01.pdf
@@ -1617,7 +1723,7 @@ claims:
   label: ④-47
   kind: 従う
   statement:
-    text: r を1以上の整数、0＜p≦1 とし、X₁, X₂, … が独立に同じ Bern(p) に従うとき、r 回目の成功が起きた回を X とすると、P(X＝k)＝ₖ₋₁C_{r−1}·p^r·(1−p)^(k−r)（k＝r, r＋1, …）。X は負の二項分布に従う（成功した回も数える。r＝1 は ④-46 の幾何分布）
+    text: r を1以上の整数、0＜p≦1 とし、X₁, X₂, … が独立に同じ Bern(p) に従うとき、r 回目の成功が起きた回を X とすると、P(X＝k)＝ₖ₋₁C_{r−1}·p^r·(1−p)^(k−r)（k＝r, r＋1, …）。X は負の二項分布に従う（成功した回も数える。r＝1 は幾何分布）
   premises:
     subjects:
     - TERM-bernoulli
@@ -1668,7 +1774,7 @@ claims:
     outside: 戻して、毎回どれも同じ確率で独立に取り出すと、当たりの個数は二項分布 B(n, M/N) に従う。n≧2 で 0＜M＜N なら超幾何分布とは違う分布になる。選ばれやすさに偏りがあると、どちらに従うとも言えない
   grounds:
   - source:
-      title: 組は全部で C(N, n) 通りで、どれも確率 1÷C(N, n)。当たりが k 個の組は、当たりから k 個・はずれから n−k 個を選ぶ C(M, k)·C(N−M, n−k) 通り（④-40 の単純無作為抽出と同じ数え方）
+      title: 組は全部で C(N, n) 通りで、どれも確率 1÷C(N, n)。当たりが k 個の組は、当たりから k 個・はずれから n−k 個を選ぶ C(M, k)·C(N−M, n−k) 通り（単純無作為抽出と同じ数え方）
   teaching:
     conclusion: true
     proof: 扱う
@@ -1680,3 +1786,298 @@ claims:
       version: fa0a89a
     external: なし
   version: 1
+- id: CLM-49
+  label: ④-49
+  kind: 等しい
+  statement:
+    text: x・y・z の n 組のデータ（n≧3）で、x・y・z はどれも値が全部同じではなく、相関係数 r_xz・r_yz が ±1 でないとき、偏相関係数 r_xy·z＝(r_xy−r_xz r_yz)÷√((1−r_xz²)(1−r_yz²)) は、x と y をそれぞれ z に切片を含む直線で最小二乗法により当てはめた残差どうしの相関係数に等しい（データの値についての恒等式。仮定はいらない）
+  premises:
+    subjects:
+    - TERM-resid
+  conclusion:
+    predicates:
+    - TERM-partial-corr
+  grounds:
+  - source:
+      title: z に当てはめた残差は、標準化した値で書くと e_x＝x*−r_xz z*・e_y＝y*−r_yz z*（x*・y*・z* は平均0・標準偏差1 に直した値。標準偏差は n で割るもの）。その平均は0、積の平均は r_xy−r_xz r_yz、2乗の平均は 1−r_xz²・1−r_yz² なので、相関係数は (r_xy−r_xz r_yz)÷√((1−r_xz²)(1−r_yz²))
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 1：等式と解釈の条件を分けた）
+- id: CLM-50
+  label: ④-50
+  kind: 等しい
+  statement:
+    text: x の値が全部同じではない n 組のデータに、切片を含む直線 ŷ＝a＋bx を最小二乗法で当てはめると、残差 eᵢ＝yᵢ−ŷᵢ は Σeᵢ＝0 と Σxᵢeᵢ＝0 を満たす（説明変数が2つ以上でも、切片を含めば Σeᵢ＝0 で、各説明変数と残差の積の和も0）
+  conclusion:
+    predicates:
+    - TERM-resid
+  conditions:
+  - text: 切片を含む回帰式を、最小二乗法で当てはめる
+    kind: 仮定
+    outside: 残差の合計が0 になるとは限らない（原点を通る直線を当てはめたときなど）
+  grounds:
+  - source:
+      title: 残差の2乗の和 Σ(yᵢ−a−bxᵢ)² を a で微分して0 とおくと Σeᵢ＝0、b で微分して0 とおくと Σxᵢeᵢ＝0（正規方程式）
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C）
+- id: CLM-51
+  label: ④-51
+  kind: 等しい
+  statement:
+    text: y の値が全部同じではない（SST＝Σ(yᵢ−ȳ)²＞0）n 組のデータに、切片を含む回帰式を最小二乗法で当てはめると、SSR＝Σ(ŷᵢ−ȳ)²・SSE＝Σ(yᵢ−ŷᵢ)² について SST＝SSR＋SSE が成り立ち、決定係数 R²＝1−SSE÷SST＝SSR÷SST は 0≦R²≦1
+  premises:
+    subjects:
+    - TERM-resid
+  conclusion:
+    predicates:
+    - TERM-r2
+  conditions:
+  - text: 切片を含む回帰式を、最小二乗法で当てはめる
+    kind: 仮定
+    outside: SST＝SSR＋SSE とは限らず、R²＝1−SSE÷SST が 0〜1 に収まるとも限らない（原点を通る直線では負になることがある）
+  grounds:
+  - claim: CLM-50
+  - source:
+      title: yᵢ−ȳ＝(ŷᵢ−ȳ)＋eᵢ の2乗を足すと、間の項 2Σ(ŷᵢ−ȳ)eᵢ は、ŷᵢ が切片と説明変数の1次式で Σeᵢ＝0・Σxᵢeᵢ＝0 なので0
+      uses: [CLM-50]
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3c の補う1：SST＞0 を文に書いた）
+- id: CLM-52
+  label: ④-52
+  kind: 推定量の性質
+  statement:
+    text: n 組のデータで説明変数の値 x_{i1}, …, x_{ik} を決まった値とし、切片と k 個の説明変数の列が一次独立（n≧k＋1）で、各 Yᵢ の期待値が E(Yᵢ)＝β₀＋β₁x_{i1}＋…＋β_kx_{ik} のとき、最小二乗の係数 b_j は β_j の不偏推定量（E(b_j)＝β_j）。β_j は、ほかの説明変数が同じ値のとき x_j が1大きい個体どうしの y の平均の差。1つの標本の b_j は β_j からずれ、標本ごとに変わる（当てはめた式で、ほかの説明変数を同じ値にして x_j を1大きくすると予測値が b_j だけ変わるのは、仮定のいらない式の性質）
+  conclusion:
+    predicates:
+    - TERM-mreg
+    - TERM-unbiased
+  conditions:
+  - text: 説明変数の値の組ごとの y の平均が、説明変数の1次式に乗る（説明変数どうしの掛け算や曲がりがない）
+    kind: 仮定
+    outside: E(b_j)＝β_j とは限らず、b_j を、ほかの説明変数が同じ値どうしで比べた y の平均の差とは読めない（差が x の値で変わると、b_j はそれらをならした値になる）
+  grounds:
+  - source:
+      title: 係数は b＝(XᵀX)⁻¹XᵀY（X は切片の列と説明変数の列。一次独立なので XᵀX は逆行列をもつ）。E(Y)＝Xβ なら E(b)＝(XᵀX)⁻¹XᵀXβ＝β。誤差の独立・等分散は不偏には要らない（b の分散で要る）
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 4：式の性質・母集団の性質・推定の性質を分けた）
+- id: CLM-53
+  label: ④-53
+  kind: 推定量の性質
+  statement:
+    text: n 組のデータで説明変数の値を決まった値とし、切片と k 個の説明変数の列が一次独立（行列の階数 k＋1）で n＞k＋1、Yᵢ＝β₀＋β₁x_{i1}＋…＋β_kx_{ik}＋εᵢ（E(εᵢ)＝0）とする。誤差 ε₁, …, εₙ が互いに無相関で分散が σ² にそろうとき、残差の平均平方 SSE÷(n−k−1) の期待値は σ²（正規分布でなくてよい）
+  conclusion:
+    subjects:
+    - TERM-ms
+    predicates:
+    - TERM-unbiased
+  conditions:
+  - text: 回帰式の形が正しい（E(Yᵢ)＝β₀＋β₁x_{i1}＋…＋β_kx_{ik}）
+    kind: 仮定
+    outside: E(SSE÷(n−k−1))＝σ² とは限らない（式から外れた分が残差に入り、期待値は σ² 以上の値になる）
+  - text: 誤差が互いに無相関で、分散が σ² にそろう
+    kind: 仮定
+    outside: 残差の平均平方が誤差の分散の不偏推定になるとは限らない（無相関のままで分散が値ごとに違うと E(SSE)＝Σ(1−hᵢᵢ)σᵢ² になり、1つの σ² の推定にならない。hᵢᵢ は当てはめの行列の対角）
+  grounds:
+  - source:
+      title: 当てはめの行列 H＝X(XᵀX)⁻¹Xᵀ で残差は (I−H)ε。E(SSE)＝E(εᵀ(I−H)ε)＝tr((I−H)V(ε))＝σ² tr(I−H)＝σ²(n−k−1)（I−H の跡は n から X の階数 k＋1 を引いた数）
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3c の 2：列の一次独立と n＞k＋1 を書き、誤差は無相関・等分散にした）
+- id: CLM-54
+  label: ④-54
+  kind: 推定量の性質
+  statement:
+    text: 要素 N 個（N≧2）の抽出枠の値 y₁, …, y_N の平均を Ȳ、S²＝Σ(yᵢ−Ȳ)²÷(N−1) とし、大きさ n（1≦n≦N）の標本を非復元の単純無作為抽出で選ぶとき、標本平均 ȳ の標本誤差 ȳ−Ȳ は期待値0・分散 (1−n/N)S²÷n。この分散は n が大きいほど小さく、n＝N で0（N で割った枠の分散 σ²＝Σ(yᵢ−Ȳ)²÷N で書くと (N−n)÷(N−1)·σ²÷n）
+  premises:
+    subjects:
+    - TERM-random-sampling
+  conclusion:
+    predicates:
+    - TERM-sampling-error
+  conditions:
+  - text: 大きさ n のどの組み合わせも同じ確率で選ぶ（非復元の単純無作為抽出）
+    kind: 仮定
+    outside: 標本誤差が平均して0 になるとも、標本を増やせば小さくなるとも限らない（集落抽出で同じ集落の中の要素を足しても、小さくならないことがある）
+  grounds:
+  - claim: CLM-40
+  - source:
+      title: 要素 i が標本に入るかを Iᵢ（0 か 1）とすると、単純無作為抽出の主張から E(Iᵢ)＝n/N なので E(ȳ)＝Ȳ。i≠j で E(IᵢIⱼ)＝n(n−1)÷(N(N−1)) から V(ȳ)＝(1÷n−1÷N)S²
+      uses: [CLM-40]
+  teaching:
+    conclusion: true
+    proof: 範囲外
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3c の補う2：S² の割り方と N・n の範囲を書いた）
+- id: CLM-55
+  label: ④-55
+  kind: 手続きの保証
+  statement:
+    text: m 個（m≧1）の帰無仮説 H₁, …, H_m のファミリーで、0＜α＜1 とし、各検定 j を、H_j が正しいとき棄却する確率が α÷m 以下になるように行うと、正しい帰無仮説のうちどれか1つでも棄却する確率は α 以下になる（検定どうしが独立でなくてよい。ボンフェローニの方法）
+  conclusion:
+    subjects:
+    - TERM-multcomp
+    predicates:
+    - TERM-type1
+  conditions:
+  - text: 各検定は、その帰無仮説が正しいとき、棄却する確率が決めた水準（α÷m）以下になる
+    kind: 仮定
+    outside: 全体の誤り率を α 以下に抑えられるとは限らない
+  grounds:
+  - source:
+      title: 正しい帰無仮説が m₀ 個（m₀≦m）のとき、どれか1つでも棄却する確率は、和事象の確率がそれぞれの確率の和以下（ブールの不等式）なので m₀×α÷m 以下で、これは α 以下
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C）
+- id: CLM-56
+  label: ④-56
+  kind: 推定量の性質
+  statement:
+    text: x₁, …, xₙ を決まった値とし（全部同じではない）、各 Yᵢ の期待値が E(Yᵢ)＝α＋βxᵢ のとき、最小二乗の傾き b と切片 a は β と α の不偏推定量（E(b)＝β、E(a)＝α）。1つの標本の b は β からずれ、標本ごとに変わる（不偏に要るのは平均の形だけで、誤差の独立・等分散は b の分散・標準誤差で要る）
+  conclusion:
+    predicates:
+    - TERM-slr
+    - TERM-unbiased
+  conditions:
+  - text: x の値ごとの y の平均が、1本の直線 α＋βx に乗る（E(Yᵢ)＝α＋βxᵢ）
+    kind: 仮定
+    outside: E(b)＝β とは限らない（曲がりがあると、b は範囲の中の違う傾きをならした値になり、x の場所ごとに見込みが一方へずれる）
+  grounds:
+  - source:
+      title: b＝Σ(xᵢ−x̄)Yᵢ÷Σ(xᵢ−x̄)²（Σ(xᵢ−x̄)＝0 を使う）。E(Yᵢ)＝α＋βxᵢ を入れると E(b)＝Σ(xᵢ−x̄)(α＋βxᵢ)÷Σ(xᵢ−x̄)²＝β。a＝Ȳ−b x̄ から E(a)＝α＋βx̄−βx̄＝α
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・1.3b：標本の直線と母集団の平均の直線を分けた）
+- id: CLM-57
+  label: ④-57
+  kind: 手続きの保証
+  statement:
+    text: X₁, …, Xₙ（n≧1）が独立に同じ N(μ, σ²) に従い、σ（＞0）が分かっているとき、0＜α＜1 と標準正規分布の上側 α÷2 の点 z_{α/2} について、区間 X̄±z_{α/2}·σ÷√n が μ を含む確率は、μ のどの値でも 1−α（σ が分かっている平均の信頼区間）
+  premises:
+    subjects:
+    - TERM-sample-mean
+  conclusion:
+    subjects:
+    - TERM-ci
+    predicates:
+    - TERM-conf-level
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ正規分布 N(μ, σ²) に従う
+    kind: 仮定
+    outside: 含む確率が 1−α とは限らない（正規でなくても、独立に同じ分布で分散が有限なら、n が大きいとき 1−α に近づく）
+  - text: σ が分かっている（データから推定しない）
+    kind: 仮定
+    outside: σ を標本の標準偏差に置き換えると、含む確率はどの n でも 1−α より小さく、n が小さいほど差が大きい（t の点を使う区間にする）
+  grounds:
+  - claim: CLM-6a
+  - source:
+      title: X̄ が N(μ, σ²/n) に従う主張から Z＝(X̄−μ)÷(σ÷√n) は N(0, 1) に従い、P(−z_{α/2}≦Z≦z_{α/2})＝1−α。この事象は X̄−z_{α/2}σ÷√n≦μ≦X̄＋z_{α/2}σ÷√n と同じ
+      uses: [CLM-6a]
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・決定 A1：信頼区間の主張を分布の主張から分けた）
+- id: CLM-58
+  label: ④-58
+  kind: 手続きの保証
+  statement:
+    text: X₁, …, Xₙ（n≧2）が独立に同じ N(μ, σ²)（σ＞0）に従うとき、s を不偏分散の平方根（n−1 で割る）とし、0＜α＜1 と自由度 n−1 の t 分布の上側 α÷2 の点 t_{α/2}(n−1) について、区間 X̄±t_{α/2}(n−1)·s÷√n が μ を含む確率は、μ・σ のどの値でも 1−α（σ が分からない平均の信頼区間）
+  premises:
+    subjects:
+    - TERM-sample-mean
+  conclusion:
+    subjects:
+    - TERM-ci
+    predicates:
+    - TERM-conf-level
+  conditions:
+  - text: X₁, …, Xₙ が独立に同じ正規分布 N(μ, σ²) に従う
+    kind: 仮定
+    outside: 含む確率が 1−α とは限らない（n が大きければ中心極限定理で近くなるが、n が小さく歪んだ母集団ではずれる。正の相関があると区間が狭すぎる）
+  grounds:
+  - claim: CLM-28a
+  - source:
+      title: t 統計量の主張を本当の μ に当てると、T＝(X̄−μ)÷(s÷√n) は t(n−1) に従い、P(−t_{α/2}(n−1)≦T≦t_{α/2}(n−1))＝1−α。この事象は μ が区間に入ることと同じ
+      uses: [CLM-28a]
+  teaching:
+    conclusion: true
+    proof: 扱う
+  verification:
+    math:
+    - method: 独立な確かめ
+      by: AI3
+      date: '2026-11-26'
+      version: 21355ed
+    external: なし
+  version: 1   # 2026-11-26 に立てた（#532 C・決定 A1）

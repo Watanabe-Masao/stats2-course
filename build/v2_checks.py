@@ -252,4 +252,31 @@ def v2_errors(data: dict) -> list[str]:
     # 定義の依存は輪にならない（⑤ の 構成）
     for cyc in _cycles([(r["from"], r["to"]) for r in v2 if r["type"] == "定める"]):
         err.append(f"定めるの輪：{' → '.join(cyc)}（⑤ の 構成）")
+    err += ref_number_leaks(data)
     return err
+
+
+def ref_number_leaks(data: dict) -> list[str]:
+    """画面に出る文に、製本の番号（④-NN）や主張の id（CLM-NN）を書かない（#536。渡辺さん 2026-11-21・11-26 の決定 A3：
+    文脈から分かる名前で書き、追跡に要る所は証明の段の uses などの項目に id を持つ）。
+    想定する故障：主張を言い換えたあと、新しく書いた文に番号を戻す。id の項目（id・claim・claims・uses など）と label は文ではないので見ない"""
+    import re
+    pat = re.compile(r"④-\d|(?<![:\w])CLM-\d")
+    skip = {"id", "label", "claim", "claims", "uses", "from", "to", "via", "terms", "subject", "subjects", "predicates", "concepts", "refs"}
+    out: list[str] = []
+
+    def walk(o, path: str) -> None:
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k not in skip:
+                    walk(v, f"{path}.{k}" if path else k)
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                walk(v, f"{path}[{i}]")
+        elif isinstance(o, str) and pat.search(o):
+            out.append(f"{path}：画面に出る文に製本の番号・主張の id がある（名前で書く。#536）：{o[:60]}")
+
+    for k in ("concepts", "relations", "claims", "derivations", "units"):
+        for x in data.get(k) or []:
+            walk(x, f"{k}:{x.get('id', '?')}")
+    return out

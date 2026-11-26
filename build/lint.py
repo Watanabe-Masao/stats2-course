@@ -30,6 +30,8 @@ def lint_page(name: str, md: str, assets: set[str]) -> list[str]:
             err.append(f"{where}: 太字 ** が残っている → {line.strip()[:60]}")
         if re.match(r"^\s*- \[[ xX]\] ", line):
             err.append(f"{where}: 教材にチェック欄（- [ ]）がある。個人の状態が教材に残る（□ の箇条書きにする）")
+        if re.search(r"④-\d|(?<![:\w])CLM-\d", line):
+            err.append(f"{where}: 製本の番号・主張の id が本文にある（名前で書く。#536）→ {line.strip()[:60]}")
         if "<sup>" in line:
             err.append(f"{where}: <sup> は Notion で消える（ʳ や ² を使う）")
         if line.startswith("|") and line.rstrip().endswith("|"):

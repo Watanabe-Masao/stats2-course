@@ -1052,6 +1052,15 @@ def v2_source_errors(c: Course) -> list[str]:
     for i in {x for x in ids if ids.count(x) > 1}:
         err.append(f"claims.yaml：主張の id {i} が重複")
     for cl in claims:
+        # 証明の段で使う主張（uses。#536・2026-11-26 の A3）：あること・自分でないこと・grounds の claim にも挙げていること
+        # （画面は名前で出し、追跡は ID で。文の中に製本の番号を書かない）
+        listed = {g.get("claim") for g in cl.get("grounds") or []}
+        for g in cl.get("grounds") or []:
+            for u in (g.get("source") or {}).get("uses") or []:
+                if u not in ids or u == cl.get("id"):
+                    err.append(f"claims.yaml：{cl.get('id')} の証明の段の uses の {u} が、自分以外の主張にない")
+                elif u not in listed:
+                    err.append(f"claims.yaml：{cl.get('id')} の証明の段で {u} を使うなら、grounds に claim: {u} も挙げる")
         for side in ("premises", "conclusion"):
             for k, v in (cl.get(side) or {}).items():
                 for tid in v:
@@ -1222,11 +1231,15 @@ def validate_network(c: Course) -> list[str]:
         if cond is not None and not (isinstance(cond, dict) and isinstance(cond.get("math"), list)):
             err.append(f"{tid}: conditions は math（数学的な条件）と data（データに当てはめるときの条件）に分けて書く")
         elif cond is not None and not cond["math"] and not any(
-            cl.get("conditions") and tid in (cl.get("conclusion") or {}).get("predicates", []) for cl in live_claims
+            cl.get("conditions") and (tid in (cl.get("conclusion") or {}).get("predicates", [])
+                                      # 主張そのものが概念の語（ベイズの定理・大数の法則など。forms: proposition）は、概念の claims: にある自分を表す主張でもよい
+                                      # （何かの主張を指すだけでは通さない。渡辺さん 2026-11-26 の決定 A2）
+                                      or ("proposition" in (t.get("forms") or []) and cl.get("id") in (t.get("claims") or [])))
+            for cl in live_claims
         ):
             # 要件の行がない概念（#532 の A）：仮定は主張の条件にあるので、その概念について言える主張（結論の述語）で、
             # 条件の行のあるものが要る。仮定を消しただけ・主張を retired にしただけで、概念のページから条件が消えるのを止める
-            err.append(f"{tid}: conditions.math が空なら、この概念を結論の述語にする主張（retired でなく、条件の行のあるもの）が要る（#532）")
+            err.append(f"{tid}: conditions.math が空なら、この概念を結論の述語にする主張か、主張そのものの概念なら claims: にある自分の主張（retired でなく、条件の行のあるもの）が要る（#532）")
         for f in t.get("formulas", []):
             for s in f.get("symbols", []):
                 if not (s.get("symbol") and s.get("meaning")):
@@ -1698,7 +1711,9 @@ def export_claim(cl: dict, g, refs=None) -> dict:
         e["conditions"] = [{**x, **({"terms": [g(t) for t in x["terms"]]} if x.get("terms") else {}),
                             **({"subject": g(x["subject"])} if x.get("subject") else {}), "target": x.get("target", "claim")} for x in cl["conditions"]]
     if cl.get("grounds"):
-        e["grounds"] = [{k: (g(v) if k in ("claim", "derivation") else v) for k, v in x.items()} for x in cl["grounds"]]
+        e["grounds"] = [{k: (g(v) if k in ("claim", "derivation") else
+                             {**v, "uses": [g(u) for u in v["uses"]]} if k == "source" and v.get("uses") else v)
+                         for k, v in x.items()} for x in cl["grounds"]]
     if cl.get("converse"):
         e["converse"] = g(cl["converse"])
     for k in ("counterexamples", "units"):

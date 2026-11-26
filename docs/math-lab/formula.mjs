@@ -12,16 +12,8 @@ const COMPARE_OPS = [
 ];
 const isCompare = (op) => COMPARE_OPS.includes(op);
 /** 記号に書かなくてよい共通の関数（それ以外の fn の name は、その式の symbols の key）。
-*  gt・ge・lt・le・between は比べる op に移る前の形（読み替えの期間。教材を op に書き直したら外す。stats2-course #72） */
-const COMMON_FNS = [
-	"exp",
-	"log",
-	"gt",
-	"ge",
-	"lt",
-	"le",
-	"between"
-];
+*  比べるは op（lt・le・gt・ge）。前の fn の gt・ge・lt・le・between は 2026-11-26 に外した（教材を op に書き直した。stats2-course #72） */
+const COMMON_FNS = ["exp", "log"];
 // packages/engine/src/formula/tex.ts
 const GREEK = {
 	α: "\\alpha",
@@ -212,26 +204,6 @@ function toTex(node, opt = {}) {
 				t: `${paren(a[0], a[0].p < ATOM || !!a[0].neg)}!`,
 				p: ATOM
 			};
-			case "gt": return {
-				t: `${a[0].t}>${a[1].t}`,
-				p: 0
-			};
-			case "ge": return {
-				t: `${a[0].t}\\ge ${a[1].t}`,
-				p: 0
-			};
-			case "lt": return {
-				t: `${a[0].t}<${a[1].t}`,
-				p: 0
-			};
-			case "le": return {
-				t: `${a[0].t}\\le ${a[1].t}`,
-				p: 0
-			};
-			case "between": return {
-				t: `${a[0].t}\\le ${a[1].t}\\le ${a[2].t}`,
-				p: 0
-			};
 			case "exp":
 			case "log": return {
 				t: `\\${name}${wrapParen(list)}`,
@@ -371,12 +343,7 @@ const BUILTIN = {
 	perm,
 	fact: factorial,
 	exp: Math.exp,
-	log: Math.log,
-	gt: (a, b) => +(a > b),
-	ge: (a, b) => +(a >= b),
-	lt: (a, b) => +(a < b),
-	le: (a, b) => +(a <= b),
-	between: (x, a, b) => +(a <= x && x <= b)
+	log: Math.log
 };
 /** 1つの演算を、引数の値から計算する（計算できなければ undefined） */
 function apply(n, v, env) {
