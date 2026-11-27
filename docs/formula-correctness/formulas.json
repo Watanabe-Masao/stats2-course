@@ -1240,6 +1240,288 @@
   }
  },
  {
+  "concept": "TERM-normal",
+  "index": 1,
+  "id": "F-normal-interval",
+  "label": "区間に入る確率（標準化して Φ の差で求める）",
+  "tex": "P(a\\le X\\le b)=\\int_{a}^{b}f(x)\\,dx=\\mathrm{Phi}\\left(\\dfrac{b-\\mu}{\\sigma}\\right)-\\mathrm{Phi}\\left(\\dfrac{a-\\mu}{\\sigma}\\right)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "X",
+    "meaning": "この密度に従う確率変数（μ・σ は X の期待値・標準偏差）",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "f(x)",
+    "meaning": "正規分布の確率密度（高さ。面積が確率）",
+    "key": "f",
+    "concept": "TERM-normal"
+   },
+   {
+    "symbol": "x",
+    "meaning": "積分で動かす値",
+    "key": "x",
+    "kind": "index"
+   },
+   {
+    "symbol": "a",
+    "meaning": "区間の左端（−∞ なら「b 以下」）",
+    "key": "a",
+    "kind": "value"
+   },
+   {
+    "symbol": "b",
+    "meaning": "区間の右端（∞ なら「a 以上」）",
+    "key": "b",
+    "kind": "value"
+   },
+   {
+    "symbol": "μ",
+    "meaning": "平均（山の中心）",
+    "key": "mu",
+    "concept": "TERM-expect",
+    "kind": "param",
+    "of": "X"
+   },
+   {
+    "symbol": "σ",
+    "meaning": "標準偏差（山の広がり）",
+    "range": "0より大きい",
+    "key": "sigma",
+    "concept": "TERM-sd",
+    "kind": "param",
+    "of": "X",
+    "domain": {
+     "min": 0,
+     "minOpen": true
+    }
+   },
+   {
+    "symbol": "Φ( )",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "key": "Phi",
+    "concept": "TERM-std-normal"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "op": "le",
+       "args": [
+        {
+         "sym": "a"
+        },
+        {
+         "sym": "X"
+        },
+        {
+         "sym": "b"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "op": "int",
+     "args": [
+      {
+       "op": "fn",
+       "name": "f",
+       "args": [
+        {
+         "sym": "x"
+        }
+       ]
+      }
+     ],
+     "var": "x",
+     "lower": {
+      "sym": "a"
+     },
+     "upper": {
+      "sym": "b"
+     }
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "op": "fn",
+       "name": "Phi",
+       "args": [
+        {
+         "op": "div",
+         "args": [
+          {
+           "op": "sub",
+           "args": [
+            {
+             "sym": "b"
+            },
+            {
+             "sym": "mu"
+            }
+           ]
+          },
+          {
+           "sym": "sigma"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "Phi",
+       "args": [
+        {
+         "op": "div",
+         "args": [
+          {
+           "op": "sub",
+           "args": [
+            {
+             "sym": "a"
+            },
+            {
+             "sym": "mu"
+            }
+           ]
+          },
+          {
+           "sym": "sigma"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式",
+    "変換"
+   ],
+   "properties": [
+    "非負",
+    "有界",
+    "単調"
+   ],
+   "conditions": [
+    {
+     "text": "a ≦ b",
+     "tree": {
+      "op": "le",
+      "args": [
+       {
+        "sym": "a"
+       },
+       {
+        "sym": "b"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "concept": "TERM-normal",
+  "index": 2,
+  "id": "F-std-def",
+  "defined_in": "TERM-std",
+  "tex": "Z=\\dfrac{X-\\mu}{\\sigma}",
+  "symbols": [
+   {
+    "symbol": "Z",
+    "meaning": "標準化した値（期待値から標準偏差いくつ分か）",
+    "key": "Z",
+    "kind": "rv"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "μ",
+    "meaning": "X の期待値 E(X)",
+    "key": "mu",
+    "concept": "TERM-expect",
+    "kind": "param",
+    "of": "X"
+   },
+   {
+    "symbol": "σ",
+    "meaning": "X の標準偏差",
+    "range": "0より大きい",
+    "key": "sigma",
+    "concept": "TERM-sd",
+    "kind": "param",
+    "of": "X",
+    "domain": {
+     "min": 0,
+     "minOpen": true
+    }
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "sym": "Z"
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "sub",
+       "args": [
+        {
+         "sym": "X"
+        },
+        {
+         "sym": "mu"
+        }
+       ]
+      },
+      {
+       "sym": "sigma"
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "定義",
+    "変換"
+   ],
+   "properties": [
+    "線形",
+    "不変",
+    "単位の整合",
+    "条件しだい"
+   ],
+   "representative": true
+  }
+ },
+ {
   "concept": "TERM-expect",
   "index": 0,
   "id": "F-expect-def",
@@ -3812,6 +4094,199 @@
  {
   "concept": "TERM-expo",
   "index": 2,
+  "id": "F-expo-interval",
+  "label": "待ち時間が a〜b に入る確率",
+  "tex": "P(a\\le X\\le b)=\\int_{a}^{b}f(x)\\,dx=e^{-\\lambda a}-e^{-\\lambda b}",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "f(x)",
+    "meaning": "指数分布の確率密度（高さ。面積が確率）",
+    "key": "f",
+    "concept": "TERM-expo"
+   },
+   {
+    "symbol": "x",
+    "meaning": "積分で動かす値",
+    "key": "x",
+    "kind": "index"
+   },
+   {
+    "symbol": "a",
+    "meaning": "区間の左端（0 なら「b 以下」）",
+    "key": "a",
+    "kind": "value",
+    "domain": {
+     "min": 0
+    }
+   },
+   {
+    "symbol": "b",
+    "meaning": "区間の右端（∞ なら「a 以上」）",
+    "key": "b",
+    "kind": "value",
+    "domain": {
+     "min": 0
+    }
+   },
+   {
+    "symbol": "λ",
+    "meaning": "単位時間あたりに起きる平均の回数（a・b と同じ時間の単位で数える）",
+    "range": "0より大きい",
+    "key": "lambda",
+    "kind": "param",
+    "domain": {
+     "min": 0,
+     "minOpen": true
+    }
+   },
+   {
+    "symbol": "e",
+    "meaning": "自然対数の底（約2.718）",
+    "key": "e",
+    "kind": "const"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "op": "le",
+       "args": [
+        {
+         "sym": "a"
+        },
+        {
+         "sym": "X"
+        },
+        {
+         "sym": "b"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "op": "int",
+     "args": [
+      {
+       "op": "fn",
+       "name": "f",
+       "args": [
+        {
+         "sym": "x"
+        }
+       ]
+      }
+     ],
+     "var": "x",
+     "lower": {
+      "sym": "a"
+     },
+     "upper": {
+      "sym": "b"
+     }
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "e"
+        },
+        {
+         "op": "neg",
+         "args": [
+          {
+           "op": "mul",
+           "args": [
+            {
+             "sym": "lambda"
+            },
+            {
+             "sym": "a"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "pow",
+       "args": [
+        {
+         "sym": "e"
+        },
+        {
+         "op": "neg",
+         "args": [
+          {
+           "op": "mul",
+           "args": [
+            {
+             "sym": "lambda"
+            },
+            {
+             "sym": "b"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "有界",
+    "単調"
+   ],
+   "conditions": [
+    {
+     "text": "a ≦ b",
+     "tree": {
+      "op": "le",
+      "args": [
+       {
+        "sym": "a"
+       },
+       {
+        "sym": "b"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "concept": "TERM-expo",
+  "index": 3,
   "id": "F-expo-mean",
   "label": "期待値",
   "tex": "E(X)=\\dfrac{1}{\\lambda}",
@@ -3877,7 +4352,7 @@
  },
  {
   "concept": "TERM-expo",
-  "index": 3,
+  "index": 4,
   "id": "F-expo-var",
   "label": "分散",
   "tex": "V(X)=\\dfrac{1}{\\lambda^{2}}",
@@ -4204,6 +4679,168 @@
  {
   "concept": "TERM-uniform",
   "index": 1,
+  "id": "F-uniform-interval",
+  "label": "区間に入る確率（幅の比）",
+  "tex": "P(c\\le X\\le d)=\\int_{c}^{d}f(x)\\,dx=\\dfrac{d-c}{b-a}",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "X の値で決まる事象（X＝k、X＞x など）の確率。P(A) と同じ確率 P で、別の記号ではない",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "X",
+    "meaning": "確率変数",
+    "key": "X",
+    "kind": "rv"
+   },
+   {
+    "symbol": "f(x)",
+    "meaning": "一様分布の確率密度（a〜b で同じ高さ）",
+    "key": "f",
+    "concept": "TERM-uniform"
+   },
+   {
+    "symbol": "x",
+    "meaning": "積分で動かす値",
+    "key": "x",
+    "kind": "index"
+   },
+   {
+    "symbol": "c",
+    "meaning": "区間の左端（a 以上）",
+    "key": "c",
+    "kind": "value"
+   },
+   {
+    "symbol": "d",
+    "meaning": "区間の右端（b 以下）",
+    "key": "d",
+    "kind": "value"
+   },
+   {
+    "symbol": "a",
+    "meaning": "値のとる範囲の左端",
+    "key": "a",
+    "kind": "param"
+   },
+   {
+    "symbol": "b",
+    "meaning": "値のとる範囲の右端",
+    "key": "b",
+    "kind": "param"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "op": "le",
+       "args": [
+        {
+         "sym": "c"
+        },
+        {
+         "sym": "X"
+        },
+        {
+         "sym": "d"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "op": "int",
+     "args": [
+      {
+       "op": "fn",
+       "name": "f",
+       "args": [
+        {
+         "sym": "x"
+        }
+       ]
+      }
+     ],
+     "var": "x",
+     "lower": {
+      "sym": "c"
+     },
+     "upper": {
+      "sym": "d"
+     }
+    },
+    {
+     "op": "div",
+     "args": [
+      {
+       "op": "sub",
+       "args": [
+        {
+         "sym": "d"
+        },
+        {
+         "sym": "c"
+        }
+       ]
+      },
+      {
+       "op": "sub",
+       "args": [
+        {
+         "sym": "b"
+        },
+        {
+         "sym": "a"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "有界",
+    "単調"
+   ],
+   "conditions": [
+    {
+     "text": "a ≦ c ≦ d ≦ b",
+     "tree": {
+      "op": "le",
+      "args": [
+       {
+        "sym": "a"
+       },
+       {
+        "sym": "c"
+       },
+       {
+        "sym": "d"
+       },
+       {
+        "sym": "b"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "concept": "TERM-uniform",
+  "index": 2,
   "id": "F-uniform-mean",
   "label": "期待値",
   "tex": "E(X)=\\dfrac{a+b}{2}",
@@ -4284,7 +4921,7 @@
  },
  {
   "concept": "TERM-uniform",
-  "index": 2,
+  "index": 3,
   "id": "F-uniform-var",
   "label": "分散",
   "tex": "V(X)=\\dfrac{(b-a)^{2}}{12}",
@@ -5476,6 +6113,366 @@
     "非負",
     "単調",
     "条件しだい"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-std-normal",
+  "index": 0,
+  "id": "F-stdnorm-pdf",
+  "tex": "\\mathrm{phi}(z)=\\dfrac{1}{\\sqrt{2\\pi}}\\exp\\left(-\\dfrac{z^{2}}{2}\\right)",
+  "symbols": [
+   {
+    "symbol": "φ( )",
+    "meaning": "標準正規分布の確率密度（高さ。面積が確率）",
+    "key": "phi",
+    "concept": "TERM-std-normal"
+   },
+   {
+    "symbol": "z",
+    "meaning": "値",
+    "key": "z",
+    "kind": "value",
+    "range": "実数全体"
+   },
+   {
+    "symbol": "π",
+    "meaning": "円周率",
+    "key": "pi",
+    "kind": "const"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "phi",
+     "args": [
+      {
+       "sym": "z"
+      }
+     ]
+    },
+    {
+     "op": "mul",
+     "args": [
+      {
+       "op": "div",
+       "args": [
+        {
+         "num": 1
+        },
+        {
+         "op": "sqrt",
+         "args": [
+          {
+           "op": "mul",
+           "args": [
+            {
+             "num": 2
+            },
+            {
+             "sym": "pi"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "exp",
+       "args": [
+        {
+         "op": "neg",
+         "args": [
+          {
+           "op": "div",
+           "args": [
+            {
+             "op": "pow",
+             "args": [
+              {
+               "sym": "z"
+              },
+              {
+               "num": 2
+              }
+             ]
+            },
+            {
+             "num": 2
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "確率モデル"
+   ],
+   "properties": [
+    "非負",
+    "正規化",
+    "対称",
+    "有界"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-std-normal",
+  "index": 1,
+  "id": "F-stdnorm-cdf",
+  "label": "累積分布関数（z 以下になる確率）",
+  "tex": "\\mathrm{Phi}(z)=P(Z\\le z)=\\int_{-\\infty}^{z}\\mathrm{phi}(t)\\,dt",
+  "symbols": [
+   {
+    "symbol": "Φ( )",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "key": "Phi",
+    "concept": "TERM-std-normal"
+   },
+   {
+    "symbol": "P( )",
+    "meaning": "Z の値で決まる事象（Z≦z など）の確率。P(A) と同じ確率 P で、別の記号ではない",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "Z",
+    "meaning": "標準正規分布に従う確率変数",
+    "key": "Z",
+    "kind": "rv"
+   },
+   {
+    "symbol": "z",
+    "meaning": "値（標準正規分布表の見出し）",
+    "key": "z",
+    "kind": "value"
+   },
+   {
+    "symbol": "φ( )",
+    "meaning": "標準正規分布の確率密度（高さ。面積が確率）",
+    "key": "phi",
+    "concept": "TERM-std-normal"
+   },
+   {
+    "symbol": "t",
+    "meaning": "積分で動かす値",
+    "key": "t",
+    "kind": "index"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "Phi",
+     "args": [
+      {
+       "sym": "z"
+      }
+     ]
+    },
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "op": "le",
+       "args": [
+        {
+         "sym": "Z"
+        },
+        {
+         "sym": "z"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "op": "int",
+     "args": [
+      {
+       "op": "fn",
+       "name": "phi",
+       "args": [
+        {
+         "sym": "t"
+        }
+       ]
+      }
+     ],
+     "var": "t",
+     "upper": {
+      "sym": "z"
+     }
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "定義"
+   ],
+   "properties": [
+    "有界",
+    "単調"
+   ]
+  }
+ },
+ {
+  "concept": "TERM-std-normal",
+  "index": 2,
+  "id": "F-stdnorm-interval",
+  "label": "区間に入る確率（Φ の差）",
+  "tex": "P(a\\le Z\\le b)=\\int_{a}^{b}\\mathrm{phi}(z)\\,dz=\\mathrm{Phi}(b)-\\mathrm{Phi}(a)",
+  "symbols": [
+   {
+    "symbol": "P( )",
+    "meaning": "Z の値で決まる事象（Z≦z など）の確率。P(A) と同じ確率 P で、別の記号ではない",
+    "key": "P",
+    "concept": "TERM-dist"
+   },
+   {
+    "symbol": "Z",
+    "meaning": "標準正規分布に従う確率変数",
+    "key": "Z",
+    "kind": "rv"
+   },
+   {
+    "symbol": "φ( )",
+    "meaning": "標準正規分布の確率密度（高さ。面積が確率）",
+    "key": "phi",
+    "concept": "TERM-std-normal"
+   },
+   {
+    "symbol": "z",
+    "meaning": "積分で動かす値",
+    "key": "z",
+    "kind": "index"
+   },
+   {
+    "symbol": "a",
+    "meaning": "区間の左端（−∞ なら「b 以下」）",
+    "key": "a",
+    "kind": "value"
+   },
+   {
+    "symbol": "b",
+    "meaning": "区間の右端（∞ なら「a 以上」）",
+    "key": "b",
+    "kind": "value"
+   },
+   {
+    "symbol": "Φ( )",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "key": "Phi",
+    "concept": "TERM-std-normal"
+   }
+  ],
+  "tree": {
+   "op": "eq",
+   "args": [
+    {
+     "op": "fn",
+     "name": "P",
+     "args": [
+      {
+       "op": "le",
+       "args": [
+        {
+         "sym": "a"
+        },
+        {
+         "sym": "Z"
+        },
+        {
+         "sym": "b"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "op": "int",
+     "args": [
+      {
+       "op": "fn",
+       "name": "phi",
+       "args": [
+        {
+         "sym": "z"
+        }
+       ]
+      }
+     ],
+     "var": "z",
+     "lower": {
+      "sym": "a"
+     },
+     "upper": {
+      "sym": "b"
+     }
+    },
+    {
+     "op": "sub",
+     "args": [
+      {
+       "op": "fn",
+       "name": "Phi",
+       "args": [
+        {
+         "sym": "b"
+        }
+       ]
+      },
+      {
+       "op": "fn",
+       "name": "Phi",
+       "args": [
+        {
+         "sym": "a"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "contract": {
+   "kinds": [
+    "恒等式"
+   ],
+   "properties": [
+    "非負",
+    "有界",
+    "単調"
+   ],
+   "conditions": [
+    {
+     "text": "a ≦ b",
+     "tree": {
+      "op": "le",
+      "args": [
+       {
+        "sym": "a"
+       },
+       {
+        "sym": "b"
+       }
+      ]
+     }
+    }
    ]
   }
  }

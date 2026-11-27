@@ -95,6 +95,13 @@ contracts:
   kinds: [確率モデル]
   properties: [非負, 正規化, 対称, 有界, 単位の整合]
   review: [μ・σ が X の期待値・標準偏差（of。D7）]
+- formula: F-normal-interval
+  kinds: [恒等式, 変換]
+  properties: [非負, 有界, 単調]
+  conditions:
+  - text: a ≦ b
+    tree: {"op": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
+  review: [∫ と Φ の差が等しいのは、標準化した (X−μ)/σ が標準正規分布に従うから（F-std-def）, 区間の端が −∞・∞ のとき Φ を 0・1 と読む]
 - formula: F-expect-def
   kinds: [定義]
   properties: [線形, 有界, 単位の整合]
@@ -191,6 +198,13 @@ contracts:
   kinds: [恒等式]
   properties: [有界, 単調, 同値, 不変]
   review: [単位（λ は 1/時間）]   # F-expo-pdf と同じ観点（#514 で λ の意味をそろえた）
+- formula: F-expo-interval
+  kinds: [恒等式]
+  properties: [非負, 有界, 単調]
+  conditions:
+  - text: a ≦ b
+    tree: {"op": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
+  review: [単位（λ と a・b の時間の単位をそろえる）]
 - formula: F-expo-mean
   kinds: [恒等式]
   properties: [同値, 単位の整合]
@@ -209,6 +223,13 @@ contracts:
 - formula: F-uniform-pdf
   kinds: [確率モデル]
   properties: [非負, 正規化, 条件しだい]
+- formula: F-uniform-interval
+  kinds: [恒等式]
+  properties: [非負, 有界, 単調]
+  conditions:
+  - text: a ≦ c ≦ d ≦ b
+    tree: {"op": "le", "args": [{"sym": "a"}, {"sym": "c"}, {"sym": "d"}, {"sym": "b"}]}
+  review: [区間の端を分布の端 a・b と別の記号 c・d にした（一様分布の母数と取り違えない）]
 - formula: F-uniform-mean
   kinds: [恒等式]
   properties: [対称, 線形, 同値]
@@ -230,3 +251,16 @@ contracts:
   representative: true
   review: [有界（0〜1 が保証されるのは、切片を含む最小二乗で当てはめたときだけ）]
   review_refs: [CLM-51]   # 観点の根拠の仮定は主張 ④-51 の条件（#532 C で概念から移した。2026-11-26）
+- formula: F-stdnorm-pdf
+  kinds: [確率モデル]
+  properties: [非負, 正規化, 対称, 有界]
+- formula: F-stdnorm-cdf
+  kinds: [定義]
+  properties: [有界, 単調]
+  review: [下の端のない積分（−∞ から z まで）を、表の値 Φ(z) と同じものとして読む]
+- formula: F-stdnorm-interval
+  kinds: [恒等式]
+  properties: [非負, 有界, 単調]
+  conditions:
+  - text: a ≦ b
+    tree: {"op": "le", "args": [{"sym": "a"}, {"sym": "b"}]}
