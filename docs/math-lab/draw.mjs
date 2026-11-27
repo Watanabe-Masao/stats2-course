@@ -85,6 +85,35 @@ function negbinomPmf(r, p, kmax) {
 		return Math.exp(lnComb(k - 1, r - 1) + r * Math.log(p) + (k - r) * Math.log(1 - p));
 	});
 }
+/** 正規分布 N(μ, σ²) の密度。二項分布の棒に重ねる曲線に使う（棒の幅1なので、密度の値が棒の高さに並ぶ）。σ は0より大きい */
+function normalDensity(x, mean, sd) {
+	if (!(sd > 0)) throw new Error(`σ は0より大きい：${sd}`);
+	const z = (x - mean) / sd;
+	return Math.exp(-z * z / 2) / (sd * Math.sqrt(2 * Math.PI));
+}
+// packages/engine/src/dists.ts
+/** ln Γ(x)（x＞0。Lanczos の近似） */
+function lnGamma(x) {
+	const c = [
+		76.18009172947146,
+		-86.50532032941678,
+		24.01409824083091,
+		-1.231739572450155,
+		.001208650973866179,
+		-5395239384953e-18
+	];
+	let y = x, t = x + 5.5;
+	t -= (x + .5) * Math.log(t);
+	let s = 1.000000000190015;
+	for (const ci of c) s += ci / ++y;
+	return -t + Math.log(2.5066282746310007 * s / x);
+}
+/** t 分布 t(df) の密度・分布関数・左側累積 p の点 */
+const tDensity = (t, df) => Math.exp(lnGamma((df + 1) / 2) - lnGamma(df / 2) - .5 * Math.log(df * Math.PI) - (df + 1) / 2 * Math.log(1 + t * t / df));
+/** カイ二乗分布 χ²(df) */
+const chi2Density = (x, df) => x <= 0 ? 0 : Math.exp((df / 2 - 1) * Math.log(x) - x / 2 - df / 2 * Math.log(2) - lnGamma(df / 2));
+/** F 分布 F(d1, d2) */
+const fDensity = (x, d1, d2) => x <= 0 ? 0 : Math.exp(.5 * (d1 * Math.log(d1 * x) + d2 * Math.log(d2) - (d1 + d2) * Math.log(d1 * x + d2)) - Math.log(x) - (lnGamma(d1 / 2) + lnGamma(d2 / 2) - lnGamma((d1 + d2) / 2)));
 // packages/ui/src/draw/svg.ts
 const COLORS = Object.fromEntries(Object.entries({
 	"$type": "color",
@@ -373,6 +402,135 @@ var Canvas = class {
 		return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${this.w} ${H}"${size} font-family="sans-serif" role="img" aria-label="${esc(label)}">` + bg + this.parts.join("") + "</svg>";
 	}
 };
+// packages/ui/src/draw/curve.ts
+const CURVE_FAMILIES = [
+	"normal",
+	"uniform",
+	"expo",
+	"t",
+	"chi2",
+	"f"
+];
+/** 密度の関数と平均（平均がない分布は NaN） */
+function densityOf(sp) {
+	switch (sp.family) {
+		case "normal": return {
+			f: (x) => normalDensity(x, sp.mu, sp.sigma),
+			mean: sp.mu,
+			name: `正規分布 N(${num(sp.mu)}, ${num(sp.sigma)}²)`,
+			short: `N(${num(sp.mu)}, ${num(sp.sigma)}²)`
+		};
+		case "uniform": return {
+			f: (x) => x >= sp.a && x <= sp.b ? 1 / (sp.b - sp.a) : 0,
+			mean: (sp.a + sp.b) / 2,
+			name: `一様分布（${num(sp.a)}〜${num(sp.b)}）`,
+			short: `一様 ${num(sp.a)}〜${num(sp.b)}`
+		};
+		case "expo": return {
+			f: (x) => x >= 0 ? sp.lam * Math.exp(-sp.lam * x) : 0,
+			mean: 1 / sp.lam,
+			name: `指数分布（λ＝${num(sp.lam)}）`,
+			short: `指数 λ＝${num(sp.lam)}`
+		};
+		case "t": return {
+			f: (x) => tDensity(x, sp.df),
+			mean: sp.df > 1 ? 0 : NaN,
+			name: `t 分布 t(${sp.df})`,
+			short: `t(${sp.df})`
+		};
+		case "chi2": {
+			const g = (x) => chi2Density(x === 0 ? 1e-12 : x, sp.df);
+			const cap = sp.df < 2 ? 2.5 * g(.5) : Infinity;
+			return {
+				f: (x) => Math.min(g(x), cap),
+				mean: sp.df,
+				name: `カイ二乗分布 χ²(${sp.df})`,
+				short: `χ²(${sp.df})`
+			};
+		}
+		case "f": {
+			const g = (x) => fDensity(x === 0 ? 1e-12 : x, sp.d1, sp.d2);
+			const cap = sp.d1 <= 2 ? 2.5 * g(.5) : Infinity;
+			return {
+				f: (x) => Math.min(g(x), cap),
+				mean: sp.d2 > 2 ? sp.d2 / (sp.d2 - 2) : NaN,
+				name: `F 分布 F(${sp.d1}, ${sp.d2})`,
+				short: `F(${sp.d1}, ${sp.d2})`
+			};
+		}
+	}
+}
+function drawCurve(sp, theme = "file") {
+	const c = new Canvas(theme);
+	const unit = sp.unit ?? "";
+	let y = 8;
+	if (sp.title) y = c.para(8, 22, sp.title, 344, 13.5, "ink", "bold") - 8;
+	const top = y + 26, base = y + 190, left = 20, right = 340;
+	const { f, mean, name, short } = densityOf(sp);
+	const [lo, hi, step] = sp.ticks;
+	const X = (v) => left + (v - lo) / (hi - lo) * 320;
+	const xs = Array.from({ length: 241 }, (_, i) => lo + (hi - lo) * i / 240);
+	const g = sp.overlay ? (x) => normalDensity(x, sp.overlay.mu, sp.overlay.sigma) : null;
+	const pmax = Math.max(...xs.map(f).filter(Number.isFinite), ...g ? xs.map(g) : []);
+	const scale = (base - top - 18) / pmax;
+	const Y = (v) => base - (Number.isFinite(v) ? v : pmax) * scale;
+	c.line(left, base, right, base, "ink-2", 1);
+	for (const sh of sp.shade ?? []) {
+		const outside = "outside" in sh;
+		const parts = outside ? [[lo, sh.outside[0]], [sh.outside[1], hi]] : [[sh.from, sh.to]];
+		for (const [a0, b0] of parts) {
+			const a = Math.max(a0, lo), b = Math.min(b0, hi);
+			if (b <= a) continue;
+			const pts = Array.from({ length: 81 }, (_, i) => a + (b - a) * i / 80);
+			const d = `M${f1(X(a))},${base} ` + pts.map((x) => `L${f1(X(x))},${f1(Y(f(x)))}`).join(" ") + ` L${f1(X(b))},${base} Z`;
+			c.add(`<path d="${d}"${c.paint({ fill: outside ? "data-hi" : "data-1" })} fill-opacity="${outside ? .55 : .35}"/>`);
+		}
+		if (sh.label) {
+			if (outside) c.text(right, base - 62, sh.label, 11.5, "data-hi", "end", "bold");
+			else {
+				const mid = (sh.from + sh.to) / 2;
+				c.add(`<text x="${f1(X(mid))}" y="${f1(base - f(mid) * scale * .45)}" font-size="${c.fs(12.5)}"${c.paint({
+					fill: "ink",
+					stroke: c.halo
+				})} text-anchor="middle" font-weight="bold" stroke-width="4" paint-order="stroke">${esc(sh.label)}</text>`);
+			}
+		}
+	}
+	c.add(`<path d="M${xs.map((x) => `${f1(X(x))},${f1(Y(f(x)))}`).join(" L")}" fill="none"${c.paint({ stroke: "data-1" })} stroke-width="2.2"/>`);
+	(sp.marks ?? []).forEach((mk, i) => {
+		c.line(X(mk.x), top - 4 + i * 16, X(mk.x), base, "ink-2", 1.2, "4 3");
+		c.text(X(mk.x) + 4, top + 6 + i * 16, mk.label, 11.5, "ink-2");
+	});
+	if (g) c.add(`<path d="M${xs.map((x) => `${f1(X(x))},${f1(Y(g(x)))}`).join(" L")}" fill="none"${c.paint({ stroke: "ink" })} stroke-width="1.6" stroke-dasharray="4 3"/>`);
+	for (let t = lo; t <= hi + 1e-9; t += step) c.text(X(t), base + 15, num(t), 11, "ink-2", "middle");
+	if ((sp.mark_mean ?? true) && Number.isFinite(mean)) {
+		const mx = X(mean);
+		c.add(`<path d="M${f1(mx)},${base + 20} l-7,12 h14 z"${c.paint({ fill: "data-hi" })}/>`);
+		c.text(mx, base + 46, `平均 ${num(Number(mean.toFixed(2)))}${unit}`, 12, "data-hi", "middle", "bold");
+	}
+	y = base + 58;
+	if (sp.overlay || sp.label) {
+		c.line(8, y + 8, 20, y + 8, "data-1", 2.2);
+		const lab = sp.label ?? short;
+		c.text(24, y + 12, lab, 12, "ink-2");
+		if (sp.overlay) {
+			let ox = 190;
+			if (lab.length > 14) {
+				y += 20;
+				ox = 8;
+			}
+			c.line(ox, y + 8, ox + 12, y + 8, "ink", 1.6, "4 3");
+			c.text(ox + 16, y + 12, sp.overlay.label ?? "重ねる分布", 12, "ink-2");
+		}
+		y += 20;
+		for (const line of sp.lines ?? []) {
+			c.text(8, y + 12, line, 12.5, "ink");
+			y += 20;
+		}
+	}
+	if (sp.note) y = c.para(8, y + 10, sp.note, 344, 12.5, "ink-2");
+	return c.done(y + 6, `${name} の曲線${Number.isFinite(mean) ? `。平均は ${num(Number(mean.toFixed(2)))}${unit}` : ""}`);
+}
 // packages/ui/src/draw/dist.ts
 const FAMILIES = [
 	"binom",
@@ -381,8 +539,9 @@ const FAMILIES = [
 	"geom",
 	"hyper"
 ];
-/** この関数で描ける設定か（離散の分布で、重ねる分布・帯・境目のないもの） */
+/** この関数で描ける設定か（離散：重ねる分布・帯・境目のないもの。連続：帯がなく、重ねるのは正規分布だけで、横軸 ticks があるもの） */
 function canDrawDist(sp) {
+	if (CURVE_FAMILIES.includes(String(sp.family))) return !sp.band && Array.isArray(sp.ticks) && (!sp.overlay || sp.overlay.family === "normal");
 	if (!FAMILIES.includes(String(sp.family)) || sp.overlay || sp.band || sp.upto !== void 0) return false;
 	return sp.family !== "poisson" && sp.family !== "geom" || sp.kmax !== void 0;
 }
@@ -432,7 +591,7 @@ function distPoints(sp) {
 				success: sp.K
 			});
 			mean = sp.n * sp.K / sp.N;
-			name = `超幾何分布（N＝${sp.N}、K＝${sp.K}、n＝${sp.n}）`;
+			name = `超幾何分布（${sp.N}個のうち当たり${sp.K}個から${sp.n}個取る）`;
 			top = sp.n;
 	}
 	const k0 = sp.kmin ?? (sp.family === "geom" ? sp.r ?? 1 : 0), k1 = sp.kmax ?? top;
@@ -446,6 +605,9 @@ function distPoints(sp) {
 }
 function drawDist(sp, theme = "file") {
 	if (!canDrawDist(sp)) throw new Error(`この設定はまだ描けない：${JSON.stringify(sp)}`);
+	return CURVE_FAMILIES.includes(sp.family) ? drawCurve(sp, theme) : drawBars(sp, theme);
+}
+function drawBars(sp, theme) {
 	const c = new Canvas(theme);
 	const unit = sp.unit ?? "";
 	let y = 8;
@@ -499,4 +661,4 @@ function drawDist(sp, theme = "file") {
 	const most = pmf.reduce((b, q) => q[1] > b[1] + 1e-12 ? q : b, pmf[0]);
 	return c.done(y + 6, `${name} の棒。いちばん高いのは ${num(most[0])}${unit}、期待値は ${num(Number(mean.toFixed(2)))}${unit}`);
 }
-export { canDrawDist, distPoints, drawDist, wrap };
+export { canDrawDist, densityOf, distPoints, drawDist, wrap };
