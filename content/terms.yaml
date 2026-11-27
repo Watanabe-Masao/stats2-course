@@ -2491,6 +2491,7 @@
   figures: [FIG-U15-concept]
   labs:
   - {id: LAB-pois, preset: s1-pois, purpose: 平均件数 λ から、k 件の確率を読む}
+  chart: {kind: poisson, lam: 3, kmax: 10, unit: 件, note: λ＝3 では 2件と3件がいちばん起こりやすい（どちらも約0.22）。平均は λ＝3件で、右へ裾を引く。}   # 概要の図（#577 D1。数は engine が描く）
   workspace: {formula: 0, vary: [lambda], over: k, mean: 1, initial: {lambda: 3, k: 3}}   # 式の作業台（#608）。k に上限はない（画面が確率の残る所まで並べる）
   principle: 二項分布で n を大きく、p を小さくし、np＝λ を保ったときに行き着く形。期待値と分散がどちらも λ になる。
   formulas:
@@ -2565,6 +2566,7 @@
     locator: 確率モデルの導入（確率変数・確率分布）
   checks:
   - abs(math.exp(-2)-0.135)<0.0005
+  - abs(math.exp(-3)*3**2/2-0.224)<0.0005 and abs(math.exp(-3)*3**3/6-math.exp(-3)*3**2/2)<1e-12
 - id: TERM-geom
   name: 幾何分布
   en: geometric distribution
@@ -2577,6 +2579,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-geom, purpose: 1割の当たりでも、初めて当たる回は1回目がいちばん起こりやすく、平均は 1÷0.1＝10 回}
+  chart: {kind: geom, p: 0.1, kmax: 30, unit: 回目, note: いちばん起こりやすいのは1回目（0.1）。1回ごとに0.9倍ずつ減るが、裾が長く、平均は 1/p＝10回目。}   # 概要の図（#577 D1）
   workspace: {formula: 0, vary: [p], over: k, mean: 1}   # 式の作業台（#608）。k に上限はない
   principle: k−1 回続けて失敗してから成功する確率なので (1−p)^(k−1)p。毎回の確率が同じで独立なので、それまでの失敗は次の確率を変えない（無記憶性）。
   formulas:
@@ -2661,6 +2664,7 @@
   - Fraction(1,1)/Fraction(1,6)==6
   - abs((5/6)**5*(1/6)-0.067)<0.0005
   - abs(1/0.1-10)<1e-9 and 0.1>0.9*0.1   # 概念から開くラボの目的の文の数（2026-11-25）
+  - abs(0.9*0.1-0.09)<1e-12 and abs(1/0.1-10)<1e-9
 - id: TERM-negbinom
   name: 負の二項分布
   en: negative binomial distribution
@@ -2673,6 +2677,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-negbinom, purpose: r を1（幾何分布）から3に増やすと山が右へ移り、止めるまでの回数の平均は r÷p になる}
+  chart: {kind: geom, p: 0.3, r: 3, kmax: 25, unit: 回目, note: いちばん起こりやすいのは7回目（約0.097）。平均は r/p＝3÷0.3＝10回目。}   # 概要の図（#577 D1。geom に r を書くと負の二項）
   workspace: {formula: 0, vary: [r, p], over: k, initial: {r: 3, p: 0.3, k: 10}}   # 式の作業台（#608）。k に上限はない。k＝10 は期待値 r/p
   principle: k 回目に r 回目の成功が起きるのは、それまでの k−1 回にちょうど r−1 回成功し、k 回目に成功するとき。並び方の数 ₖ₋₁C_{r−1} を掛ける。r＝1 なら幾何分布。
   formulas:
@@ -2721,6 +2726,7 @@
   counterexample: 回数 n を先に決めて成功の数を数えるなら二項分布。何を固定し、何を数えるかが逆になる。
   checks:
   - math.comb(2,1)*0.5**2*0.5==0.25
+  - 'max(range(3,26), key=lambda k: math.comb(k-1,2)*0.3**3*0.7**(k-3)) == 7 and abs(math.comb(6,2)*0.3**3*0.7**4-0.097)<0.0005 and abs(3/0.3-10)<1e-9'
 - id: TERM-hyper
   name: 超幾何分布
   en: hypergeometric distribution
@@ -2733,6 +2739,7 @@
   version: 1
   labs:
   - {id: LAB-pois, preset: c-hyper, purpose: 戻さないので、取るたびに箱の中身が変わる。N を大きくすると、戻して取り出す二項分布の確率に近づく}
+  chart: {kind: hyper, N: 10, K: 3, n: 4, unit: 個, note: いちばん起こりやすいのは1個（0.5）。当たりは3個しかないので、4個とも当たりは起こらない。平均は 4×3/10＝1.2個。}   # 概要の図（#577 D1）
   workspace: {formula: 0, vary: [N, M, n], over: k, mean: 1, initial: {N: 20, M: 8, n: 5, k: 2}}   # 式の作業台（#608）。20 個のうち当たり 8 個から 5 個を取り出す
   principle: 取り出し方の組合せの数の比。戻さないので、1個取るたびに残りの当たりの割合が変わる（各回は独立ではない）。
   formulas:
@@ -2817,6 +2824,7 @@
   - Fraction(math.comb(3,2),math.comb(10,2))==Fraction(1,15)
   - abs(0.3**2-0.09)<1e-12
   - abs(1/15-0.067)<0.0005
+  - Fraction(math.comb(3,1)*math.comb(7,3),math.comb(10,4)) == Fraction(1,2) and abs(4*3/10-1.2)<1e-12
 - id: TERM-expo
   name: 指数分布
   en: exponential distribution
@@ -5542,6 +5550,7 @@
   gist: 1人の客に試食を出し、買えば1、買わなければ0と記録する。この1人が買う見込みを、記録する前に確率で表したい。
   definition: 値 1 を確率 p、値 0 を確率 1−p でとる確率変数の分布。成功を1、失敗を0と数えた1回の試行の結果の分布。
   version: 1
+  chart: {kind: bernoulli, p: 0.3, note: 1（買う）の確率 0.3、0（買わない）の確率 0.7。期待値は p＝0.3 で、0 と 1 の間の値になる。}   # 概要の図（#577 D1）
   workspace: {formula: 0, vary: [p], over: k}   # 式の作業台（#608）。期待値の式は持たない（E(X)＝p は二項分布の n＝1）
   principle: とる値が 0 と 1 の2つだけなので、確率 p 1つで分布が決まる。平均は 1×p＋0×(1−p)＝p、分散は p(1−p)。1回の成功の回数（0回か1回）とみると、n 回分を足したものが二項分布になる。
   formulas:
@@ -5582,6 +5591,7 @@
   - 0.5**1*(1-0.5)**0 == 0.5 and 0.5**0*(1-0.5)**1 == 0.5
   - Fraction(1,6)**1*(1-Fraction(1,6))**0 == Fraction(1,6)
   - 'Fraction(1,6)*1 + Fraction(5,6)*0 == Fraction(1,6) and Fraction(1,6)*(1-Fraction(1,6))**2 + Fraction(5,6)*(0-Fraction(1,6))**2 == Fraction(1,6)*Fraction(5,6)'
+  - abs(1-0.3-0.7)<1e-12
 - id: TERM-sample-mean
   name: 標本平均
   en: sample mean
