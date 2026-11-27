@@ -1480,28 +1480,131 @@
             "required": [
               "kind"
             ],
-            "description": "概要の図：分布の棒をその場で描く設定（数は engine の modelPmf から。画像にしない。stats2-course #188 01b）",
+            "description": "概要の図：分布の棒をその場で描く設定（数は engine から。画像にしない。math-lab の drawDist。項目の名前は教材の静止図の設定と同じ。stats2-course #188 01b・#577 D1）",
             "properties": {
               "kind": {
                 "enum": [
-                  "binom"
-                ]
+                  "binom",
+                  "bernoulli",
+                  "poisson",
+                  "geom",
+                  "hyper"
+                ],
+                "description": "分布：二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項：r 回目の成功が何回目か）・超幾何"
               },
               "n": {
                 "type": "integer",
                 "minimum": 1,
-                "maximum": 60
+                "maximum": 60,
+                "description": "二項の回数・超幾何の取る数"
               },
               "p": {
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1
               },
+              "lam": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 30,
+                "description": "ポアソンの λ"
+              },
+              "r": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "負の二項の r（幾何は1）"
+              },
+              "N": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200,
+                "description": "超幾何の全部の数"
+              },
+              "K": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 200,
+                "description": "超幾何の当たりの数"
+              },
+              "kmax": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 60,
+                "description": "棒を出す上限（上限のないポアソン・幾何で要る）"
+              },
+              "unit": {
+                "type": "string",
+                "maxLength": 4,
+                "description": "横軸の値に付ける単位（既定：二項は「回」、ほかはなし）"
+              },
               "note": {
                 "$ref": "#/$defs/text",
                 "description": "図の下の一言"
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "bernoulli"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "p"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "poisson"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "lam",
+                    "kmax"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "geom"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "p",
+                    "kmax"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "hyper"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "N",
+                    "K",
+                    "n"
+                  ]
+                }
+              }
+            ]
           },
           "icon": {
             "type": "string",
@@ -2644,5 +2747,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 13
+  "x-revision": 14
 }

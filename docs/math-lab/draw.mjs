@@ -24,6 +24,7 @@ Object.fromEntries(Object.entries({
 	"−": "-"
 }).filter(([k]) => /\p{L}/u.test(k)).map(([k, v]) => [v.slice(1).replace("var", ""), v]));
 // packages/engine/src/lab.ts
+const isCount = (x) => Number.isInteger(x) && x >= 0;
 const lnFact = (() => {
 	const t = [0];
 	return (k) => {
@@ -64,26 +65,25 @@ function modelPmf(m) {
 	} else out.push(Math.exp(lnComb(m.success, k) + lnComb(m.total - m.success, m.n - k) - lnComb(m.total, m.n)));
 	return out;
 }
-/** モデルの期待値・分散 */
-function modelMoments(m) {
-	if (m.kind === "binom") return {
-		mean: m.n * m.p,
-		variance: m.n * m.p * (1 - m.p)
-	};
-	if (m.kind === "table") {
-		const tot = m.weights.reduce((a, b) => a + b, 0);
-		const mu = m.values.reduce((s, v, j) => s + v * m.weights[j] / tot, 0);
-		const v2 = m.values.reduce((s, v, j) => s + (v - mu) ** 2 * m.weights[j] / tot, 0);
-		return {
-			mean: m.n * mu,
-			variance: m.n * v2
-		};
-	}
-	const q = m.success / m.total, fpc = m.total > 1 ? (m.total - m.n) / (m.total - 1) : 0;
-	return {
-		mean: m.n * q,
-		variance: m.n * q * (1 - q) * fpc
-	};
+/** ポアソン分布 Po(λ) の確率（k＝0〜kmax）。つながりの図で二項分布と並べる（stats2-course #188 04）。
+*  上限のない分布なので kmax で切る（合計は1より少し小さい）。λ は0以上 */
+function poissonPmf(lambda, kmax) {
+	if (!(lambda >= 0) || !Number.isFinite(lambda)) throw new Error(`λ は0以上の有限の数：${lambda}`);
+	if (!isCount(kmax)) throw new Error(`kmax は0以上の整数：${kmax}`);
+	if (lambda === 0) return Array.from({ length: kmax + 1 }, (_, k) => k === 0 ? 1 : 0);
+	return Array.from({ length: kmax + 1 }, (_, k) => Math.exp(-lambda + k * Math.log(lambda) - lnFact(k)));
+}
+/** r 回目の成功が k 回目の試行で起きる確率（k＝0〜kmax。k＜r は0）。r＝1 で幾何分布、2以上で負の二項分布。
+*  P(k)＝C(k−1, r−1) p^r (1−p)^(k−r)。平均 r/p・分散 r(1−p)/p²（stats2-course #188 04b） */
+function negbinomPmf(r, p, kmax) {
+	if (!isCount(r) || r < 1) throw new Error(`r は1以上の整数：${r}`);
+	if (!(p > 0 && p <= 1)) throw new Error(`p は0より大きく1以下：${p}`);
+	if (!isCount(kmax)) throw new Error(`kmax は0以上の整数：${kmax}`);
+	return Array.from({ length: kmax + 1 }, (_, k) => {
+		if (k < r) return 0;
+		if (p === 1) return k === r ? 1 : 0;
+		return Math.exp(lnComb(k - 1, r - 1) + r * Math.log(p) + (k - r) * Math.log(1 - p));
+	});
 }
 // packages/ui/src/draw/svg.ts
 const COLORS = Object.fromEntries(Object.entries({
@@ -374,31 +374,84 @@ var Canvas = class {
 	}
 };
 // packages/ui/src/draw/dist.ts
-/** この関数で描ける設定か（D0：二項分布で、重ねる分布・帯・境目のないもの） */
+const FAMILIES = [
+	"binom",
+	"bernoulli",
+	"poisson",
+	"geom",
+	"hyper"
+];
+/** この関数で描ける設定か（離散の分布で、重ねる分布・帯・境目のないもの） */
 function canDrawDist(sp) {
-	return sp.family === "binom" && !sp.overlay && !sp.band && sp.upto === void 0;
+	if (!FAMILIES.includes(String(sp.family)) || sp.overlay || sp.band || sp.upto !== void 0) return false;
+	return sp.family !== "poisson" && sp.family !== "geom" || sp.kmax !== void 0;
+}
+/** 棒の値（[k, 確率]）と期待値・図の説明の名前 */
+function distPoints(sp) {
+	let all, mean, name, top;
+	switch (sp.family) {
+		case "binom":
+			all = modelPmf({
+				kind: "binom",
+				n: sp.n,
+				p: sp.p
+			});
+			mean = sp.n * sp.p;
+			name = `二項分布 B(${sp.n}, ${sp.p})`;
+			top = sp.n;
+			break;
+		case "bernoulli":
+			all = modelPmf({
+				kind: "binom",
+				n: 1,
+				p: sp.p
+			});
+			mean = sp.p;
+			name = `ベルヌーイ分布（p＝${sp.p}）`;
+			top = 1;
+			break;
+		case "poisson":
+			top = sp.kmax;
+			all = poissonPmf(sp.lam, top);
+			mean = sp.lam;
+			name = `ポアソン分布（λ＝${sp.lam}）`;
+			break;
+		case "geom": {
+			const r = sp.r ?? 1;
+			top = sp.kmax;
+			all = negbinomPmf(r, sp.p, top);
+			mean = r / sp.p;
+			name = r === 1 ? `幾何分布（p＝${sp.p}）` : `負の二項分布（r＝${r}、p＝${sp.p}）`;
+			break;
+		}
+		case "hyper":
+			all = modelPmf({
+				kind: "hyper",
+				n: sp.n,
+				total: sp.N,
+				success: sp.K
+			});
+			mean = sp.n * sp.K / sp.N;
+			name = `超幾何分布（N＝${sp.N}、K＝${sp.K}、n＝${sp.n}）`;
+			top = sp.n;
+	}
+	const k0 = sp.kmin ?? (sp.family === "geom" ? sp.r ?? 1 : 0), k1 = sp.kmax ?? top;
+	const pmf = [];
+	for (let k = k0; k <= k1; k++) pmf.push([k, all[k] ?? 0]);
+	return {
+		pmf,
+		mean,
+		name
+	};
 }
 function drawDist(sp, theme = "file") {
-	if (sp.family !== "binom") throw new Error(`分布 ${String(sp.family)} はまだ描けない（D0 は二項分布だけ）`);
-	const { n, p } = sp;
+	if (!canDrawDist(sp)) throw new Error(`この設定はまだ描けない：${JSON.stringify(sp)}`);
 	const c = new Canvas(theme);
 	const unit = sp.unit ?? "";
 	let y = 8;
 	if (sp.title) y = c.para(8, 22, sp.title, 344, 13.5, "ink", "bold") - 8;
 	const top = y + 26, base = y + 190, left = 20, right = 340;
-	const all = modelPmf({
-		kind: "binom",
-		n,
-		p
-	});
-	const k0 = sp.kmin ?? 0, k1 = sp.kmax ?? n;
-	const pmf = [];
-	for (let k = k0; k <= k1; k++) pmf.push([k, all[k] ?? 0]);
-	const mean = modelMoments({
-		kind: "binom",
-		n,
-		p
-	}).mean;
+	const { pmf, mean, name } = distPoints(sp);
 	const lo = pmf[0][0] - .5, hi = pmf[pmf.length - 1][0] + .5;
 	const X = (v) => left + (v - lo) / (hi - lo) * 320;
 	const pmax = Math.max(...pmf.map((q) => q[1]));
@@ -408,7 +461,9 @@ function drawDist(sp, theme = "file") {
 	const dec = sp.decimals ?? 2;
 	const hl = new Set(sp.highlight ?? []);
 	c.line(left, base, right, base, "ink-2", 1);
-	const every = Math.max(1, Math.ceil(pmf.length / 12));
+	const em = (t) => [...t].reduce((w, ch) => w + (ch.charCodeAt(0) < 8192 ? .6 : 1), 0) * 11.5;
+	const widest = Math.max(...pmf.map(([x]) => em(`${num(x)}${unit}`)));
+	const every = Math.max(1, Math.ceil(pmf.length / 12), Math.ceil((widest + 6) / slot));
 	for (const [x, q] of pmf) {
 		const cx = X(x);
 		c.rect(cx - bw / 2, base - q * scale, bw, q * scale, hl.has(x) ? "data-hi" : "data-1-soft", 3);
@@ -416,7 +471,8 @@ function drawDist(sp, theme = "file") {
 			fill: "ink",
 			stroke: c.halo
 		})} text-anchor="middle" stroke-width="4" paint-order="stroke">${q.toFixed(dec)}</text>`);
-		if ((x - pmf[0][0]) % every === 0 || hl.has(x)) c.text(cx, base + 15, `${num(x)}${unit}`, 11.5, "ink-2", "middle");
+		const nearHl = [...hl].some((h) => h !== x && Math.abs(h - x) < every);
+		if (hl.has(x) || (x - pmf[0][0]) % every === 0 && !nearHl) c.text(cx, base + 15, `${num(x)}${unit}`, 11.5, "ink-2", "middle");
 	}
 	if (sp.mark_mean ?? true) {
 		const mx = X(mean);
@@ -441,6 +497,6 @@ function drawDist(sp, theme = "file") {
 	}
 	if (sp.note) y = c.para(8, y + 10, sp.note, 344, 12.5, "ink-2");
 	const most = pmf.reduce((b, q) => q[1] > b[1] + 1e-12 ? q : b, pmf[0]);
-	return c.done(y + 6, `二項分布 B(${n}, ${p}) の棒。いちばん高いのは ${num(most[0])}${unit}、期待値は ${num(Number(mean.toFixed(2)))}${unit}`);
+	return c.done(y + 6, `${name} の棒。いちばん高いのは ${num(most[0])}${unit}、期待値は ${num(Number(mean.toFixed(2)))}${unit}`);
 }
-export { canDrawDist, drawDist, wrap };
+export { canDrawDist, distPoints, drawDist, wrap };
