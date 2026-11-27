@@ -562,6 +562,8 @@ def boxplot(sp: dict) -> str:
 
 # ---- 折れ線（時系列。幾何平均の率で結んだ線・指数平滑の線を計算して重ねられる） ----
 def line(sp: dict) -> str:
+    if (drawn := _drawn(sp, "line")):   # 画面と同じ math-lab の関数で描く（D3b。#577）
+        return drawn
     c = Canvas()
     series = [dict(s) for s in sp["series"]]           # [{label, values}]
     labels = sp.get("labels") or [str(i + 1) for i in range(len(series[0]["values"]))]
@@ -717,6 +719,8 @@ def _scatter_fit(sp: dict) -> str:
 
 
 def scatter(sp: dict) -> str:
+    if (drawn := _drawn(sp, "scatter")):   # 画面と同じ math-lab の関数で描く（D3b。#577）
+        return drawn
     c = Canvas()
     if sp.get("show") == "fit":             # 2つ以上の組を重ね、組ごとの回帰直線を引く（傾きと相関係数を下に出す）
         return _scatter_fit(sp)
@@ -899,7 +903,7 @@ def _pdf(sp: dict):
 # 画面と同じ関数（docs/math-lab/draw.mjs の写し）で SVG を作る。node の呼び出しは1回にまとめる（prefetch）。
 # math-lab で描けない設定（重ねる分布・帯・境目・二項分布でない分布）は、下の Python の描き方のまま（D1 以降で移す）。
 _DRAWN: dict[str, str] = {}
-_ML_TYPES = ("dist", "hist", "boxplot", "centers")   # math-lab で描ける型（dist は設定しだい。D3a でデータの図を足した。#577）
+_ML_TYPES = ("dist", "hist", "boxplot", "centers", "scatter", "line")   # math-lab で描ける型（dist は設定しだい。D3a でデータの図、D3b で散布図・折れ線を足した。#577）
 
 
 def _drawn(sp: dict, typ: str) -> str:

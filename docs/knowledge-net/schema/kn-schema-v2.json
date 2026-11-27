@@ -1497,9 +1497,11 @@
                   "f",
                   "hist",
                   "boxplot",
-                  "centers"
+                  "centers",
+                  "scatter",
+                  "line"
                 ],
-                "description": "分布：離散は二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項）・超幾何の棒、連続は一様・指数・正規・t・カイ二乗・F の曲線（#577 D2）。データの図はヒストグラム・箱ひげ図・代表値の位置（点を積んで平均・中央値・最頻値の線。#577 D3a）"
+                "description": "分布：離散は二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項）・超幾何の棒、連続は一様・指数・正規・t・カイ二乗・F の曲線（#577 D2）。データの図はヒストグラム・箱ひげ図・代表値の位置（点を積んで平均・中央値・最頻値の線。#577 D3a）。散布図・折れ線（D3b）"
               },
               "n": {
                 "type": "integer",
@@ -1752,6 +1754,180 @@
                 "type": "number",
                 "description": "代表値の位置の右端"
               },
+              "show": {
+                "enum": [
+                  "cov",
+                  "resid",
+                  "fit"
+                ],
+                "description": "散布図：cov＝偏差の積の長方形、resid＝平均からの偏差と直線からの残差、fit＝組ごとの回帰直線"
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 3
+                },
+                "minItems": 2,
+                "maxItems": 200,
+                "description": "散布図の点 [x, y]"
+              },
+              "sets": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "description": "散布図（fit）の組。adjust を書くと点は [x, z, y] で、縦は y−adjust×z",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "label",
+                    "points"
+                  ],
+                  "properties": {
+                    "label": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "points": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 3
+                      },
+                      "minItems": 2,
+                      "maxItems": 200
+                    },
+                    "adjust": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "x": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "lo",
+                  "hi"
+                ],
+                "properties": {
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "lo": {
+                    "type": "number"
+                  },
+                  "hi": {
+                    "type": "number"
+                  },
+                  "step": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "description": "散布図の横軸"
+              },
+              "y": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "lo",
+                  "hi"
+                ],
+                "properties": {
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "lo": {
+                    "type": "number"
+                  },
+                  "hi": {
+                    "type": "number"
+                  },
+                  "step": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "description": "散布図の縦軸"
+              },
+              "unbiased": {
+                "type": "boolean",
+                "description": "散布図（cov）：共分散を n−1 で割る"
+              },
+              "values": {
+                "type": "boolean",
+                "description": "散布図（resid）：2乗の和を出す（既定は出す）"
+              },
+              "r2": {
+                "type": "boolean",
+                "description": "散布図（resid）：決定係数と相関係数の2乗を並べる"
+              },
+              "slope_only": {
+                "type": "boolean",
+                "description": "散布図（fit）：傾きだけを出す"
+              },
+              "series": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "description": "折れ線の系列",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "values"
+                  ],
+                  "properties": {
+                    "label": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 2,
+                      "maxItems": 60
+                    },
+                    "show_values": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 60,
+                "description": "折れ線の横軸の名前"
+              },
+              "geom": {
+                "type": "boolean",
+                "description": "折れ線：最初と最後を同じ倍率で結ぶ線（倍率の幾何平均）"
+              },
+              "smooth": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "description": "折れ線：指数平滑の α"
+              },
+              "zero": {
+                "type": "boolean",
+                "description": "折れ線：縦の下端を0にする"
+              },
               "unit": {
                 "type": "string",
                 "maxLength": 4,
@@ -1966,6 +2142,47 @@
                 "then": {
                   "required": [
                     "data"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "scatter"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "anyOf": [
+                    {
+                      "required": [
+                        "points"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "sets"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "line"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "series"
                   ]
                 }
               }
@@ -3112,5 +3329,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 16
+  "x-revision": 17
 }
