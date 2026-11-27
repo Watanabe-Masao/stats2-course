@@ -1305,7 +1305,7 @@
    },
    {
     "symbol": "Φ( )",
-    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（下側の累積。上側確率の表なら 1−表の値）",
     "key": "Phi",
     "concept": "TERM-std-normal"
    }
@@ -4122,7 +4122,7 @@
    },
    {
     "symbol": "X",
-    "meaning": "確率変数",
+    "meaning": "指数分布に従う待ち時間",
     "key": "X",
     "kind": "rv"
    },
@@ -4760,7 +4760,12 @@
    {
     "symbol": "b",
     "meaning": "値のとる範囲の右端",
+    "range": "a より大きい",
     "key": "b",
+    "domain": {
+     "min": "a",
+     "minOpen": true
+    },
     "kind": "param"
    }
   ],
@@ -6265,7 +6270,7 @@
   },
   "contract": {
    "kinds": [
-    "確率モデル"
+    "恒等式"
    ],
    "properties": [
     "非負",
@@ -6284,7 +6289,7 @@
   "symbols": [
    {
     "symbol": "Φ( )",
-    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（下側の累積。上側確率の表なら 1−表の値）",
     "key": "Phi",
     "concept": "TERM-std-normal"
    },
@@ -6304,7 +6309,8 @@
     "symbol": "z",
     "meaning": "値（標準正規分布表の見出し）",
     "key": "z",
-    "kind": "value"
+    "kind": "value",
+    "range": "実数全体"
    },
    {
     "symbol": "φ( )",
@@ -6423,7 +6429,7 @@
    },
    {
     "symbol": "Φ( )",
-    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（標準正規分布表で読む値）",
+    "meaning": "標準正規分布の累積分布関数 Φ(z)＝P(Z≦z)（下側の累積。上側確率の表なら 1−表の値）",
     "key": "Phi",
     "concept": "TERM-std-normal"
    }
