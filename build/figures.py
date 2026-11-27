@@ -423,6 +423,8 @@ def zscale(sp: dict) -> str:
 
 # ---- 代表値の位置（点を数直線に積み、平均・中央値・最頻値に縦線。数は図を作るときに計算する） ----
 def centers(sp: dict) -> str:
+    if (drawn := _drawn(sp, "centers")):   # 画面と同じ math-lab の関数で描く（D3a。#577）
+        return drawn
     c = Canvas()
     d = sorted(sp["data"]); n = len(d)
     lo, hi = sp.get("lo", min(d)), sp.get("hi", max(d))
@@ -458,7 +460,7 @@ def centers(sp: dict) -> str:
         c.text(36, y + 14, f"{name} {_num(round(v, 2))}", 12, INK2)
         y += 18
     if sp.get("axis_label"):
-        y = c.para(8, y + 4, sp["axis_label"], 344, 12, INK2)
+        y = c.para(8, y + 14, sp["axis_label"], 344, 12, INK2)   # 凡例の最後の行に重ならないよう1行下げる（math-lab と同じ。#577）
     if sp.get("note"):
         y = c.para(8, y + 4, sp["note"], 344, 12.5, INK2)
     return c.done(y + 6)
@@ -466,6 +468,8 @@ def centers(sp: dict) -> str:
 
 # ---- ヒストグラム（階級・度数。幅が違えば度数密度。箱ひげ図を下に付けられる） ----
 def hist(sp: dict) -> str:
+    if (drawn := _drawn(sp, "hist")):   # 画面と同じ math-lab の関数で描く（D3a。#577）
+        return drawn
     c = Canvas()
     if "data" in sp:                        # データと階級の幅から数える
         a0, w, top = sp["start"], sp["width"], max(sp["data"])
@@ -525,6 +529,8 @@ def hist(sp: dict) -> str:
 
 # ---- 箱ひげ図（データから5つの数を計算して描く。複数並べられる） ----
 def boxplot(sp: dict) -> str:
+    if (drawn := _drawn(sp, "boxplot")):   # 画面と同じ math-lab の関数で描く（D3a。#577）
+        return drawn
     c = Canvas()
     rows = sp["rows"]                       # [{label, data}]
     Fs = [five(r["data"]) for r in rows]
@@ -893,6 +899,14 @@ def _pdf(sp: dict):
 # 画面と同じ関数（docs/math-lab/draw.mjs の写し）で SVG を作る。node の呼び出しは1回にまとめる（prefetch）。
 # math-lab で描けない設定（重ねる分布・帯・境目・二項分布でない分布）は、下の Python の描き方のまま（D1 以降で移す）。
 _DRAWN: dict[str, str] = {}
+_ML_TYPES = ("dist", "hist", "boxplot", "centers")   # math-lab で描ける型（dist は設定しだい。D3a でデータの図を足した。#577）
+
+
+def _drawn(sp: dict, typ: str) -> str:
+    """math-lab で描いた図（描けない設定は空。Python で描く）"""
+    full = {**sp, "type": typ}
+    prefetch([full])
+    return _DRAWN.get(_key(full)) or ""
 
 
 def _key(sp: dict) -> str:
@@ -903,7 +917,7 @@ def _key(sp: dict) -> str:
 def prefetch(sps: list[dict]) -> None:
     import json
     import subprocess
-    todo = [sp for sp in sps if sp.get("type") == "dist" and _key(sp) not in _DRAWN]
+    todo = [sp for sp in sps if sp.get("type") in _ML_TYPES and _key(sp) not in _DRAWN]
     if not todo:
         return
     r = subprocess.run(["node", str(ROOT / "build" / "draw_svg.mjs")], input=json.dumps([{"id": i, "spec": sp} for i, sp in enumerate(todo)]),
@@ -913,9 +927,7 @@ def prefetch(sps: list[dict]) -> None:
 
 
 def dist(sp: dict) -> str:
-    prefetch([{**sp, "type": "dist"}])
-    drawn = _DRAWN.get(_key({**sp, "type": "dist"}))
-    if drawn:
+    if (drawn := _drawn(sp, "dist")):
         return drawn
     import math
     c = Canvas()

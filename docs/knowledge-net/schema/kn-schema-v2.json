@@ -1494,9 +1494,12 @@
                   "normal",
                   "t",
                   "chi2",
-                  "f"
+                  "f",
+                  "hist",
+                  "boxplot",
+                  "centers"
                 ],
-                "description": "分布：離散は二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項）・超幾何の棒、連続は一様・指数・正規・t・カイ二乗・F の曲線（#577 D2）"
+                "description": "分布：離散は二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項）・超幾何の棒、連続は一様・指数・正規・t・カイ二乗・F の曲線（#577 D2）。データの図はヒストグラム・箱ひげ図・代表値の位置（点を積んで平均・中央値・最頻値の線。#577 D3a）"
               },
               "n": {
                 "type": "integer",
@@ -1579,9 +1582,9 @@
                 "items": {
                   "type": "number"
                 },
-                "minItems": 3,
-                "maxItems": 3,
-                "description": "連続の分布の横軸：[左, 右, 目盛りの刻み]"
+                "minItems": 2,
+                "maxItems": 20,
+                "description": "横軸の目盛り。連続の分布は [左, 右, 刻み]、代表値の位置は目盛りを書く値の並び"
               },
               "shade": {
                 "type": "array",
@@ -1644,6 +1647,110 @@
                     "$ref": "#/$defs/text"
                   }
                 }
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 1,
+                "maxItems": 200,
+                "description": "データの値（ヒストグラム・代表値の位置）"
+              },
+              "start": {
+                "type": "number",
+                "description": "ヒストグラムの最初の階級の下限"
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "ヒストグラムの階級の幅"
+              },
+              "classes": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "description": "ヒストグラムの階級：[下限, 上限, 度数] の並び（data の代わり）"
+              },
+              "density": {
+                "type": "boolean",
+                "description": "高さを度数密度（度数÷幅）にする"
+              },
+              "mark": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "強調する階級の番号（0から）"
+              },
+              "cumulative": {
+                "type": "boolean",
+                "description": "下に累積相対度数の行"
+              },
+              "box": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 1,
+                "maxItems": 200,
+                "description": "ヒストグラムの下に付ける箱ひげ図のデータ"
+              },
+              "axis_label": {
+                "$ref": "#/$defs/text",
+                "description": "横軸の名前"
+              },
+              "rows": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "箱ひげ図の行",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "label": {
+                      "$ref": "#/$defs/text"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 1,
+                      "maxItems": 200
+                    }
+                  }
+                }
+              },
+              "fence": {
+                "type": "boolean",
+                "description": "箱ひげ図の柵（Q₁−1.5×IQR・Q₃＋1.5×IQR）と外れ値候補"
+              },
+              "mean": {
+                "type": "boolean",
+                "description": "箱ひげ図に平均の▲"
+              },
+              "step": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "箱ひげ図の横軸の刻み"
+              },
+              "lo": {
+                "type": "number",
+                "description": "代表値の位置の左端"
+              },
+              "hi": {
+                "type": "number",
+                "description": "代表値の位置の右端"
               },
               "unit": {
                 "type": "string",
@@ -1806,6 +1913,59 @@
                     "d1",
                     "d2",
                     "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "hist"
+                    }
+                  }
+                },
+                "then": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "data",
+                        "start",
+                        "width"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "classes"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "boxplot"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "rows"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "centers"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "data"
                   ]
                 }
               }
@@ -2952,5 +3112,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 15
+  "x-revision": 16
 }
