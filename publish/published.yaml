@@ -5,9 +5,9 @@ U02: {digest: 'c9239a484af42086', date: '2026-11-27'}
 U03: {digest: '0991698832a5a49d', date: '2026-11-27'}
 U04: {digest: '31d6fc002533395d', date: '2026-11-27'}
 U05: {digest: '4f022ca1b4eefb59', date: '2026-11-28'}
-U05T: {digest: 'f462bb04b3262470', date: '2026-11-27'}
+U05T: {digest: '4e8a6f71520ce936', date: '2026-11-28'}
 U06: {digest: '7b8be51767d4f716', date: '2026-11-28'}
-U07: {digest: 'a7ac76776287280c', date: '2026-11-27'}
+U07: {digest: '7b38d90730b932b2', date: '2026-11-28'}
 U08: {digest: '21a859bac753060c', date: '2026-11-28'}
 U09: {digest: '43e7b3b7653c633f', date: '2026-11-27'}
 U10: {digest: '218ec7b17d635967', date: '2026-11-27'}
@@ -28,10 +28,10 @@ U24: {digest: '5d64d6b61152829b', date: '2026-11-27'}
 U25: {digest: '9d19ec77aaf4ac46', date: '2026-11-27'}
 U26: {digest: 'a630a12759ceee6f', date: '2026-11-27'}
 U27: {digest: 'b312130aa6b5556a', date: '2026-11-27'}
-U28: {digest: 'a3a58f99e30da885', date: '2026-11-27'}
-U29: {digest: 'ff68aa301ff6e35e', date: '2026-11-27'}
-U30: {digest: '393bd02fbdec3395', date: '2026-11-27'}
-U31: {digest: '1580dc355384f06e', date: '2026-11-27'}
+U28: {digest: 'de430627d26963b0', date: '2026-11-28'}
+U29: {digest: 'abdbcdf37466d98d', date: '2026-11-28'}
+U30: {digest: '1e54b83d03a15bd1', date: '2026-11-28'}
+U31: {digest: 'd7b190d731d70b22', date: '2026-11-28'}
 U32: {digest: '8ef29726fd70eb30', date: '2026-11-27'}
 guide: {digest: '74132791faeafdc6', date: '2026-11-19'}
 home: {digest: '74d055bc84899f32', date: '2026-11-21'}
