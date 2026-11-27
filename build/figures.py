@@ -599,6 +599,10 @@ def line(sp: dict) -> str:
     Y = lambda v: base - (v - lo) / (hi - lo) * (base - top)  # noqa: E731
     c.line(16, base, W - 16, base, INK2, 1)
     colors = [BLUE, ORANGE, VIOLET]
+    alls = series + extra
+    def above(k, i):   # 同じ時点にほかの線の点があるとき、高い方の点は上・低い方は下に値を出す（字が重ならないように）
+        v = alls[k]["values"][i]
+        return all(v >= o["values"][i] for j, o in enumerate(alls) if j != k and i < len(o["values"]) and o["values"][i] is not None)
     for k, s in enumerate(series + extra):
         col = colors[k % len(colors)]
         pts = [(X(i), Y(v), i) for i, v in enumerate(s["values"]) if v is not None]
@@ -606,7 +610,7 @@ def line(sp: dict) -> str:
         for px, py, i in pts:
             c.circle(px, py, 4, col)
             if k == 0 or s.get("show_values", True):
-                c.add(f'<text x="{px:.1f}" y="{py - 9:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
+                c.add(f'<text x="{px:.1f}" y="{(py - 9) if above(k, i) else (py + 19):.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
                       f'stroke="{BG}" stroke-width="4" paint-order="stroke">{esc(_num(round(s["values"][i], 2)))}</text>')
     for i, t in enumerate(labels):
         c.text(X(i), base + 16, t, 11.5, INK2, "middle")
