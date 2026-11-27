@@ -1924,6 +1924,13 @@
                 "maximum": 1,
                 "description": "折れ線：指数平滑の α"
               },
+              "ma": {
+                "type": "integer",
+                "minimum": 3,
+                "maximum": 25,
+                "not": { "multipleOf": 2 },
+                "description": "折れ線：中央移動平均の窓の幅（奇数。窓が端からはみ出す時点は描かない）"
+              },
               "zero": {
                 "type": "boolean",
                 "description": "折れ線：縦の下端を0にする"
@@ -3329,5 +3336,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 17
+  "x-revision": 18
 }

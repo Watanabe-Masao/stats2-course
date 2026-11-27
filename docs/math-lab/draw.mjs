@@ -837,8 +837,17 @@ function drawLine(sp, theme = "file") {
 			dash: "6 4"
 		});
 	}
+	if (sp.ma !== void 0) {
+		const h = (sp.ma - 1) / 2;
+		const mv = first.map((_, i) => i < h || i + h >= first.length ? NaN : first.slice(i - h, i + h + 1).reduce((t, v) => t + v, 0) / sp.ma);
+		extra.push({
+			label: `中央${sp.ma}点移動平均`,
+			values: mv,
+			dash: "6 4"
+		});
+	}
 	const all = [...series, ...extra];
-	const allv = all.flatMap((s) => s.values);
+	const allv = all.flatMap((s) => s.values).filter(Number.isFinite);
 	let lo = Math.min(...allv), hi = Math.max(...allv);
 	if (sp.zero) lo = 0;
 	const pad = (hi - lo) * .15 || 1;
@@ -857,9 +866,13 @@ function drawLine(sp, theme = "file") {
 	];
 	all.forEach((s, k) => {
 		const col = colors[k % 3];
-		const pts = s.values.map((v, i) => [X(i), Y(v)]);
+		const pts = s.values.map((v, i) => [
+			X(i),
+			Y(v),
+			i
+		]).filter(([, , i]) => Number.isFinite(s.values[i]));
 		c.add(`<polyline points="${pts.map(([px, py]) => `${f1(px)},${f1(py)}`).join(" ")}" fill="none"${c.paint({ stroke: col })} stroke-width="2.5"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round"/>`);
-		pts.forEach(([px, py], i) => {
+		pts.forEach(([px, py, i]) => {
 			c.circle(px, py, 4, col);
 			if (k === 0 || (s.show_values ?? true)) c.add(`<text x="${f1(px)}" y="${f1(py - 9)}" font-size="${c.fs(12)}"${c.paint({
 				fill: "ink",
