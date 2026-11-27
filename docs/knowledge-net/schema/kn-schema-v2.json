@@ -1488,9 +1488,15 @@
                   "bernoulli",
                   "poisson",
                   "geom",
-                  "hyper"
+                  "hyper",
+                  "uniform",
+                  "expo",
+                  "normal",
+                  "t",
+                  "chi2",
+                  "f"
                 ],
-                "description": "分布：二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項：r 回目の成功が何回目か）・超幾何"
+                "description": "分布：離散は二項・ベルヌーイ・ポアソン・幾何（r を書くと負の二項）・超幾何の棒、連続は一様・指数・正規・t・カイ二乗・F の曲線（#577 D2）"
               },
               "n": {
                 "type": "integer",
@@ -1507,7 +1513,7 @@
                 "type": "number",
                 "exclusiveMinimum": 0,
                 "maximum": 30,
-                "description": "ポアソンの λ"
+                "description": "ポアソン・指数の λ"
               },
               "r": {
                 "type": "integer",
@@ -1532,6 +1538,112 @@
                 "minimum": 1,
                 "maximum": 60,
                 "description": "棒を出す上限（上限のないポアソン・幾何で要る）"
+              },
+              "a": {
+                "type": "number",
+                "description": "一様の左端"
+              },
+              "b": {
+                "type": "number",
+                "description": "一様の右端"
+              },
+              "mu": {
+                "type": "number",
+                "description": "正規の平均"
+              },
+              "sigma": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "正規の標準偏差"
+              },
+              "df": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200,
+                "description": "t・カイ二乗の自由度"
+              },
+              "d1": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200,
+                "description": "F の分子の自由度"
+              },
+              "d2": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 200,
+                "description": "F の分母の自由度"
+              },
+              "ticks": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "連続の分布の横軸：[左, 右, 目盛りの刻み]"
+              },
+              "shade": {
+                "type": "array",
+                "maxItems": 3,
+                "description": "連続の分布で塗る範囲：from〜to か、outside の両裾",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "from": {
+                      "type": "number"
+                    },
+                    "to": {
+                      "type": "number"
+                    },
+                    "outside": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "label": {
+                      "$ref": "#/$defs/text"
+                    }
+                  },
+                  "oneOf": [
+                    {
+                      "required": [
+                        "from",
+                        "to"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "outside"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "overlay": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "mu",
+                  "sigma"
+                ],
+                "description": "連続の分布に点線で重ねる正規分布（t と標準正規を比べるなど）",
+                "properties": {
+                  "mu": {
+                    "type": "number"
+                  },
+                  "sigma": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "label": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
               },
               "unit": {
                 "type": "string",
@@ -1601,6 +1713,99 @@
                     "N",
                     "K",
                     "n"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "uniform"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "a",
+                    "b",
+                    "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "expo"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "lam",
+                    "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "normal"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "mu",
+                    "sigma",
+                    "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "t"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "df",
+                    "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "chi2"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "df",
+                    "ticks"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "f"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "d1",
+                    "d2",
+                    "ticks"
                   ]
                 }
               }
@@ -2747,5 +2952,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 14
+  "x-revision": 15
 }
