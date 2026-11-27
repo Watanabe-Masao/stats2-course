@@ -865,8 +865,12 @@ function drawLine(sp, theme = "file") {
 		"data-2"
 	];
 	const above = (k, i) => {
-		const v = all[k].values[i];
-		return all.filter((_, j) => j !== k).map((o) => o.values[i]).filter((x) => Number.isFinite(x)).every((o) => v >= o);
+		const v = all[k].values[i], py = Y(v);
+		if (py + 19 > base - 6) return true;
+		return !all.some((o, j) => {
+			const u = o.values[i];
+			return j !== k && u !== void 0 && Number.isFinite(u) && u > v && py - Y(u) < 18;
+		});
 	};
 	all.forEach((s, k) => {
 		const col = colors[k % 3];
