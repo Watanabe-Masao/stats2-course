@@ -600,9 +600,12 @@ def line(sp: dict) -> str:
     c.line(16, base, W - 16, base, INK2, 1)
     colors = [BLUE, ORANGE, VIOLET]
     alls = series + extra
-    def above(k, i):   # 同じ時点にほかの線の点があるとき、高い方の点は上・低い方は下に値を出す（字が重ならないように）
+    def above(k, i):   # ふだんは点の上。同じ時点のほかの線の点が上に近く（18px 以内）にあるときだけ、低い方の字を下に（横軸の名前に入らないときは上）
         v = alls[k]["values"][i]
-        return all(v >= o["values"][i] for j, o in enumerate(alls) if j != k and i < len(o["values"]) and o["values"][i] is not None)
+        if Y(v) + 19 > base - 6:
+            return True
+        return not any(j != k and i < len(o["values"]) and o["values"][i] is not None and o["values"][i] > v and Y(v) - Y(o["values"][i]) < 18
+                       for j, o in enumerate(alls))
     for k, s in enumerate(series + extra):
         col = colors[k % len(colors)]
         pts = [(X(i), Y(v), i) for i, v in enumerate(s["values"]) if v is not None]
