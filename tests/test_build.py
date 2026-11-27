@@ -495,6 +495,13 @@ class TestVisuals(unittest.TestCase):
         self.assertEqual(svgkit.themed(out), out)   # 2回通しても重ねない
         with self.assertRaisesRegex(ValueError, "#123456"):
             svgkit.themed('<svg><rect fill="#123456"/></svg>')
+        # 暗い版（画面が <picture> で選ぶ。iPhone の Safari で SVG の中の規則が2枚目以降に効かなかった）：規則を外し、色そのものを暗い値にする
+        d = svgkit.dark(out)
+        self.assertNotIn("prefers-color-scheme", d)
+        self.assertIn(f'<rect fill="{t["surface"]["$extensions"]["dark"].lower()}"/>', d)
+        self.assertIn(f'<text fill="{t["ink"]["$extensions"]["dark"].lower()}">', d)
+        with self.assertRaisesRegex(ValueError, "#123456"):
+            svgkit.dark('<svg><rect fill="#123456"/></svg>')
 
     def test_term_links_to_network(self):
         r = NotionRenderer(course(), TARGET)

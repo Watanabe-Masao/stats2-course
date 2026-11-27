@@ -120,6 +120,20 @@ def fig_url(base: str, fid: str, course: Course | None = None) -> str:
     return url
 
 
+def fig_url_dark(base: str, fid: str, course: Course) -> str | None:
+    """暗い版の図の URL（設定から作る図だけ。手で描いた図は None）。印（?v=）は暗い版の中身から作る"""
+    if fid not in course.figures or not course.figures[fid].get("generated") or not (ROOT / course.figures[fid]["file"]).exists():
+        return None
+    import hashlib
+    return f"{base.rstrip('/')}/fig/{fid}.dark.svg?v=" + hashlib.sha1(fig_bytes_dark(course, fid)).hexdigest()[:10]
+
+
+def fig_bytes_dark(course: Course, fid: str) -> bytes:
+    """暗い版の図の中身（svgkit.dark）"""
+    import svgkit   # fig_bytes が道を足す
+    return svgkit.dark(fig_bytes(course, fid).decode("utf-8")).encode("utf-8")
+
+
 def fig_bytes(course: Course, fid: str) -> bytes:
     """公開サイトに置く図の中身：設定から作る図は、ダークの画面で色を置き換える規則を足す（svgkit.themed。#582）。
     URL の印（fig_url）もこの中身から作るので、規則が変わっても Notion は新しい図を読む"""
@@ -189,6 +203,8 @@ def build_site(course: Course) -> list[dict]:
     figdir.mkdir(exist_ok=True)
     for fid in course.figures:
         (figdir / f"{fid}.svg").write_bytes(fig_bytes(course, fid))
+        if course.figures[fid].get("generated"):
+            (figdir / f"{fid}.dark.svg").write_bytes(fig_bytes_dark(course, fid))
     icondir = SITE / "icons"   # 語の印（build/term_icons.py。概念の icon がここを指す。#220）
     icondir.mkdir(exist_ok=True)
     import term_icons

@@ -421,6 +421,11 @@
             "type": "string",
             "format": "uri"
           },
+          "url_dark": {
+            "type": "string",
+            "format": "uri",
+            "description": "端末がダークのときに出す図（同じ図の暗い色の版）。画面は <picture> の media で選ぶ。ない古いデータは url だけを出す（stats2-course #582）"
+          },
           "caption": {
             "type": "string"
           }
@@ -2639,5 +2644,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 12
+  "x-revision": 13
 }
