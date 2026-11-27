@@ -430,3 +430,38 @@ reviews:
   by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
   date: '2026-11-26'
   fingerprint: 04eabcc7bf9fd208
+- formula: F-normal-interval
+  points:
+  - ∫ と Φ の差が等しいのは、標準化した (X−μ)/σ が標準正規分布に従うから（F-std-def）
+  judgement: z＝(x−μ)/σ と置き換えると f(x)dx＝φ(z)dz で、積分の端は (a−μ)/σ・(b−μ)/σ に移るので ∫ₐᵇ f(x)dx＝Φ((b−μ)/σ)−Φ((a−μ)/σ)。数値積分と閉じた形を照らして差は 1e-9 以下。f は TERM-normal、μ・σ は of X、Φ は TERM-std-normal を指し、作業台で密度・累積に開ける
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-28'
+  fingerprint: 0839704e45182768
+- formula: F-normal-interval
+  points:
+  - 区間の端が −∞・∞ のとき Φ を 0・1 と読む
+  judgement: σ＞0 なので a＝−∞・b＝∞ なら標準化した値も −∞・∞ になり、Φ(−∞)＝0・Φ(∞)＝1（engine の normalCdf も同じ。作業台の以下・以上はこの読み方で値を出す）
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-28'
+  fingerprint: 0839704e45182768
+- formula: F-expo-interval
+  points:
+  - 単位（λ と a・b の時間の単位をそろえる）
+  judgement: λ の意味に「a・b と同じ時間の単位で数える」とあり、λa・λb は単位のない数になる。∫ₐᵇ λe^(−λx)dx＝e^(−λa)−e^(−λb)、a・b の domain は 0 以上で値は 0〜1。b＝∞ なら e^(−λa)、a＝0 なら 1−e^(−λb)
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-28'
+  fingerprint: 81371e51788c9b54
+- formula: F-uniform-interval
+  points:
+  - 区間の端を分布の端 a・b と別の記号 c・d にした（一様分布の母数と取り違えない）
+  judgement: c・d は kind value、a・b は kind param で分けてあり取り違えはない。a≦c≦d≦b のとき (d−c)/(b−a)。レビューで b に範囲（a より大きい）がなく 0 で割る形を許すと指摘があり、F-uniform-pdf と同じ domain を足した
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-28'
+  fingerprint: 690361f19310a8b4
+- formula: F-stdnorm-cdf
+  points:
+  - 下の端のない積分（−∞ から z まで）を、表の値 Φ(z) と同じものとして読む
+  judgement: 木の int に lower がなく、toTex は −∞ を出す。∫₋∞ᶻ φ(t)dt は下側の累積 P(Z≦z) で Φ(z) と同じ。統計検定の付表は上側確率なので、Φ の意味を「下側の累積。上側確率の表なら 1−表の値」に限った（レビューの指摘。同じ文の3式をいっしょに直した）
+  by: 独立なレビュー（式を書いていない別のエージェント。PR で渡辺さんが確かめる）
+  date: '2026-11-28'
+  fingerprint: 8f3317bdae4e64eb
