@@ -580,7 +580,11 @@ def line(sp: dict) -> str:
         for x in first[1:]:
             sm.append(a * x + (1 - a) * sm[-1])
         extra.append({"label": f"指数平滑（α＝{_num(a)}）", "values": sm, "dash": "6 4"})
-    allv = [v for s in series + extra for v in s["values"]]
+    if sp.get("ma") is not None:                          # 中央移動平均（窓が端からはみ出す時点は None で描かない）
+        m, h = sp["ma"], (sp["ma"] - 1) // 2
+        mv = [None if i < h or i + h >= len(first) else sum(first[i - h:i + h + 1]) / m for i in range(len(first))]
+        extra.append({"label": f"中央{m}点移動平均", "values": mv, "dash": "6 4"})
+    allv = [v for s in series + extra for v in s["values"] if v is not None]
     lo, hi = min(allv), max(allv)
     if sp.get("zero"):
         lo = 0
@@ -597,9 +601,9 @@ def line(sp: dict) -> str:
     colors = [BLUE, ORANGE, VIOLET]
     for k, s in enumerate(series + extra):
         col = colors[k % len(colors)]
-        pts = [(X(i), Y(v)) for i, v in enumerate(s["values"])]
-        c.poly(pts, col, 2.5, dash=s.get("dash"))
-        for i, (px, py) in enumerate(pts):
+        pts = [(X(i), Y(v), i) for i, v in enumerate(s["values"]) if v is not None]
+        c.poly([(px, py) for px, py, _ in pts], col, 2.5, dash=s.get("dash"))
+        for px, py, i in pts:
             c.circle(px, py, 4, col)
             if k == 0 or s.get("show_values", True):
                 c.add(f'<text x="{px:.1f}" y="{py - 9:.1f}" font-size="12" fill="{INK}" text-anchor="middle" font-weight="bold" '
