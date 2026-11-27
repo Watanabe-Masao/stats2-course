@@ -252,8 +252,9 @@ contracts:
   review: [有界（0〜1 が保証されるのは、切片を含む最小二乗で当てはめたときだけ）]
   review_refs: [CLM-51]   # 観点の根拠の仮定は主張 ④-51 の条件（#532 C で概念から移した。2026-11-26）
 - formula: F-stdnorm-pdf
-  kinds: [確率モデル]
+  kinds: [恒等式]
   properties: [非負, 正規化, 対称, 有界]
+  note: 正規分布の密度（F-normal-pdf。基準の定義）で μ＝0・σ＝1 としたもの。標準正規分布の基準の定義は文（basis）なので、確率モデル（basis_formula の式）には数えない（docs/rules/formula-check.md の 1。独立なレビュー 2026-11-28）
 - formula: F-stdnorm-cdf
   kinds: [定義]
   properties: [有界, 単調]
