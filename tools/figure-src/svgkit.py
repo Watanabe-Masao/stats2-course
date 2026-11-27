@@ -45,6 +45,16 @@ def themed(svg: str) -> str:
     return f"{svg[:head]}<style>@media (prefers-color-scheme: dark){{{rules}}}</style>{svg[head:]}"
 
 
+def dark(svg: str) -> str:
+    """図の暗い版：色を暗い値に置き換えた SVG（画面が端末のダークのときに <picture> で選ぶ。#582）。
+    themed の規則を足した図からも作れる（規則は外す）"""
+    import re
+    svg = re.sub(r"<style>@media \(prefers-color-scheme: dark\)\{[^<]*\}</style>", "", svg, count=1)
+    themed(svg)   # 置き換えのない色があれば、ここで止まる
+    m = dark_map()
+    return re.sub(r'((?:fill|stroke)=")(#[0-9a-fA-F]{6})(")', lambda x: x[1] + m[x[2].lower()] + x[3], svg)
+
+
 def f(v):
     s = f"{v:.1f}"
     return s[:-2] if s.endswith(".0") else s

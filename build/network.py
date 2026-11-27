@@ -1522,11 +1522,18 @@ def lab_refs(c: Course, base: str, items) -> list[dict]:
 
 
 def fig_refs(c: Course, base: str, ids) -> list[dict]:
-    from labs import fig_url
+    from labs import fig_url, fig_url_dark
     if not base:
         return []   # 公開先がない配布先では、図への参照を出さない
-    return [{"id": f, "url": fig_url(base, f, c), **({"caption": c.figures[f]["caption"]} if c.figures[f].get("caption") else {})}
-            for f in ids or []]
+    out = []
+    for f in ids or []:
+        ref = {"id": f, "url": fig_url(base, f, c)}
+        if (dark := fig_url_dark(base, f, c)):
+            ref["url_dark"] = dark   # 端末がダークのとき画面が選ぶ版（#582）
+        if c.figures[f].get("caption"):
+            ref["caption"] = c.figures[f]["caption"]
+        out.append(ref)
+    return out
 
 
 def _assemble(c: Course, target: dict) -> dict:
