@@ -402,6 +402,17 @@ claims:
 
 概念の `table_workspace`（型の改訂15、#119）は `formula`（期待値の定義の式の番号）、任意の `linear`（E(aX＋b)の式の番号）、`tables`（実験室の値の表のテーマを指す：`{experiment: EXP-…, theme: テーマ id, use: start か compare}`。値・重みを2か所に書かない）を持つ。build がテーマから値・重み・呼び名・単位を写して公開の JSON（型の valueTable）にし、式の参照・テーマの有無・値・重みを検査する。同じテーマなら作業台と実験室で値・重み・期待値が一致する。
 
+概念の `curve_workspace`（連続の分布の作業台＝パターン3。型の改訂19、#608。渡辺さん 2026-11-28）は、境目を指で引くと塗った面積（区間の確率）・結果・計算の段が動く作業台。
+
+```yaml
+  curve_workspace: {formula: 1, family: normal, vary: [mu, sigma], lo: a, hi: b, dir: between, initial: {mu: 500, sigma: 4, a: 496, b: 504}}
+```
+
+- `formula`：主役の式の番号。P(a≦X≦b)＝∫ₐᵇ f(x)dx＝（分布ごとの閉じた形）の連なりにし、f は分布の概念を指す（作業台で密度の式に開ける）。`parts` に面積と閉じた形の2つを書く
+- `family`：normal・std-normal・expo・uniform（engine の連続の分布）。`vary` はその母数の記号（正規 mu・sigma、指数 lambda、一様 a・b）だけで、開いたときの値を `initial` に書く（画面がつまみの範囲をその大きさで決める）
+- `lo`・`hi`：区間の両端の値の記号（一様分布は母数の a・b と分けて c・d）。`dir`：開いたときの向き（le 以下・ge 以上・between 間・out 外側）
+- build が、式の番号・母数・端の記号・向き・開いたときの値（lo ≦ hi）を止める
+
 ### 項目
 
 - `links`：つなぐ概念（説明のある用語）と線（関係・導出）。地図と実験室を行き来する

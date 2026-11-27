@@ -673,7 +673,7 @@ def heading(t: dict) -> bool:
 
 
 HEADING_OWN = ("definition", "short", "basis", "basis_formula", "formulas", "conditions", "principle", "example", "counterexample",
-               "misconceptions", "workspace", "table_workspace", "labs", "figures", "claims")
+               "misconceptions", "workspace", "table_workspace", "curve_workspace", "labs", "figures", "claims")
 
 
 def heading_errors(c: "Course") -> list[str]:
@@ -1319,6 +1319,38 @@ def validate_network(c: Course) -> list[str]:
                 err.append(f"{tid}: workspace の mean {ws.get('mean')} が木のある式を指していない")
             if "linear" in ws and not (isinstance(ws["linear"], int) and ws["linear"] < len(fs) and (fs[ws["linear"]].get("tree") or fs[ws["linear"]].get("ref"))):
                 err.append(f"{tid}: workspace の linear {ws.get('linear')} が木のある式を指していない（変換の欄の E(aX＋b)。#156）")
+        # 連続の分布の作業台（パターン3。#608）：主役の式・分布・母数の記号・区間の両端の記号・向き・開いたときの値
+        cw = t.get("curve_workspace")
+        if cw:
+            fs = t.get("formulas", [])
+            main = fs[cw["formula"]] if isinstance(cw.get("formula"), int) and cw["formula"] < len(fs) else None
+            if not main or not main.get("tree"):
+                err.append(f"{tid}: curve_workspace の formula {cw.get('formula')} が木のある式を指していない")
+            else:
+                syms = {x.get("key"): x for x in main.get("symbols", [])}
+                params = {"normal": {"mu", "sigma"}, "std-normal": set(), "expo": {"lambda"}, "uniform": {"a", "b"}}.get(cw.get("family"))
+                if params is None:
+                    err.append(f"{tid}: curve_workspace の family {cw.get('family')} は normal・std-normal・expo・uniform")
+                elif set(cw.get("vary", [])) - params:
+                    err.append(f"{tid}: curve_workspace の vary は分布の母数の記号（{'・'.join(sorted(params)) or 'なし'}）")
+                for side in ("lo", "hi"):
+                    k = cw.get(side)
+                    if k not in syms or syms[k].get("kind") != "value":
+                        err.append(f"{tid}: curve_workspace の {side} {k} は主役の式の値の記号（区間の端）")
+                if cw.get("dir", "between") not in ("le", "ge", "between", "out"):
+                    err.append(f"{tid}: curve_workspace の dir は le・ge・between・out")
+                ini = cw.get("initial") or {}
+                for k, v in ini.items():
+                    if k not in set(cw.get("vary", [])) | {cw.get("lo"), cw.get("hi")}:
+                        err.append(f"{tid}: curve_workspace の initial {k} は vary か lo・hi の記号")
+                    elif not isinstance(v, (int, float)) or isinstance(v, bool):
+                        err.append(f"{tid}: curve_workspace の initial {k} は数")
+                for k in cw.get("vary", []):
+                    if k not in ini:
+                        err.append(f"{tid}: curve_workspace の vary {k} は initial に開いたときの値を書く（画面がつまみの範囲をその大きさで決める）")
+                lo_v, hi_v = ini.get(cw.get("lo")), ini.get(cw.get("hi"))
+                if isinstance(lo_v, (int, float)) and isinstance(hi_v, (int, float)) and lo_v > hi_v:
+                    err.append(f"{tid}: curve_workspace の initial は lo ≦ hi")
         tw = t.get("table_workspace")
         if tw is not None:
             tw, terr = resolve_table_workspace(tw)
@@ -1587,7 +1619,7 @@ def _assemble(c: Course, target: dict) -> dict:
         if base and term_icons.svg(tid):   # 語の印（build/term_icons.py が原本。公開サイトの icons/ に書く。#220）
             e["icon"] = f"{base.rstrip('/')}/icons/{tid}.svg"
         if filled(t):
-            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace", "gist", "question", "chart"):
+            for k in ("definition", "principle", "formulas", "conditions", "example", "counterexample", "misconceptions", "workspace", "table_workspace", "curve_workspace", "gist", "question", "chart"):
                 if t.get(k):
                     e[k] = t[k]
             if t.get("table_workspace"):
