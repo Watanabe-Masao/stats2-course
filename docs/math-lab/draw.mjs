@@ -864,6 +864,10 @@ function drawLine(sp, theme = "file") {
 		"data-hi",
 		"data-2"
 	];
+	const above = (k, i) => {
+		const v = all[k].values[i];
+		return all.filter((_, j) => j !== k).map((o) => o.values[i]).filter((x) => Number.isFinite(x)).every((o) => v >= o);
+	};
 	all.forEach((s, k) => {
 		const col = colors[k % 3];
 		const pts = s.values.map((v, i) => [
@@ -874,7 +878,7 @@ function drawLine(sp, theme = "file") {
 		c.add(`<polyline points="${pts.map(([px, py]) => `${f1(px)},${f1(py)}`).join(" ")}" fill="none"${c.paint({ stroke: col })} stroke-width="2.5"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round"/>`);
 		pts.forEach(([px, py, i]) => {
 			c.circle(px, py, 4, col);
-			if (k === 0 || (s.show_values ?? true)) c.add(`<text x="${f1(px)}" y="${f1(py - 9)}" font-size="${c.fs(12)}"${c.paint({
+			if (k === 0 || (s.show_values ?? true)) c.add(`<text x="${f1(px)}" y="${f1(above(k, i) ? py - 9 : py + 19)}" font-size="${c.fs(12)}"${c.paint({
 				fill: "ink",
 				stroke: c.halo
 			})} text-anchor="middle" font-weight="bold" stroke-width="4" paint-order="stroke">${esc(num(Number(s.values[i].toFixed(2))))}</text>`);
