@@ -197,8 +197,8 @@ def rollout_lines(c) -> list:
     # 作業台が要る語：確率分布の分類で、確率関数・密度関数（pmf・pdf）の式を持つ語
     need_ws = [t for t in ts if t.get("category") == "確率分布" and t["id"] not in NO_WORKSPACE
                and any(isinstance(f, dict) and str(f.get("id", "")).endswith(("-pmf", "-pdf")) for f in t.get("formulas") or [])]
-    has_ws = [t for t in need_ws if t.get("workspace") or t.get("table_workspace")]
-    other_ws = [t for t in ts if (t.get("workspace") or t.get("table_workspace")) and t not in need_ws]
+    has_ws = [t for t in need_ws if t.get("workspace") or t.get("table_workspace") or t.get("curve_workspace")]
+    other_ws = [t for t in ts if (t.get("workspace") or t.get("table_workspace") or t.get("curve_workspace")) and t not in need_ws]
     exps = (load_yaml(ROOT / "content" / "experiments.yaml") or {}).get("experiments") or []
     mains = {it.get("concept") for e in exps if not e.get("retired") for g in e.get("catalog") or []
              for it in g.get("items") or [] if not it.get("retired")}

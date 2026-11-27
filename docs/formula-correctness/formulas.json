@@ -1244,7 +1244,7 @@
   "index": 1,
   "id": "F-normal-interval",
   "label": "区間に入る確率（標準化して Φ の差で求める）",
-  "tex": "P(a\\le X\\le b)=\\int_{a}^{b}f(x)\\,dx=\\mathrm{Phi}\\left(\\dfrac{b-\\mu}{\\sigma}\\right)-\\mathrm{Phi}\\left(\\dfrac{a-\\mu}{\\sigma}\\right)",
+  "tex": "P(a\\le X\\le b)=\\int_{a}^{b}f(x)\\,dx=\\Phi\\left(\\dfrac{b-\\mu}{\\sigma}\\right)-\\Phi\\left(\\dfrac{a-\\mu}{\\sigma}\\right)",
   "symbols": [
    {
     "symbol": "P( )",
@@ -1411,6 +1411,22 @@
     }
    ]
   },
+  "parts": [
+   {
+    "path": [
+     1
+    ],
+    "name": "面積",
+    "meaning": "密度の曲線の下の、a から b までの面積"
+   },
+   {
+    "path": [
+     2
+    ],
+    "name": "標準化して表で読む",
+    "meaning": "a・b を標準化し、標準正規分布の累積 Φ の差にした形"
+   }
+  ],
   "contract": {
    "kinds": [
     "恒等式",
@@ -4257,6 +4273,22 @@
     }
    ]
   },
+  "parts": [
+   {
+    "path": [
+     1
+    ],
+    "name": "面積",
+    "meaning": "密度の曲線の下の、a から b までの面積"
+   },
+   {
+    "path": [
+     2
+    ],
+    "name": "閉じた形",
+    "meaning": "a を超えて待つ確率 e^(−λa) から、b を超えて待つ確率 e^(−λb) を引いた形"
+   }
+  ],
   "contract": {
    "kinds": [
     "恒等式"
@@ -4805,6 +4837,22 @@
     }
    ]
   },
+  "parts": [
+   {
+    "path": [
+     1
+    ],
+    "name": "面積",
+    "meaning": "密度の曲線（平らな線）の下の、c から d までの面積"
+   },
+   {
+    "path": [
+     2
+    ],
+    "name": "幅の比",
+    "meaning": "区間の幅 d−c を、とりうる範囲の幅 b−a で割った形"
+   }
+  ],
   "contract": {
    "kinds": [
     "恒等式"
@@ -6120,7 +6168,7 @@
   "concept": "TERM-std-normal",
   "index": 0,
   "id": "F-stdnorm-pdf",
-  "tex": "\\mathrm{phi}(z)=\\dfrac{1}{\\sqrt{2\\pi}}\\exp\\left(-\\dfrac{z^{2}}{2}\\right)",
+  "tex": "\\varphi(z)=\\dfrac{1}{\\sqrt{2\\pi}}\\exp\\left(-\\dfrac{z^{2}}{2}\\right)",
   "symbols": [
    {
     "symbol": "φ( )",
@@ -6232,7 +6280,7 @@
   "index": 1,
   "id": "F-stdnorm-cdf",
   "label": "累積分布関数（z 以下になる確率）",
-  "tex": "\\mathrm{Phi}(z)=P(Z\\le z)=\\int_{-\\infty}^{z}\\mathrm{phi}(t)\\,dt",
+  "tex": "\\Phi(z)=P(Z\\le z)=\\int_{-\\infty}^{z}\\varphi(t)\\,dt",
   "symbols": [
    {
     "symbol": "Φ( )",
@@ -6335,7 +6383,7 @@
   "index": 2,
   "id": "F-stdnorm-interval",
   "label": "区間に入る確率（Φ の差）",
-  "tex": "P(a\\le Z\\le b)=\\int_{a}^{b}\\mathrm{phi}(z)\\,dz=\\mathrm{Phi}(b)-\\mathrm{Phi}(a)",
+  "tex": "P(a\\le Z\\le b)=\\int_{a}^{b}\\varphi(z)\\,dz=\\Phi(b)-\\Phi(a)",
   "symbols": [
    {
     "symbol": "P( )",
@@ -6449,6 +6497,22 @@
     }
    ]
   },
+  "parts": [
+   {
+    "path": [
+     1
+    ],
+    "name": "面積",
+    "meaning": "密度の曲線の下の、a から b までの面積"
+   },
+   {
+    "path": [
+     2
+    ],
+    "name": "表で読む",
+    "meaning": "標準正規分布表の Φ(b) と Φ(a) の差"
+   }
+  ],
   "contract": {
    "kinds": [
     "恒等式"

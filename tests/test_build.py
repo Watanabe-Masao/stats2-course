@@ -1074,6 +1074,24 @@ class TestNetwork(unittest.TestCase):
         self.assertTrue(any("initial n は数" in e for e in err))
         self.assertTrue(any("mean 9 が木のある式を指していない" in e for e in err))
 
+    def test_curve_workspace(self):
+        # 連続の作業台（パターン3。#608）：原本の書き違いで画面が別の記号を動かす・つまみの範囲が決まらない・両端が逆になる、を build で止める。
+        # 見つけ方：正規分布の作業台を1か所ずつ壊し、止める文が出るか。既存の test_workspace_and_parts はパターン1（棒の分布）だけ
+        c = course()
+        self.assertEqual(c.terms["TERM-normal"]["curve_workspace"]["family"], "normal")
+        self.assertFalse(self._validate(c))
+        w = c.terms["TERM-normal"]["curve_workspace"]
+        w["vary"] = ["mu", "lambda"]                    # 正規分布の母数でない
+        w["lo"] = "mu"                                  # 区間の端でない（母数）
+        w["dir"] = "below"
+        w["initial"] = {"mu": 500, "a": 510, "b": 504, "q": 1}   # lambda の値がない・lo＞hi・使わない記号
+        err = "\n".join(self._validate(c))
+        for part in ["vary は分布の母数の記号（mu・sigma）", "lo mu は主役の式の値の記号", "dir は le・ge・between・out",
+                     "vary lambda は initial に", "initial q は vary か lo・hi の記号"]:
+            self.assertIn(part, err)
+        w.update({"lo": "a", "initial": {"mu": 500, "sigma": 4, "a": 510, "b": 504}, "vary": ["mu", "sigma"], "dir": "between"})
+        self.assertIn("initial は lo ≦ hi", "\n".join(self._validate(c)))
+
     def test_experiments(self):
         # 実験室の定義（#102）：つなぐ概念と線・条件の範囲・反例（崩す条件）・予想の答えを書かない
         import network
