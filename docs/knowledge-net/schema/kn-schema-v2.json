@@ -1440,7 +1440,27 @@
             "$ref": "#/$defs/text",
             "description": "分類（分布・統計量・手法・性質など。教材が決める言葉）"
           },
-          "table_workspace": {
+          "curve_workspace": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["formula", "family", "lo", "hi"],
+        "description": "連続の分布の作業台（パターン3。stats2-course の issue 608。渡辺さん 2026-11-28）：境目を指で引くと、塗った面積（区間の確率）・計算の段が一緒に動く。formula：主役の式 P(a≦X≦b)＝∫f(x)dx＝… の番号、family：分布（engine の連続の分布）、vary：つまみで動かす母数の記号、lo・hi：区間の左端・右端の記号、dir：開いたときの向き（以下・以上・間・外側）、initial：開いたときの記号の値",
+        "properties": {
+          "formula": { "type": "integer", "minimum": 0 },
+          "family": { "enum": ["normal", "std-normal", "expo", "uniform"] },
+          "vary": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" } },
+          "lo": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+          "hi": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+          "dir": { "enum": ["le", "ge", "between", "out"] },
+          "mean": { "type": "integer", "minimum": 0, "description": "期待値の式の番号（任意。図に期待値の線）" },
+          "initial": {
+            "type": "object",
+            "propertyNames": { "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+            "additionalProperties": { "type": "number" }
+          }
+        }
+      },
+      "table_workspace": {
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -3336,5 +3356,5 @@
     }
   },
   "$comment": "v2（2026-11-08、#263）。v1 から作った。設計：stats2-course docs/schema-v2-design.md",
-  "x-revision": 18
+  "x-revision": 19
 }

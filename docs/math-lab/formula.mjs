@@ -211,7 +211,7 @@ function toTex(node, opt = {}) {
 				fn: true
 			};
 			default: {
-				const head = name.length > 1 ? `\\mathrm{${name}}` : name;
+				const head = NAMES[name] ?? (name.length > 1 ? `\\mathrm{${name}}` : name);
 				return {
 					t: `${opt.wrap ? opt.wrap(name, head) : head}${wrapParen(list)}`,
 					p: ATOM,
@@ -221,6 +221,14 @@ function toTex(node, opt = {}) {
 		}
 	};
 	return go(node).t;
+}
+// packages/engine/src/lab.ts
+/** 標準正規分布の累積 Φ(z)。誤差関数の近似（Abramowitz–Stegun 7.1.26。誤差 1.5×10⁻⁷ 以下。教材の旧版のラボと同じ式） */
+function normalCdf(z) {
+	if (!Number.isFinite(z)) return z > 0 ? 1 : 0;
+	const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + .3275911 * x);
+	const erf = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-x * x);
+	return z >= 0 ? (1 + erf) / 2 : (1 - erf) / 2;
 }
 // packages/engine/src/formula/scope.ts
 /** 自由な記号（縛られていない記号の葉）。関数の名前は入れない */
@@ -343,7 +351,8 @@ const BUILTIN = {
 	perm,
 	fact: factorial,
 	exp: Math.exp,
-	log: Math.log
+	log: Math.log,
+	Phi: normalCdf
 };
 /** 1つの演算を、引数の値から計算する（計算できなければ undefined） */
 function apply(n, v, env) {
